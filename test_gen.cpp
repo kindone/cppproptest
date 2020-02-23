@@ -117,34 +117,6 @@ struct GenSmallInt : public Gen<int32_t> {
 
 constexpr int32_t GenSmallInt::boundaryValues[13];
 
-struct Animal {
-    Animal(int f, std::string n, std::vector<int>& m) : numFeet(f), name(n/*, allocator()*/), measures(m/*, allocator()*/) {
-
-    }
-    int numFeet;
-    std::string name;
-    std::vector<int> measures;
-};
-
-struct Animal2 {
-    Animal2(int f, std::string n) : numFeet(f), name(n/*, allocator()*/) {
-
-    }
-    int numFeet;
-    std::string name;
-};
-
-/*
-struct GenAnimal : public Gen<Animal2> {
-    Animal generate1(Random& rand) {
-        return construct<Animal, Arbitrary<int>, Arbitrary<std::string>, Arbitrary<std::vector<int> > >(rand);
-    }
-
-    Animal2 generate2(Random& rand) {
-        return construct<Animal2, Arbitrary<int>, Arbitrary<std::string> >(rand);
-    }
-};
-*/
 
 TEST(PropTest, TestBasic) {
     int64_t seed = getCurrentTime();
@@ -257,3 +229,41 @@ TEST(PropTest, TestBasic2) {
 
 }
 
+
+struct Animal {
+    Animal(int f, std::string n, std::vector<int>& m) : numFeet(f), name(n/*, allocator()*/), measures(m/*, allocator()*/) {
+
+    }
+    int numFeet;
+    std::string name;
+    std::vector<int> measures;
+};
+
+struct Animal2 {
+    Animal2(int f, std::string n) : numFeet(f), name(n/*, allocator()*/) {
+
+    }
+    int numFeet;
+    std::string name;
+};
+
+std::ostream& operator<<(std::ostream& os, const Animal &input)
+{
+	os << "{ ";
+    os << "numFeet: " << input.numFeet;
+    os << ", name: " << input.name;
+    os << ", measures: " << input.measures;
+	os << " }";
+	return os;
+}
+
+
+
+TEST(PropTest, TestConstruct) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen = Construct<Animal, int, std::string, std::vector<int>&>();
+    auto animal = gen.generate(rand);
+    std::cout << "animal: " << animal << std::endl;
+}
