@@ -42,7 +42,7 @@ int32_t Random::getRandomInt32() {
 }
 
 uint32_t Random::getRandomUInt32() {
-    return (next8U() % (std::numeric_limits<uint32_t>::max()+1));
+    return (next8U() % (static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())+1));
 }
 
 int64_t Random::getRandomInt64() {
