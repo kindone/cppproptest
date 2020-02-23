@@ -213,7 +213,7 @@ public:
 };
 
 
-TEST(PropTest, TestBasic2) {
+TEST(PropTest, TestPropertyFunctionLambdaMethod) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
@@ -263,7 +263,14 @@ TEST(PropTest, TestConstruct) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = Construct<Animal, int, std::string, std::vector<int>&>();
+    using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
+    auto gen = AnimalGen();
     auto animal = gen.generate(rand);
     std::cout << "animal: " << animal << std::endl;
+
+    check<AnimalGen>(rand, [](Animal animal) -> bool {
+        std::cout << "animal: " << animal << std::endl;
+        return true;
+    });
+
 }
