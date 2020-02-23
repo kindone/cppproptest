@@ -2,6 +2,7 @@
 #define TESTING_PROPERTY_ASSERT_HPP
 
 #include <exception>
+#include <system_error>
 
 namespace PropertyBasedTesting {
 
