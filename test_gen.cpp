@@ -1,8 +1,7 @@
 #include "testing/proptest.hpp"
-#include "gmock/fused_src/gtest/gtest.h"
-#include "gmock/fused_src/gmock/gmock.h"
-#include "gmock/utils/gmock.hpp"
-#include "testing/random.hpp"
+#include "googletest/googletest/include/gtest/gtest.h"
+#include "googletest/googlemock/include/gmock/gmock.h"
+#include "testing/Random.hpp"
 #include <chrono>
 #include <iostream>
 
@@ -10,7 +9,7 @@
 int64_t getCurrentTime() {
 	auto curTime = std::chrono::system_clock::now();
 	auto duration = curTime.time_since_epoch();
-	auto millis = std::chrono::duration_cast<std::chrono::millisecond>(duration).count();
+	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 	return millis;
 }
 
@@ -31,6 +30,42 @@ using NumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, 
 
 TYPED_TEST_CASE(NumericTest, NumericTypes);
 
+template <typename T>
+T abs(T& t) {
+    return t;
+}
+
+template <>
+int8_t abs<int8_t>(int8_t& val) {
+    return std::abs(val);
+}
+
+template <>
+int16_t abs<int16_t>(int16_t& val) {
+    return std::abs(val);
+}
+
+template <>
+int32_t abs<int32_t>(int32_t& val) {
+    return std::abs(val);
+}
+
+template <>
+int64_t abs<int64_t>(int64_t& val) {
+    return std::abs(val);
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<int> &input)
+{
+	os << "[ ";
+	for (auto const& i: input) {
+		os << i << " ";
+	}
+	os << "]";
+	return os;
+}
+
+
 TYPED_TEST(NumericTest, NumericTypeGen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -38,7 +73,7 @@ TYPED_TEST(NumericTest, NumericTypeGen) {
 
     for(int i = 0; i < 20; i++) {
         auto val = gen.generate(rand);
-        std::cout << val << " " << std::abs(val) << std::endl;
+        std::cout << val << " " << abs<TypeParam>(val) << std::endl;
     }
 }
 
@@ -80,8 +115,10 @@ struct GenSmallInt : public Gen<int32_t> {
     static constexpr int32_t boundaryValues[13] = {INT32_MIN, 0, INT32_MAX, -1, 1, -2, 2, INT32_MIN+1, INT32_MAX-1, INT16_MIN, INT16_MAX, INT16_MIN+1, INT16_MAX-1};
 };
 
+constexpr int32_t GenSmallInt::boundaryValues[13];
+
 struct Animal {
-    Animal(int f, std::string n, std::vector<int>& m) : numFeet(f), name(n, allocator()), measures(m, allocator()) {
+    Animal(int f, std::string n, std::vector<int>& m) : numFeet(f), name(n/*, allocator()*/), measures(m/*, allocator()*/) {
 
     }
     int numFeet;
@@ -90,14 +127,14 @@ struct Animal {
 };
 
 struct Animal2 {
-    Animal2(int f, std::string n) : numFeet(f), name(n, allocator()) {
+    Animal2(int f, std::string n) : numFeet(f), name(n/*, allocator()*/) {
 
     }
     int numFeet;
     std::string name;
 };
 
-
+/*
 struct GenAnimal : public Gen<Animal2> {
     Animal generate1(Random& rand) {
         return construct<Animal, Arbitrary<int>, Arbitrary<std::string>, Arbitrary<std::vector<int> > >(rand);
@@ -107,7 +144,7 @@ struct GenAnimal : public Gen<Animal2> {
         return construct<Animal2, Arbitrary<int>, Arbitrary<std::string> >(rand);
     }
 };
-
+*/
 
 TEST(PropTest, TestBasic) {
     int64_t seed = getCurrentTime();
@@ -125,7 +162,7 @@ TEST(PropTest, TestBasic) {
     });
 
     check(rand, [](std::string a, std::string b) -> bool {
-        std::string c(allocator()), d(allocator());
+        std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
         EXPECT_EQ(c.size(), d.size());
@@ -134,7 +171,7 @@ TEST(PropTest, TestBasic) {
     });
 
     check(rand, [](UTF8String a, UTF8String b) -> bool {
-        std::string c(allocator()), d(allocator());
+        std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
         PROP_ASSERT(c.size() == d.size(), {});

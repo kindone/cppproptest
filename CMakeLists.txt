@@ -1,4 +1,3 @@
-### library
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 cmake_minimum_required(VERSION 3.0.2)
@@ -9,8 +8,9 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory("googletest")
 
-include_directories(.)
+include_directories(. googletest/googletest/include googletest/googlemock/include/)
 
+### library
 SET(proptest_sources
     testing/generator/numeric.cpp
     testing/generator/string.cpp
@@ -43,9 +43,11 @@ ADD_EXECUTABLE(test_proptest
     ${proptest_testsources}
 )
 
-
 TARGET_LINK_LIBRARIES(test_proptest
     PRIVATE
         proptest
+	gtest_main
+	gmock_main
 )
 
+ADD_TEST(NAME proptest_gtest COMMAND test_proptest)

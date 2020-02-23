@@ -62,6 +62,9 @@ struct function_traits
             static_assert(N < arity, "error: invalid parameter index.");
             using type = typename call_type::template argument<N+1>::type;
         };
+
+        using full_argument_type_list = typename call_type::argument_type_list;
+        using argument_type_list = typename full_argument_type_list::Tail;
 };
  
 template<class F>

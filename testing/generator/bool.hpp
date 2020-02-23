@@ -1,5 +1,5 @@
 #ifndef __PROPTEST_BOOL_HPP
-#define __PROPTETS_BOOL_HPP
+#define __PROPTEST_BOOL_HPP
 
 #include "testing/gen.hpp"
 
@@ -15,7 +15,7 @@ public:
     }
 };
 
-template struct Arbitrary<bool>;
+//template struct Arbitrary<bool>;
 
 } // namespace PropertyBasedTesting
 

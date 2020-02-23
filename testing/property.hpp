@@ -26,7 +26,7 @@ protected:
 template <typename CallableWrapper, typename GenTuple>
 class Property : public PropertyBase {
 public:
-    Property(CallableWrapper&& c, GenTuple& g) : callableWrapper(c), genTup(g) {
+    Property(CallableWrapper&& c, GenTuple& g) : callableWrapper(std::move(c)), genTup(g) {
     }
 
     virtual void invoke(Random& rand) {
@@ -44,15 +44,16 @@ private:
 template <class Callable>
 class CallableWrapper {
 public:
-    Callable callable;
+    Callable&& callable;
     CallableWrapper(Callable&& c) : callable(std::forward<Callable>(c)) {
     }
 };
 
 template <class Callable>
-CallableWrapper<Callable> make_CallableWrapper(Callable&& f) {
-    return { std::forward<Callable>(f) };
+auto make_CallableWrapper(Callable&& callable) {
+    return CallableWrapper<typename std::remove_reference<Callable>::type>(std::move(callable));
 }
+
 
 
 template <typename Callable>
@@ -60,14 +61,15 @@ auto property(Callable&& callable) {
     typename function_traits<Callable>::argument_type_list argument_type_list;
     // acquire tuple of generators
     auto genTup = createGenTuple(argument_type_list);
-    return Property<CallableWrapper<Callable>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
+    return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
 }
 
 template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
 auto property(Callable&& callable) {
     // acquire tuple of generators
     auto genTup = createGenTuple<GENS...>();
-    return Property<CallableWrapper<Callable>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
+    return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
+    //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
 }
 
 

@@ -1,7 +1,8 @@
 #ifndef __PROPTEST_VECTOR_HPP
-#define __PROPTETS_VECTOR_HPP
+#define __PROPTEST_VECTOR_HPP
 
 #include "testing/gen.hpp"
+#include "testing/Random.hpp"
 #include <vector>
 
 namespace PropertyBasedTesting
@@ -18,12 +19,12 @@ public:
     }
 
     std::vector<T> generate(Random& rand) {
-        int len = rand.getRandom(0, maxLen+1);
-        std::vector<T> val(allocator());
+        int len = rand.getRandomSize(0, maxLen+1);
+        std::vector<T> val;
         val.reserve(len);
         for(int i = 0; i < len; i++)
             val.push_back(elemGen.generate(rand));
-        return std::vector<T>(std::move(val), allocator());
+        return std::vector<T>(std::move(val));
     }
 
     int maxLen;

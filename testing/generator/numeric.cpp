@@ -86,6 +86,17 @@ double Arbitrary<double>::generate(Random& rand) {
     return rand.getRandomDouble();
 }
 
+constexpr int8_t Arbitrary<int8_t>::boundaryValues[];
+constexpr int16_t Arbitrary<int16_t>::boundaryValues[];
+constexpr int32_t Arbitrary<int32_t>::boundaryValues[];
+constexpr int64_t Arbitrary<int64_t>::boundaryValues[];
+constexpr uint8_t Arbitrary<uint8_t>::boundaryValues[];
+constexpr uint16_t Arbitrary<uint16_t>::boundaryValues[];
+constexpr uint32_t Arbitrary<uint32_t>::boundaryValues[];
+constexpr uint64_t Arbitrary<uint64_t>::boundaryValues[];
+constexpr float Arbitrary<float>::boundaryValues[];
+constexpr double Arbitrary<double>::boundaryValues[];
+
 /*
 template struct Arbitrary<int8_t>;
 template struct Arbitrary<int16_t>;

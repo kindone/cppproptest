@@ -1,7 +1,6 @@
 #include "testing/proptest.hpp"
-#include "gmock/fused_src/gtest/gtest.h"
-#include "gmock/fused_src/gmock/gmock.h"
-#include "gmock/utils/gmock.hpp"
+#include "googletest/googletest/include/gtest/gtest.h"
+#include "googletest/googlemock/include/gmock/gmock.h"
 
 class MockTestCase : public ::testing::Test {
 };

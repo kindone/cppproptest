@@ -1,7 +1,12 @@
 #ifndef TESTING_TYPELIST_HPP
 #define TESTING_TYPELIST_HPP
 
-template<class... Ts> struct TypeList {};
+template<class... Ts> struct TypeList;
+
+template<class First, class... Ts> struct TypeList<First, Ts...> {
+    using Tail = TypeList<Ts...>;
+};
+
  
 namespace TypeListItemAt
 {

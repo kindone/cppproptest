@@ -40,7 +40,7 @@ struct Success : public std::logic_error {
 #define PROP_ASSERT_VARGS(condition, code, /*args*/ ...)                                                                \
     do                                                                                                                  \
     {                                                                                                                   \
-        if (!condition)                                                                                 \
+        if (!(condition))                                                                                 \
         {                                                                                                               \
             ::PropertyBasedTesting::AssertFailed __proptest_except_obj(__FILE__, __LINE__, code, #condition, nullptr);  \
             throw __proptest_except_obj;                                                                                \
