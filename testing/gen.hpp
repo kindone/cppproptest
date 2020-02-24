@@ -26,6 +26,19 @@ template <typename T, typename ElemGen = void>
 struct Arbitrary : public Gen<T>{
 };
 
+
+template <class T> class BaseType;
+template <class T> class BaseType<Gen<T>> {
+public:
+    using type = T;
+};
+
+template <class T> class BaseType<Arbitrary<T>> {
+public:
+    using type = T;
+};
+
+
 template< typename Function, typename GenTuple, std::size_t... index>
 decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...> ) {
     return f( std::get<index>(genTup).generate(rand)... );

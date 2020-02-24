@@ -276,7 +276,7 @@ TEST(PropTest, TestConstruct) {
 
 namespace PropertyBasedTesting {
 
-// define arbitrary of Animal
+// define arbitrary of Animal using Construct
 template<>
 class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector<int>&> {
 };
@@ -293,4 +293,16 @@ TEST(PropTest, TestArbitraryWithConstruct) {
         return true;
     });
 }
+
+TEST(PropTest, TestFilter) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    Filter<Arbitrary<Animal>> filteredGen([](Animal& a) -> bool {
+        return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() == 3 && a.measures.size() < 10;
+    });
+
+    std::cout << "filtered animal: " << filteredGen.generate(rand) << std::endl;
+}
+
 
