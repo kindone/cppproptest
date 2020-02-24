@@ -266,11 +266,31 @@ TEST(PropTest, TestConstruct) {
     using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
     auto gen = AnimalGen();
     auto animal = gen.generate(rand);
-    std::cout << "animal: " << animal << std::endl;
+    std::cout << "Gen animal: " << animal << std::endl;
 
     check<AnimalGen>(rand, [](Animal animal) -> bool {
         std::cout << "animal: " << animal << std::endl;
         return true;
     });
+}
+
+namespace PropertyBasedTesting {
+
+// define arbitrary of Animal
+template<>
+class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector<int>&> {
+};
 
 }
+
+TEST(PropTest, TestArbitraryWithConstruct) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    check(rand, [](std::vector<Animal> animals) -> bool {
+        if(!animals.empty())
+            std::cout << "animal: " << animals[0] << std::endl;
+        return true;
+    });
+}
+
