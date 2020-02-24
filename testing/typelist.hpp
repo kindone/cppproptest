@@ -7,7 +7,7 @@ template<class First, class... Ts> struct TypeList<First, Ts...> {
     using Tail = TypeList<Ts...>;
 };
 
- 
+
 namespace TypeListItemAt
 {
     template<class List, int Index> struct AtHelper;
@@ -34,13 +34,13 @@ namespace TypeListItemAt
                                                                ".");
         using type= typename AtHelper<List<Ts...>, Index>::type;
     };
- 
- 
+
+
 }  // namespace At
- 
+
 template<class List, int Index>
 using itemAt= typename TypeListItemAt::At<List, Index>::type;
- 
+
 
 #endif
 

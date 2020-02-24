@@ -5,7 +5,7 @@
 
 namespace PropertyBasedTesting
 {
- 
+
 // generateByTupleType<std::tuple>(make_index_sequence<N>{})
 template<typename Tuple, std::size_t... index>
 decltype( auto ) generateByTupleType(std::index_sequence<index...> ) {
@@ -15,7 +15,7 @@ decltype( auto ) generateByTupleType(std::index_sequence<index...> ) {
 // ArgsToTuple
 // TupleToArgs?
 // ApplyTuple
- 
+
 // generateByTypeList(argument_type_list)
 template<typename ... ARGS >
 decltype( auto ) generateByTypeList(TypeList<ARGS...>) {
@@ -25,7 +25,7 @@ decltype( auto ) generateByTypeList(TypeList<ARGS...>) {
         std::make_index_sequence<arity>{} // {0,1,2,3,...,N-1}
     );
 }
- 
+
 template<typename ... ARGS >
 decltype( auto ) generateByTypes() {
     using ArgsAsTuple = std::tuple<ARGS...>;
@@ -34,29 +34,29 @@ decltype( auto ) generateByTypes() {
         std::make_index_sequence<arity>{} // {0,1,2,3,...,N-1}
     );
 }
- 
+
 template <typename Callable>
 auto generateByParamList(Callable&&) {
     typename function_traits<Callable>::argument_type_list argument_type_list;
     return generateByTypeList(argument_type_list);
 }
- 
- 
+
+
 template <typename TO, typename FROM, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
 decltype(auto) autoCast(FROM&& f) {
     return std::move(f);
 }
- 
+
 template <typename TO, typename FROM, std::enable_if_t<std::is_pointer<TO>::value, bool> = false>
 decltype(auto) autoCast(FROM& f) {
     return &f;
 }
- 
+
 template <typename TO, typename FROM, std::enable_if_t<std::is_lvalue_reference<TO>::value, bool> = true>
 decltype(auto) autoCast(FROM&& f) {
     return f;
 }
- 
+
 template <typename ToTuple, std::size_t N, typename FromTuple>
 decltype(auto) autoCastTuple(FromTuple&& tuple) {
     return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple));
@@ -66,7 +66,7 @@ template<typename Constructible, typename CastTuple, typename ValueTuple, std::s
 decltype( auto ) constructByTupleType(ValueTuple&& valueTuple, std::index_sequence<index...> ) {
     return Constructible(autoCastTuple<CastTuple,index>(valueTuple)...);
 }
- 
+
 template<typename Constructible, typename ... ARGS, typename ValueTuple >
 decltype( auto ) constructAccordingly(ValueTuple&& valueTuple) {
     using ArgsAsTuple = std::tuple<ARGS...>;
