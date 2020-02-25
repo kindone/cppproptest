@@ -6,12 +6,12 @@
 namespace PropertyBasedTesting {
 
 
-int8_t Arbitrary<int8_t>::generate(Random& rand) {
+Shrinkable<int8_t> Arbitrary<int8_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<int8_t>(boundaryValues[i]);
     }
-    return rand.getRandomInt8();
+    return Shrinkable<int8_t>(rand.getRandomInt8());
 }
 
 int16_t Arbitrary<int16_t>::generate(Random& rand) {

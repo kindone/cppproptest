@@ -31,27 +31,27 @@ using NumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, 
 TYPED_TEST_CASE(NumericTest, NumericTypes);
 
 template <typename T>
-T abs(T& t) {
+T abs(T t) {
     return t;
 }
 
 template <>
-int8_t abs<int8_t>(int8_t& val) {
+int8_t abs<int8_t>(int8_t val) {
     return std::abs(val);
 }
 
 template <>
-int16_t abs<int16_t>(int16_t& val) {
+int16_t abs<int16_t>(int16_t val) {
     return std::abs(val);
 }
 
 template <>
-int32_t abs<int32_t>(int32_t& val) {
+int32_t abs<int32_t>(int32_t val) {
     return std::abs(val);
 }
 
 template <>
-int64_t abs<int64_t>(int64_t& val) {
+int64_t abs<int64_t>(int64_t val) {
     return std::abs(val);
 }
 
@@ -84,7 +84,7 @@ TYPED_TEST(NumericTest, NumericTypeGen) {
 
     for(int i = 0; i < 20; i++) {
         auto val = gen.generate(rand);
-        std::cout << val << " " << abs<TypeParam>(val) << std::endl;
+        std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
     }
 }
 

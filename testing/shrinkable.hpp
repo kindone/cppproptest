@@ -8,6 +8,10 @@ struct Shrinkable {
     using type = T;
     Shrinkable(T&& v) : value(std::move(v)) {
     }
+
+    Shrinkable(const T& v) : value(v) {
+    }
+
     T value;
 
     operator T() const { return value; } 

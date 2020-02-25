@@ -9,7 +9,7 @@ template <>
 class PROPTEST_API Arbitrary<int8_t> : public Gen<int8_t>
 {
 public:
-    int8_t generate(Random& rand);
+    Shrinkable<int8_t> generate(Random& rand);
     static constexpr int8_t boundaryValues[] = {INT8_MIN, 0, INT8_MAX, -1, 1, -2, 2, INT8_MIN+1, INT8_MAX-1, ' ', '"',  '\'',  '\t', '\n', '\r'};
 };
 
