@@ -6,6 +6,7 @@
 #include "testing/api.hpp"
 #include "testing/Random.hpp"
 #include "testing/typelist.hpp"
+#include "testing/shrinkable.hpp"
 
 
 namespace PropertyBasedTesting
@@ -19,7 +20,7 @@ struct Gen
     Gen() {
     }
 
-    T generate(Random& rand);
+    Shrinkable<T> generate(Random& rand);
 };
 
 template <typename T, typename ElemGen = void>

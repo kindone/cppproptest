@@ -65,6 +65,17 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int> &input)
 	return os;
 }
 
+TEST(PropTest, GenerateBool) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<bool> gen;
+
+    for(int i = 0; i < 20; i++) {
+        auto val = gen.generate(rand);
+        std::cout << val << " " << std::endl;
+    }
+}
+
 
 TYPED_TEST(NumericTest, NumericTypeGen) {
     int64_t seed = getCurrentTime();
@@ -303,6 +314,30 @@ TEST(PropTest, TestFilter) {
     });
 
     std::cout << "filtered animal: " << filteredGen.generate(rand) << std::endl;
+}
+
+class Complicated {
+public:
+    int value;
+    Complicated(int a) : value(a){
+    }
+ 
+    Complicated(const Complicated&) = delete;
+    Complicated(Complicated&&) = default;
+private:
+    Complicated() {
+    }
+};
+
+
+TEST(PropTest, TestShrinkable) {
+    Shrinkable<std::vector<int>> vec(std::vector<int>());
+    Shrinkable<Complicated> complicated(Complicated(5));
+
+    auto shrink = []() {
+        return Shrinkable<Complicated>(Complicated(5));
+    };
+
 }
 
 
