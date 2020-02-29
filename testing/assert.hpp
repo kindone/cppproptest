@@ -16,6 +16,20 @@ struct AssertFailed : public std::logic_error {
     }
 };
 
+struct PropertyFailedBase : public std::logic_error {
+    PropertyFailedBase(const std::logic_error& e) : logic_error(e) {
+    }
+};
+
+template <typename ValueTuple>
+struct PropertyFailed : public PropertyFailedBase {
+    PropertyFailed(const std::logic_error& e, ValueTuple&& v) : PropertyFailedBase(e), valueTup(std::move(v)) {
+    }
+
+    ValueTuple valueTup;
+};
+
+
 struct Discard : public std::logic_error {
     Discard(const char* fname,
                 int line,

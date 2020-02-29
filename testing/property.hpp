@@ -4,6 +4,7 @@
 #include "testing/api.hpp"
 #include "testing/gen.hpp"
 #include "testing/function_traits.hpp"
+#include "testing/tuple.hpp"
 
 namespace PropertyBasedTesting
 {
@@ -17,11 +18,31 @@ public:
 
 protected:
     virtual void invoke(Random& rand) = 0;
+    virtual void shrink(const PropertyFailedBase& e) = 0;
 protected:
     // TODO: configurations
     uint64_t seed;
 
 };
+
+
+struct X {
+    int generate(Random& rand) {
+        return 0;
+    }
+};
+
+template <typename T>
+decltype(auto) ReturnTypeOf() {
+    TypeHolder<typename std::result_of<decltype(&T::generate)(T, Random&)>::type> typeHolder;
+    return typeHolder;
+}
+
+template <typename ...ARGS>
+decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup) {
+    TypeList<typename decltype(ReturnTypeOf<ARGS>())::type...> typeList;
+    return typeList;
+}
 
 template <typename CallableWrapper, typename GenTuple>
 class Property : public PropertyBase {
@@ -36,6 +57,20 @@ public:
     Property& setSeed(uint64_t s) {
         seed = s;
     }
+
+    virtual void shrink(const PropertyFailedBase& e) {
+        auto retTup = ReturnTypeTupleFromGenTup(genTup);
+        using ValueTuple = typename decltype(retTup)::type_tuple;
+        try {
+            auto failure = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
+        }
+        catch(const std::bad_cast &bc) {
+            std::cerr << "bad cast: " << bc.what() << std::endl;
+            throw bc;
+        }
+
+    }
+
 private:
     CallableWrapper callableWrapper;
     GenTuple genTup;
@@ -58,6 +93,7 @@ auto make_CallableWrapper(Callable&& callable) {
 
 template <typename Callable>
 auto property(Callable&& callable) {
+    using argument_type_tuple = typename function_traits<Callable>::argument_type_list::type_tuple;
     typename function_traits<Callable>::argument_type_list argument_type_list;
     // acquire tuple of generators
     auto genTup = createGenTuple(argument_type_list);
@@ -67,6 +103,7 @@ auto property(Callable&& callable) {
 template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
 auto property(Callable&& callable) {
     // acquire tuple of generators
+    using argument_type_tuple = typename std::tuple<GENS...>;
     auto genTup = createGenTuple<GENS...>();
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
     //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
@@ -86,6 +123,7 @@ template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof.
 bool check(Random& rand, Callable&& callable) {
     return property<GENS...>(callable).check();
 }
+
 
 
 } // namespace PropertyBasedTesting

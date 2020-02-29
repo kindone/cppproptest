@@ -1,9 +1,18 @@
 #ifndef TESTING_TYPELIST_HPP
 #define TESTING_TYPELIST_HPP
 
-template<class... Ts> struct TypeList;
+
+template <typename T>
+struct TypeHolder {
+    using type = T;
+};
+
+template<class... Ts> struct TypeList {
+    using type_tuple = typename std::tuple<Ts...>;
+};
 
 template<class First, class... Ts> struct TypeList<First, Ts...> {
+    using type_tuple = typename std::tuple<First, Ts...>;
     using Tail = TypeList<Ts...>;
 };
 

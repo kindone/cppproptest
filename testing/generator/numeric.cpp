@@ -13,6 +13,18 @@ Shrinkable<int8_t> Arbitrary<int8_t>::generate(Random& rand) {
     }
     return Shrinkable<int8_t>(rand.getRandomInt8());
 }
+/*
+Stream<Shrinkable<int8_t>> Arbitrary<int8_t>::shrinks(Shrinkable<int8_t>& target) {
+    int8_t value = target;
+    if(value == 0)
+        return Stream.empty();
+    if(value > 0)
+        return Stream.fromValues(value - 1, value/2, value >> 1);
+    
+    return Stream.fromValues(value + 1, value/2, value >> 1);
+
+}
+*/
 
 int16_t Arbitrary<int16_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {

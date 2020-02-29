@@ -7,7 +7,7 @@
 #include "testing/Random.hpp"
 #include "testing/typelist.hpp"
 #include "testing/shrinkable.hpp"
-
+#include "testing/assert.hpp"
 
 namespace PropertyBasedTesting
 {
@@ -40,53 +40,12 @@ public:
 };
 
 
-template< typename Function, typename GenTuple, std::size_t... index>
-decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...> ) {
-    return f( std::get<index>(genTup).generate(rand)... );
-}
-
-template< typename Function, typename Tuple >
-decltype( auto ) invokeWithGenTuple(Random& rand, Function&& f, Tuple&& genTup ) {
-    constexpr auto Arity = function_traits< std::remove_reference_t<decltype(f)> >::arity;
-    return invokeWithGenHelper(
-        rand,
-        std::forward<Function>(f),
-        std::forward<Tuple>( genTup ),
-        std::make_index_sequence<Arity>{}
-    );
-}
-
-template<typename Tuple, std::size_t... index>
-decltype( auto ) createGenHelperListed(std::index_sequence<index...> ) {
-    return std::make_tuple(Arbitrary< itemAt<Tuple,index> >()...);
-}
-
-template<typename ... ARGS, std::size_t... index>
-decltype( auto ) createGenHelperPacked(std::index_sequence<index...> ) {
-    return std::make_tuple(ARGS()...);
-}
-
-// returns a std::Tuple<Arbitrary<ARGS...>>
-template<typename ... ARGS >
-decltype( auto ) createGenTuple(TypeList<ARGS...> argument_list ) {
-    using ArgsAsTuple = std::tuple<std::remove_reference_t<ARGS>...>;
-    constexpr auto Size = std::tuple_size<ArgsAsTuple>::value;
-    return createGenHelperListed<ArgsAsTuple>(
-        std::make_index_sequence<Size>{}
-    );
-}
-
-template<typename ... ARGS >
-decltype( auto ) createGenTuple() {
-    constexpr auto Size = sizeof...(ARGS);
-    return createGenHelperPacked<ARGS...>(
-        std::make_index_sequence<Size>{}
-    );
-}
-
-
 
 } // namespace PropertyBasedTesting
 
+#include "testing/Map.hpp"
+#include "testing/invokeWithArgs.hpp"
+#include "testing/invokeWithGenTuple.hpp"
+#include "testing/createGenTuple.hpp"
 
 #endif // TESTING_GEN_HPP

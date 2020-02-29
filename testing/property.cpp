@@ -24,13 +24,16 @@ bool PropertyBase::check() {
                 }
             } while(!pass);
         }
-    } catch(const AssertFailed& e) {
+    } catch(const PropertyFailedBase& e) {
         // TODO:
         // shrink
+        shrink(e);
+
         //FIXME
         return false;
     } catch(const std::exception& e) {
         // TODO
+        // skip shrinking?
     }
     return true;
 }

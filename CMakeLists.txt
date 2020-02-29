@@ -36,6 +36,7 @@ TARGET_LINK_LIBRARIES(proptest
 SET(proptest_testsources
     test_gen.cpp
     test_mock.cpp
+    test_util.cpp
 )
 
 

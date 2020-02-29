@@ -6,6 +6,7 @@
 namespace PropertyBasedTesting
 {
 
+/*
 // generateByTupleType<std::tuple>(make_index_sequence<N>{})
 template<typename Tuple, std::size_t... index>
 decltype( auto ) generateByTupleType(std::index_sequence<index...> ) {
@@ -41,6 +42,7 @@ auto generateByParamList(Callable&&) {
     return generateByTypeList(argument_type_list);
 }
 
+*/
 
 template <typename TO, typename FROM, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
 decltype(auto) autoCast(FROM&& f) {
@@ -77,12 +79,13 @@ decltype( auto ) constructAccordingly(ValueTuple&& valueTuple) {
     );
 }
 
+/*
 template <typename CLASS, typename ... ARGS>
 auto forwardHelper(ARGS&& ...args) {
     return CLASS(std::move(args)...);
 }
 
-/*template< typename T, typename GenTuple, std::size_t... index>
+template< typename T, typename GenTuple, std::size_t... index>
 decltype( auto ) constructHelper(Random& rand, GenTuple&& genTup, std::index_sequence<index...> ) {
     return forwardHelper<T>(std::get<index>(genTup).generate(rand)...);
 }
@@ -102,6 +105,7 @@ class Construct : public Gen<CLASS>
 public:
     using ArgumentList = TypeList<ARGTYPES...>;
     using GenTuple = std::tuple<Arbitrary<std::remove_reference_t<ARGTYPES>>...>;
+
     static constexpr auto Size = sizeof...(ARGTYPES);
     static ArgumentList argument_list;
 

@@ -129,7 +129,8 @@ struct GenSmallInt : public Gen<int32_t> {
 constexpr int32_t GenSmallInt::boundaryValues[13];
 
 
-TEST(PropTest, TestBasic) {
+
+TEST(PropTest, TestCheckBasic) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     check(rand, [](int a, int b) -> bool {
@@ -206,6 +207,15 @@ TEST(PropTest, TestBasic) {
     });
 
     prop.check();
+}
+
+TEST(PropTest, TestCheckFail) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    check(rand, [](int a, int b) -> bool {
+        PROP_ASSERT(false, {});
+        return true;
+    });
 }
 
 bool propertyAsFunc(std::string a, int i, std::vector<int> v) {
@@ -294,7 +304,7 @@ class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector
 
 }
 
-TEST(PropTest, TestArbitraryWithConstruct) {
+TEST(PropTest, TestCheckArbitraryWithConstruct) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
