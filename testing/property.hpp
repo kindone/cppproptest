@@ -58,17 +58,27 @@ public:
         seed = s;
     }
 
+    void shrinkFurther() {
+        //TODO
+    }
+
     virtual void shrink(const PropertyFailedBase& e) {
         auto retTup = ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTup)::type_tuple;
+        auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
+        
         try {
-            auto failure = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
+            bool result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(failed.valueTup));
+            if(!result)
+                shrinkFurther();
         }
-        catch(const std::bad_cast &bc) {
-            std::cerr << "bad cast: " << bc.what() << std::endl;
-            throw bc;
+        catch(const AssertFailed& e) {
+            std::cerr << "oops, failed again!" << std::endl;
+            shrinkFurther();
         }
-
+        catch(const std::exception& e) {
+            std::cerr << "oops, failed again!" << std::endl;
+        }
     }
 
 private:
