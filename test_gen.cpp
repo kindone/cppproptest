@@ -341,7 +341,7 @@ private:
 
 
 TEST(PropTest, TestShrinkable) {
-    Shrinkable<std::vector<int>> vec(std::vector<int>());
+    Shrinkable<std::vector<int>> vec{std::vector<int>()};
     Shrinkable<Complicated> complicated(Complicated(5));
 
     auto shrink = []() {

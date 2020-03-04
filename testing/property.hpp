@@ -58,8 +58,9 @@ public:
         seed = s;
     }
 
-    void shrinkFurther() {
-        //TODO
+    template <typename ValueTuple>
+    void shrinkFurther(ValueTuple&& valTup) {
+
     }
 
     virtual void shrink(const PropertyFailedBase& e) {
@@ -70,11 +71,11 @@ public:
         try {
             bool result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(failed.valueTup));
             if(!result)
-                shrinkFurther();
+                shrinkFurther(failed.valueTup);
         }
         catch(const AssertFailed& e) {
             std::cerr << "oops, failed again!" << std::endl;
-            shrinkFurther();
+            shrinkFurther(failed.valueTup);
         }
         catch(const std::exception& e) {
             std::cerr << "oops, failed again!" << std::endl;

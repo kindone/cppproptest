@@ -107,9 +107,8 @@ public:
     using GenTuple = std::tuple<Arbitrary<std::remove_reference_t<ARGTYPES>>...>;
 
     static constexpr auto Size = sizeof...(ARGTYPES);
-    static ArgumentList argument_list;
 
-    Construct() : genTup(createGenTuple(argument_list)) {
+    Construct() : genTup(createGenTuple(ArgumentList{})) {
     }
 
     template <std::size_t... index>
