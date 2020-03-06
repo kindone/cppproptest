@@ -5,6 +5,8 @@
 #include "testing/gen.hpp"
 #include "testing/function_traits.hpp"
 #include "testing/tuple.hpp"
+#include "testing/Stream.hpp"
+#include "testing/Map.hpp"
 
 namespace PropertyBasedTesting
 {
@@ -18,19 +20,13 @@ public:
 
 protected:
     virtual void invoke(Random& rand) = 0;
-    virtual void shrink(const PropertyFailedBase& e) = 0;
+    virtual void handleShrink(const PropertyFailedBase& e) = 0;
 protected:
     // TODO: configurations
     uint64_t seed;
 
 };
 
-
-struct X {
-    int generate(Random& rand) {
-        return 0;
-    }
-};
 
 template <typename T>
 decltype(auto) ReturnTypeOf() {
@@ -44,6 +40,33 @@ decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup) {
     return typeList;
 }
 
+/*
+template <typename T>
+struct GetShrinks {
+    static Stream<Shrinkable<T>> map(Shrinkable<T>&& v) {
+        return v.shrinks();
+    }
+
+    static Stream<T> map(T&& v) {
+        return Shrinkable<T>(v).shrinks();
+    }
+};
+
+template <typename T>
+struct GetIterator {
+    static Iterator<Shrinkable<T>> map(Stream<Shrinkable<T>>&& stream) {
+        return stream.iterator();
+    }
+};
+
+template <typename T>
+struct GetNext {
+    static Shrinkable<T> map(Iterator<Shrinkable<T>>&& itr) {
+        return itr.next();
+    }
+};
+
+*/
 template <typename CallableWrapper, typename GenTuple>
 class Property : public PropertyBase {
 public:
@@ -59,27 +82,35 @@ public:
     }
 
     template <typename ValueTuple>
-    void shrinkFurther(ValueTuple&& valTup) {
-
+    void shrink(ValueTuple&& valueTup) {
+        bool stop = false;
+        while(!stop) {
+            /*
+            auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(valueTup));
+            auto iterTuple = mapHeteroTuple<GetIterator>(shrinksTuple);
+            auto nextValueTup = mapHeteroTuple<GetNext>(iterTuple);
+            
+            try {
+                bool result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(nextValueTup));
+                if(!result)
+                {
+                }
+            }
+            catch(const AssertFailed& e) {
+                std::cerr << "oops, failed again!" << std::endl;
+            }
+            catch(const std::exception& e) {
+                std::cerr << "oops, failed again!" << std::endl;
+            }
+            */
+        }
     }
 
-    virtual void shrink(const PropertyFailedBase& e) {
-        auto retTup = ReturnTypeTupleFromGenTup(genTup);
-        using ValueTuple = typename decltype(retTup)::type_tuple;
+    virtual void handleShrink(const PropertyFailedBase& e) {
+        auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
+        using ValueTuple = typename decltype(retTypeTup)::type_tuple;
         auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        
-        try {
-            bool result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(failed.valueTup));
-            if(!result)
-                shrinkFurther(failed.valueTup);
-        }
-        catch(const AssertFailed& e) {
-            std::cerr << "oops, failed again!" << std::endl;
-            shrinkFurther(failed.valueTup);
-        }
-        catch(const std::exception& e) {
-            std::cerr << "oops, failed again!" << std::endl;
-        }
+        shrink(failed.valueTup);
     }
 
 private:

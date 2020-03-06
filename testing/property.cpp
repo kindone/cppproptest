@@ -25,15 +25,14 @@ bool PropertyBase::check() {
             } while(!pass);
         }
     } catch(const PropertyFailedBase& e) {
-        // TODO:
         // shrink
-        shrink(e);
-
-        //FIXME
+        handleShrink(e);
         return false;
     } catch(const std::exception& e) {
-        // TODO
         // skip shrinking?
+        std::cerr << "std::exception occurred: " << e.what() << std::endl;
+        std::cerr << "    seed: " << seed << std::endl;
+        return false;
     }
     return true;
 }

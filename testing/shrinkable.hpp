@@ -1,7 +1,9 @@
-#ifndef TESTING_SHRINKABLE_HPP
-#define TESTING_SHRINKABLE_HPP
+#pragma once
 
 #include <iostream>
+#include "testing/Stream.hpp"
+
+namespace PropertyBasedTesting {
 
 template <typename T>
 struct Shrinkable {
@@ -14,7 +16,12 @@ struct Shrinkable {
 
     T value;
 
-    operator T() const { return value; } 
+    operator T() const { return value; }
+
+    Stream<Shrinkable<T>> shrinks(Shrinkable<T>& target) {
+        return Stream<Shrinkable<T>>::empty();
+    }
+
 };
 
-#endif
+}

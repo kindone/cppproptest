@@ -40,18 +40,20 @@ struct Mapper;
 
 template <>
 struct Mapper<int> {
-    static std::string map(int v) {
+    static std::string map(int&& v) {
         std::cout << "Mapper<int> - " << v << std::endl;
         return std::to_string(v + 1);
     }
+
 };
 
 template <>
 struct Mapper<std::string> {
-    static int map(std::string v) {
+    static int map(std::string&& v) {
         std::cout << "Mapper<string> - " << v << std::endl;
         return v.size();
     }
+
 };
 
 TEST(UtilTestCase, mapHeteroTest) {
@@ -61,6 +63,14 @@ TEST(UtilTestCase, mapHeteroTest) {
 
 TEST(UtilTestCase, mapHeteroTest2) {
     mapHeteroTuple<Mapper>(mapHeteroTuple<Mapper>(std::make_tuple(5,6,7)));
+}
+
+
+
+TEST(UtilTestCase, mapHeteroTest3) {
+    int a = 5;
+    std::string b("a");
+    mapHeteroTuple<Mapper>(mapHeteroTuple<Mapper>(std::make_tuple(a,b,7)));
 }
 
 template <typename T>
