@@ -19,8 +19,9 @@ struct Iterator {
     }
 
     T next() {
-        if(!hasNext())
+        if(!hasNext()) {
             throw std::invalid_argument("iterator has no more next");
+        }
         T value = stream.head();
         stream = stream.tail();
         return value;
@@ -106,8 +107,6 @@ struct Stream {
     
     Stream(const T& h, std::function<Stream<T>()> gen) :  impl(std::make_shared<NonEmptyStream<T>>(h, gen)) {
     }
-
-
 
     bool isEmpty() const {
         return impl->isEmpty();

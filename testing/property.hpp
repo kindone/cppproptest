@@ -40,33 +40,62 @@ decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup) {
     return typeList;
 }
 
+template <typename T>
+decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr) {
+    return shr.shrinks();
+}
 /*
 template <typename T>
-struct GetShrinks {
-    static Stream<Shrinkable<T>> map(Shrinkable<T>&& v) {
-        return v.shrinks();
-    }
+decltype(auto) GetShrinksHelper(Shrinkable<T> shr) {
+    return shr.shrinks();
+}
+*/
 
+template <typename T>
+struct GetShrinks {
     static Stream<T> map(T&& v) {
-        return Shrinkable<T>(v).shrinks();
+        return GetShrinksHelper(v);
     }
 };
+
+template <typename P>
+Iterator<Shrinkable<P>> GetIteratorHelper(Stream<Shrinkable<P>>&& stream) {
+    return stream.iterator();
+}
+
 
 template <typename T>
 struct GetIterator {
-    static Iterator<Shrinkable<T>> map(Stream<Shrinkable<T>>&& stream) {
-        return stream.iterator();
+    static decltype(auto) map(T&& stream) {
+        return GetIteratorHelper(std::move(stream));
     }
 };
+
+template <typename P>
+bool HasNextHelper(Iterator<Shrinkable<P>>& itr) {
+    return itr.hasNext();
+}
+
+template <typename T>
+struct HasNext {
+    static decltype(auto) map(T&& itr) {
+        return  HasNextHelper(itr);
+    }
+};
+
+
+template <typename P>
+Shrinkable<P> GetNextHelper(Iterator<Shrinkable<P>>& itr) {
+    return itr.next();
+}
 
 template <typename T>
 struct GetNext {
-    static Shrinkable<T> map(Iterator<Shrinkable<T>>&& itr) {
-        return itr.next();
+    static decltype(auto) map(T&& itr) {
+        return  GetNextHelper(itr);
     }
 };
 
-*/
 template <typename CallableWrapper, typename GenTuple>
 class Property : public PropertyBase {
 public:
@@ -82,28 +111,62 @@ public:
     }
 
     template <typename ValueTuple>
-    void shrink(ValueTuple&& valueTup) {
-        bool stop = false;
-        while(!stop) {
-            /*
-            auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(valueTup));
-            auto iterTuple = mapHeteroTuple<GetIterator>(shrinksTuple);
-            auto nextValueTup = mapHeteroTuple<GetNext>(iterTuple);
-            
-            try {
-                bool result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(nextValueTup));
-                if(!result)
-                {
+    bool test(ValueTuple&& valueTup) {
+        bool result = false;
+        try {
+            result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(valueTup));
+        }
+        catch(const AssertFailed& e) {
+            // TODO: trace
+        }
+        catch(const std::exception& e) {
+            // TODO: trace
+        }
+        return result;
+    }
+
+    template <size_t N, typename ValueTuple, typename ShrinksTuple>
+    decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple) {
+        auto shrinks = std::get<N>(shrinksTuple);
+        // keep shrinking until no shrinking is possible
+        while(!shrinks.isEmpty()) {
+            auto iter = shrinks.iterator();
+            bool shrinkFound = false;
+            // keep trying until failure is reproduced
+            while(iter.hasNext()) {
+                auto next = iter.next();
+                std::get<N>(valueTup) = next;
+                if(!test(valueTup)) {
+                    shrinks = next.shrinks();
+                    shrinkFound = true;
+                    break;
                 }
             }
-            catch(const AssertFailed& e) {
-                std::cerr << "oops, failed again!" << std::endl;
-            }
-            catch(const std::exception& e) {
-                std::cerr << "oops, failed again!" << std::endl;
-            }
-            */
+            if(!shrinkFound)
+                break;
         }
+        return std::get<N>(valueTup);
+    }
+
+    template <typename ValueTuple, typename ShrinksTuple, std::size_t...index>
+    decltype(auto) shrinkEachHelper(ValueTuple&& valueTup, ShrinksTuple&& shrinksTup, std::index_sequence<index...>) {
+        return std::make_tuple(shrinkN<index>(valueTup, shrinksTup)...);
+    }
+
+    template <typename ValueTuple>
+    decltype(auto) shrinkEach(ValueTuple&& valueTup) {
+        constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
+        auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(valueTup));
+        return shrinkEachHelper(std::move(valueTup),
+                std::move(shrinksTuple),
+                std::make_index_sequence<Size>{});
+    }
+
+    template <typename ValueTuple>
+    void shrink(ValueTuple&& valueTup) {
+        // TODO: serialize initial value as stream before mutating
+        static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
+        auto shrunk = shrinkEach(valueTup);
     }
 
     virtual void handleShrink(const PropertyFailedBase& e) {

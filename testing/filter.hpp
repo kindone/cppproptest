@@ -16,11 +16,11 @@ public:
     Filter(FilterFunc&& f) : filter(f) {
     }
     
-    T generate(Random& rand) {
+    Shrinkable<T> generate(Random& rand) {
         while(true) {
-            auto val = gen.generate(rand);
+            auto val = gen.generate(rand).value;
             if(filter(val))
-                return val;
+                return Shrinkable<T>(val);
         }
     }
 

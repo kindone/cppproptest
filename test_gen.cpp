@@ -83,7 +83,7 @@ TYPED_TEST(NumericTest, NumericTypeGen) {
     Arbitrary<TypeParam> gen;
 
     for(int i = 0; i < 20; i++) {
-        auto val = gen.generate(rand);
+        auto val = gen.generate(rand).value;
         std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
     }
 }
@@ -94,7 +94,7 @@ TEST(PropTest, GenUTF8String) {
     Arbitrary<UTF8String> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        std::cout << "str: \"" << gen.generate(rand) << "\"" << std::endl;
+        std::cout << "str: \"" << gen.generate(rand).value << "\"" << std::endl;
     }
 }
 
@@ -104,7 +104,7 @@ TEST(PropTest, GenLttVectorOfInt) {
     Arbitrary<std::vector<int>> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        auto val = gen.generate(rand);
+        auto val = gen.generate(rand).value;
         std::cout << "vec: ";
         for(size_t j = 0; j < val.size(); j++)
         {
@@ -117,9 +117,9 @@ TEST(PropTest, GenLttVectorOfInt) {
 struct GenSmallInt : public Gen<int32_t> {
     GenSmallInt() : step(0ULL) {
     }
-    int32_t generate(Random& rand) {
+    Shrinkable<int32_t> generate(Random& rand) {
         constexpr size_t num = sizeof(boundaryValues)/sizeof(boundaryValues[0]);
-        return boundaryValues[step++ % num];
+        return Shrinkable<int32_t>(boundaryValues[step++ % num]);
     }
 
     size_t step;
@@ -213,6 +213,7 @@ TEST(PropTest, TestCheckFail) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     check(rand, [](int a, int b) -> bool {
+        std::cout << "check" << std::endl;
         PROP_ASSERT(false, {});
         return true;
     });
@@ -286,7 +287,7 @@ TEST(PropTest, TestConstruct) {
 
     using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
     auto gen = AnimalGen();
-    auto animal = gen.generate(rand);
+    auto animal = gen.generate(rand).value;
     std::cout << "Gen animal: " << animal << std::endl;
 
     check<AnimalGen>(rand, [](Animal animal) -> bool {

@@ -6,43 +6,6 @@
 namespace PropertyBasedTesting
 {
 
-/*
-// generateByTupleType<std::tuple>(make_index_sequence<N>{})
-template<typename Tuple, std::size_t... index>
-decltype( auto ) generateByTupleType(std::index_sequence<index...> ) {
-    return std::make_tuple(Arbitrary<itemAt<Tuple,index> >::generate()...);
-}
-
-// ArgsToTuple
-// TupleToArgs?
-// ApplyTuple
-
-// generateByTypeList(argument_type_list)
-template<typename ... ARGS >
-decltype( auto ) generateByTypeList(TypeList<ARGS...>) {
-    using ArgsAsTuple = std::tuple<ARGS...>;
-    constexpr auto arity = sizeof...(ARGS);
-    return generateByTupleType<ArgsAsTuple>(
-        std::make_index_sequence<arity>{} // {0,1,2,3,...,N-1}
-    );
-}
-
-template<typename ... ARGS >
-decltype( auto ) generateByTypes() {
-    using ArgsAsTuple = std::tuple<ARGS...>;
-    constexpr auto arity = sizeof...(ARGS);
-    return generateByTupleType<ArgsAsTuple>(
-        std::make_index_sequence<arity>{} // {0,1,2,3,...,N-1}
-    );
-}
-
-template <typename Callable>
-auto generateByParamList(Callable&&) {
-    typename function_traits<Callable>::argument_type_list argument_type_list;
-    return generateByTypeList(argument_type_list);
-}
-
-*/
 
 template <typename TO, typename FROM, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
 decltype(auto) autoCast(FROM&& f) {
@@ -61,7 +24,7 @@ decltype(auto) autoCast(FROM&& f) {
 
 template <typename ToTuple, std::size_t N, typename FromTuple>
 decltype(auto) autoCastTuple(FromTuple&& tuple) {
-    return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple));
+    return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple).value);
 }
 
 template<typename Constructible, typename CastTuple, typename ValueTuple, std::size_t... index>
@@ -79,17 +42,6 @@ decltype( auto ) constructAccordingly(ValueTuple&& valueTuple) {
     );
 }
 
-/*
-template <typename CLASS, typename ... ARGS>
-auto forwardHelper(ARGS&& ...args) {
-    return CLASS(std::move(args)...);
-}
-
-template< typename T, typename GenTuple, std::size_t... index>
-decltype( auto ) constructHelper(Random& rand, GenTuple&& genTup, std::index_sequence<index...> ) {
-    return forwardHelper<T>(std::get<index>(genTup).generate(rand)...);
-}
-*/
 
 
 template <typename Constructible, typename ... ARGS, typename ValueTuple>
@@ -120,9 +72,9 @@ public:
         return generateArgsHelper(rand, std::make_index_sequence<Size>{});
     }
 
-    CLASS generate(Random& rand) {
+    Shrinkable<CLASS> generate(Random& rand) {
         auto argTup = generateArgs(rand);
-        return constructHelper<CLASS, ARGTYPES...>(argTup);
+        return Shrinkable<CLASS>{constructHelper<CLASS, ARGTYPES...>(argTup)};
     }
 private:
     GenTuple genTup;

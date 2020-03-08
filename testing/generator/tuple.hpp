@@ -2,16 +2,47 @@
 
 #include "testing/gen.hpp"
 #include "testing/Random.hpp"
+#include "testing/shrinkable.hpp"
 #include <tuple>
 
 
 namespace PropertyBasedTesting
 {
 
+namespace TupleUtil {
+
+bool OR()
+{
+    return false;
+}
+
+template <typename T, typename...Us>
+auto OR(T&& t, Us&&... us)
+{
+    return OR(std::forward<Us>(us)...) || std::forward<T>(t);
+}
+
+template <typename T, size_t...Is>
+auto or_components_impl(T const& t, std::index_sequence<Is...>)
+{
+    constexpr auto last_index = sizeof...(Is) - 1;
+    return OR(std::get<last_index - Is>(t)...);
+}
+
+template <class Tuple>
+bool or_components(const Tuple& t)
+{
+    constexpr auto Size = std::tuple_size<Tuple>{};
+    return or_components_impl(t, std::make_index_sequence<Size>{});
+}
+
+}
+
 template <typename... Ts>
 class PROPTEST_API Arbitrary< std::tuple<Ts...>> : public Gen< std::tuple<Ts...> >
 {
 public:
+    constexpr auto Size = sizeof...(Ts);
 
     Arbitrary(Gen<T>... _elemGens) : elemGenTuple(std::make_tuple(_elemGens))  {
     }
@@ -23,14 +54,23 @@ public:
 
     Shrinkable<std::tuple<Ts...>> generate(Random& rand) {
         constexpr auto Size = sizeof...(Ts);
-        int len = rand.getRandomSize(0, maxLen+1);
-        std::tuple<Ts...> val;
-        
+        std::tuple<Ts...> val;        
         auto valueTuple = generateHelper(rand, std::make_index_sequence<Size>{});
-        return Shrinkable<std::tuple<Ts...>>(std::move(valueTuple));
+
+        return Shrinkable<std::tuple<Ts...>>(std::move(valueTuple), []() -> Stream<Shrinkable<std::tuple<Ts...>>> {
+            /* strategy: 
+             * assume elements are independent
+             * shrink each element one by one upto its limit
+             * stream of stream?
+             * */
+            constexpr auto Size = sizeof...(Ts);
+            for(size_t i = 0; i < Size; i++) {
+
+            }
+            return Stream<Shrinkable<std::tuple<Ts...>>>::empty();
+        });
     }
 
-    int maxLen;
     std::tuple<Gen<T>...> elemGenTuple;
 };
 

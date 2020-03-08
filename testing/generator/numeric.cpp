@@ -26,76 +26,82 @@ Stream<Shrinkable<int8_t>> Arbitrary<int8_t>::shrinks(Shrinkable<int8_t>& target
 }
 */
 
-int16_t Arbitrary<int16_t>::generate(Random& rand) {
+Shrinkable<int16_t> Arbitrary<int16_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<int16_t>(boundaryValues[i]);
     }
-    return rand.getRandomInt16();
+    return Shrinkable<int16_t>(rand.getRandomInt16());
 }
 
-int32_t Arbitrary<int32_t>::generate(Random& rand) {
+Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
+    uint32_t value = 0;
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        value = boundaryValues[i];
     }
-    return rand.getRandomInt32();
+    else
+       value = rand.getRandomInt32();
+
+    return Shrinkable<int32_t>(value, []()->Stream<Shrinkable<int32_t>> {
+        return Stream<Shrinkable<int32_t>>::one(Shrinkable<int32_t>{5});
+    });
 }
 
-int64_t Arbitrary<int64_t>::generate(Random& rand) {
+Shrinkable<int64_t> Arbitrary<int64_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<int64_t>(boundaryValues[i]);
     }
-    return rand.getRandomInt64();
+    return Shrinkable<int64_t>(rand.getRandomInt64());
 }
 
-uint8_t Arbitrary<uint8_t>::generate(Random& rand) {
+Shrinkable<uint8_t> Arbitrary<uint8_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<uint8_t>(boundaryValues[i]);
     }
-    return rand.getRandomUInt8();
+    return Shrinkable<uint8_t>(rand.getRandomUInt8());
 }
 
-uint16_t Arbitrary<uint16_t>::generate(Random& rand) {
+Shrinkable<uint16_t> Arbitrary<uint16_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<uint16_t>(boundaryValues[i]);
     }
-    return rand.getRandomUInt16();
+    return Shrinkable<uint16_t>(rand.getRandomUInt16());
 }
 
-uint32_t Arbitrary<uint32_t>::generate(Random& rand) {
+Shrinkable<uint32_t> Arbitrary<uint32_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<uint32_t>(boundaryValues[i]);
     }
-    return rand.getRandomUInt32();
+    return Shrinkable<uint32_t>(rand.getRandomUInt32());
 }
 
-uint64_t Arbitrary<uint64_t>::generate(Random& rand) {
+Shrinkable<uint64_t> Arbitrary<uint64_t>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<uint64_t>(boundaryValues[i]);
     }
-    return rand.getRandomUInt64();
+    return Shrinkable<uint64_t>(rand.getRandomUInt64());
 }
 
-float Arbitrary<float>::generate(Random& rand) {
+Shrinkable<float> Arbitrary<float>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<float>(boundaryValues[i]);
     }
-    return rand.getRandomFloat();
+    return Shrinkable<float>(rand.getRandomFloat());
 }
 
-double Arbitrary<double>::generate(Random& rand) {
+Shrinkable<double> Arbitrary<double>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return boundaryValues[i];
+        return Shrinkable<double>(boundaryValues[i]);
     }
-    return rand.getRandomDouble();
+    return Shrinkable<double>(rand.getRandomDouble());
 }
 
 constexpr int8_t Arbitrary<int8_t>::boundaryValues[];
