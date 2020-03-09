@@ -7,6 +7,9 @@
 #include "testing/tuple.hpp"
 #include "testing/Stream.hpp"
 #include "testing/Map.hpp"
+#include "testing/printing.hpp"
+
+#include <iostream>
 
 namespace PropertyBasedTesting
 {
@@ -142,31 +145,40 @@ public:
                     break;
                 }
             }
-            if(!shrinkFound)
+            if(shrinkFound) {
+                std::cout << "shrinking... ";
+                {
+                    using namespace printing;
+                    std::cout << valueTup;
+                }
+                std::cout << std::endl;
+            }
+            else
                 break;
         }
         return std::get<N>(valueTup);
     }
 
     template <typename ValueTuple, typename ShrinksTuple, std::size_t...index>
-    decltype(auto) shrinkEachHelper(ValueTuple&& valueTup, ShrinksTuple&& shrinksTup, std::index_sequence<index...>) {
+    decltype(auto) shrinkEach(ValueTuple&& valueTup, ShrinksTuple&& shrinksTup, std::index_sequence<index...>) {
         return std::make_tuple(shrinkN<index>(valueTup, shrinksTup)...);
     }
 
     template <typename ValueTuple>
-    decltype(auto) shrinkEach(ValueTuple&& valueTup) {
-        constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
-        auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(valueTup));
-        return shrinkEachHelper(std::move(valueTup),
-                std::move(shrinksTuple),
-                std::make_index_sequence<Size>{});
-    }
-
-    template <typename ValueTuple>
     void shrink(ValueTuple&& valueTup) {
+        std::cout << "shrinking value: ";
+        {
+            std::cout << valueTup;
+        }
+        std::cout << std::endl;
+
         // TODO: serialize initial value as stream before mutating
         static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
-        auto shrunk = shrinkEach(valueTup);
+        auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(valueTup));
+        auto shrunk = shrinkEach(std::move(valueTup),
+                std::move(shrinksTuple),
+                std::make_index_sequence<Size>{});
+
     }
 
     virtual void handleShrink(const PropertyFailedBase& e) {

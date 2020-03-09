@@ -3,17 +3,6 @@
 
 namespace PropertyBasedTesting {
 
-// TODO
-template <class Callable, typename ...ARGTYPES>
-class Map {
-public:
-    using ArgumentList = TypeList<ARGTYPES...>;
-    static constexpr auto Size = sizeof...(ARGTYPES);
-    static ArgumentList argument_list;
-
-};
-
-
 template <typename Function, typename Tuple,  std::size_t... index>
 decltype( auto ) mapTupleHelper(Function&& f, Tuple&& tup, std::index_sequence<index...> index_sequence) {
     return std::make_tuple(f(std::move(std::get<index>(tup)))...);
