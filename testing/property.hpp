@@ -121,14 +121,14 @@ public:
         bool result = false;
         try {
             result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(valueTup));
-            std::cout << "test done: " << std::endl;
+            std::cout << "test done: " << (result ? "true" : "false") << std::endl;
         }
         catch(const AssertFailed& e) {
-            std::cout << "test failed: " << std::endl;
+            std::cout << "test failed: " << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
         catch(const std::exception& e) {
-            std::cout << "test failed2: " << std::endl;
+            std::cout << "test failed2: " << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
         return result;
@@ -156,8 +156,10 @@ public:
                 show(std::cout, valueTup);
                 std::cout << std::endl;
             }
-            else
+            else {
+                std::cout << "no more shrinking found for arg... ";
                 break;
+            }
         }
         return std::get<N>(valueTup);
     }
