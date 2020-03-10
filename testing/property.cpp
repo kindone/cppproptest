@@ -11,6 +11,7 @@ bool PropertyBase::check() {
         for(int i = 0; i < 100; i++) {
             bool pass = true;
             do {
+                pass = true;
                 try {
                     invoke(rand);
                     pass = true;

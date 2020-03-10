@@ -44,30 +44,26 @@ Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
     else
        value = rand.getRandomInt32();
 
-    if(value >= 0) {
-        auto binary = [value]() {
-            std::cout << "shrink!" << std::endl;
-            static std::function<std::function<Stream<Shrinkable<int32_t>>()>(int, int)> shrink = [](int min, int max) {
-                return [min, max]() {
-                    if(min + 1 <= max)
-                        return Stream<Shrinkable<int32_t>>::one(min);
-                    else
-                        return Stream<Shrinkable<int32_t>>((max - min)/2, [min, max]() { 
-                            return shrink((max - min)/2 + 1, max)();
-                        });
-                };
+    return Shrinkable<int>(value, [value]() {
+        return  Stream<Shrinkable<int>>(0, [value]() {
+            static std::function<Stream<Shrinkable<int>>(int,int)> genpos = [](int min, int val) {
+                if(val <= 0 || (val-min) <= 1)
+                    return Stream<Shrinkable<int>>::empty();
+                else
+                    return Stream<Shrinkable<int>>(Shrinkable<int>((val + min)/2), [min, val]() { return genpos((val+min)/2, val); });
             };
-            if(value > 1)
-                return Stream<Shrinkable<int32_t>>(Shrinkable<int32_t>(0), shrink(1, value));
+            static std::function<Stream<Shrinkable<int>>(int,int)> genneg = [](int max, int val) {
+                if(val >= 0 || (max-val) <= 1)
+                    return Stream<Shrinkable<int>>::empty();
+                else
+                    return Stream<Shrinkable<int>>(Shrinkable<int>((val + max)/2), [max, val]() { return genneg((val+max)/2, val); });
+            };
+            if(value >= 0)
+                return genpos(0, value);
             else
-                return Stream<Shrinkable<int32_t>>::two(0,1);
-        };
-        return Shrinkable<int32_t>(value, binary);
-    }
-    else
-        return Shrinkable<int32_t>(value, []() {
-            return Stream<Shrinkable<int32_t>>::two(1,2);
+                return genneg(0, value);
         });
+    });
 }
 
 Shrinkable<int64_t> Arbitrary<int64_t>::generate(Random& rand) {

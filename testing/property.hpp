@@ -115,14 +115,20 @@ public:
 
     template <typename ValueTuple>
     bool test(ValueTuple&& valueTup) {
+        std::cout << "test: " << std::endl;
+        show(std::cout, valueTup);
+        std::cout << std::endl;
         bool result = false;
         try {
             result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(valueTup));
+            std::cout << "test done: " << std::endl;
         }
         catch(const AssertFailed& e) {
+            std::cout << "test failed: " << std::endl;
             // TODO: trace
         }
         catch(const std::exception& e) {
+            std::cout << "test failed2: " << std::endl;
             // TODO: trace
         }
         return result;
