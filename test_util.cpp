@@ -115,3 +115,59 @@ TEST(UtilTestCase, TypeList) {
     using type_tuple = typename decltype(res)::type_tuple;
 
 }
+
+TEST(UtilTestCase, Stream) {
+    int val = -50;
+    // recursive
+    auto stream = Stream<int>(val, [val]() {
+        static std::function<Stream<int>(int,int)> genpos = [](int min, int val) {
+            if(val <= 0 || (val-min) <= 1)
+                return Stream<int>::empty();
+            else
+                return Stream<int>((val + min)/2, [min, val]() { return genpos((val+min)/2, val); });
+        };
+        static std::function<Stream<int>(int,int)> genneg = [](int max, int val) {
+            if(val >= 0 || (max-val) <= 1)
+                return Stream<int>::empty();
+            else
+                return Stream<int>((val + max)/2, [max, val]() { return genneg((val+max)/2, val); });
+        };
+        if(val >= 0)
+            return genpos(0, val);
+        else
+            return genneg(0, val);
+    });
+
+    for(auto itr = stream.iterator(); itr.hasNext(); ) {
+        std::cout << "stream:" << itr.next() << std::endl;
+    }
+}
+
+TEST(UtilTestCase, Shrinkable) {
+    // generates 50,49,...,0
+    int val = 50;
+    // recursive
+    auto stream = Stream<Shrinkable<int>>(Shrinkable<int>(val), [val]() {
+        static std::function<Stream<Shrinkable<int>>(int)> gen = [](int val) {
+            if(val <= 0)
+                return Stream<Shrinkable<int>>::empty();
+            else
+                return Stream<Shrinkable<int>>(Shrinkable<int>(val-1), [val]() { return gen(val-1); });
+        };
+        return gen(val);
+    });
+
+    for(auto itr = stream.iterator(); itr.hasNext(); ) {
+        std::cout << "stream:" << itr.next() << std::endl;
+    }
+
+    auto shrinkable = Shrinkable<int>(5, [=]() {
+        return stream;
+    });
+
+    auto stream2 = shrinkable.shrinks();
+    for(auto itr = stream.iterator(); itr.hasNext(); ) {
+        std::cout << "stream2:" << itr.next() << std::endl;
+    }
+   
+}

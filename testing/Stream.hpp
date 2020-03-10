@@ -108,6 +108,10 @@ struct Stream {
     Stream(const T& h, std::function<Stream<T>()> gen) :  impl(std::make_shared<NonEmptyStream<T>>(h, gen)) {
     }
 
+    Stream(const T& h) :  impl(std::make_shared<NonEmptyStream<T>>(h, done())) {
+    }
+
+
     bool isEmpty() const {
         return impl->isEmpty();
     }
@@ -131,17 +135,20 @@ struct Stream {
         return Stream(std::make_shared<EmptyStream<T>>());
     }
 
-    static Stream<T> one(T&& a)  {
-        return Stream(a, []()->Stream<T> {
+    static std::function<Stream<T>()> done() {
+        static auto produceEmpty =  []() -> Stream<T> {
             return empty();
-        });
+        };
+        return produceEmpty;
+    }
+
+    static Stream<T> one(T&& a)  {
+        return Stream(a);
     }
 
     static Stream<T> two(T&& a, T&& b)  {
         return Stream(a, [=]()->Stream<T> {
-            return Stream(b, []()->Stream<T> {
-                return empty();
-            });
+            return Stream(b);
         });
     }
 

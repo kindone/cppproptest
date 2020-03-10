@@ -7,8 +7,7 @@
 namespace PropertyBasedTesting
 {
 
-template <typename T>
-std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
+
 std::ostream& show(std::ostream& os, const std::string&);
 std::ostream& show(std::ostream& os, const int8_t&);
 std::ostream& show(std::ostream& os, const uint8_t&);
@@ -21,8 +20,11 @@ std::ostream& show(std::ostream& os, const uint64_t&);
 std::ostream& show(std::ostream& os, const float&);
 std::ostream& show(std::ostream& os, const double&);
 
+template <typename T>
+std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
+
 
 struct HasShowImpl {
     template <typename T, typename CRITERIA = decltype(show(std::cout, std::declval<T>()))>

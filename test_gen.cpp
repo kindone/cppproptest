@@ -215,7 +215,7 @@ TEST(PropTest, TestCheckFail) {
     Random rand(seed);
     check(rand, [](int a, int b, std::string str, std::vector<int> vec) -> bool {
         std::cout << "check" << std::endl;
-        PROP_ASSERT(false, {});
+        PROP_ASSERT(a > 2000 || a < 1000, {});
         return true;
     });
 }
