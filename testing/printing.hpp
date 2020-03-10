@@ -6,42 +6,84 @@
 
 namespace PropertyBasedTesting
 {
-namespace printing {
-// default printer
+
 template <typename T>
-typename std::enable_if<!std::is_same<T, std::string>::value, std::ostream&>::type operator<<(std::ostream& out, const T & obj)
+std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
+std::ostream& show(std::ostream& os, const std::string&);
+std::ostream& show(std::ostream& os, const int8_t&);
+std::ostream& show(std::ostream& os, const uint8_t&);
+std::ostream& show(std::ostream& os, const int16_t&);
+std::ostream& show(std::ostream& os, const uint16_t&);
+std::ostream& show(std::ostream& os, const int32_t&);
+std::ostream& show(std::ostream& os, const uint32_t&);
+std::ostream& show(std::ostream& os, const int64_t&);
+std::ostream& show(std::ostream& os, const uint64_t&);
+std::ostream& show(std::ostream& os, const float&);
+std::ostream& show(std::ostream& os, const double&);
+
+template <typename T, typename Allocator>
+std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
+
+struct HasShowImpl {
+    template <typename T, typename CRITERIA = decltype(show(std::cout, std::declval<T>()))>
+    static std::true_type test(const T&);
+
+    static std::false_type test(...);
+
+};
+
+template <typename T>
+struct HasShow {
+    static constexpr bool value = decltype(HasShowImpl::test(std::declval<T>()))::value;
+};
+
+// default printer
+template <typename T, bool = !HasShow<T>::value>
+struct ShowDefault {
+	static std::ostream& show(std::ostream& os, const T & obj)
+	{
+		os << "<\?\?\?>";
+		return os;
+	}
+};
+
+template <typename T>
+struct ShowDefault<T, false> {
+	static std::ostream& show(std::ostream& os, const T & obj)
+	{
+		os <<  obj;
+		return os;
+	}
+};
+
+template <typename T>
+static std::ostream& show(std::ostream& os, const T & obj)
 {
-    std::operator<<(out, "???");
-    return out;
+	ShowDefault<T>::show(os, obj);;
+	return os;
 }
 
-} // namespace printing
 
 
 template <typename T>
-std::ostream& operator<<(std::ostream& out, const Shrinkable<T>& shrinkable)
+std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
 {
-    using namespace printing;
-    //std::operator<<(out, "Shrinkable(");
-    out << shrinkable.value;
-    //std::operator<<(out, ")");
-    return out;
+    show(os, shrinkable.value);
+    return os;
 }
 
 template <typename T>
 bool toStreamLast(std::ostream& os, const T& t)
 {
-	using namespace printing;
-    os << t;
+    show(os, t);
     return true;
 }
 
 template <typename T>
 bool toStreamFrontHelper(std::ostream& os, const T& t)
 {
-	using namespace printing;
-    os << t;
-    std::operator<<(os, ", ");
+    show(os,  t);
+    os << ", ";
     return true;
 }
 
@@ -64,16 +106,33 @@ struct ToStreamEach<0,Tuple> {
 };
 
 template <typename ...ARGS>
-std::ostream& operator<< (std::ostream& os, const std::tuple<ARGS...>& tuple)
+std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)
 {
-    std::operator<<(os, "{");
-
     constexpr auto Size = sizeof...(ARGS);
+    os << "{ ";
     ToStreamEach<Size-1, const std::tuple<ARGS...>> toStreamEach;
     toStreamEach.get(os, std::move(tuple));
     toStreamLast(os, std::get<Size-1>(tuple));
-    std::operator<<(os, "}");
+    os << " }";
+    return os;
+}
 
+template <typename T, typename Allocator>
+std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec) {
+    os << "[ ";
+	
+	auto begin = vec.begin();
+	if(begin == vec.end()) {
+		show(os, *begin);
+	}
+	else {
+		show(os, *begin);
+		for(auto itr = ++begin; itr != vec.end(); itr++) {
+			os << ", ";
+			show(os, *itr);
+		}
+	}
+    os << " ]";
     return os;
 }
 

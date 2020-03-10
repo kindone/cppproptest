@@ -147,10 +147,7 @@ public:
             }
             if(shrinkFound) {
                 std::cout << "shrinking... ";
-                {
-                    using namespace printing;
-                    std::cout << valueTup;
-                }
+                show(std::cout, valueTup);
                 std::cout << std::endl;
             }
             else
@@ -167,9 +164,7 @@ public:
     template <typename ValueTuple>
     void shrink(ValueTuple&& valueTup) {
         std::cout << "shrinking value: ";
-        {
-            std::cout << valueTup;
-        }
+        show(std::cout, valueTup);
         std::cout << std::endl;
 
         // TODO: serialize initial value as stream before mutating

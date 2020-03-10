@@ -209,10 +209,11 @@ TEST(PropTest, TestCheckBasic) {
     prop.check();
 }
 
+
 TEST(PropTest, TestCheckFail) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    check(rand, [](int a, int b) -> bool {
+    check(rand, [](int a, int b, std::string str, std::vector<int> vec) -> bool {
         std::cout << "check" << std::endl;
         PROP_ASSERT(false, {});
         return true;

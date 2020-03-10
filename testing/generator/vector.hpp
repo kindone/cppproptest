@@ -1,9 +1,10 @@
-#ifndef __PROPTEST_VECTOR_HPP
-#define __PROPTEST_VECTOR_HPP
+#pragma once
 
 #include "testing/gen.hpp"
 #include "testing/Random.hpp"
+#include "testing/printing.hpp"
 #include <vector>
+#include <iostream>
 
 namespace PropertyBasedTesting
 {
@@ -31,6 +32,8 @@ public:
     Arbitrary<T> elemGen;
 };
 
+
 } // namespace PropertyBasedTesting
 
-#endif
+
+

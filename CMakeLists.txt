@@ -16,6 +16,7 @@ SET(proptest_sources
     testing/generator/string.cpp
     testing/property.cpp
     testing/Random.cpp
+    testing/printing.cpp
 )
 
 ADD_LIBRARY(proptest
