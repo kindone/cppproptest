@@ -198,3 +198,81 @@ TEST(UtilTestCase, Shrinkable) {
     }
 
 }
+
+struct NoBlank {
+    NoBlank() = delete;
+    NoBlank(int a) {}
+};
+
+struct NoCopy {
+    NoCopy(int a) : id(nextId()){
+        std::cout << "nocopy create" << id << std::endl;
+    }
+    NoCopy(const NoCopy&) = delete;
+    NoCopy& operator=(const NoCopy&) = delete;
+    NoCopy(NoCopy&& a) {
+        id = nextId();
+        std::cout << "nocopy move" << id << std::endl;
+    }
+    ~NoCopy() {
+        std::cout << "~nocopy destroy" << id << std::endl;
+    }
+
+    int id;
+    static int maxId;
+    static int nextId() {
+        return maxId++;
+    }
+};
+
+int NoCopy::maxId = 1;
+
+struct NoMove {
+    NoMove(int a) :id(nextId()){
+        std::cout << "nomove create" << id << std::endl;
+    }
+    NoMove(const NoMove& other) {
+        id = nextId();
+        std::cout << "nomove copy" << id << std::endl;
+    };
+    NoMove(NoMove&& a) = delete;
+    ~NoMove() {
+        std::cout << "~nomove destroy" << id << std::endl;
+    }
+
+    int id;
+    static int maxId ;
+    static int nextId() {
+        return maxId++;
+    }
+};
+
+int NoMove::maxId = 1;
+
+struct NoDelete {
+    ~NoDelete() = delete;
+};
+
+TEST(UtilTestCase, ObjectsWithConstraints) {
+    //std::tuple<NoBlank> t1(NoBlank(5));
+    {
+    std::tuple<NoCopy> t2(NoCopy(5));
+    std::tuple<NoCopy> t2_2(std::move(std::get<0>(t2)));
+    std::tuple<NoCopy> t2_3(std::move(t2_2));
+    }
+
+    {
+    std::tuple<NoMove> t3(std::move(NoMove(5)));
+    std::tuple<NoMove> t3_2  = t3;
+    std::tuple<NoMove> t3_3(std::move(t3));
+    }
+
+    //std::tuple<NoBlank> t1_2  = t1;
+    //std::tuple<NoCopy> t2_2  = t2;
+    //std::get<0>(t1) = NoBlank(5);
+    //std::get<0>(t2) = NoCopy(5);
+    //std::get<0>(t3) = NoMove(5);
+
+    //std::tuple<NoDelete>(NoDelete(5));
+}
+
