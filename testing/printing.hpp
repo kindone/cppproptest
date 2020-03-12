@@ -70,7 +70,7 @@ static std::ostream& show(std::ostream& os, const T & obj)
 template <typename T>
 std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
 {
-    show(os, shrinkable.value);
+    show(os, static_cast<T>(shrinkable));
     return os;
 }
 

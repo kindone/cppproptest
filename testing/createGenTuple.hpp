@@ -15,7 +15,7 @@ decltype( auto ) createGenHelperPacked(std::index_sequence<index...> ) {
 // returns a std::Tuple<Arbitrary<ARGS...>>
 template<typename ... ARGS >
 decltype( auto ) createGenTuple(TypeList<ARGS...> argument_list ) {
-    using ArgsAsTuple = std::tuple<std::remove_reference_t<ARGS>...>;
+    using ArgsAsTuple = std::tuple<std::decay_t<ARGS>...>;
     constexpr auto Size = std::tuple_size<ArgsAsTuple>::value;
     return createGenHelperListed<ArgsAsTuple>(
         std::make_index_sequence<Size>{}

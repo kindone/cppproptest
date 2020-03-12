@@ -17,9 +17,22 @@ decltype(auto) invokeWithArgTuple(Function&& f, ArgTuple&& argTup) {
 }
 
 
+
+template<size_t N, size_t M, typename Tuple, typename Replace, std::enable_if_t<N == M, bool> = true >
+decltype(auto) ReplaceHelper(Tuple&& valueTup, Replace&& replace) {
+    return replace;
+}
+
+template<size_t N, size_t M, typename Tuple, typename Replace, std::enable_if_t<N != M, bool> = false >
+decltype(auto) ReplaceHelper(Tuple&& valueTup, Replace&& replace) {
+    return std::get<M>(valueTup);
+}
+
+
 template<size_t N, typename Function, typename Tuple, typename Replace, std::size_t...index>
 decltype(auto) invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&& replace, std::index_sequence<index...>) {
-    return f((index == N ? std::get<index>(valueTup) : replace)...);
+    static_assert(std::is_same<Replace, std::decay_t<decltype(std::get<N>(valueTup))> >::value, "");
+    return f(ReplaceHelper<N, index>(valueTup, replace)...);
 }
 
 template <size_t N, typename Function, typename ArgTuple, typename Replace>

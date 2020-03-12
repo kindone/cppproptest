@@ -5,7 +5,35 @@
 
 namespace PropertyBasedTesting
 {
+/*
+// 
+// FROM (generated value) is  value
+// TO can be anything: value, lvalue(, rvalue - less likely)
 
+// FROM is movable, TO is value
+template <typename TO, typename FROM, std::enable_if_t<!std::is_reference<TO>::value>, std::enable_if_t<!std::is_pointer<TO>::value >
+decltype(auto) autoCast(FROM&& f) {
+    return f;
+}
+
+// FROM is movable, TO is lvalue_reference
+template <typename TO, typename FROM, std::enable_if_t<std::is_lvalue_reference<TO>::value>>
+decltype(auto) autoCast(FROM&& f) {
+    return f;
+}
+
+// FROM is movable, TO is rvalue_reference
+template <typename TO, typename FROM, std::enable_if_t<std::is_rvalue_reference<TO>::value>>
+decltype(auto) autoCast(FROM&& f) {
+    return std::move(f);
+}
+
+
+template <typename TO, typename FROM, bool DEFAULT = true>
+decltype(auto) autoCast(const FROM& f) {
+    return std::move(f);
+}
+*/
 
 template <typename TO, typename FROM, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
 decltype(auto) autoCast(FROM&& f) {
@@ -24,7 +52,8 @@ decltype(auto) autoCast(FROM&& f) {
 
 template <typename ToTuple, std::size_t N, typename FromTuple>
 decltype(auto) autoCastTuple(FromTuple&& tuple) {
-    return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple).value);
+    auto value = std::get<N>(tuple).move();
+    return autoCast<typename std::tuple_element<N, ToTuple>::type>(value);
 }
 
 template<typename Constructible, typename CastTuple, typename ValueTuple, std::size_t... index>

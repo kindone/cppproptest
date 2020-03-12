@@ -44,20 +44,40 @@ Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
     else
        value = rand.getRandomInt32();
 
-    return Shrinkable<int>(value, [value]() {
-        return  Stream<Shrinkable<int>>(0, [value]() {
-            static std::function<Stream<Shrinkable<int>>(int,int)> genpos = [](int min, int val) {
-                if(val <= 0 || (val-min) <= 1)
-                    return Stream<Shrinkable<int>>::empty();
-                else
-                    return Stream<Shrinkable<int>>(Shrinkable<int>((val + min)/2), [min, val]() { return genpos((val+min)/2, val); });
-            };
-            static std::function<Stream<Shrinkable<int>>(int,int)> genneg = [](int max, int val) {
-                if(val >= 0 || (max-val) <= 1)
-                    return Stream<Shrinkable<int>>::empty();
-                else
-                    return Stream<Shrinkable<int>>(Shrinkable<int>((val + max)/2), [max, val]() { return genneg((val+max)/2, val); });
-            };
+    using shrinkable_t = Shrinkable<int>;
+    using stream_t = Stream<shrinkable_t>;
+    using func_t = typename std::function<stream_t()>;
+    using genfunc_t = typename std::function<stream_t(int, int)>;
+
+    // given min, val, generate stream
+    static genfunc_t genpos = [](int min, int val) {
+        int mid = val/2 + min/2;
+        if(val <= 0 || (val-min) <= 1)
+            return stream_t::empty();
+        else
+            return stream_t(
+                shrinkable_t(mid, [=]() { return genpos(0, mid);}),
+                [=]() { return genpos(mid, val); }
+            );
+    };
+
+    static genfunc_t genneg = [](int max, int val) {
+        int mid = val/2 + max/2;
+        std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl; 
+        if(val >= 0 || (max-val) <= 1)
+            return stream_t::empty();
+        else
+            return stream_t(
+                shrinkable_t(mid, [=]() { return genneg(0, mid);}),
+                [=]() { return genneg(mid, val); }
+            );
+    };
+
+    std::cout << "      val0: " << value << std::endl; 
+    return shrinkable_t(value, [value]() {
+        std::cout << "      val1: " << value << std::endl; 
+        return  stream_t(0, [value]() {
+            std::cout << "      val2: " << value << std::endl; 
             if(value >= 0)
                 return genpos(0, value);
             else

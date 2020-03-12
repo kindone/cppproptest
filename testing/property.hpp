@@ -113,34 +113,48 @@ public:
         seed = s;
     }
 
-    template <size_t N, typename ValueTuple, typename Iterator>
-    bool test(ValueTuple&& valueTup, Iterator&& iter) {
-        std::cout << "test: tuple ";
+    template <size_t N, typename ValueTuple, typename Replace>
+    bool test(ValueTuple&& valueTup, Replace&& replace) {
+        std::cout << "    test: tuple ";
         show(std::cout, valueTup);
-        std::cout << " replaced with " << N << "th arg: "; 
+        std::cout << " replaced with arg " << N << ": ";
+        show(std::cout, replace); 
         std::cout << std::endl;
 
         bool result = false;
         try {
-            result = invokeWithArgTupleWithReplace<N>(std::move(callableWrapper.callable), std::move(valueTup), iter.next());
-            std::cout << "test done: " << (result ? "true" : "false") << std::endl;
+            result = invokeWithArgTupleWithReplace<N>(std::move(callableWrapper.callable), std::move(valueTup), replace);
+            std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         }
         catch(const AssertFailed& e) {
-            std::cout << "test failed: " << (result ? "true" : "false") << std::endl;
+            std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
         catch(const std::exception& e) {
-            std::cout << "test failed2: " << (result ? "true" : "false") << std::endl;
+            std::cout << "    test failed with std::exception: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
         return result;
     }
 
+    template <typename Shrinks>
+    static void printShrinks(const Shrinks& shrinks) {
+        auto itr = shrinks.iterator();
+        std::cout << "    shrinks: " << std::endl;
+        for(int i = 0; i < 4 && itr.hasNext(); i++) {
+            std::cout << "    ";
+            show(std::cout, itr.next());
+            std::cout << std::endl;
+        }
+    }
+
     template <size_t N, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple) {
+        std::cout << "  shrinking arg " << N << ":" << std::endl;
         auto shrinks = std::get<N>(shrinksTuple);
         // keep shrinking until no shrinking is possible
         while(!shrinks.isEmpty()) {
+            printShrinks(shrinks);
             auto iter = shrinks.iterator();
             bool shrinkFound = false;
             // keep trying until failure is reproduced
@@ -149,20 +163,21 @@ public:
                 auto next = iter.next();
                 if(!test<N>(valueTup, next)) {
                     shrinks = next.shrinks();
+                    std::get<N>(valueTup) = std::move(next);
                     shrinkFound = true;
                     break;
                 }
             }
             if(shrinkFound) {
-                std::cout << "shrinking... ";
+                std::cout << "  shrinking arg " << N << " found: ";
                 show(std::cout, valueTup);
                 std::cout << std::endl;
             }
             else {
-                std::cout << "no more shrinking found for arg... ";
                 break;
             }
         }
+        std::cout << "  no more shrinking found for arg " << N << std::endl;
         return std::get<N>(valueTup);
     }
 

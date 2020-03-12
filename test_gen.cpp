@@ -71,7 +71,7 @@ TEST(PropTest, GenerateBool) {
     Arbitrary<bool> gen;
 
     for(int i = 0; i < 20; i++) {
-        auto val = gen.generate(rand);
+        bool val = gen.generate(rand);
         std::cout << val << " " << std::endl;
     }
 }
@@ -83,7 +83,7 @@ TYPED_TEST(NumericTest, NumericTypeGen) {
     Arbitrary<TypeParam> gen;
 
     for(int i = 0; i < 20; i++) {
-        auto val = gen.generate(rand).value;
+        TypeParam val = gen.generate(rand);
         std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
     }
 }
@@ -94,7 +94,7 @@ TEST(PropTest, GenUTF8String) {
     Arbitrary<UTF8String> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        std::cout << "str: \"" << gen.generate(rand).value << "\"" << std::endl;
+        std::cout << "str: \"" << static_cast<UTF8String>(gen.generate(rand)) << "\"" << std::endl;
     }
 }
 
@@ -104,7 +104,7 @@ TEST(PropTest, GenLttVectorOfInt) {
     Arbitrary<std::vector<int>> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        auto val = gen.generate(rand).value;
+        std::vector<int> val(gen.generate(rand));
         std::cout << "vec: ";
         for(size_t j = 0; j < val.size(); j++)
         {
@@ -133,7 +133,7 @@ constexpr int32_t GenSmallInt::boundaryValues[13];
 TEST(PropTest, TestCheckBasic) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    check(rand, [](int a, int b) -> bool {
+    check(rand, [](const int& a, const int& b) -> bool {
         EXPECT_EQ(a+b, b+a);
 
         std::cout << "a: " << a << ", b: " << b << std::endl;
@@ -214,8 +214,7 @@ TEST(PropTest, TestCheckFail) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     check(rand, [](int a, int b/*,std::string str, std::vector<int> vec*/) -> bool {
-        std::cout << "check" << std::endl;
-        PROP_ASSERT(-10 < a && a < 10, {});
+        PROP_ASSERT(-10 < a && a < 100, {});
         return true;
     });
 }
@@ -288,7 +287,7 @@ TEST(PropTest, TestConstruct) {
 
     using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
     auto gen = AnimalGen();
-    auto animal = gen.generate(rand).value;
+    Animal animal = gen.generate(rand);
     std::cout << "Gen animal: " << animal << std::endl;
 
     check<AnimalGen>(rand, [](Animal animal) -> bool {
