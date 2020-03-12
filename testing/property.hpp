@@ -116,23 +116,23 @@ public:
 
     template <size_t N, typename ValueTuple, typename Replace>
     bool test(ValueTuple&& valueTup, Replace&& replace) {
-        std::cout << "    test: tuple ";
-        show(std::cout, valueTup);
-        std::cout << " replaced with arg " << N << ": ";
-        show(std::cout, replace); 
-        std::cout << std::endl;
+        //std::cout << "    test: tuple ";
+        //show(std::cout, valueTup);
+        //std::cout << " replaced with arg " << N << ": ";
+        //show(std::cout, replace); 
+        //std::cout << std::endl;
 
         bool result = false;
         try {
             result = invokeWithArgTupleWithReplace<N>(std::move(callableWrapper.callable), std::move(valueTup), replace);
-            std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
+            //std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         }
         catch(const AssertFailed& e) {
-            std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
+            //std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
         catch(const std::exception& e) {
-            std::cout << "    test failed with std::exception: result=" << (result ? "true" : "false") << std::endl;
+            //std::cout << "    test failed with std::exception: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
         return result;
@@ -155,7 +155,7 @@ public:
         auto shrinks = std::get<N>(shrinksTuple);
         // keep shrinking until no shrinking is possible
         while(!shrinks.isEmpty()) {
-            printShrinks(shrinks);
+            //printShrinks(shrinks);
             auto iter = shrinks.iterator();
             bool shrinkFound = false;
             // keep trying until failure is reproduced

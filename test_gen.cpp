@@ -206,7 +206,7 @@ TEST(PropTest, TestCheckFail) {
     std::cout << "seed: " << seed << std::endl;
     Random rand(seed);
     check(rand, [](int a, int b/*,std::string str, std::vector<int> vec*/) -> bool {
-        PROP_ASSERT(-10 < a && a < 100, {});
+        PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200, {});
         return true;
     });
 }
