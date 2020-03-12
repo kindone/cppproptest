@@ -5,16 +5,7 @@
 #include <chrono>
 #include <iostream>
 
-
-int64_t getCurrentTime() {
-	auto curTime = std::chrono::system_clock::now();
-	auto duration = curTime.time_since_epoch();
-	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-	return millis;
-}
-
 using namespace PropertyBasedTesting;
-
 
 class PropTestCase : public ::testing::Test {
 };
@@ -212,6 +203,7 @@ TEST(PropTest, TestCheckBasic) {
 
 TEST(PropTest, TestCheckFail) {
     int64_t seed = getCurrentTime();
+    std::cout << "seed: " << seed << std::endl;
     Random rand(seed);
     check(rand, [](int a, int b/*,std::string str, std::vector<int> vec*/) -> bool {
         PROP_ASSERT(-10 < a && a < 100, {});

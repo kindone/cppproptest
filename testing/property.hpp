@@ -18,6 +18,7 @@ class Random;
 
 class PROPTEST_API PropertyBase {
 public:
+    PropertyBase();
     bool check();
     virtual ~PropertyBase() {}
 

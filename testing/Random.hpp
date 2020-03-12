@@ -4,6 +4,8 @@
 
 namespace PropertyBasedTesting {
 
+int64_t getCurrentTime();
+
 class Random
 {
 public:
@@ -23,7 +25,8 @@ public:
 private:
     uint64_t next8U();
     std::random_device device;
-    std::default_random_engine engine;
+    //std::default_random_engine engine;
+    std::mt19937_64 engine;
     std::uniform_int_distribution<uint64_t> dist;
 
 };

@@ -4,8 +4,12 @@
 
 namespace PropertyBasedTesting {
 
+PropertyBase::PropertyBase() : seed(getCurrentTime()) {
+}
+
 bool PropertyBase::check() {
     Random rand(seed);
+    std::cout << "rand seed: " << seed << std::endl;
     try {
         // TODO: configurable runs
         for(int i = 0; i < 100; i++) {

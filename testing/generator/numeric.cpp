@@ -36,7 +36,7 @@ Shrinkable<int16_t> Arbitrary<int16_t>::generate(Random& rand) {
 }
 
 Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
-    uint32_t value = 0;
+    int32_t value = 0;
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         value = boundaryValues[i];

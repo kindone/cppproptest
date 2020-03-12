@@ -1,6 +1,9 @@
 #include "testing/Random.hpp"
 #include <random>
 #include <limits>
+#include <iostream>
+#include <chrono>
+
 
 namespace PropertyBasedTesting {
 
@@ -10,7 +13,8 @@ Random::Random(uint64_t seed) :
 }
 
 uint64_t Random::next8U() {
-    return dist(engine);
+    auto value = dist(engine);
+    return value; 
 }
 
 bool Random::getRandomBool() {
@@ -69,5 +73,11 @@ double Random::getRandomDouble() {
     return *reinterpret_cast<double*>(&intVal);
 }
 
+int64_t getCurrentTime() {
+	auto curTime = std::chrono::system_clock::now();
+	auto duration = curTime.time_since_epoch();
+	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+	return millis;
+}
 
 } // namespace

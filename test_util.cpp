@@ -1,6 +1,7 @@
 #include "testing/proptest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
+#include "testing/Random.hpp"
 #include <iostream>
 
 class UtilTestCase : public ::testing::Test {
@@ -264,7 +265,7 @@ TEST(UtilTestCase, ObjectsWithConstraints) {
     {
     std::tuple<NoMove> t3(std::move(NoMove(5)));
     std::tuple<NoMove> t3_2  = t3;
-    std::tuple<NoMove> t3_3(std::move(t3));
+    //std::tuple<NoMove> t3_3(std::move(t3));
     }
 
     //std::tuple<NoBlank> t1_2  = t1;
@@ -274,5 +275,14 @@ TEST(UtilTestCase, ObjectsWithConstraints) {
     //std::get<0>(t3) = NoMove(5);
 
     //std::tuple<NoDelete>(NoDelete(5));
+}
+
+
+TEST(UtilTestCase, Random) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 0; i < 5; i++) {
+        std::cout << "rng: " << rand.getRandomInt32() << std::endl;
+    }
 }
 

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <tuple>
 #include <string>
+#include <vector>
 #include "testing/shrinkable.hpp"
 
 namespace PropertyBasedTesting
