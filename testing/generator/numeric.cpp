@@ -63,7 +63,7 @@ Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
 
     static genfunc_t genneg = [](int max, int val) {
         int mid = val/2 + max/2;
-        std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl; 
+        //std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl; 
         if(val >= 0 || (max-val) <= 1)
             return stream_t::empty();
         else
@@ -73,11 +73,11 @@ Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
             );
     };
 
-    std::cout << "      val0: " << value << std::endl; 
+    //std::cout << "      val0: " << value << std::endl; 
     return shrinkable_t(value, [value]() {
-        std::cout << "      val1: " << value << std::endl; 
+        //std::cout << "      val1: " << value << std::endl; 
         return  stream_t(0, [value]() {
-            std::cout << "      val2: " << value << std::endl; 
+            //std::cout << "      val2: " << value << std::endl; 
             if(value >= 0)
                 return genpos(0, value);
             else
