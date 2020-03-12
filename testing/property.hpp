@@ -113,14 +113,16 @@ public:
         seed = s;
     }
 
-    template <typename ValueTuple>
-    bool test(ValueTuple&& valueTup) {
-        std::cout << "test: " << std::endl;
+    template <size_t N, typename ValueTuple, typename Iterator>
+    bool test(ValueTuple&& valueTup, Iterator&& iter) {
+        std::cout << "test: tuple ";
         show(std::cout, valueTup);
+        std::cout << " replaced with " << N << "th arg: "; 
         std::cout << std::endl;
+
         bool result = false;
         try {
-            result = invokeWithArgTuple(std::move(callableWrapper.callable), std::move(valueTup));
+            result = invokeWithArgTupleWithReplace<N>(std::move(callableWrapper.callable), std::move(valueTup), iter.next());
             std::cout << "test done: " << (result ? "true" : "false") << std::endl;
         }
         catch(const AssertFailed& e) {
@@ -143,9 +145,9 @@ public:
             bool shrinkFound = false;
             // keep trying until failure is reproduced
             while(iter.hasNext()) {
+                // get shrinkable
                 auto next = iter.next();
-                std::get<N>(valueTup) = next;
-                if(!test(valueTup)) {
+                if(!test<N>(valueTup, next)) {
                     shrinks = next.shrinks();
                     shrinkFound = true;
                     break;
