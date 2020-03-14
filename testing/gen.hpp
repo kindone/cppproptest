@@ -6,7 +6,7 @@
 #include "testing/api.hpp"
 #include "testing/Random.hpp"
 #include "testing/typelist.hpp"
-#include "testing/shrinkable.hpp"
+#include "testing/Shrinkable.hpp"
 #include "testing/assert.hpp"
 #include "testing/Seq.hpp"
 

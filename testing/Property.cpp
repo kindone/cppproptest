@@ -1,4 +1,4 @@
-#include "testing/property.hpp"
+#include "testing/Property.hpp"
 #include "testing/assert.hpp"
 #include <exception>
 

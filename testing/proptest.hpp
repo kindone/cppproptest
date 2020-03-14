@@ -3,10 +3,10 @@
 
 #include "testing/gen.hpp"
 #include "testing/generators.hpp"
-#include "testing/property.hpp"
-#include "testing/construct.hpp"
+#include "testing/Property.hpp"
+#include "testing/Construct.hpp"
 #include "testing/tuple.hpp"
-#include "testing/filter.hpp"
+#include "testing/Filter.hpp"
 #include "testing/assert.hpp"
 
 #endif

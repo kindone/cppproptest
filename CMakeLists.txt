@@ -15,7 +15,7 @@ include_directories(. googletest/googletest/include googletest/googlemock/includ
 SET(proptest_sources
     testing/generator/numeric.cpp
     testing/generator/string.cpp
-    testing/property.cpp
+    testing/Property.cpp
     testing/Random.cpp
     testing/printing.cpp
 )

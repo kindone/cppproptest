@@ -3,7 +3,7 @@
 #include <tuple>
 #include <string>
 #include <vector>
-#include "testing/shrinkable.hpp"
+#include "testing/Shrinkable.hpp"
 
 namespace PropertyBasedTesting
 {

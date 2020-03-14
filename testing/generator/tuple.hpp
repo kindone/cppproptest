@@ -2,7 +2,7 @@
 
 #include "testing/gen.hpp"
 #include "testing/Random.hpp"
-#include "testing/shrinkable.hpp"
+#include "testing/Shrinkable.hpp"
 #include <tuple>
 
 
