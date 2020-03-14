@@ -24,7 +24,7 @@ public:
 
 protected:
     virtual void invoke(Random& rand) = 0;
-    virtual void handleShrink(const PropertyFailedBase& e) = 0;
+    virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) = 0;
 protected:
     // TODO: configurations
     uint64_t seed;
@@ -71,7 +71,7 @@ Iterator<Shrinkable<P>> GetIteratorHelper(Stream<Shrinkable<P>>&& stream) {
 template <typename T>
 struct GetIterator {
     static decltype(auto) map(T&& stream) {
-        return GetIteratorHelper(std::move(stream));
+        return GetIteratorHelper(stream);
     }
 };
 
@@ -96,9 +96,17 @@ Shrinkable<P> GetNextHelper(Iterator<Shrinkable<P>>& itr) {
 template <typename T>
 struct GetNext {
     static decltype(auto) map(T&& itr) {
-        return  GetNextHelper(itr);
+        return GetNextHelper(itr);
     }
 };
+
+template <typename T>
+struct Generate {
+    static decltype(auto) map(T&& gen, Random rand) {
+        return gen.generate(rand);
+    }
+};
+
 
 template <typename CallableWrapper, typename GenTuple>
 class Property : public PropertyBase {
@@ -164,7 +172,7 @@ public:
                 auto next = iter.next();
                 if(!test<N>(valueTup, next)) {
                     shrinks = next.shrinks();
-                    std::get<N>(valueTup) = std::move(next);
+                    std::get<N>(valueTup) = next;
                     shrinkFound = true;
                     break;
                 }
@@ -188,25 +196,26 @@ public:
     }
 
     template <typename ValueTuple>
-    void shrink(ValueTuple&& valueTup) {
+    void shrink(Random& savedRand, ValueTuple&& valueTup) {
         std::cout << "shrinking value: ";
         show(std::cout, valueTup);
         std::cout << std::endl;
 
-        // TODO: serialize initial value as stream before mutating
+        auto generatedValueTup = mapHeteroTupleWithArg<Generate>(std::move(genTup), std::move(savedRand));
+        //std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
-        auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(valueTup));
-        auto shrunk = shrinkEach(std::move(valueTup),
-                std::move(shrinksTuple),
+        auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(generatedValueTup));
+        auto shrunk = shrinkEach(generatedValueTup,
+                shrinksTuple,
                 std::make_index_sequence<Size>{});
 
     }
 
-    virtual void handleShrink(const PropertyFailedBase& e) {
+    virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) {
         auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTypeTup)::type_tuple;
         auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        shrink(failed.valueTup);
+        shrink(savedRand, failed.valueTup);
     }
 
 private:

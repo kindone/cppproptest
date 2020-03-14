@@ -12,6 +12,12 @@ Random::Random(uint64_t seed) :
 {
 }
 
+Random::Random(const Random& other) :
+   engine(other.engine), dist(other.dist) 
+{
+}
+
+
 uint64_t Random::next8U() {
     auto value = dist(engine);
     return value; 

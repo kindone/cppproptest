@@ -284,5 +284,17 @@ TEST(UtilTestCase, Random) {
     for(int i = 0; i < 5; i++) {
         std::cout << "rng: " << rand.getRandomInt32() << std::endl;
     }
+
+    // reusuability
+    Random rand2 = rand;
+    Random rand3 = rand;
+    for(int i = 0; i < 5; i++) {
+        auto r1 = rand.getRandomInt32();
+        auto r2 = rand2.getRandomInt32();
+        auto r3 = rand3.getRandomInt32();
+        EXPECT_EQ(r1, r2);
+        EXPECT_EQ(r2, r2);
+    }
+   
 }
 

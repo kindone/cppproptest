@@ -10,6 +10,7 @@ class Random
 {
 public:
     Random(uint64_t seed);
+    Random(const Random& other);
     bool getRandomBool();
     int8_t getRandomInt8();
     uint8_t getRandomUInt8();
@@ -24,7 +25,6 @@ public:
     uint32_t getRandomSize(size_t fromIncluded, size_t toExcluded);
 private:
     uint64_t next8U();
-    std::random_device device;
     //std::default_random_engine engine;
     std::mt19937_64 engine;
     std::uniform_int_distribution<uint64_t> dist;

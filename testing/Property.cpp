@@ -9,6 +9,7 @@ PropertyBase::PropertyBase() : seed(getCurrentTime()) {
 
 bool PropertyBase::check() {
     Random rand(seed);
+    Random savedRand(seed);
     std::cout << "rand seed: " << seed << std::endl;
     try {
         // TODO: configurable runs
@@ -17,6 +18,7 @@ bool PropertyBase::check() {
             do {
                 pass = true;
                 try {
+                    savedRand = rand;
                     invoke(rand);
                     pass = true;
                 }
@@ -31,7 +33,7 @@ bool PropertyBase::check() {
         }
     } catch(const PropertyFailedBase& e) {
         // shrink
-        handleShrink(e);
+        handleShrink(savedRand, e);
         return false;
     } catch(const std::exception& e) {
         // skip shrinking?
