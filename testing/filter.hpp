@@ -18,9 +18,9 @@ public:
     
     Shrinkable<T> generate(Random& rand) {
         while(true) {
-            auto val = gen.generate(rand).getRef();
-            if(filter(val))
-                return make_shrinkable<T>(val);
+            auto val = gen.generate(rand);
+            if(filter(val.getRef()))
+                return val;
         }
     }
 
