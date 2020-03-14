@@ -10,14 +10,14 @@ std::string Arbitrary<std::string>::boundaryValues[1] = {""};
 Shrinkable<std::string> Arbitrary<std::string>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return Shrinkable<std::string>(std::string(boundaryValues[i]/*, allocator()*/));
+        return make_shrinkable<std::string>(std::string(boundaryValues[i]/*, allocator()*/));
     }
 
     int len = rand.getRandomSize(0, maxLen+1);
     std::string str(len, ' '/*, allocator()*/);
     for(int i = 0; i < len; i++)
         str[i] = rand.getRandomSize(0, 128);
-    return Shrinkable<std::string>(str);
+    return make_shrinkable<std::string>(str);
 }
 
 
@@ -131,7 +131,7 @@ bool isValidUTF8(std::vector<uint8_t>& chars) {
 Shrinkable<UTF8String> Arbitrary<UTF8String>::generate(Random& rand) {
     if(rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return Shrinkable<UTF8String>(UTF8String(boundaryValues[i]/*, allocator()*/));
+        return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i]/*, allocator()*/));
     }
 
     int len = rand.getRandomSize(0, maxLen+1);
@@ -232,7 +232,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::generate(Random& rand) {
         str[i] = chars[i];
     }
 
-    return Shrinkable<UTF8String>(str);
+    return make_shrinkable<UTF8String>(str);
 }
 
 } // namespace PropertyBasedTesting

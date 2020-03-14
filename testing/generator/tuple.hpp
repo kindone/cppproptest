@@ -57,7 +57,7 @@ public:
         std::tuple<Ts...> val;        
         auto valueTuple = generateHelper(rand, std::make_index_sequence<Size>{});
 
-        return Shrinkable<std::tuple<Ts...>>(std::move(valueTuple), []() -> Stream<Shrinkable<std::tuple<Ts...>>> {
+        return make_shrinkable<std::tuple<Ts...>>(valueTuple).with([]() -> Stream<Shrinkable<std::tuple<Ts...>>> {
             /* strategy: 
              * assume elements are independent
              * shrink each element one by one upto its limit

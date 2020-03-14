@@ -11,7 +11,7 @@ class PROPTEST_API Arbitrary< bool > : public Gen< bool >
 {
 public:
     Shrinkable<bool> generate(Random& rand) {
-        return Shrinkable<bool>(rand.getRandomBool());
+        return make_shrinkable<bool>(rand.getRandomBool());
     }
 };
 

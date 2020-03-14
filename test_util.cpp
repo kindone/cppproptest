@@ -147,18 +147,18 @@ TEST(UtilTestCase, Stream) {
 TEST(UtilTestCase, StreamShrink) {
     int val = -50; // 0, -25, ... -49
     // recursive
-    auto stream = Stream<Shrinkable<int>>(0, [val]() {
+    auto stream = Stream<Shrinkable<int>>(make_shrinkable<int>(0), [val]() {
         static std::function<Stream<Shrinkable<int>>(int,int)> genpos = [](int min, int val) {
             if(val <= 0 || (val-min) <= 1)
                 return Stream<Shrinkable<int>>::empty();
             else
-                return Stream<Shrinkable<int>>(Shrinkable<int>((val + min)/2), [min, val]() { return genpos((val+min)/2, val); });
+                return Stream<Shrinkable<int>>(make_shrinkable<int>((val + min)/2), [min, val]() { return genpos((val+min)/2, val); });
         };
         static std::function<Stream<Shrinkable<int>>(int,int)> genneg = [](int max, int val) {
             if(val >= 0 || (max-val) <= 1)
                 return Stream<Shrinkable<int>>::empty();
             else
-                return Stream<Shrinkable<int>>(Shrinkable<int>((val + max)/2), [max, val]() { return genneg((val+max)/2, val); });
+                return Stream<Shrinkable<int>>(make_shrinkable<int>((val + max)/2), [max, val]() { return genneg((val+max)/2, val); });
         };
         if(val >= 0)
             return genpos(0, val);
@@ -175,12 +175,12 @@ TEST(UtilTestCase, Shrinkable) {
     // generates 50,49,...,0
     int val = 50;
     // recursive
-    auto stream = Stream<Shrinkable<int>>(Shrinkable<int>(val), [val]() {
+    auto stream = Stream<Shrinkable<int>>(make_shrinkable<int>(val), [val]() {
         static std::function<Stream<Shrinkable<int>>(int)> gen = [](int val) {
             if(val <= 0)
                 return Stream<Shrinkable<int>>::empty();
             else
-                return Stream<Shrinkable<int>>(Shrinkable<int>(val-1), [val]() { return gen(val-1); });
+                return Stream<Shrinkable<int>>(make_shrinkable<int>(val-1), [val]() { return gen(val-1); });
         };
         return gen(val);
     });
@@ -189,7 +189,7 @@ TEST(UtilTestCase, Shrinkable) {
         std::cout << "stream:" << itr.next() << std::endl;
     }
 
-    auto shrinkable = Shrinkable<int>(5, [=]() {
+    auto shrinkable = make_shrinkable<int>(5).with([=]() {
         return stream;
     });
 

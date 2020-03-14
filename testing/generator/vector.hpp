@@ -25,7 +25,7 @@ public:
         val.reserve(len);
         for(int i = 0; i < len; i++)
             val.push_back(elemGen.generate(rand));
-        return Shrinkable<std::vector<T>>(std::vector<T>(std::move(val)));
+        return make_shrinkable<std::vector<T>>(std::move(val));
     }
 
     int maxLen;

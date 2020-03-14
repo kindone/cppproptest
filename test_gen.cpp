@@ -110,7 +110,7 @@ struct GenSmallInt : public Gen<int32_t> {
     }
     Shrinkable<int32_t> generate(Random& rand) {
         constexpr size_t num = sizeof(boundaryValues)/sizeof(boundaryValues[0]);
-        return Shrinkable<int32_t>(boundaryValues[step++ % num]);
+        return make_shrinkable<int32_t>(boundaryValues[step++ % num]);
     }
 
     size_t step;
@@ -334,11 +334,11 @@ private:
 
 
 TEST(PropTest, TestShrinkable) {
-    Shrinkable<std::vector<int>> vec{std::vector<int>()};
-    Shrinkable<Complicated> complicated(Complicated(5));
+    auto vec = make_shrinkable<std::vector<int>>(std::vector<int>());
+    auto complicated = make_shrinkable<Complicated>(5);
 
     auto shrink = []() {
-        return Shrinkable<Complicated>(Complicated(5));
+        return make_shrinkable<Complicated>(5);
     };
 
 }

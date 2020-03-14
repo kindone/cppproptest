@@ -5,55 +5,25 @@
 
 namespace PropertyBasedTesting
 {
-/*
-// 
-// FROM (generated value) is  value
-// TO can be anything: value, lvalue(, rvalue - less likely)
 
-// FROM is movable, TO is value
-template <typename TO, typename FROM, std::enable_if_t<!std::is_reference<TO>::value>, std::enable_if_t<!std::is_pointer<TO>::value >
-decltype(auto) autoCast(FROM&& f) {
-    return f;
+template <typename TO, typename SHRINKABLE, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
+decltype(auto) autoCast(SHRINKABLE&& shr) {
+    return shr.get();
 }
 
-// FROM is movable, TO is lvalue_reference
-template <typename TO, typename FROM, std::enable_if_t<std::is_lvalue_reference<TO>::value>>
-decltype(auto) autoCast(FROM&& f) {
-    return f;
+template <typename TO, typename SHRINKABLE, std::enable_if_t<std::is_pointer<TO>::value, bool> = false>
+decltype(auto) autoCast(SHRINKABLE&& shr) {
+    return shr.getPtr();
 }
 
-// FROM is movable, TO is rvalue_reference
-template <typename TO, typename FROM, std::enable_if_t<std::is_rvalue_reference<TO>::value>>
-decltype(auto) autoCast(FROM&& f) {
-    return std::move(f);
-}
-
-
-template <typename TO, typename FROM, bool DEFAULT = true>
-decltype(auto) autoCast(const FROM& f) {
-    return std::move(f);
-}
-*/
-
-template <typename TO, typename FROM, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
-decltype(auto) autoCast(FROM&& f) {
-    return std::move(f);
-}
-
-template <typename TO, typename FROM, std::enable_if_t<std::is_pointer<TO>::value, bool> = false>
-decltype(auto) autoCast(FROM& f) {
-    return &f;
-}
-
-template <typename TO, typename FROM, std::enable_if_t<std::is_lvalue_reference<TO>::value, bool> = true>
-decltype(auto) autoCast(FROM&& f) {
-    return f;
+template <typename TO, typename SHRINKABLE, std::enable_if_t<std::is_lvalue_reference<TO>::value, bool> = true>
+decltype(auto) autoCast(SHRINKABLE&& shr) {
+    return shr.getRef();
 }
 
 template <typename ToTuple, std::size_t N, typename FromTuple>
 decltype(auto) autoCastTuple(FromTuple&& tuple) {
-    auto value = std::get<N>(tuple).move();
-    return autoCast<typename std::tuple_element<N, ToTuple>::type>(value);
+    return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple));
 }
 
 template<typename Constructible, typename CastTuple, typename ValueTuple, std::size_t... index>
@@ -103,7 +73,7 @@ public:
 
     Shrinkable<CLASS> generate(Random& rand) {
         auto argTup = generateArgs(rand);
-        return Shrinkable<CLASS>{constructHelper<CLASS, ARGTYPES...>(argTup)};
+        return make_shrinkable<CLASS>(constructHelper<CLASS, ARGTYPES...>(argTup));
     }
 private:
     GenTuple genTup;
