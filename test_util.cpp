@@ -142,11 +142,63 @@ TEST(UtilTestCase, Stream) {
     for(auto itr = stream.iterator(); itr.hasNext(); ) {
         std::cout << "stream:" << itr.next() << std::endl;
     }
+
+    auto strstream = stream.map<std::string>([](const int& value) {
+        return std::to_string(value);
+    });
+
+    for(auto itr = strstream.iterator(); itr.hasNext(); ) {
+        std::cout << "strstream:" << itr.next() << std::endl;
+    }   
+
 }
 
 TEST(UtilTestCase, StreamShrink) {
-    int val = -50; // 0, -25, ... -49
+    int value = -50; // 0, -25, ... -49
     // recursive
+    using shrinkable_t = Shrinkable<int>;
+    using stream_t = Stream<shrinkable_t>;
+    using func_t = typename std::function<stream_t()>;
+    using genfunc_t = typename std::function<stream_t(int, int)>;
+
+    // given min, val, generate stream
+    static genfunc_t genpos = [](int min, int val) {
+        int mid = val/2 + min/2;
+        if(val <= 0 || (val-min) <= 1 || mid == val || mid == min)
+            return stream_t::empty();
+        else
+            return stream_t(
+                make_shrinkable<int>(mid).with([=]() { return genpos(0, mid);}),
+                [=]() { return genpos(mid, val); }
+            );
+    };
+
+    static genfunc_t genneg = [](int max, int val) {
+        int mid = val/2 + max/2;
+        //std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl; 
+        if(val >= 0 || (max-val) <= 1 || mid == val || mid == max)
+            return stream_t::empty();
+        else
+            return stream_t(
+                make_shrinkable<int>(mid).with([=]() { return genneg(0, mid);}),
+                [=]() { return genneg(mid, val); }
+            );
+    };
+
+    //std::cout << "      val0: " << value << std::endl; 
+    auto shr = make_shrinkable<int>(value).with([value]() {
+        //std::cout << "      val1: " << value << std::endl; 
+        return  stream_t(make_shrinkable<int>(0), [value]() {
+            //std::cout << "      val2: " << value << std::endl; 
+            if(value >= 0)
+                return genpos(0, value);
+            else
+                return genneg(0, value);
+        });
+    });
+
+
+    /*
     auto stream = Stream<Shrinkable<int>>(make_shrinkable<int>(0), [val]() {
         static std::function<Stream<Shrinkable<int>>(int,int)> genpos = [](int min, int val) {
             if(val <= 0 || (val-min) <= 1)
@@ -165,10 +217,37 @@ TEST(UtilTestCase, StreamShrink) {
         else
             return genneg(0, val);
     });
+    */
 
-    for(auto itr = stream.iterator(); itr.hasNext(); ) {
-        std::cout << "streamshrink:" << itr.next() << std::endl;
+    for(auto itr = shr.shrinks().iterator(); itr.hasNext(); ) {
+        auto shrinkable = itr.next();
+        std::cout << "streamshrink:" << shrinkable << std::endl;
+        for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
+            std::cout << "  shrink: " << itr2.next().get() << std::endl;
+        }
+
     }
+
+    Stream<Shrinkable<std::string>> strstream = shr.shrinks().map<Shrinkable<std::string>>([](const Shrinkable<int>& value) {
+        auto shrinks = value.shrinks;
+        return make_shrinkable<std::string>(std::to_string(value.get())).with([shrinks]() {
+            return shrinks().map<Shrinkable<std::string>>([](const Shrinkable<int>& v) {
+                return make_shrinkable<std::string>(std::to_string(v));
+            });
+        });
+    });
+
+    
+    for(auto itr = strstream.iterator(); itr.hasNext(); ) {
+        auto shrinkable = itr.next();
+        std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
+        for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
+            std::cout << "  shrink: " << itr2.next().get() << std::endl;
+        }
+    }
+    
+
+
 }
 
 TEST(UtilTestCase, Shrinkable) {

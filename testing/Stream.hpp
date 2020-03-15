@@ -84,6 +84,14 @@ struct NonEmptyStream : public StreamImpl<T> {
         return Iterator<T>{Stream<T>{*this}};
     }
 
+    template <typename U>
+    NonEmptyStream<U> map(std::function<U(const T&)> mapper) {
+        auto gen = tailGen;
+        return NonEmptyStream<U>(mapper(_head), [mapper, gen]() -> Stream<U> {
+            return gen().map(mapper);
+        });
+    }
+
     T _head;
     std::function<Stream<T>()> tailGen;
 };
@@ -126,6 +134,16 @@ struct Stream {
 
     Iterator<T> iterator() const {
         return impl->iterator();
+    }
+
+    template<typename U>
+    Stream<U> map(std::function<U(const T&)> mapper) {
+        if(isEmpty()) {
+            return Stream<U>::empty();
+        }
+        else {
+            return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->map(mapper));
+        }
     }
 
     std::shared_ptr<StreamImpl<T>> impl;
