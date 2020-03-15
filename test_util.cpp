@@ -149,7 +149,15 @@ TEST(UtilTestCase, Stream) {
 
     for(auto itr = strstream.iterator(); itr.hasNext(); ) {
         std::cout << "strstream:" << itr.next() << std::endl;
-    }   
+    }
+
+    auto filtered = strstream.filter([](const std::string& str) {
+        return str[1] == '4';
+    });
+
+    for(auto itr = filtered.iterator(); itr.hasNext(); ) {
+        std::cout << "filtered:" << itr.next() << std::endl;
+    }
 
 }
 

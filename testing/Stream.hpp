@@ -85,11 +85,24 @@ struct NonEmptyStream : public StreamImpl<T> {
     }
 
     template <typename U>
-    NonEmptyStream<U> map(std::function<U(const T&)> mapper) {
+    NonEmptyStream<U> map(std::function<U(const T&)>& mapper) {
         auto gen = tailGen;
         return NonEmptyStream<U>(mapper(_head), [mapper, gen]() -> Stream<U> {
             return gen().map(mapper);
         });
+    }
+
+    Stream<T> filter(std::function<bool(const T&)> criteria) const {
+        for(auto itr = iterator(); itr.hasNext();) {
+            auto value = itr.next();
+            if(criteria(value)) {
+                auto tail = itr.stream;
+                return Stream<T>{value, [criteria, tail]() {
+                    return tail.filter(criteria);
+                }};
+            }
+        }
+        return Stream<T>::empty();
     }
 
     T _head;
@@ -105,6 +118,9 @@ struct Stream {
     }
     
     Stream(const std::shared_ptr<StreamImpl<T>>& otherImpl) :  impl(otherImpl) {
+    }
+    
+    Stream(const StreamImpl<T>& otherImpl) :  impl(std::make_shared<StreamImpl<T>>(otherImpl)) {
     }
 
     Stream(const EmptyStream<T>& otherImpl) :  impl(std::make_shared<EmptyStream<T>>(otherImpl)) {
@@ -143,6 +159,15 @@ struct Stream {
         }
         else {
             return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->map(mapper));
+        }
+    }
+
+    Stream<T> filter(std::function<bool(const T&)> criteria) const {
+        if(isEmpty()) {
+            return Stream::empty();
+        }
+        else {
+            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->filter(criteria);
         }
     }
 
