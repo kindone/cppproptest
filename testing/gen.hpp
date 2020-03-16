@@ -21,7 +21,7 @@ struct Gen
     Gen() {
     }
 
-    Shrinkable<T> operator()(Random& rand);
+    virtual Shrinkable<T> operator()(Random& rand) = 0;
 };
 
 template <typename T, typename ElemGen = void>
@@ -29,22 +29,8 @@ struct Arbitrary : public Gen<T>{
 };
 
 
-template <class T> class BaseType;
-template <class T> class BaseType<Gen<T>> {
-public:
-    using type = T;
-};
-
-template <class T> class BaseType<Arbitrary<T>> {
-public:
-    using type = T;
-};
-
-
-
 } // namespace PropertyBasedTesting
 
-#include "testing/Map.hpp"
 #include "testing/invokeWithArgs.hpp"
 #include "testing/invokeWithGenTuple.hpp"
 #include "testing/createGenTuple.hpp"

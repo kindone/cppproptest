@@ -7,6 +7,7 @@
 #include "testing/Construct.hpp"
 #include "testing/tuple.hpp"
 #include "testing/Filter.hpp"
+#include "testing/Map.hpp"
 #include "testing/assert.hpp"
 
 #endif

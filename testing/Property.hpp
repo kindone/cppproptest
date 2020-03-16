@@ -6,7 +6,6 @@
 #include "testing/function_traits.hpp"
 #include "testing/tuple.hpp"
 #include "testing/Stream.hpp"
-#include "testing/Map.hpp"
 #include "testing/printing.hpp"
 
 #include <iostream>

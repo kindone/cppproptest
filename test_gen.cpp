@@ -319,6 +319,21 @@ TEST(PropTest, TestFilter) {
     std::cout << "filtered animal: " << filteredGen(rand) << std::endl;
 }
 
+
+TEST(PropTest, TestFilter22) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    Arbitrary<int> gen;
+    auto evenGen = filter<int>(gen, [](const int& value) {
+        return value % 2 == 0;
+    }); 
+
+    for(int i = 0; i < 10; i++) {
+        std::cout << "even: " << evenGen(rand) << std::endl;
+    }
+}
+
 class Complicated {
 public:
     int value;
@@ -342,5 +357,6 @@ TEST(PropTest, TestShrinkable) {
     };
 
 }
+
 
 
