@@ -49,10 +49,10 @@ public:
 
     template <typename T, std::size_t... index>
     decltype(auto) generateHelper(Random& rand, std::index_sequence<index> index_sequence) {
-        return std::make_tuple(std::get<index>(elemGenTuple).generate(rand)...);
+        return std::make_tuple(std::get<index>(elemGenTuple)(rand)...);
     }
 
-    Shrinkable<std::tuple<Ts...>> generate(Random& rand) {
+    Shrinkable<std::tuple<Ts...>> operator()(Random& rand) {
         constexpr auto Size = sizeof...(Ts);
         std::tuple<Ts...> val;        
         auto valueTuple = generateHelper(rand, std::make_index_sequence<Size>{});

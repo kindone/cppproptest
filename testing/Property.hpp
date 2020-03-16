@@ -34,7 +34,7 @@ protected:
 
 template <typename T>
 decltype(auto) ReturnTypeOf() {
-    TypeHolder<typename std::result_of<decltype(&T::generate)(T, Random&)>::type> typeHolder;
+    TypeHolder<typename std::result_of<decltype(&T::operator())(T, Random&)>::type> typeHolder;
     return typeHolder;
 }
 
@@ -103,7 +103,7 @@ struct GetNext {
 template <typename T>
 struct Generate {
     static decltype(auto) map(T&& gen, Random rand) {
-        return gen.generate(rand);
+        return gen(rand);
     }
 };
 

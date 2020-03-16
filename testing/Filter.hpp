@@ -16,9 +16,9 @@ public:
     Filter(FilterFunc&& f) : filter(f) {
     }
     
-    Shrinkable<T> generate(Random& rand) {
+    Shrinkable<T> operator()(Random& rand) {
         while(true) {
-            auto shrinkable = gen.generate(rand);
+            auto shrinkable = gen(rand);
             if(filter(shrinkable.getRef())) {
                 return shrinkable;
             }

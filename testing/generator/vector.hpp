@@ -19,12 +19,12 @@ public:
     Arbitrary(Arbitrary<T> _elemGen, int _maxLen = 200) : elemGen(_elemGen), maxLen(_maxLen)  {
     }
 
-    Shrinkable<std::vector<T>> generate(Random& rand) {
+    Shrinkable<std::vector<T>> operator()(Random& rand) {
         int len = rand.getRandomSize(0, maxLen+1);
         std::vector<T> val;
         val.reserve(len);
         for(int i = 0; i < len; i++)
-            val.push_back(elemGen.generate(rand));
+            val.push_back(elemGen(rand));
         return make_shrinkable<std::vector<T>>(std::move(val));
     }
 

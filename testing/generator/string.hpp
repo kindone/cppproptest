@@ -15,7 +15,7 @@ public:
     Arbitrary(int _maxLen = 300) : maxLen(_maxLen) {
     }
 
-    Shrinkable<std::string> generate(Random& rand);
+    Shrinkable<std::string> operator()(Random& rand);
     static std::string boundaryValues[1];
 
     int maxLen;
@@ -36,7 +36,7 @@ public:
     Arbitrary(int _maxLen = 300) : maxLen(_maxLen) {
     }
 
-    Shrinkable<UTF8String> generate(Random& rand);
+    Shrinkable<UTF8String> operator()(Random& rand);
     static std::string boundaryValues[1];
 
     int maxLen;

@@ -7,7 +7,7 @@ namespace PropertyBasedTesting {
 template< typename Function, typename GenTuple, std::size_t... index>
 decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...> index_sequence) {
 
-    auto valueTup = std::make_tuple(std::get<index>(genTup).generate(rand)...); 
+    auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...); 
     try {
         return invokeWithArgTuple(std::move(f), std::move(valueTup));
     }

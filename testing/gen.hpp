@@ -21,7 +21,7 @@ struct Gen
     Gen() {
     }
 
-    Shrinkable<T> generate(Random& rand);
+    Shrinkable<T> operator()(Random& rand);
 };
 
 template <typename T, typename ElemGen = void>

@@ -64,14 +64,14 @@ public:
 
     template <std::size_t... index>
     decltype(auto) generateArgsHelper(Random& rand, std::index_sequence<index...>) {
-        return std::make_tuple(std::get<index>(genTup).generate(rand)...);
+        return std::make_tuple(std::get<index>(genTup)(rand)...);
     }
 
     decltype(auto) generateArgs(Random& rand) {
         return generateArgsHelper(rand, std::make_index_sequence<Size>{});
     }
 
-    Shrinkable<CLASS> generate(Random& rand) {
+    Shrinkable<CLASS> operator()(Random& rand) {
         auto argTup = generateArgs(rand);
         return make_shrinkable<CLASS>(constructHelper<CLASS, ARGTYPES...>(argTup));
     }

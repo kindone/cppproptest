@@ -10,7 +10,7 @@ template <>
 class PROPTEST_API Arbitrary< bool > : public Gen< bool >
 {
 public:
-    Shrinkable<bool> generate(Random& rand) {
+    Shrinkable<bool> operator()(Random& rand) {
         return make_shrinkable<bool>(rand.getRandomBool());
     }
 };

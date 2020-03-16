@@ -7,7 +7,7 @@
 namespace PropertyBasedTesting {
 
 
-Shrinkable<int8_t> Arbitrary<int8_t>::generate(Random& rand) {
+Shrinkable<int8_t> Arbitrary<int8_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<int8_t>(boundaryValues[i]);
@@ -27,7 +27,7 @@ Stream<Shrinkable<int8_t>> Arbitrary<int8_t>::shrinks(Shrinkable<int8_t>& target
 }
 */
 
-Shrinkable<int16_t> Arbitrary<int16_t>::generate(Random& rand) {
+Shrinkable<int16_t> Arbitrary<int16_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<int16_t>(boundaryValues[i]);
@@ -35,7 +35,7 @@ Shrinkable<int16_t> Arbitrary<int16_t>::generate(Random& rand) {
     return make_shrinkable<int16_t>(rand.getRandomInt16());
 }
 
-Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
+Shrinkable<int32_t> Arbitrary<int32_t>::operator()(Random& rand) {
     int32_t value = 0;
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
@@ -86,7 +86,7 @@ Shrinkable<int32_t> Arbitrary<int32_t>::generate(Random& rand) {
     });
 }
 
-Shrinkable<int64_t> Arbitrary<int64_t>::generate(Random& rand) {
+Shrinkable<int64_t> Arbitrary<int64_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<int64_t>(boundaryValues[i]);
@@ -94,7 +94,7 @@ Shrinkable<int64_t> Arbitrary<int64_t>::generate(Random& rand) {
     return make_shrinkable<int64_t>(rand.getRandomInt64());
 }
 
-Shrinkable<uint8_t> Arbitrary<uint8_t>::generate(Random& rand) {
+Shrinkable<uint8_t> Arbitrary<uint8_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<uint8_t>(boundaryValues[i]);
@@ -102,7 +102,7 @@ Shrinkable<uint8_t> Arbitrary<uint8_t>::generate(Random& rand) {
     return make_shrinkable<uint8_t>(rand.getRandomUInt8());
 }
 
-Shrinkable<uint16_t> Arbitrary<uint16_t>::generate(Random& rand) {
+Shrinkable<uint16_t> Arbitrary<uint16_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<uint16_t>(boundaryValues[i]);
@@ -110,7 +110,7 @@ Shrinkable<uint16_t> Arbitrary<uint16_t>::generate(Random& rand) {
     return make_shrinkable<uint16_t>(rand.getRandomUInt16());
 }
 
-Shrinkable<uint32_t> Arbitrary<uint32_t>::generate(Random& rand) {
+Shrinkable<uint32_t> Arbitrary<uint32_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<uint32_t>(boundaryValues[i]);
@@ -118,7 +118,7 @@ Shrinkable<uint32_t> Arbitrary<uint32_t>::generate(Random& rand) {
     return make_shrinkable<uint32_t>(rand.getRandomUInt32());
 }
 
-Shrinkable<uint64_t> Arbitrary<uint64_t>::generate(Random& rand) {
+Shrinkable<uint64_t> Arbitrary<uint64_t>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<uint64_t>(boundaryValues[i]);
@@ -126,7 +126,7 @@ Shrinkable<uint64_t> Arbitrary<uint64_t>::generate(Random& rand) {
     return make_shrinkable<uint64_t>(rand.getRandomUInt64());
 }
 
-Shrinkable<float> Arbitrary<float>::generate(Random& rand) {
+Shrinkable<float> Arbitrary<float>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<float>(boundaryValues[i]);
@@ -134,7 +134,7 @@ Shrinkable<float> Arbitrary<float>::generate(Random& rand) {
     return make_shrinkable<float>(rand.getRandomFloat());
 }
 
-Shrinkable<double> Arbitrary<double>::generate(Random& rand) {
+Shrinkable<double> Arbitrary<double>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<double>(boundaryValues[i]);

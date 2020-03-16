@@ -7,7 +7,7 @@ namespace PropertyBasedTesting {
 
 std::string Arbitrary<std::string>::boundaryValues[1] = {""};
 
-Shrinkable<std::string> Arbitrary<std::string>::generate(Random& rand) {
+Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<std::string>(std::string(boundaryValues[i]/*, allocator()*/));
@@ -128,7 +128,7 @@ bool isValidUTF8(std::vector<uint8_t>& chars) {
     return true;
 }
 
-Shrinkable<UTF8String> Arbitrary<UTF8String>::generate(Random& rand) {
+Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i]/*, allocator()*/));

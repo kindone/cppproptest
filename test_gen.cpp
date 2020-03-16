@@ -62,7 +62,7 @@ TEST(PropTest, GenerateBool) {
     Arbitrary<bool> gen;
 
     for(int i = 0; i < 20; i++) {
-        bool val = gen.generate(rand);
+        bool val = gen(rand);
         std::cout << val << " " << std::endl;
     }
 }
@@ -74,7 +74,7 @@ TYPED_TEST(NumericTest, NumericTypeGen) {
     Arbitrary<TypeParam> gen;
 
     for(int i = 0; i < 20; i++) {
-        TypeParam val = gen.generate(rand);
+        TypeParam val = gen(rand);
         std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
     }
 }
@@ -85,7 +85,7 @@ TEST(PropTest, GenUTF8String) {
     Arbitrary<UTF8String> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        std::cout << "str: \"" << static_cast<UTF8String>(gen.generate(rand)) << "\"" << std::endl;
+        std::cout << "str: \"" << static_cast<UTF8String>(gen(rand)) << "\"" << std::endl;
     }
 }
 
@@ -95,7 +95,7 @@ TEST(PropTest, GenLttVectorOfInt) {
     Arbitrary<std::vector<int>> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        std::vector<int> val(gen.generate(rand));
+        std::vector<int> val(gen(rand));
         std::cout << "vec: ";
         for(size_t j = 0; j < val.size(); j++)
         {
@@ -108,7 +108,7 @@ TEST(PropTest, GenLttVectorOfInt) {
 struct GenSmallInt : public Gen<int32_t> {
     GenSmallInt() : step(0ULL) {
     }
-    Shrinkable<int32_t> generate(Random& rand) {
+    Shrinkable<int32_t> operator()(Random& rand) {
         constexpr size_t num = sizeof(boundaryValues)/sizeof(boundaryValues[0]);
         return make_shrinkable<int32_t>(boundaryValues[step++ % num]);
     }
@@ -279,7 +279,7 @@ TEST(PropTest, TestConstruct) {
 
     using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
     auto gen = AnimalGen();
-    Animal animal = gen.generate(rand);
+    Animal animal = gen(rand);
     std::cout << "Gen animal: " << animal << std::endl;
 
     check<AnimalGen>(rand, [](Animal animal) -> bool {
@@ -316,7 +316,7 @@ TEST(PropTest, TestFilter) {
         return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() == 3 && a.measures.size() < 10;
     });
 
-    std::cout << "filtered animal: " << filteredGen.generate(rand) << std::endl;
+    std::cout << "filtered animal: " << filteredGen(rand) << std::endl;
 }
 
 class Complicated {
