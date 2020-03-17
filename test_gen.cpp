@@ -320,7 +320,7 @@ TEST(PropTest, TestFilter) {
 }
 
 
-TEST(PropTest, TestFilter22) {
+TEST(PropTest, TestFilter2) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
@@ -332,7 +332,42 @@ TEST(PropTest, TestFilter22) {
     for(int i = 0; i < 10; i++) {
         std::cout << "even: " << evenGen(rand) << std::endl;
     }
+
+    auto fours = filter<int>(evenGen, [](const int& value) {
+        EXPECT_EQ(value % 2, 0);
+        return value % 4 == 0;
+    });
+
+    for(int i = 0; i < 10; i++) {
+        std::cout << "four: " << fours(rand) << std::endl;
+    }
+
 }
+
+TEST(PropTest, TestMap) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    Arbitrary<int> gen;
+    auto stringGen = map<int,std::string>(gen, [](const int& value) {
+        return "(" + std::to_string(value) + ")";
+    }); 
+
+    for(int i = 0; i < 10; i++) {
+        std::cout << "string: " << stringGen(rand) << std::endl;
+    }
+
+    auto vectorGen = map<std::string,std::vector<std::string>>(stringGen, [](const std::string& value) {
+        std::vector<std::string> vec;
+        vec.push_back(value);
+        return vec;
+    }); 
+
+    for(int i = 0; i < 10; i++) {
+        std::cout << "vector " << vectorGen(rand)[0] << std::endl;
+    }
+}
+
 
 class Complicated {
 public:

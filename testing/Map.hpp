@@ -2,9 +2,9 @@
 
 namespace PropertyBasedTesting {
 
-template <typename T>
-std::function<Shrinkable<T>(Random&)> filter(Gen<T>& gen, std::function<bool(const T&)> criteria) {
-    return [=](Random& rand) {
+template <typename T, typename GEN>
+decltype(auto) filter(GEN&& gen, std::function<bool(const T&)> criteria) {
+    return [=, &gen](Random& rand) {
         while(true) {
             Shrinkable<T> generated = gen(rand);
             if(criteria(generated.getRef())) {
@@ -14,9 +14,9 @@ std::function<Shrinkable<T>(Random&)> filter(Gen<T>& gen, std::function<bool(con
     };
 }
 
-template <typename T, typename U>
-std::function<U(Random&)> map(const Gen<T>& gen, std::function<U(const T&)> mapper) {
-    return [=](Random& rand) {
+template <typename T, typename U,  typename GEN>
+decltype(auto) map(GEN&& gen, std::function<U(const T&)> mapper) {
+    return [=, &gen](Random& rand) {
         T generated = gen(rand);
         return mapper(generated);
     };
