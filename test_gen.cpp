@@ -201,15 +201,27 @@ TEST(PropTest, TestCheckBasic) {
 }
 
 
-TEST(PropTest, TestCheckFail) {
+TYPED_TEST(NumericTest, TestCheckFail) {
     int64_t seed = getCurrentTime();
     std::cout << "seed: " << seed << std::endl;
     Random rand(seed);
-    check(rand, [](int a, int b/*,std::string str, std::vector<int> vec*/) -> bool {
+    check(rand, [](TypeParam a, TypeParam b/*,std::string str, std::vector<int> vec*/) -> bool {
         PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200, {});
         return true;
     });
 }
+
+TEST(PropTest, TestStringCheckFail) {
+    int64_t seed = getCurrentTime();
+    std::cout << "seed: " << seed << std::endl;
+    Random rand(seed);
+    check(rand, [](std::string a) -> bool {
+        std::cout << "a: " << a << std::endl;
+        PROP_ASSERT(a.size() < 5, {});
+        return true;
+    });
+}
+
 
 bool propertyAsFunc(std::string a, int i, std::vector<int> v) {
     return true;

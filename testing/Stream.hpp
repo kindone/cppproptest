@@ -153,7 +153,7 @@ struct Stream {
     }
 
     template<typename U>
-    Stream<U> map(std::function<U(const T&)> mapper) {
+    Stream<U> map(std::function<U(const T&)> mapper) const {
         if(isEmpty()) {
             return Stream<U>::empty();
         }

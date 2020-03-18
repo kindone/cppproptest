@@ -5,5 +5,6 @@
 #include "testing/generator/bool.hpp"
 #include "testing/generator/string.hpp"
 #include "testing/generator/vector.hpp"
+#include "testing/generator/util.hpp"
 
 #endif

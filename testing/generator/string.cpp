@@ -1,5 +1,6 @@
 #include "testing/gen.hpp"
 #include "testing/generator/string.hpp"
+#include "testing/generator/util.hpp"
 #include <vector>
 
 namespace PropertyBasedTesting {
@@ -10,14 +11,30 @@ std::string Arbitrary<std::string>::boundaryValues[1] = {""};
 Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
     if(rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return make_shrinkable<std::string>(std::string(boundaryValues[i]/*, allocator()*/));
+        std::string str = std::string(boundaryValues[i]);
+        int len = str.size();
+        return binarySearchShrinkable<int>(len).map<std::string>([str](const int& len) {
+            return str.substr(0, len);
+        });
+    }
+    else {
+        int len = rand.getRandomSize(0, maxLen+1);
+        std::string str(len, ' '/*, allocator()*/);
+        for(int i = 0; i < len; i++)
+            str[i] = rand.getRandomSize(0, 128);
+
+        return binarySearchShrinkable<int>(len).map<std::string>([str](const int& len) {
+            return str.substr(0, len);
+        });
+
     }
 
-    int len = rand.getRandomSize(0, maxLen+1);
-    std::string str(len, ' '/*, allocator()*/);
-    for(int i = 0; i < len; i++)
-        str[i] = rand.getRandomSize(0, 128);
-    return make_shrinkable<std::string>(str);
+
+    /*
+    return make_shrinkable<std::string>(str).with([str]() -> stream_t {
+        return stream_t::empty();
+    });
+    */
 }
 
 

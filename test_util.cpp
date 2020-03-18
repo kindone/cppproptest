@@ -284,6 +284,49 @@ TEST(UtilTestCase, Shrinkable) {
     for(auto itr = stream.iterator(); itr.hasNext(); ) {
         std::cout << "stream2:" << itr.next() << std::endl;
     }
+}
+
+TEST(UtilTestCase, ShrinkableNumeric) {
+    // should show 0~7, -7~0
+    int values[] = {8,-8};
+    for(size_t i = 0; i < 2; i++) {
+        int value = values[i];
+        auto shrinkable =  binarySearchShrinkable<int>(value);
+
+        for(auto itr = shrinkable.shrinks().iterator(); itr.hasNext(); ) {
+            auto shrinkable = itr.next();
+            std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
+            for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
+                auto shrinkable2 = itr2.next();
+                std::cout << "  shrink: " << shrinkable2.get() << std::endl;
+                for(auto itr3 = shrinkable2.shrinks().iterator(); itr3.hasNext();) {
+                    auto shrinkable3 = itr3.next();
+                    std::cout << "    shrink: " << shrinkable3.get() << std::endl;
+                    for(auto itr4 = shrinkable3.shrinks().iterator(); itr4.hasNext();) {
+                        auto shrinkable4 = itr4.next();
+                        std::cout << "      shrink: " << shrinkable4.get() << std::endl;
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+TEST(UtilTestCase, ShrinkableString) {
+    auto str = std::string("hello world");
+    int len = str.size();
+    auto shrinkable =  binarySearchShrinkable<int>(len).map<std::string>([str](const int& len) {
+        return str.substr(0, len);
+    });
+
+    for(auto itr = shrinkable.shrinks().iterator(); itr.hasNext(); ) {
+        auto shrinkable = itr.next();
+        std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
+        for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
+            std::cout << "  shrink: " << itr2.next().get() << std::endl;
+        }
+    }
 
 }
 

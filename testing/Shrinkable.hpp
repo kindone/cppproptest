@@ -6,6 +6,9 @@
 
 namespace PropertyBasedTesting {
 
+template <typename T> struct Shrinkable;
+template <typename T, typename ...Args>
+Shrinkable<T> make_shrinkable(Args&&... args);
 
 template <typename T>
 struct Shrinkable {
@@ -23,6 +26,17 @@ struct Shrinkable {
     T get() const { return *ptr; }
     T* getPtr() const { return ptr.get(); }
     T& getRef() const { return *ptr.get(); }
+
+    template <typename U>
+    Shrinkable<U> map(std::function<U(const T&)> mapper) const {
+        auto shrinks = this->shrinks();
+        auto shrinkable = make_shrinkable<U>(mapper(getRef()));
+        return shrinkable.with([shrinks, mapper]() {
+            return shrinks.template map<Shrinkable<U>>([mapper](const Shrinkable<T>& shr) {
+                return shr.map(mapper);
+            });
+        });
+    }
 
 private:
     Shrinkable() {

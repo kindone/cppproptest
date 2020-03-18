@@ -1,5 +1,6 @@
 #include "testing/gen.hpp"
 #include "testing/generator/numeric.hpp"
+#include "testing/generator/util.hpp"
 #include <string>
 #include <functional>
 
@@ -28,11 +29,15 @@ Stream<Shrinkable<int8_t>> Arbitrary<int8_t>::shrinks(Shrinkable<int8_t>& target
 */
 
 Shrinkable<int16_t> Arbitrary<int16_t>::operator()(Random& rand) {
+    int16_t value = 0;
     if(rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return make_shrinkable<int16_t>(boundaryValues[i]);
+        value = boundaryValues[i];
     }
-    return make_shrinkable<int16_t>(rand.getRandomInt16());
+    else
+        value = rand.getRandomInt16();
+
+    return binarySearchShrinkable<int16_t>(value);
 }
 
 Shrinkable<int32_t> Arbitrary<int32_t>::operator()(Random& rand) {
@@ -44,46 +49,7 @@ Shrinkable<int32_t> Arbitrary<int32_t>::operator()(Random& rand) {
     else
        value = rand.getRandomInt32();
 
-    using shrinkable_t = Shrinkable<int>;
-    using stream_t = Stream<shrinkable_t>;
-    using func_t = typename std::function<stream_t()>;
-    using genfunc_t = typename std::function<stream_t(int, int)>;
-
-    // given min, val, generate stream
-    static genfunc_t genpos = [](int min, int val) {
-        int mid = val/2 + min/2;
-        if(val <= 0 || (val-min) <= 1 || mid == val || mid == min)
-            return stream_t::empty();
-        else
-            return stream_t(
-                make_shrinkable<int>(mid).with([=]() { return genpos(0, mid);}),
-                [=]() { return genpos(mid, val); }
-            );
-    };
-
-    static genfunc_t genneg = [](int max, int val) {
-        int mid = val/2 + max/2;
-        //std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl; 
-        if(val >= 0 || (max-val) <= 1 || mid == val || mid == max)
-            return stream_t::empty();
-        else
-            return stream_t(
-                make_shrinkable<int>(mid).with([=]() { return genneg(0, mid);}),
-                [=]() { return genneg(mid, val); }
-            );
-    };
-
-    //std::cout << "      val0: " << value << std::endl; 
-    return make_shrinkable<int>(value).with([value]() {
-        //std::cout << "      val1: " << value << std::endl; 
-        return  stream_t(make_shrinkable<int>(0), [value]() {
-            //std::cout << "      val2: " << value << std::endl; 
-            if(value >= 0)
-                return genpos(0, value);
-            else
-                return genneg(0, value);
-        });
-    });
+    return binarySearchShrinkable<int32_t>(value);
 }
 
 Shrinkable<int64_t> Arbitrary<int64_t>::operator()(Random& rand) {
