@@ -222,6 +222,19 @@ TEST(PropTest, TestStringCheckFail) {
     });
 }
 
+TEST(PropTest, TestVectorCheckFail) {
+    int64_t seed = getCurrentTime();
+    std::cout << "seed: " << seed << std::endl;
+    Random rand(seed);
+    check(rand, [](std::vector<int> a) -> bool {
+        std::cout << "a: ";
+        show(std::cout, a);
+        std::cout << std::endl;
+        PROP_ASSERT(a.size() < 5, {});
+        return true;
+    });
+}
+
 
 bool propertyAsFunc(std::string a, int i, std::vector<int> v) {
     return true;

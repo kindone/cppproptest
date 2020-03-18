@@ -3,6 +3,7 @@
 #include "testing/gen.hpp"
 #include "testing/Random.hpp"
 #include "testing/printing.hpp"
+#include "testing/generator/util.hpp"
 #include <vector>
 #include <iostream>
 
@@ -21,11 +22,22 @@ public:
 
     Shrinkable<std::vector<T>> operator()(Random& rand) {
         int len = rand.getRandomSize(0, maxLen+1);
-        std::vector<T> val;
-        val.reserve(len);
+        std::vector<T> vec;
+        vec.reserve(len);
         for(int i = 0; i < len; i++)
-            val.push_back(elemGen(rand));
-        return make_shrinkable<std::vector<T>>(std::move(val));
+            vec.push_back(elemGen(rand));
+
+        //return make_shrinkable<std::vector<T>>(std::move(vec));
+
+        return binarySearchShrinkable<int>(len).map<std::vector<T>>([vec](const int& len) {
+            if(len <= 0)
+                return std::vector<T>();
+
+            auto begin = vec.begin();
+            auto last = vec.begin() + len;
+            return std::vector<T>(begin, last);;
+        });
+
     }
 
     int maxLen;

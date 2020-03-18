@@ -330,6 +330,40 @@ TEST(UtilTestCase, ShrinkableString) {
 
 }
 
+/*
+TEST(UtilTestCase, ShrinkableVector) {
+
+    int len = 8;
+    std::vector<int> vec;
+    for(int i = 0; i < len; i++)
+        vec.push_back(i);
+
+    auto shrinkable =  binarySearchShrinkable<int>(value).map<std::vector<int>>([vec](const int& len) {
+        auto begin = vec.begin();
+        auto last = vec.begin() + len;
+        return std::vector<T>(begin, last);;
+    });
+
+    for(auto itr = shrinkable.shrinks().iterator(); itr.hasNext(); ) {
+        auto shrinkable = itr.next();
+        std::cout << "vecstreamshrink:" << shrinkable.get() << std::endl;
+        for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
+            auto shrinkable2 = itr2.next();
+            std::cout << "  shrink: " << shrinkable2.get() << std::endl;
+            for(auto itr3 = shrinkable2.shrinks().iterator(); itr3.hasNext();) {
+                auto shrinkable3 = itr3.next();
+                std::cout << "    shrink: " << shrinkable3.get() << std::endl;
+                for(auto itr4 = shrinkable3.shrinks().iterator(); itr4.hasNext();) {
+                    auto shrinkable4 = itr4.next();
+                    std::cout << "      shrink: " << shrinkable4.get() << std::endl;
+                }
+
+            }
+        }
+    }
+}
+*/
+
 struct NoBlank {
     NoBlank() = delete;
     NoBlank(int a) {}
