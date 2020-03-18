@@ -86,4 +86,43 @@ int64_t getCurrentTime() {
 	return millis;
 }
 
+template <>
+int8_t Random::getRandom<int8_t>() {
+    return getRandomInt8();
+}
+
+template <>
+int16_t Random::getRandom<int16_t>() {
+    return getRandomInt16();
+}
+
+template <>
+int32_t Random::getRandom<int32_t>() {
+    return getRandomInt32();
+}
+
+template <>
+int64_t Random::getRandom<int64_t>() {
+    return getRandomInt64();
+}
+
+template <>
+uint8_t Random::getRandom<uint8_t>() {
+    return getRandomUInt8();
+}
+
+template <>
+uint16_t Random::getRandom<uint16_t>() {
+    return getRandomUInt16();
+}
+
+template <>
+uint32_t Random::getRandom<uint32_t>() {
+    return getRandomUInt32();
+}
+
+template <>
+uint64_t Random::getRandom<uint64_t>() {
+    return getRandomUInt64();
+}
 } // namespace

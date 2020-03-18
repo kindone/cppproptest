@@ -1,6 +1,7 @@
 #ifndef TESTING_RANDOM_HPP
 #define TESTING_RANDOM_HPP
 #include <random>
+#include <exception>
 
 namespace PropertyBasedTesting {
 
@@ -23,6 +24,11 @@ public:
     float getRandomFloat();
     double getRandomDouble();
     uint32_t getRandomSize(size_t fromIncluded, size_t toExcluded);
+
+    template <typename T>
+    T getRandom() {
+        throw std::bad_exception();
+    }
 private:
     uint64_t next8U();
     //std::default_random_engine engine;

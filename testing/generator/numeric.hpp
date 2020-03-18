@@ -3,9 +3,24 @@
 #include "testing/gen.hpp"
 #include "testing/Seq.hpp"
 #include "testing/Stream.hpp"
+#include "testing/generator/util.hpp"
 
 namespace PropertyBasedTesting
 {
+
+template <typename T>
+Shrinkable<T> generateNumeric(Random& rand) {
+    T value = 0;
+    if(rand.getRandomBool()) {
+        uint32_t i = rand.getRandomSize(0, sizeof(Arbitrary<T>::boundaryValues) / sizeof(Arbitrary<T>::boundaryValues[0]));
+        value = Arbitrary<T>::boundaryValues[i];
+    }
+    else
+        value = rand.getRandom<T>();
+
+    return binarySearchShrinkable<T>(value);
+}
+    
 
 template <>
 class PROPTEST_API Arbitrary<int8_t> : public Gen<int8_t>
