@@ -126,7 +126,6 @@ std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec) {
 	
 	auto begin = vec.begin();
 	if(begin == vec.end()) {
-		show(os, *begin);
 	}
 	else {
 		show(os, *begin);
