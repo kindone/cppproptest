@@ -1,0 +1,21 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cmake",
+            "type": "shell",
+            "command": "cmake . -BBUILD -DCMAKE_BUILD_TYPE=Debug"
+        },
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "cd BUILD; make -j 8",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

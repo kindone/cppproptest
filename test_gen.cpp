@@ -122,21 +122,19 @@ constexpr int32_t GenSmallInt::boundaryValues[13];
 
 
 TEST(PropTest, TestCheckBasic) {
-    int64_t seed = getCurrentTime();
-    Random rand(seed);
-    check(rand, [](const int& a, const int& b) -> bool {
+    check([](const int& a, const int& b) -> bool {
         EXPECT_EQ(a+b, b+a);
 
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
     });
 
-    check(rand, [](int a) -> bool {
+    check([](int a) -> bool {
         std::cout << "a: " << a << std::endl;
         return true;
     });
 
-    check(rand, [](std::string a, std::string b) -> bool {
+    check([](std::string a, std::string b) -> bool {
         std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
@@ -145,7 +143,7 @@ TEST(PropTest, TestCheckBasic) {
         return true;
     });
 
-    check(rand, [](UTF8String a, UTF8String b) -> bool {
+    check([](UTF8String a, UTF8String b) -> bool {
         std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
@@ -155,12 +153,19 @@ TEST(PropTest, TestCheckBasic) {
     });
 
 
-    check(rand, [](std::vector<int> a) -> bool {
+    check([](std::vector<int> a) -> bool {
         std::cout << "a: " << a << std::endl;
         return true;
     });
 
-    check<GenSmallInt, GenSmallInt>(rand, [](int a, int b) -> bool {
+    check<GenSmallInt, GenSmallInt>(GenSmallInt(), GenSmallInt(), [](int a, int b) -> bool {
+        std::cout << "a: " << a << ", b: " << b << std::endl;
+        return true;
+    });
+
+    GenSmallInt genSmallInt;
+
+    check<GenSmallInt, GenSmallInt>(genSmallInt, genSmallInt, [](int a, int b) -> bool {
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
     });
@@ -189,7 +194,7 @@ TEST(PropTest, TestCheckBasic) {
     };
 
     property(func).check();
-    check(rand, func);
+    check(func);
 
     auto prop = property([](std::string a, int i, std::string b) -> bool {
         std::cout << "deferred check!" << std::endl;
@@ -202,20 +207,16 @@ TEST(PropTest, TestCheckBasic) {
 
 
 TYPED_TEST(NumericTest, TestCheckFail) {
-    int64_t seed = getCurrentTime();
-    std::cout << "seed: " << seed << std::endl;
-    Random rand(seed);
-    check(rand, [](TypeParam a, TypeParam b/*,std::string str, std::vector<int> vec*/) -> bool {
+
+    check([](TypeParam a, TypeParam b/*,std::string str, std::vector<int> vec*/) -> bool {
         PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200, {});
         return true;
     });
 }
 
 TEST(PropTest, TestStringCheckFail) {
-    int64_t seed = getCurrentTime();
-    std::cout << "seed: " << seed << std::endl;
-    Random rand(seed);
-    check(rand, [](std::string a) -> bool {
+
+    check([](std::string a) -> bool {
         std::cout << "a: " << a << std::endl;
         PROP_ASSERT(a.size() < 5, {});
         return true;
@@ -223,10 +224,8 @@ TEST(PropTest, TestStringCheckFail) {
 }
 
 TEST(PropTest, TestVectorCheckFail) {
-    int64_t seed = getCurrentTime();
-    std::cout << "seed: " << seed << std::endl;
-    Random rand(seed);
-    check(rand, [](std::vector<int> a) -> bool {
+
+    check([](std::vector<int> a) -> bool {
         std::cout << "a: ";
         show(std::cout, a);
         std::cout << std::endl;
@@ -253,18 +252,15 @@ public:
 
 
 TEST(PropTest, TestPropertyFunctionLambdaMethod) {
-    int64_t seed = getCurrentTime();
-    Random rand(seed);
-
     property(propertyAsFunc).check();
-    check(rand, propertyAsFunc);
+    check(propertyAsFunc);
 
     PropertyAsClass propertyAsClass;
     property(propertyAsClass).check();
-    check(rand, propertyAsClass);
+    check(propertyAsClass);
 
     property(PropertyAsClass::propertyAsMethod).check();
-    check(rand, PropertyAsClass::propertyAsMethod);
+    check(PropertyAsClass::propertyAsMethod);
 
 }
 
@@ -307,7 +303,7 @@ TEST(PropTest, TestConstruct) {
     Animal animal = gen(rand);
     std::cout << "Gen animal: " << animal << std::endl;
 
-    check<AnimalGen>(rand, [](Animal animal) -> bool {
+    check(gen, [](Animal animal) -> bool {
         std::cout << "animal: " << animal << std::endl;
         return true;
     });
@@ -326,7 +322,7 @@ TEST(PropTest, TestCheckArbitraryWithConstruct) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    check(rand, [](std::vector<Animal> animals) -> bool {
+    check([](std::vector<Animal> animals) -> bool {
         if(!animals.empty())
             std::cout << "animal: " << animals[0] << std::endl;
         return true;
@@ -352,7 +348,7 @@ TEST(PropTest, TestFilter2) {
     Arbitrary<int> gen;
     auto evenGen = filter<int>(gen, [](const int& value) {
         return value % 2 == 0;
-    }); 
+    });
 
     for(int i = 0; i < 10; i++) {
         std::cout << "even: " << evenGen(rand) << std::endl;
@@ -376,7 +372,7 @@ TEST(PropTest, TestMap) {
     Arbitrary<int> gen;
     auto stringGen = map<int,std::string>(gen, [](const int& value) {
         return "(" + std::to_string(value) + ")";
-    }); 
+    });
 
     for(int i = 0; i < 10; i++) {
         std::cout << "string: " << stringGen(rand) << std::endl;
@@ -386,7 +382,7 @@ TEST(PropTest, TestMap) {
         std::vector<std::string> vec;
         vec.push_back(value);
         return vec;
-    }); 
+    });
 
     for(int i = 0; i < 10; i++) {
         std::cout << "vector " << vectorGen(rand)[0] << std::endl;
@@ -399,7 +395,7 @@ public:
     int value;
     Complicated(int a) : value(a){
     }
- 
+
     Complicated(const Complicated&) = delete;
     Complicated(Complicated&&) = default;
 private:

@@ -81,7 +81,7 @@ public:
         //std::cout << "    test: tuple ";
         //show(std::cout, valueTup);
         //std::cout << " replaced with arg " << N << ": ";
-        //show(std::cout, replace); 
+        //show(std::cout, replace);
         //std::cout << std::endl;
 
         bool result = false;
@@ -201,11 +201,19 @@ auto property(Callable&& callable) {
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
 }
 
+// template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
+// auto property(Callable&& callable) {
+//     // acquire tuple of generators
+//     using argument_type_tuple = typename std::tuple<GENS...>;
+//     auto genTup = createGenTuple<GENS...>();
+//     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
+//     //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
+// }
+
 template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-auto property(Callable&& callable) {
+auto property(GENS&&... gens, Callable&& callable) {
     // acquire tuple of generators
-    using argument_type_tuple = typename std::tuple<GENS...>;
-    auto genTup = createGenTuple<GENS...>();
+    auto genTup = std::make_tuple(gens...);
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
     //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
 }
@@ -214,17 +222,21 @@ auto property(Callable&& callable) {
 // check with Arbitrary<ARG1>, Arbitrary<ARG2>, ... as generators
 // check(rand, [](ARG1 arg1, ARG2) -> bool {});
 template <typename Callable>
-bool check(Random& rand, Callable&& callable) {
+bool check(Callable&& callable) {
     return property(callable).check();
 }
 
 // check with generators specified
-// check<CUSTOM_GEN_ARG1>, CUSTOM_GEN_ARG2>,...>(rand, [](ARG1 arg1, ARG2) -> bool {});
-template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-bool check(Random& rand, Callable&& callable) {
-    return property<GENS...>(callable).check();
-}
+// // check<CUSTOM_GEN_ARG1, CUSTOM_GEN_ARG2,...>(rand, [](ARG1 arg1, ARG2) -> bool {});
+// template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
+// bool check(Callable&& callable) {
+//     return property<GENS...>(callable).check();
+// }
 
+template <typename ...GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
+bool check(GENS&&...gens, Callable&& callable) {
+    return property<GENS...>(gens..., callable).check();
+}
 
 
 } // namespace PropertyBasedTesting
