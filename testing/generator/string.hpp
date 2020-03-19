@@ -1,6 +1,4 @@
-#ifndef __PROPTEST_STRING_HPP__
-#define __PROPTEST_STRING_HPP__
-
+#pragma once
 #include "testing/gen.hpp"
 #include <string>
 
@@ -43,4 +41,3 @@ public:
 };
 } // namespace PropertyBasedTesting
 
-#endif

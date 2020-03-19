@@ -1,10 +1,10 @@
-#ifndef TESTING_FUNCTION_TRAITS_HPP
-#define TESTING_FUNCTION_TRAITS_HPP
+#pragma once
 #include <memory>
 #include <utility>
 #include <type_traits>
 #include "testing/typelist.hpp"
 
+namespace PropertyBasedTesting {
 
 template<class F>
 struct function_traits;
@@ -75,4 +75,5 @@ template<class F>
 struct function_traits<F&&> : public function_traits<F>
 {};
 
-#endif
+}
+

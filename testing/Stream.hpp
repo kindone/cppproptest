@@ -1,5 +1,4 @@
-#ifndef __PROPTEST_STREAM_HPP__
-#define __PROPTEST_STREAM_HPP__
+#pragma once
 
 #include "testing/Seq.hpp"
 
@@ -201,6 +200,4 @@ struct Stream {
 
 
 } // namespace
-
-#endif
 

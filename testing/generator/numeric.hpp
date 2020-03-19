@@ -1,5 +1,4 @@
-#ifndef __PROPTEST_NUMRIC_HPP__
-#define __PROPTEST_NUMRIC_HPP__
+#pragma once
 #include "testing/gen.hpp"
 #include "testing/Seq.hpp"
 #include "testing/Stream.hpp"
@@ -149,4 +148,3 @@ public:
 
 } // namespace PropertyBasedTesting
 
-#endif

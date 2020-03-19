@@ -1,6 +1,4 @@
-#ifndef TESTING_PROPERTY_ASSERT_HPP
-#define TESTING_PROPERTY_ASSERT_HPP
-
+#pragma once
 #include <exception>
 #include <system_error>
 
@@ -78,4 +76,3 @@ struct Success : public std::logic_error {
     } while (false)
 
 
-#endif // TESTING_PROPERTY_ASSERT_HPP

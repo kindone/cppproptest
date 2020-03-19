@@ -1,5 +1,5 @@
-#ifndef TESTING_GEN_HPP
-#define TESTING_GEN_HPP
+#pragma once
+
 #include <functional>
 #include <tuple>
 #include "testing/function_traits.hpp"
@@ -12,7 +12,8 @@
 
 namespace PropertyBasedTesting
 {
-    class Random;
+
+class Random;
 
 template <typename T>
 struct Gen
@@ -35,4 +36,3 @@ struct Arbitrary : public Gen<T>{
 #include "testing/invokeWithGenTuple.hpp"
 #include "testing/createGenTuple.hpp"
 
-#endif // TESTING_GEN_HPP

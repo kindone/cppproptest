@@ -1,5 +1,4 @@
-#ifndef TESTING_API_HPP
-#define TESTING_API_HPP
+#pragma once
 
 // Generic helper definitions for shared library support
 #if defined _WIN32 || defined __CYGWIN__
@@ -41,4 +40,3 @@
 //#define PROPTEST_API SYMBOL_VISIBILITY_IMPORT
 //#endif
 
-#endif

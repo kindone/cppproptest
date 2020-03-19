@@ -1,6 +1,4 @@
-#ifndef TESTING_PROPERTY_HPP
-#define TESTING_PROPERTY_HPP
-
+#pragma once
 #include "testing/api.hpp"
 #include "testing/gen.hpp"
 #include "testing/function_traits.hpp"
@@ -47,12 +45,6 @@ template <typename T>
 decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr) {
     return shr.shrinks();
 }
-/*
-template <typename T>
-decltype(auto) GetShrinksHelper(Shrinkable<T> shr) {
-    return shr.shrinks();
-}
-*/
 
 template <typename T>
 struct GetShrinks {
@@ -61,43 +53,6 @@ struct GetShrinks {
     }
 };
 
-template <typename P>
-Iterator<Shrinkable<P>> GetIteratorHelper(Stream<Shrinkable<P>>&& stream) {
-    return stream.iterator();
-}
-
-
-template <typename T>
-struct GetIterator {
-    static decltype(auto) map(T&& stream) {
-        return GetIteratorHelper(stream);
-    }
-};
-
-template <typename P>
-bool HasNextHelper(Iterator<Shrinkable<P>>& itr) {
-    return itr.hasNext();
-}
-
-template <typename T>
-struct HasNext {
-    static decltype(auto) map(T&& itr) {
-        return  HasNextHelper(itr);
-    }
-};
-
-
-template <typename P>
-Shrinkable<P> GetNextHelper(Iterator<Shrinkable<P>>& itr) {
-    return itr.next();
-}
-
-template <typename T>
-struct GetNext {
-    static decltype(auto) map(T&& itr) {
-        return GetNextHelper(itr);
-    }
-};
 
 template <typename T>
 struct Generate {
@@ -274,5 +229,4 @@ bool check(Random& rand, Callable&& callable) {
 
 } // namespace PropertyBasedTesting
 
-#endif // TESTING_PROPERTY_HPP
 

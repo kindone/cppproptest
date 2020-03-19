@@ -1,6 +1,4 @@
-#ifndef __PROPTEST_BOOL_HPP
-#define __PROPTEST_BOOL_HPP
-
+#pragma once
 #include "testing/gen.hpp"
 
 namespace PropertyBasedTesting
@@ -19,4 +17,3 @@ public:
 
 } // namespace PropertyBasedTesting
 
-#endif

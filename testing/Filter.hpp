@@ -1,6 +1,4 @@
-#ifndef TESTING_PROP_FILTER_HPP
-#define TESTING_PROP_FILTER_HPP
-
+#pragma once
 #include "testing/gen.hpp"
 
 namespace PropertyBasedTesting {
@@ -30,4 +28,3 @@ public:
 };
 
 } // namespace
-#endif

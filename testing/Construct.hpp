@@ -1,6 +1,4 @@
-#ifndef TESTING_PROP_CONSTRUCT_HPP
-#define TESTING_PROP_CONSTRUCT_HPP
-
+#pragma once
 #include "testing/gen.hpp"
 
 namespace PropertyBasedTesting
@@ -41,15 +39,6 @@ decltype( auto ) constructAccordingly(ValueTuple&& valueTuple) {
     );
 }
 
-
-
-template <typename Constructible, typename ... ARGS, typename ValueTuple>
-decltype(auto) constructHelper(ValueTuple&& valueTuple) {
-    return constructAccordingly<Constructible, ARGS...>(valueTuple);
-}
-
-
-
 template <class CLASS, typename ...ARGTYPES>
 class Construct : public Gen<CLASS>
 {
@@ -73,7 +62,7 @@ public:
 
     Shrinkable<CLASS> operator()(Random& rand) {
         auto argTup = generateArgs(rand);
-        return make_shrinkable<CLASS>(constructHelper<CLASS, ARGTYPES...>(argTup));
+        return make_shrinkable<CLASS>(constructAccordingly<CLASS, ARGTYPES...>(argTup));
     }
 private:
     GenTuple genTup;
@@ -83,5 +72,4 @@ private:
 
 } // namespace PropertyBasedTesting
 
-#endif // TESTING_PROP_CONSTRUCT_HPP
 

@@ -1,5 +1,5 @@
-#ifndef TESTING_RANDOM_HPP
-#define TESTING_RANDOM_HPP
+#pragma once
+
 #include <random>
 #include <exception>
 
@@ -38,5 +38,4 @@ private:
 };
 
 } // namespace PropertyBasedTesting
-#endif // TESTING_RANDOM_HPP
 

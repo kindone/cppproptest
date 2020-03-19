@@ -66,13 +66,4 @@ Shrinkable<T> make_shrinkable(Args&&... args) {
     return shrinkable;
 }
 
-/*
-template <typename T, typename ...Args>
-Shrinkable<T> make_shrinkable(Args&&... args, std::function<Stream<Shrinkable<T>>()> shrinks ) {
-    Shrinkable<T> shrinkable(shrinks);
-    shrinkable.ptr = std::make_shared<T>(args...);
-    return shrinkable;
-}
-*/
-
 }
