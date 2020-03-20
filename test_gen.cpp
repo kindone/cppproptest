@@ -119,7 +119,7 @@ struct GenSmallInt : public Gen<int32_t> {
 
 constexpr int32_t GenSmallInt::boundaryValues[13];
 
- 
+
 
 TEST(PropTest, TestCheckBasic) {
     check([](const int& a, const int& b) -> bool {
@@ -137,7 +137,7 @@ TEST(PropTest, TestCheckBasic) {
         std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
-        EXPECT_EQ(c.size(), d.size());        
+        EXPECT_EQ(c.size(), d.size());
         return true;
     });
 
@@ -164,7 +164,7 @@ TEST(PropTest, TestCheckGen) {
         return true;
     }, GenSmallInt(), GenSmallInt());
 
-    // 
+    //
     check([](int a, int b) -> bool {
         std::cout << "custom a: " << a << ", b: " << b << std::endl;
         return true;
@@ -227,8 +227,8 @@ TEST(PropTest, TestPropertyExample) {
         PROP_ASSERT(false, {});
         return true;
     };
-    auto prop = property(func);    
-    // with specific arguments    
+    auto prop = property(func);
+    // with specific arguments
     prop.example(std::string("hello"), 10, std::string("world"));
 }
 
@@ -413,6 +413,17 @@ TEST(PropTest, TestMap) {
     for(int i = 0; i < 10; i++) {
         std::cout << "vector " << vectorGen(rand)[0] << std::endl;
     }
+}
+
+TEST(PropTest, TestOneOf) {
+    auto intGen = Arbitrary<int>();
+    auto smallIntGen = GenSmallInt();
+
+    auto gen = oneOf<int>(intGen, smallIntGen);
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 0;  i < 10; i++)
+        std::cout << gen(rand) << std::endl;
 }
 
 
