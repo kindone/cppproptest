@@ -1,4 +1,5 @@
 #pragma once
+
 #include "testing/api.hpp"
 #include "testing/gen.hpp"
 #include "testing/function_traits.hpp"
@@ -74,6 +75,7 @@ public:
 
     Property& setSeed(uint64_t s) {
         seed = s;
+        return *this;
     }
 
     template <size_t N, typename ValueTuple, typename Replace>
@@ -190,51 +192,17 @@ auto make_CallableWrapper(Callable&& callable) {
     return CallableWrapper<typename std::remove_reference<Callable>::type>(std::move(callable));
 }
 
-
-
-template <typename Callable>
-auto property(Callable&& callable) {
-    using argument_type_tuple = typename function_traits<Callable>::argument_type_list::type_tuple;
+template <typename Callable, typename ... EXPGENS>
+auto property(Callable&& callable, EXPGENS&&... gens) {
+    // acquire full tuple of generators
     typename function_traits<Callable>::argument_type_list argument_type_list;
-    // acquire tuple of generators
-    auto genTup = createGenTuple(argument_type_list);
-    return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
-}
-
-// template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-// auto property(Callable&& callable) {
-//     // acquire tuple of generators
-//     using argument_type_tuple = typename std::tuple<GENS...>;
-//     auto genTup = createGenTuple<GENS...>();
-//     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
-//     //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
-// }
-
-template <typename Callable, typename ... GENS, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-auto property(Callable&& callable, GENS&&... gens) {
-    // acquire tuple of generators
-    auto genTup = std::make_tuple(gens...);
+    auto genTup = createGenTuple(argument_type_list, gens...);
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
     //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
 }
 
-
-// check with Arbitrary<ARG1>, Arbitrary<ARG2>, ... as generators
-// check(rand, [](ARG1 arg1, ARG2) -> bool {});
-template <typename Callable>
-bool check(Callable&& callable) {
-    return property(callable).check();
-}
-
-// check with generators specified
-// // check<CUSTOM_GEN_ARG1, CUSTOM_GEN_ARG2,...>(rand, [](ARG1 arg1, ARG2) -> bool {});
-// template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-// bool check(Callable&& callable) {
-//     return property<GENS...>(callable).check();
-// }
-
-template <typename Callable, typename ...GENS, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-bool check(Callable&& callable, GENS&&...gens) {
+template <typename Callable, typename ... EXPGENS>
+bool check(Callable&& callable, EXPGENS&&...gens) {
     return property(callable, gens...).check();
 }
 

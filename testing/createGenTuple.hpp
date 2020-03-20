@@ -22,12 +22,25 @@ decltype( auto ) createGenTuple(TypeList<ARGS...> argument_list ) {
     );
 }
 
-template<typename ... ARGS >
-decltype( auto ) createGenTuple() {
-    constexpr auto Size = sizeof...(ARGS);
-    return createGenHelperPacked<ARGS...>(
-        std::make_index_sequence<Size>{}
+
+template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) == sizeof...(IMPARGS)), bool>::type = true >
+decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... gens) {
+    constexpr auto ExplicitSize = sizeof...(EXPARGS);    
+    auto explicits = std::make_tuple(gens...); 
+
+    return explicits;
+}
+
+template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) != sizeof...(IMPARGS)), bool>::type = true >
+decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... gens) {
+    constexpr auto ExplicitSize = sizeof...(EXPARGS);
+    constexpr auto ImplicitSize = sizeof...(IMPARGS) - ExplicitSize;
+    auto explicits = std::make_tuple(gens...); 
+    auto implicits = createGenHelperPacked<IMPARGS...>(
+        std::make_index_sequence<ImplicitSize>{}
     );
+
+    return std::tuple_cat(explicits, implicits);
 }
 
 }

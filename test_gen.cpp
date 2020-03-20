@@ -202,7 +202,8 @@ TEST(PropTest, TestCheckBasic) {
         return true;
     });
 
-    prop.check();
+    // chaining
+    prop.setSeed(0).check();
 }
 
 
