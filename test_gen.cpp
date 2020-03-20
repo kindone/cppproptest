@@ -119,12 +119,11 @@ struct GenSmallInt : public Gen<int32_t> {
 
 constexpr int32_t GenSmallInt::boundaryValues[13];
 
-
+ 
 
 TEST(PropTest, TestCheckBasic) {
     check([](const int& a, const int& b) -> bool {
         EXPECT_EQ(a+b, b+a);
-
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
     });
@@ -138,8 +137,7 @@ TEST(PropTest, TestCheckBasic) {
         std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
-        EXPECT_EQ(c.size(), d.size());
-        //EXPECT_EQ(c, d) << "a"; // << "a: " << a << " + b: " << b << ", a+b: " << (a+b) << ", b+a: " << (b+a);
+        EXPECT_EQ(c.size(), d.size());        
         return true;
     });
 
@@ -151,7 +149,9 @@ TEST(PropTest, TestCheckBasic) {
         //EXPECT_EQ(c, d);// << "a: " << a << " + b: " << b << ", a+b: " << (a+b) << ", b+a: " << (b+a);
         return true;
     });
+}
 
+TEST(PropTest, TestCheckGen) {
 
     check([](std::vector<int> a) -> bool {
         std::cout << "a: " << a << std::endl;
@@ -176,19 +176,25 @@ TEST(PropTest, TestCheckBasic) {
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
     }, genSmallInt, genSmallInt);
+}
 
-    property([](std::string a, int i, std::string b) -> bool {
+TEST(PropTest, TestCheckAssert) {
+
+    check([](std::string a, int i, std::string b) -> bool {
         if(i % 2 == 0)
             PROP_DISCARD();
         return true;
-    }).check();
+    });
 
-    property([](std::string a, int i, std::string b) -> bool {
+    check([](std::string a, int i, std::string b) -> bool {
         if(i % 2 == 0)
             PROP_SUCCESS();
         PROP_DISCARD();
         return true;
-    }).check();
+    });
+}
+
+TEST(PropTest, TestPropertyBasic) {
 
     property([](std::vector<int> a) -> bool {
         std::cout << "a: " << a << std::endl;
@@ -211,8 +217,20 @@ TEST(PropTest, TestCheckBasic) {
 
     // chaining
     prop.setSeed(0).check();
+    // with specific arguments
+    prop.example(std::string("hello"), 10, std::string("world"));
 }
 
+TEST(PropTest, TestPropertyExample) {
+    auto func = [](std::string a, int i, std::string b) -> bool {
+        std::cout << "deferred check!" << std::endl;
+        PROP_ASSERT(false, {});
+        return true;
+    };
+    auto prop = property(func);    
+    // with specific arguments    
+    prop.example(std::string("hello"), 10, std::string("world"));
+}
 
 TYPED_TEST(NumericTest, TestCheckFail) {
 

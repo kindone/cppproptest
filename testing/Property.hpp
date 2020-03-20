@@ -78,6 +78,45 @@ public:
         return *this;
     }
 
+    template <typename ...ARGS>
+    bool example(ARGS&&... args) {
+        try {
+            try {
+                auto valueTup = std::make_tuple(args...);
+                try {
+                    return invokeWithArgs(std::move(callableWrapper.callable), std::move(args)...);
+                }
+                catch(const AssertFailed& e) {
+                    throw PropertyFailed<decltype(valueTup)>(e, std::move(valueTup));
+                }
+            }
+            catch(const Success&) {
+                return true;
+            }
+            catch(const Discard&) {
+                // silently discard combination
+                std::cerr << "Discard is not supported for single run" << std::endl;            
+            }
+        } catch(const PropertyFailedBase& e) {
+            std::cerr << "Property failed: " << e.what() << std::endl;            
+            return false;
+        } catch(const std::exception& e) {
+            // skip shrinking?
+            std::cerr << "std::exception occurred: " << e.what() << std::endl;            
+            return false;
+        }
+        return false;     
+    }
+
+    virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) {
+        auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
+        using ValueTuple = typename decltype(retTypeTup)::type_tuple;
+        auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
+        shrink(savedRand, failed.valueTup);
+    }
+
+private:
+
     template <size_t N, typename ValueTuple, typename Replace>
     bool test(ValueTuple&& valueTup, Replace&& replace) {
         //std::cout << "    test: tuple ";
@@ -165,13 +204,6 @@ public:
                 shrinksTuple,
                 std::make_index_sequence<Size>{});
 
-    }
-
-    virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) {
-        auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
-        using ValueTuple = typename decltype(retTypeTup)::type_tuple;
-        auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        shrink(savedRand, failed.valueTup);
     }
 
 private:

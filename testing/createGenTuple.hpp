@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace PropertyBasedTesting {
 
 template<typename Tuple, std::size_t... index>
@@ -27,7 +29,6 @@ template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(si
 decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... gens) {
     constexpr auto ExplicitSize = sizeof...(EXPARGS);    
     auto explicits = std::make_tuple(gens...); 
-
     return explicits;
 }
 
