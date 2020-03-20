@@ -158,17 +158,17 @@ TEST(PropTest, TestCheckBasic) {
         return true;
     });
 
-    check<GenSmallInt, GenSmallInt>(GenSmallInt(), GenSmallInt(), [](int a, int b) -> bool {
+    check([](int a, int b) -> bool {
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
-    });
+    }, GenSmallInt(), GenSmallInt());
 
     GenSmallInt genSmallInt;
 
-    check<GenSmallInt, GenSmallInt>(genSmallInt, genSmallInt, [](int a, int b) -> bool {
+    check([](int a, int b) -> bool {
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
-    });
+    }, genSmallInt, genSmallInt);
 
     property([](std::string a, int i, std::string b) -> bool {
         if(i % 2 == 0)
@@ -303,10 +303,10 @@ TEST(PropTest, TestConstruct) {
     Animal animal = gen(rand);
     std::cout << "Gen animal: " << animal << std::endl;
 
-    check(gen, [](Animal animal) -> bool {
+    check([](Animal animal) -> bool {
         std::cout << "animal: " << animal << std::endl;
         return true;
-    });
+    }, gen);
 }
 
 namespace PropertyBasedTesting {

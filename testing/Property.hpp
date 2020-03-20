@@ -210,8 +210,8 @@ auto property(Callable&& callable) {
 //     //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
 // }
 
-template <typename ... GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-auto property(GENS&&... gens, Callable&& callable) {
+template <typename Callable, typename ... GENS, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
+auto property(Callable&& callable, GENS&&... gens) {
     // acquire tuple of generators
     auto genTup = std::make_tuple(gens...);
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
@@ -233,9 +233,9 @@ bool check(Callable&& callable) {
 //     return property<GENS...>(callable).check();
 // }
 
-template <typename ...GENS, typename Callable, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
-bool check(GENS&&...gens, Callable&& callable) {
-    return property<GENS...>(gens..., callable).check();
+template <typename Callable, typename ...GENS, typename std::enable_if<(sizeof...(GENS) > 0), bool>::type = true>
+bool check(Callable&& callable, GENS&&...gens) {
+    return property(callable, gens...).check();
 }
 
 
