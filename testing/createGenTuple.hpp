@@ -31,12 +31,14 @@ decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... 
     return explicits;
 }
 
-template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) != sizeof...(IMPARGS)), bool>::type = true >
+template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) < sizeof...(IMPARGS)), bool>::type = true >
 decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... gens) {
+    
     constexpr auto ExplicitSize = sizeof...(EXPARGS);
     constexpr auto ImplicitSize = sizeof...(IMPARGS) - ExplicitSize;
     auto explicits = std::make_tuple(gens...); 
-    auto implicits = createGenHelperPacked<IMPARGS...>(
+    using ArgsAsTuple = std::tuple<std::decay_t<IMPARGS>...>;
+    auto implicits = createGenHelperListed<ArgsAsTuple>(
         std::make_index_sequence<ImplicitSize>{}
     );
 

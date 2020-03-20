@@ -198,7 +198,7 @@ auto property(Callable&& callable, EXPGENS&&... gens) {
     typename function_traits<Callable>::argument_type_list argument_type_list;
     auto genTup = createGenTuple(argument_type_list, gens...);
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
-    //return Property<CallableWrapper<Callable>, decltype(genTup)>(wrapper, genTup);
+    
 }
 
 template <typename Callable, typename ... EXPGENS>

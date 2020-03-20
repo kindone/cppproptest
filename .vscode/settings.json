@@ -3,6 +3,7 @@
     "files.associations": {
         "functional": "cpp",
         "vector": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "tuple": "cpp"
     }
 }

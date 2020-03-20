@@ -158,10 +158,17 @@ TEST(PropTest, TestCheckBasic) {
         return true;
     });
 
+    // supply custom generator
     check([](int a, int b) -> bool {
-        std::cout << "a: " << a << ", b: " << b << std::endl;
+        std::cout << "custom a: " << a << ", custom b: " << b << std::endl;
         return true;
     }, GenSmallInt(), GenSmallInt());
+
+    // 
+    check([](int a, int b) -> bool {
+        std::cout << "custom a: " << a << ", b: " << b << std::endl;
+        return true;
+    }, GenSmallInt());
 
     GenSmallInt genSmallInt;
 
