@@ -84,10 +84,10 @@ struct NonEmptyStream : public StreamImpl<T> {
     }
 
     template <typename U>
-    NonEmptyStream<U> map(std::function<U(const T&)>& mapper) {
+    NonEmptyStream<U> transform(std::function<U(const T&)>& transformer) {
         auto gen = tailGen;
-        return NonEmptyStream<U>(mapper(_head), [mapper, gen]() -> Stream<U> {
-            return gen().map(mapper);
+        return NonEmptyStream<U>(transformer(_head), [transformer, gen]() -> Stream<U> {
+            return gen().transform(transformer);
         });
     }
 
@@ -115,10 +115,10 @@ struct Stream {
     using type = T;
     Stream(const Stream& other) : impl(other.impl) {
     }
-    
+
     Stream(const std::shared_ptr<StreamImpl<T>>& otherImpl) :  impl(otherImpl) {
     }
-    
+
     Stream(const StreamImpl<T>& otherImpl) :  impl(std::make_shared<StreamImpl<T>>(otherImpl)) {
     }
 
@@ -127,7 +127,7 @@ struct Stream {
 
     Stream(const NonEmptyStream<T>& otherImpl) :  impl(std::make_shared<NonEmptyStream<T>>(otherImpl)) {
     }
-    
+
     Stream(const T& h, std::function<Stream<T>()> gen) :  impl(std::make_shared<NonEmptyStream<T>>(h, gen)) {
     }
 
@@ -152,12 +152,12 @@ struct Stream {
     }
 
     template<typename U>
-    Stream<U> map(std::function<U(const T&)> mapper) const {
+    Stream<U> transform(std::function<U(const T&)> transformer) const {
         if(isEmpty()) {
             return Stream<U>::empty();
         }
         else {
-            return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->map(mapper));
+            return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->transform(transformer));
         }
     }
 

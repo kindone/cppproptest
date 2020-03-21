@@ -4,15 +4,15 @@
 namespace PropertyBasedTesting {
 
 template <typename Function, typename Tuple,  std::size_t... index>
-decltype( auto ) mapTupleHelper(Function&& f, Tuple&& tup, std::index_sequence<index...> index_sequence) {
+decltype( auto ) transformTupleHelper(Function&& f, Tuple&& tup, std::index_sequence<index...> index_sequence) {
     return std::make_tuple(f(std::move(std::get<index>(tup)))...);
 }
 
 template <typename Tuple, typename Function >
-decltype( auto ) mapTuple(Tuple&& argTup, Function&& f ) {
+decltype( auto ) transformTuple(Tuple&& argTup, Function&& f ) {
     constexpr auto Size = std::tuple_size<Tuple>::value;
 
-    return mapTupleHelper(
+    return transformTupleHelper(
         std::forward<Function>(f),
         std::forward<Tuple>( argTup ),
         std::make_index_sequence<Size>{}
@@ -21,41 +21,41 @@ decltype( auto ) mapTuple(Tuple&& argTup, Function&& f ) {
 
 
 template <template <typename> class FunctionTemplate, typename Tuple, int N>
-decltype(auto) callMap(Tuple&& tup) {
-    return FunctionTemplate<typename std::tuple_element<N, Tuple>::type>::map(std::move(std::get<N>(tup)));
+decltype(auto) callTransform(Tuple&& tup) {
+    return FunctionTemplate<typename std::tuple_element<N, Tuple>::type>::transform(std::move(std::get<N>(tup)));
 }
 
 template<template <typename> class FunctionTemplate, typename Tuple,  std::size_t... index>
-decltype( auto ) mapHeteroTupleHelper(Tuple&& tup, std::index_sequence<index...> index_sequence) {
-    return std::make_tuple(callMap<FunctionTemplate, Tuple, index>(std::move(tup))...);
+decltype( auto ) transformHeteroTupleHelper(Tuple&& tup, std::index_sequence<index...> index_sequence) {
+    return std::make_tuple(callTransform<FunctionTemplate, Tuple, index>(std::move(tup))...);
 }
 
 template<template <typename> class FunctionTemplate, typename Tuple>
-decltype( auto ) mapHeteroTuple(Tuple&& argTup) {
+decltype( auto ) transformHeteroTuple(Tuple&& argTup) {
     constexpr auto Size = std::tuple_size<Tuple>::value;
 
-    return mapHeteroTupleHelper<FunctionTemplate>(
+    return transformHeteroTupleHelper<FunctionTemplate>(
         std::forward<Tuple>( argTup ),
         std::make_index_sequence<Size>{}
     );
 }
 
 template <template <typename> class FunctionTemplate, typename Tuple, typename Arg, int N>
-decltype(auto) callMapWithArg(Tuple&& tup, Arg&& arg) {
-    return FunctionTemplate<typename std::tuple_element<N, Tuple>::type>::map(std::move(std::get<N>(tup)), std::move(arg));
+decltype(auto) callTransformWithArg(Tuple&& tup, Arg&& arg) {
+    return FunctionTemplate<typename std::tuple_element<N, Tuple>::type>::transform(std::move(std::get<N>(tup)), std::move(arg));
 }
 
 
 template<template <typename> class FunctionTemplate, typename Tuple, typename Arg, std::size_t... index>
-decltype( auto ) mapHeteroTupleWithArgHelper(Tuple&& tup, Arg&& arg, std::index_sequence<index...> index_sequence) {
-    return std::make_tuple(callMapWithArg<FunctionTemplate, Tuple, Arg, index>(std::move(tup), std::move(arg))...);
+decltype( auto ) transformHeteroTupleWithArgHelper(Tuple&& tup, Arg&& arg, std::index_sequence<index...> index_sequence) {
+    return std::make_tuple(callTransformWithArg<FunctionTemplate, Tuple, Arg, index>(std::move(tup), std::move(arg))...);
 }
 
 template<template <typename> class FunctionTemplate, typename Tuple, typename Arg>
-decltype( auto ) mapHeteroTupleWithArg(Tuple&& tup, Arg&& arg) {
+decltype( auto ) transformHeteroTupleWithArg(Tuple&& tup, Arg&& arg) {
     constexpr auto Size = std::tuple_size<Tuple>::value;
 
-    return mapHeteroTupleWithArgHelper<FunctionTemplate>(
+    return transformHeteroTupleWithArgHelper<FunctionTemplate>(
         std::forward<Tuple>( tup ),
         std::move(arg),
         std::make_index_sequence<Size>{}

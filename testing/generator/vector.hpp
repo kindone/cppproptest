@@ -29,7 +29,7 @@ public:
 
         //return make_shrinkable<std::vector<T>>(std::move(vec));
 
-        return binarySearchShrinkable<int>(len).template map<std::vector<T>>([vec](const int& len) {
+        return binarySearchShrinkable<int>(len).template transform<std::vector<T>>([vec](const int& len) {
             if(len <= 0)
                 return std::vector<T>();
 

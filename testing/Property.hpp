@@ -49,7 +49,7 @@ decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr) {
 
 template <typename T>
 struct GetShrinks {
-    static Stream<T> map(T&& v) {
+    static Stream<T> transform(T&& v) {
         return GetShrinksHelper(v);
     }
 };
@@ -57,7 +57,7 @@ struct GetShrinks {
 
 template <typename T>
 struct Generate {
-    static decltype(auto) map(T&& gen, Random rand) {
+    static decltype(auto) transform(T&& gen, Random rand) {
         return gen(rand);
     }
 };
@@ -95,17 +95,17 @@ public:
             }
             catch(const Discard&) {
                 // silently discard combination
-                std::cerr << "Discard is not supported for single run" << std::endl;            
+                std::cerr << "Discard is not supported for single run" << std::endl;
             }
         } catch(const PropertyFailedBase& e) {
-            std::cerr << "Property failed: " << e.what() << std::endl;            
+            std::cerr << "Property failed: " << e.what() << std::endl;
             return false;
         } catch(const std::exception& e) {
             // skip shrinking?
-            std::cerr << "std::exception occurred: " << e.what() << std::endl;            
+            std::cerr << "std::exception occurred: " << e.what() << std::endl;
             return false;
         }
-        return false;     
+        return false;
     }
 
     virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) {
@@ -196,10 +196,10 @@ private:
         show(std::cout, valueTup);
         std::cout << std::endl;
 
-        auto generatedValueTup = mapHeteroTupleWithArg<Generate>(std::move(genTup), std::move(savedRand));
+        auto generatedValueTup = transformHeteroTupleWithArg<Generate>(std::move(genTup), std::move(savedRand));
         //std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
-        auto shrinksTuple = mapHeteroTuple<GetShrinks>(std::move(generatedValueTup));
+        auto shrinksTuple = transformHeteroTuple<GetShrinks>(std::move(generatedValueTup));
         auto shrunk = shrinkEach(generatedValueTup,
                 shrinksTuple,
                 std::make_index_sequence<Size>{});
@@ -230,7 +230,7 @@ auto property(Callable&& callable, EXPGENS&&... gens) {
     typename function_traits<Callable>::argument_type_list argument_type_list;
     auto genTup = createGenTuple(argument_type_list, gens...);
     return Property<CallableWrapper<typename std::remove_reference<Callable>::type>, decltype(genTup)>(make_CallableWrapper(callable), genTup);
-    
+
 }
 
 template <typename Callable, typename ... EXPGENS>

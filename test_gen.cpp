@@ -391,12 +391,12 @@ TEST(PropTest, TestFilter2) {
 
 }
 
-TEST(PropTest, TestMap) {
+TEST(PropTest, TestTransform) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
     Arbitrary<int> gen;
-    auto stringGen = map<int,std::string>(gen, [](const int& value) {
+    auto stringGen = transform<int,std::string>(gen, [](const int& value) {
         return "(" + std::to_string(value) + ")";
     });
 
@@ -404,7 +404,7 @@ TEST(PropTest, TestMap) {
         std::cout << "string: " << stringGen(rand) << std::endl;
     }
 
-    auto vectorGen = map<std::string,std::vector<std::string>>(stringGen, [](const std::string& value) {
+    auto vectorGen = transform<std::string,std::vector<std::string>>(stringGen, [](const std::string& value) {
         std::vector<std::string> vec;
         vec.push_back(value);
         return vec;

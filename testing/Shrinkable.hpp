@@ -28,12 +28,12 @@ struct Shrinkable {
     T& getRef() const { return *ptr.get(); }
 
     template <typename U>
-    Shrinkable<U> map(std::function<U(const T&)> mapper) const {
+    Shrinkable<U> transform(std::function<U(const T&)> transformer) const {
         auto shrinks = this->shrinks();
-        auto shrinkable = make_shrinkable<U>(mapper(getRef()));
-        return shrinkable.with([shrinks, mapper]() {
-            return shrinks.template map<Shrinkable<U>>([mapper](const Shrinkable<T>& shr) {
-                return shr.map(mapper);
+        auto shrinkable = make_shrinkable<U>(transformer(getRef()));
+        return shrinkable.with([shrinks, transformer]() {
+            return shrinks.template transform<Shrinkable<U>>([transformer](const Shrinkable<T>& shr) {
+                return shr.transform(transformer);
             });
         });
     }
@@ -49,14 +49,14 @@ private:
             return Stream<Shrinkable<T>>::empty();
         };
     }
- 
+
     std::shared_ptr<T> ptr;
 public:
     std::function<Stream<Shrinkable<T>>()> shrinks;
 
     template <typename U, typename ...Args>
     friend Shrinkable<U> make_shrinkable(Args&&... args);
-   
+
 };
 
 

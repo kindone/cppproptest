@@ -13,7 +13,7 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         std::string str = std::string(boundaryValues[i]);
         int len = str.size();
-        return binarySearchShrinkable<int>(len).map<std::string>([str](const int& len) {
+        return binarySearchShrinkable<int>(len).transform<std::string>([str](const int& len) {
             return str.substr(0, len);
         });
     }
@@ -23,7 +23,7 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
         for(int i = 0; i < len; i++)
             str[i] = rand.getRandomSize(0, 128);
 
-        return binarySearchShrinkable<int>(len).map<std::string>([str](const int& len) {
+        return binarySearchShrinkable<int>(len).transform<std::string>([str](const int& len) {
             return str.substr(0, len);
         });
 

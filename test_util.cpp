@@ -25,8 +25,8 @@ TEST(UtilTestCase, invokeTest) {
     invokeWithArgs(func, arg1, arg2, arg3);
 }
 
-TEST(UtilTestCase, mapTest) {
-    mapTuple(mapTuple(std::make_tuple(5,6,7), [](int i) {
+TEST(UtilTestCase, transformTest) {
+    transformTuple(transformTuple(std::make_tuple(5,6,7), [](int i) {
         std::cout << "n: " << i << std::endl;
         return std::to_string(i);
     }), [](std::string s) {
@@ -37,41 +37,41 @@ TEST(UtilTestCase, mapTest) {
 
 
 template <typename IN>
-struct Mapper;
+struct Transformer;
 
 template <>
-struct Mapper<int> {
-    static std::string map(int&& v) {
-        std::cout << "Mapper<int> - " << v << std::endl;
+struct Transformer<int> {
+    static std::string transform(int&& v) {
+        std::cout << "Transformer<int> - " << v << std::endl;
         return std::to_string(v + 1);
     }
 
 };
 
 template <>
-struct Mapper<std::string> {
-    static int map(std::string&& v) {
-        std::cout << "Mapper<string> - " << v << std::endl;
+struct Transformer<std::string> {
+    static int transform(std::string&& v) {
+        std::cout << "Transformer<string> - " << v << std::endl;
         return v.size();
     }
 
 };
 
-TEST(UtilTestCase, mapHeteroTest) {
-    mapHeteroTuple<Mapper>(std::make_tuple(5,6,7));
+TEST(UtilTestCase, transformHeteroTest) {
+    transformHeteroTuple<Transformer>(std::make_tuple(5,6,7));
 }
 
 
-TEST(UtilTestCase, mapHeteroTest2) {
-    mapHeteroTuple<Mapper>(mapHeteroTuple<Mapper>(std::make_tuple(5,6,7)));
+TEST(UtilTestCase, transformHeteroTest2) {
+    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(std::make_tuple(5,6,7)));
 }
 
 
 
-TEST(UtilTestCase, mapHeteroTest3) {
+TEST(UtilTestCase, transformHeteroTest3) {
     int a = 5;
     std::string b("a");
-    mapHeteroTuple<Mapper>(mapHeteroTuple<Mapper>(std::make_tuple(a,b,7)));
+    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(std::make_tuple(a,b,7)));
 }
 
 template <typename T>
@@ -143,7 +143,7 @@ TEST(UtilTestCase, Stream) {
         std::cout << "stream:" << itr.next() << std::endl;
     }
 
-    auto strstream = stream.map<std::string>([](const int& value) {
+    auto strstream = stream.transform<std::string>([](const int& value) {
         return std::to_string(value);
     });
 
@@ -183,7 +183,7 @@ TEST(UtilTestCase, StreamShrink) {
 
     static genfunc_t genneg = [](int max, int val) {
         int mid = val/2 + max/2;
-        //std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl; 
+        //std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl;
         if(val >= 0 || (max-val) <= 1 || mid == val || mid == max)
             return stream_t::empty();
         else
@@ -193,11 +193,11 @@ TEST(UtilTestCase, StreamShrink) {
             );
     };
 
-    //std::cout << "      val0: " << value << std::endl; 
+    //std::cout << "      val0: " << value << std::endl;
     auto shr = make_shrinkable<int>(value).with([value]() {
-        //std::cout << "      val1: " << value << std::endl; 
+        //std::cout << "      val1: " << value << std::endl;
         return  stream_t(make_shrinkable<int>(0), [value]() {
-            //std::cout << "      val2: " << value << std::endl; 
+            //std::cout << "      val2: " << value << std::endl;
             if(value >= 0)
                 return genpos(0, value);
             else
@@ -236,16 +236,16 @@ TEST(UtilTestCase, StreamShrink) {
 
     }
 
-    Stream<Shrinkable<std::string>> strstream = shr.shrinks().map<Shrinkable<std::string>>([](const Shrinkable<int>& value) {
+    Stream<Shrinkable<std::string>> strstream = shr.shrinks().transform<Shrinkable<std::string>>([](const Shrinkable<int>& value) {
         auto shrinks = value.shrinks;
         return make_shrinkable<std::string>(std::to_string(value.get())).with([shrinks]() {
-            return shrinks().map<Shrinkable<std::string>>([](const Shrinkable<int>& v) {
+            return shrinks().transform<Shrinkable<std::string>>([](const Shrinkable<int>& v) {
                 return make_shrinkable<std::string>(std::to_string(v));
             });
         });
     });
 
-    
+
     for(auto itr = strstream.iterator(); itr.hasNext(); ) {
         auto shrinkable = itr.next();
         std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
@@ -253,7 +253,7 @@ TEST(UtilTestCase, StreamShrink) {
             std::cout << "  shrink: " << itr2.next().get() << std::endl;
         }
     }
-    
+
 
 
 }
@@ -316,7 +316,7 @@ TEST(UtilTestCase, ShrinkableNumeric) {
 TEST(UtilTestCase, ShrinkableString) {
     auto str = std::string("hello world");
     int len = str.size();
-    auto shrinkable =  binarySearchShrinkable<int>(len).map<std::string>([str](const int& len) {
+    auto shrinkable =  binarySearchShrinkable<int>(len).transform<std::string>([str](const int& len) {
         return str.substr(0, len);
     });
 
@@ -338,7 +338,7 @@ TEST(UtilTestCase, ShrinkableVector) {
     for(int i = 0; i < len; i++)
         vec.push_back(i);
 
-    auto shrinkable =  binarySearchShrinkable<int>(value).map<std::vector<int>>([vec](const int& len) {
+    auto shrinkable =  binarySearchShrinkable<int>(value).transform<std::vector<int>>([vec](const int& len) {
         auto begin = vec.begin();
         auto last = vec.begin() + len;
         return std::vector<T>(begin, last);;
@@ -459,6 +459,6 @@ TEST(UtilTestCase, Random) {
         EXPECT_EQ(r1, r2);
         EXPECT_EQ(r2, r2);
     }
-   
+
 }
 
