@@ -43,6 +43,7 @@ SET(proptest_testsources
     test_gen.cpp
     test_mock.cpp
     test_util.cpp
+    test_state.cpp
 )
 
 
