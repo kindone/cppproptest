@@ -104,6 +104,13 @@ struct NonEmptyStream : public StreamImpl<T> {
         return Stream<T>::empty();
     }
 
+    Stream<T> concat(const Stream<T>& other) {
+        auto self = *this;
+        return Stream<T>(head(), [self, other]() {
+            return Stream<T>(self.tail()).concat(other);
+        });
+    }
+
     T _head;
     std::function<Stream<T>()> tailGen;
 };
@@ -167,6 +174,14 @@ struct Stream {
         }
         else {
             return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->filter(criteria);
+        }
+    }
+
+    Stream<T> concat(const Stream<T>& other) {
+        if(isEmpty())
+            return other;
+        else {
+            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->concat(other);
         }
     }
 

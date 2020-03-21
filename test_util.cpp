@@ -143,6 +143,16 @@ TEST(UtilTestCase, Stream) {
         std::cout << "stream:" << itr.next() << std::endl;
     }
 
+    auto emptyIntStream = Stream<int>::empty();
+    auto emptyStrStream = Stream<std::string>::empty();
+
+    auto emptyTransformed = emptyIntStream.transform<std::string>([](const int& value) {
+        return std::to_string(value);
+    });
+
+    EXPECT_TRUE(emptyIntStream.isEmpty());
+    EXPECT_TRUE(emptyTransformed.isEmpty());
+
     auto strstream = stream.transform<std::string>([](const int& value) {
         return std::to_string(value);
     });
@@ -150,6 +160,12 @@ TEST(UtilTestCase, Stream) {
     for(auto itr = strstream.iterator(); itr.hasNext(); ) {
         std::cout << "strstream:" << itr.next() << std::endl;
     }
+
+    auto emptyFiltered = emptyIntStream.filter([](const int& val) {
+        return val == 5;
+    });
+
+    EXPECT_TRUE(emptyFiltered.isEmpty());
 
     auto filtered = strstream.filter([](const std::string& str) {
         return str[1] == '4';
@@ -159,6 +175,23 @@ TEST(UtilTestCase, Stream) {
         std::cout << "filtered:" << itr.next() << std::endl;
     }
 
+    auto concatenated = strstream.concat(filtered);
+    for(auto itr = concatenated.iterator(); itr.hasNext(); ) {
+        std::cout << "concatenated:" << itr.next() << std::endl;
+    }
+
+    auto emptyConcatEmpty = emptyIntStream.concat(Stream<int>::empty());
+    EXPECT_TRUE(emptyConcatEmpty.isEmpty());
+
+    auto emptyConcatNonEmpty = emptyStrStream.concat(filtered);
+    for(auto itr = emptyConcatNonEmpty.iterator(); itr.hasNext(); ) {
+        std::cout << "emptyConcatNonEmpty:" << itr.next() << std::endl;
+    }
+
+    auto nonEmptyConcatEmpty = filtered.concat(Stream<std::string>::empty());
+    for(auto itr = nonEmptyConcatEmpty.iterator(); itr.hasNext(); ) {
+        std::cout << "nonEmptyConcatEmpty:" << itr.next() << std::endl;
+    }
 }
 
 TEST(UtilTestCase, StreamShrink) {
