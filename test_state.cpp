@@ -50,6 +50,9 @@ std::shared_ptr<T> action(ARGS&&...args) {
 }
 
 TEST(StateTest, States) {
+
+// (int, int) ->
+
    auto actionGen = oneOf<std::shared_ptr<Action>>(
         [](Random& rand) {
             return action<PushBack>();
@@ -66,7 +69,9 @@ TEST(StateTest, States) {
     Random rand(seed);
 
     for(int i = 0; i < 100; i++) {
-        actionGen(rand)->run();
+        auto action = actionGen(rand);
+        if(action->precondition())
+            action->run();
     }
 
 }
