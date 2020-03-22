@@ -6,6 +6,7 @@
 #include "testing/tuple.hpp"
 #include "testing/Stream.hpp"
 #include "testing/printing.hpp"
+#include "testing/generator/util.hpp"
 
 #include <iostream>
 
@@ -41,26 +42,6 @@ decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup) {
     TypeList<typename decltype(ReturnTypeOf<ARGS>())::type...> typeList;
     return typeList;
 }
-
-template <typename T>
-decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr) {
-    return shr.shrinks();
-}
-
-template <typename T>
-struct GetShrinks {
-    static Stream<T> transform(T&& v) {
-        return GetShrinksHelper(v);
-    }
-};
-
-
-template <typename T>
-struct Generate {
-    static decltype(auto) transform(T&& gen, Random rand) {
-        return gen(rand);
-    }
-};
 
 
 template <typename CallableWrapper, typename GenTuple>

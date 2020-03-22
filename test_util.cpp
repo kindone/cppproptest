@@ -239,27 +239,6 @@ TEST(UtilTestCase, StreamShrink) {
     });
 
 
-    /*
-    auto stream = Stream<Shrinkable<int>>(make_shrinkable<int>(0), [val]() {
-        static std::function<Stream<Shrinkable<int>>(int,int)> genpos = [](int min, int val) {
-            if(val <= 0 || (val-min) <= 1)
-                return Stream<Shrinkable<int>>::empty();
-            else
-                return Stream<Shrinkable<int>>(make_shrinkable<int>((val + min)/2), [min, val]() { return genpos((val+min)/2, val); });
-        };
-        static std::function<Stream<Shrinkable<int>>(int,int)> genneg = [](int max, int val) {
-            if(val >= 0 || (max-val) <= 1)
-                return Stream<Shrinkable<int>>::empty();
-            else
-                return Stream<Shrinkable<int>>(make_shrinkable<int>((val + max)/2), [max, val]() { return genneg((val+max)/2, val); });
-        };
-        if(val >= 0)
-            return genpos(0, val);
-        else
-            return genneg(0, val);
-    });
-    */
-
     for(auto itr = shr.shrinks().iterator(); itr.hasNext(); ) {
         auto shrinkable = itr.next();
         std::cout << "streamshrink:" << shrinkable << std::endl;

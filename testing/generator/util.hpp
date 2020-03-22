@@ -2,9 +2,11 @@
 #include "testing/api.hpp"
 #include "testing/Shrinkable.hpp"
 #include "testing/Stream.hpp"
+#include "testing/Random.hpp"
 
 namespace PropertyBasedTesting {
 
+class Random;
 
 template <typename INTTYPE>
 decltype(auto) binarySearchShrinkable(INTTYPE value) {
@@ -16,7 +18,7 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
     // given min, max, generate stream
     static genfunc_t genpos = [](INTTYPE min, INTTYPE max) {
         INTTYPE mid = min/2 + max/2;
-        //std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl; 
+        //std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
         if(mid+1 >= max || min+1 >= mid)
             return stream_t(make_shrinkable<INTTYPE>(mid));
         else if(mid+1 >= max)
@@ -35,7 +37,7 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
 
     static genfunc_t genneg = [](INTTYPE min, INTTYPE max) {
         INTTYPE mid = min/2 + max/2;
-        //std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl; 
+        //std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
         if(mid+1 >= max || min+1 >= mid)
             return stream_t(make_shrinkable<INTTYPE>(mid));
         else if(mid+1 >= max)
@@ -52,11 +54,11 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
             );
     };
 
-    //std::cout << "      val0: " << value << std::endl; 
+    //std::cout << "      val0: " << value << std::endl;
     return make_shrinkable<INTTYPE>(value).with([value]() {
-        //std::cout << "      val1: " << value << std::endl; 
-        return  stream_t(make_shrinkable<INTTYPE>(0), [value]() {
-            //std::cout << "      val2: " << value << std::endl; 
+        //std::cout << "      val1: " << value << std::endl;
+        return stream_t(make_shrinkable<INTTYPE>(0), [value]() {
+            //std::cout << "      val2: " << value << std::endl;
             if(value >= 0)
                 return genpos(0, value);
             else
@@ -64,5 +66,28 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
         });
     });
 }
+
+template <typename T>
+decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr) {
+    return shr.shrinks();
+}
+
+template <typename T>
+struct GetShrinks {
+    static Stream<T> transform(T&& v) {
+        return GetShrinksHelper(v);
+    }
+};
+
+
+template <typename T>
+struct Generate {
+
+    // TOOD: check if Random can be turned to reference
+    static decltype(auto) transform(T&& gen, Random rand) {
+        return gen(rand);
+    }
+};
+
 
 } // namespace}

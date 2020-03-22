@@ -17,9 +17,10 @@ struct Shrinkable {
     Shrinkable(const Shrinkable& other) : ptr(other.ptr), shrinks(other.shrinks) {
     }
 
-    Shrinkable with(std::function<Stream<Shrinkable<T>>()> _shrinks) {
-        shrinks = _shrinks;
-        return *this;
+    Shrinkable with(std::function<Stream<Shrinkable<T>>()> _shrinks) const {
+        auto copy = *this;
+        copy.shrinks = _shrinks;
+        return copy;
     }
 
     operator T&&() const { return std::move(*ptr); }
@@ -35,6 +36,43 @@ struct Shrinkable {
             return shrinks.template transform<Shrinkable<U>>([transformer](const Shrinkable<T>& shr) {
                 return shr.transform(transformer);
             });
+        });
+    }
+
+    // provide filtered generation, shrinking
+    Shrinkable<T> filter(std::function<bool(const T&)> criteria) const {
+        if(!criteria(getRef()))
+            throw std::invalid_argument("cannot apply criteria");
+
+        auto shrinks = this->shrinks();
+
+        return with([shrinks, criteria]() {
+            auto criteriaForStream = [criteria](const Shrinkable<T>& shr) -> bool {
+                return criteria(shr.getRef());
+            };
+            // filter stream's value, and then transform each shrinkable to call filter recursively
+            return shrinks.filter(criteriaForStream).template transform<Shrinkable<T>>([criteria](const Shrinkable<T>& shr) {
+                return shr.filter(criteria);
+            });
+        });
+    }
+
+    Shrinkable<T> andThen(std::function<Stream<Shrinkable<T>>()> then) const {
+        auto shrinksGen = this->shrinks;
+        auto shrinkable = make_shrinkable<T>(getRef());
+
+        // static auto gen = [](const Shrinkable<T>& shr) {
+        //     shr.andThen(then);
+        //     return Stream<Shrinkable<T>>(make_shrinkable(shr), []() {
+
+        //     })
+        // }
+
+        return shrinkable.with([shrinksGen, then]() {
+            if(!shrinksGen().isEmpty())
+                return shrinksGen();
+            else
+                return then();
         });
     }
 

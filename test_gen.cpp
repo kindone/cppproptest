@@ -105,6 +105,67 @@ TEST(PropTest, GenLttVectorOfInt) {
     }
 }
 
+TEST(PropTest, GenShrinks) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<int> intGen;
+    auto evenGen = filter<int>(intGen, [](const int& val) -> bool{
+        return val % 2 == 0;
+    });
+
+    auto shrinkable = evenGen(rand);
+    std::cout << "GenShrinks: " << shrinkable.get() << std::endl;
+    auto shrinks = shrinkable.shrinks();
+    for(auto itr = shrinks.iterator(); itr.hasNext();) {
+        std::cout << "  shrinks: " << itr.next() << std::endl;
+    }
+}
+
+TEST(PropTest, ShrinkableAndThen) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<int> intGen;
+    auto evenGen = filter<int>(intGen, [](const int& val) -> bool{
+        return val % 2 == 0;
+    });
+
+    auto evenShrinkable = evenGen(rand);
+    std::cout<< "evenShrinkable: " << evenShrinkable.get() << std::endl;
+    {
+        auto shrinks = evenShrinkable.shrinks();
+        while(!shrinks.isEmpty()) {
+            auto tempItr = shrinks.iterator();
+            tempItr.next(); // ignore first one
+            auto shrink = tempItr.hasNext() ? tempItr.next() : shrinks.head();
+            std::cout<< "initial: " << shrink.get() << std::endl;
+            shrinks = shrink.shrinks();
+            for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
+                std::cout << "  shrinks: " << itr.next() << std::endl;
+            }
+        }
+    }
+
+    auto andThen = evenShrinkable.andThen([evenShrinkable]() {
+        return evenShrinkable.shrinks();
+    });
+
+    std::cout<< "andThen: " << andThen.get() << std::endl;
+    {
+        auto shrinks = andThen.shrinks();
+        while(!shrinks.isEmpty()) {
+            auto tempItr = shrinks.iterator();
+            tempItr.next(); // ignore first one
+            auto shrink = tempItr.hasNext() ? tempItr.next() : shrinks.head();
+            std::cout<< "andThen: " << shrink.get() << std::endl;
+            shrinks = shrink.shrinks();
+            for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
+                std::cout << "  shrinks: " << itr.next() << std::endl;
+            }
+        }
+    }
+
+}
+
 struct GenSmallInt : public Gen<int32_t> {
     GenSmallInt() : step(0ULL) {
     }
@@ -401,7 +462,18 @@ TEST(PropTest, TestTransform) {
     });
 
     for(int i = 0; i < 10; i++) {
-        std::cout << "string: " << stringGen(rand) << std::endl;
+        auto shrinkable = stringGen(rand);
+        std::cout << "string: " << shrinkable.get() << std::endl;
+        int j = 0;
+        for(auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
+            auto shrinkable2 = itr.next();
+            std::cout << "  shrink: " << shrinkable2.get() << std::endl;
+            int k = 0;
+            for(auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
+                std::cout << "    shrink: " << itr2.next().get() << std::endl;
+            }
+        }
+
     }
 
     auto vectorGen = transform<std::string,std::vector<std::string>>(stringGen, [](const std::string& value) {
@@ -411,7 +483,7 @@ TEST(PropTest, TestTransform) {
     });
 
     for(int i = 0; i < 10; i++) {
-        std::cout << "vector " << vectorGen(rand)[0] << std::endl;
+        std::cout << "vector " << vectorGen(rand).get()[0] << std::endl;
     }
 }
 

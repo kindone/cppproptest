@@ -3,6 +3,7 @@
 #include "testing/gen.hpp"
 #include "testing/Random.hpp"
 #include "testing/Shrinkable.hpp"
+#include "testing/tuple.hpp"
 #include <tuple>
 
 
@@ -74,37 +75,47 @@ namespace PropertyBasedTesting
 //     std::tuple<Gen<T>...> elemGenTuple;
 // };
 
-// template <size_t N, typename Tuple>
-// decltype(auto) shrinkN(Tuple&& tuple) {
-//     auto element = std::get<N>(tuple);
-//     // std::get<N>(tuple) = next;
-//     return std::get<N>(tuple);
-// }
+template <size_t N, typename Tuple>
+decltype(auto) shrinkN(Tuple&& tuple) {
+    auto element = std::get<N>(tuple);
+    // std::get<N>(tuple) = next;
+    return std::get<N>(tuple);
+}
 
-// template <typename Tuple, std::size_t...index>
-// decltype(auto) shrinkEach(Tuple&& tuple, std::index_sequence<index...>) {
-//     return std::make_tuple(shrinkN<index>(tuple)...);
-// }
+template <typename Tuple, std::size_t...index>
+decltype(auto) shrinkEach(Tuple&& tuple, std::index_sequence<index...>) {
+    return std::make_tuple(shrinkN<index>(tuple)...);
+}
 
 
-// template <typename ... GENS>
-// decltype(auto) tuple(GENS&&...gens) {
-//     constexpr auto Size = sizeof...(GENS);
+// generates (int, int)
+// and shrinks one parameter by one
+template <typename ... GENS>
+decltype(auto) tuple(GENS&&...gens) {
+    constexpr auto Size = sizeof...(GENS);
 
-//     return [&gens](Random& rand) {
-//         auto generatorTuple = std::make_tuple(gens...);
-//         auto valueTuple = std::make_tuple(gens(rand).get()...);
-//         using ValueTuple = decltype(valueTuple);
-//         auto shrinks = Stream<Shrinkable<ValueTuple>>(head, tail);
+    // generator
+    return [&gens](Random& rand) {
+        auto shrinkableTuple = std::make_tuple(gens(rand)...);
+        auto valueTuple = std::make_tuple(gens(rand).get()...);
+        using ValueTuple = decltype(valueTuple);
 
-//         auto shrunk = shrinkEach(valueTuple,
-//             std::make_index_sequence<Size>{});
+        // stream of (shrinkable) <int...>, <string...>, ...
+        auto shrinksTuple = transformHeteroTuple<GetShrinks>(std::move(shrinkableTuple));
 
-//         return make_shrinkable<ValueTuple>(valueTuple).with([shrinks]() {
-//             return shrinks;
-//         })
-//     }
-// }
+        auto shrinks0 = std::get<0>(shrinksTuple);
+        shrinks0.transform<std::tuple<>>([shrinkableTuple](const Shrinkable<>& shrinkable) {
+            shrinkable.transform([](const T& value){
+                std::make_tuple(value, std::get<1>(shrinkableTuple).get());
+            }) // -> shrinks based on Shrinkable<T> only. deepmost (no more shrinking possible) should continue with next one
+        });
+
+        // aggregate to tuple
+        // (shrinkable) <int, string, ...>
+        auto shrinks = 1;
+        return make_shrinkable<ValueTuple>(valueTuple).with(shrinks)
+    }
+}
 
 
 }
