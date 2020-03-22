@@ -58,22 +58,16 @@ struct Shrinkable {
     }
 
     Shrinkable<T> andThen(std::function<Stream<Shrinkable<T>>()> then) const {
-        auto shrinksGen = this->shrinks;
-        auto shrinkable = make_shrinkable<T>(getRef());
-
-        // static auto gen = [](const Shrinkable<T>& shr) {
-        //     shr.andThen(then);
-        //     return Stream<Shrinkable<T>>(make_shrinkable(shr), []() {
-
-        //     })
-        // }
-
-        return shrinkable.with([shrinksGen, then]() {
-            if(!shrinksGen().isEmpty())
-                return shrinksGen();
-            else
-                return then();
+        auto shrinks = this->shrinks();
+        return with([shrinks, then]() {
+            return shrinks.template transform<Shrinkable<T>>([then](const Shrinkable<T>& shr){
+                if(shr.shrinks().isEmpty())
+                    return shr.with(then);
+                else
+                    return shr.andThen(then);
+            });
         });
+
     }
 
 private:

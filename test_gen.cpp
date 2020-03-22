@@ -146,7 +146,7 @@ TEST(PropTest, ShrinkableAndThen) {
     }
 
     auto andThen = evenShrinkable.andThen([evenShrinkable]() {
-        return evenShrinkable.shrinks();
+        return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000));
     });
 
     std::cout<< "andThen: " << andThen.get() << std::endl;
