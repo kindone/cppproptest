@@ -56,6 +56,13 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int> &input)
 	return os;
 }
 
+
+template<typename ARG1, typename ARG2>
+std::ostream& operator << (std::ostream& os, const std::tuple<ARG1, ARG2>& tuple) {
+    os << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+    return os;
+}
+
 TEST(PropTest, GenerateBool) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -164,6 +171,105 @@ TEST(PropTest, ShrinkableAndThen) {
         }
     }
 
+    auto concat = evenShrinkable.concat([evenShrinkable]() {
+        return evenShrinkable.shrinks();
+    });
+
+    std::cout<< "concat: " << concat.get() << std::endl;
+    {
+        auto shrinks = concat.shrinks();
+        while(!shrinks.isEmpty()) {
+            auto tempItr = shrinks.iterator();
+            tempItr.next(); // ignore first one
+            auto shrink = tempItr.hasNext() ? tempItr.next() : shrinks.head();
+            std::cout<< "concat: " << shrink.get() << std::endl;
+            shrinks = shrink.shrinks();
+            for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
+                std::cout << "  shrinks: " << itr.next() << std::endl;
+            }
+        }
+    }
+}
+
+template <typename T>
+void exhaustive(const Shrinkable<T>& shrinkable, int level) {
+    for(int i = 0; i < level; i++)
+        std::cout << "  ";
+    std::cout<< "shrinkable: " << shrinkable.get() << std::endl;
+
+    auto shrinks = shrinkable.shrinks();
+    for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
+        auto shrinkable2 = itr.next();
+        exhaustive(shrinkable2, level + 1);
+    }
+}
+
+TEST(PropTest, ShrinkableBinary) {
+    {
+        auto shrinkable = binarySearchShrinkable<int>(0);
+        std::cout << "# binary of 0" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+    {
+        auto shrinkable = binarySearchShrinkable<int>(1);
+        std::cout << "# binary of 1" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+    {
+        auto shrinkable = binarySearchShrinkable<int>(8);
+        std::cout << "# binary of 8" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+
+    {
+        auto shrinkable = binarySearchShrinkable<int>(7);
+        std::cout << "# binary of 7" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+
+    {
+        auto shrinkable = binarySearchShrinkable<int>(9);
+        std::cout << "# binary of 9" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+
+    {
+        auto shrinkable = binarySearchShrinkable<int>(-1);
+        std::cout << "# binary of -1" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+    {
+        auto shrinkable = binarySearchShrinkable<int>(-3);
+        std::cout << "# binary of -3" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+    {
+        auto shrinkable = binarySearchShrinkable<int>(-8);
+        std::cout << "# binary of -8" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+
+    {
+        auto shrinkable = binarySearchShrinkable<int>(-7);
+        std::cout << "# binary of -7" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+
+    {
+        auto shrinkable = binarySearchShrinkable<int>(-9);
+        std::cout << "# binary of -9" << std::endl;
+        exhaustive(shrinkable, 0);
+    }
+}
+
+TEST(PropTest, ShrinkableConcat) {
+    auto shrinkable = binarySearchShrinkable<int>(8);
+
+    auto concat = shrinkable.concat([shrinkable]() {
+        return shrinkable.shrinks();
+    });
+
+    exhaustive(concat, 0);
 }
 
 struct GenSmallInt : public Gen<int32_t> {
@@ -237,6 +343,35 @@ TEST(PropTest, TestCheckGen) {
         std::cout << "a: " << a << ", b: " << b << std::endl;
         return true;
     }, genSmallInt, genSmallInt);
+}
+
+
+TEST(PropTest, TupleGen) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    while(true) {
+        auto intGen = Arbitrary<int>();
+        auto shrinkable = intGen(rand);
+        auto value = shrinkable.get();
+        if(value > -20 && value < 20)
+        {
+            exhaustive(shrinkable, 0);
+            break;
+        }
+    }
+
+    while(true) {
+        auto tupleGen = tuple(Arbitrary<int>(), Arbitrary<int>());
+        auto shrinkable = tupleGen(rand);
+        auto valueTup = shrinkable.get();
+        auto arg1 = std::get<0>(valueTup);
+        auto arg2 = std::get<1>(valueTup);
+        if(arg1 > -20 && arg1 < 20 && arg2 > -20 && arg2 < 20)
+        {
+            exhaustive(shrinkable, 0);
+            break;
+        }
+    }
 }
 
 TEST(PropTest, TestCheckAssert) {

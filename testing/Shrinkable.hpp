@@ -57,6 +57,18 @@ struct Shrinkable {
         });
     }
 
+    // continues with then after horizontal dead end
+    Shrinkable<T> concat(std::function<Stream<Shrinkable<T>>()> then) const {
+        auto shrinks = this->shrinks();
+        return with([shrinks, then]() {
+            auto shrinkablesWithThen = shrinks.template transform<Shrinkable<T>>([then](const Shrinkable<T>& shr){
+                return shr.concat(then);
+            });
+            return shrinkablesWithThen.concat(then());
+        });
+    }
+
+    // continues with then after vertical dead end
     Shrinkable<T> andThen(std::function<Stream<Shrinkable<T>>()> then) const {
         auto shrinks = this->shrinks();
         return with([shrinks, then]() {
@@ -67,7 +79,6 @@ struct Shrinkable {
                     return shr.andThen(then);
             });
         });
-
     }
 
 private:

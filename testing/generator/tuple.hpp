@@ -10,83 +10,62 @@
 namespace PropertyBasedTesting
 {
 
-// namespace TupleUtil {
+template <size_t N, typename...Shrinkables>
+decltype(auto) mine(std::tuple<Shrinkables...>&& shrinkableTuple);
+template <size_t N, typename...Shrinkables>
+decltype(auto) rest(std::tuple<Shrinkables...>&& shrinkableTuple);
 
-// bool OR()
-// {
-//     return false;
-// }
+template <typename T>
+struct GetValueFromShrinkable {
+    static decltype(auto) transform(T&& shr) {
+        return shr.get();
+    }
+};
 
-// template <typename T, typename...Us>
-// auto OR(T&& t, Us&&... us)
-// {
-//     return OR(std::forward<Us>(us)...) || std::forward<T>(t);
-// }
 
-// template <typename T, size_t...Is>
-// auto or_components_impl(T const& t, std::index_sequence<Is...>)
-// {
-//     constexpr auto last_index = sizeof...(Is) - 1;
-//     return OR(std::get<last_index - Is>(t)...);
-// }
+template <size_t N, typename...Shrinkables>
+decltype(auto) mine(std::tuple<Shrinkables...>&& shrinkableTuple) {
+    using InTuple = std::tuple<Shrinkables...>;
+    using OutTuple = typename std::tuple<typename Shrinkables::type...>;
+    using Out = Shrinkable<OutTuple>;
+    using T = typename std::tuple_element<N, OutTuple>::type; // Shrinkable<T>::type == T
 
-// template <class Tuple>
-// bool or_components(const Tuple& t)
-// {
-//     constexpr auto Size = std::tuple_size<Tuple>{};
-//     return or_components_impl(t, std::make_index_sequence<Size>{});
-// }
+    // Shrinkable(8).with(...)
+    auto shrinkable = std::get<N>(shrinkableTuple);
+    // (0,4,6,7)...
+    auto shrinks = shrinkable.shrinks();
 
-// }
-
-// template <typename... Ts>
-// class PROPTEST_API Arbitrary< std::tuple<Ts...>> : public Gen< std::tuple<Ts...> >
-// {
-// public:
-//     constexpr auto Size = sizeof...(Ts);
-
-//     Arbitrary(Gen<T>... _elemGens) : elemGenTuple(std::make_tuple(_elemGens))  {
-//     }
-
-//     template <typename T, std::size_t... index>
-//     decltype(auto) generateHelper(Random& rand, std::index_sequence<index> index_sequence) {
-//         return std::make_tuple(std::get<index>(elemGenTuple)(rand)...);
-//     }
-
-//     Shrinkable<std::tuple<Ts...>> operator()(Random& rand) {
-//         constexpr auto Size = sizeof...(Ts);
-//         std::tuple<Ts...> val;
-//         auto valueTuple = generateHelper(rand, std::make_index_sequence<Size>{});
-
-//         return make_shrinkable<std::tuple<Ts...>>(valueTuple).with([]() -> Stream<Shrinkable<std::tuple<Ts...>>> {
-//             /* strategy:
-//              * assume elements are independent
-//              * shrink each element one by one upto its limit
-//              * stream of stream?
-//              * */
-//             constexpr auto Size = sizeof...(Ts);
-//             for(size_t i = 0; i < Size; i++) {
-
-//             }
-//             return Stream<Shrinkable<std::tuple<Ts...>>>::empty();
-//         });
-//     }
-
-//     std::tuple<Gen<T>...> elemGenTuple;
-// };
-
-template <size_t N, typename Tuple>
-decltype(auto) shrinkN(Tuple&& tuple) {
-    auto element = std::get<N>(tuple);
-    // std::get<N>(tuple) = next;
-    return std::get<N>(tuple);
+    // shrinkable to (0, 8, 8), (4, 8, 8), (6, 8, 8), (7, 8, 8)
+    return shrinkable.template transform<OutTuple>([shrinkableTuple](const T& value) -> OutTuple {
+        OutTuple valueTup = transformHeteroTuple<GetValueFromShrinkable>(std::move(shrinkableTuple));
+        std::get<N>(valueTup) = value;
+        return valueTup;
+    });
 }
 
-template <typename Tuple, std::size_t...index>
-decltype(auto) shrinkEach(Tuple&& tuple, std::index_sequence<index...>) {
-    return std::make_tuple(shrinkN<index>(tuple)...);
+
+template<size_t N, size_t Size, typename Tuple, std::enable_if_t<N < Size-1, bool> = true >
+decltype(auto) ConcatHelper(Tuple&& shrinkableTuple) {
+    return mine<N>(std::move(shrinkableTuple))/*.concat([shrinkableTuple]() {
+        return rest<N+1>(std::move(const_cast<Tuple&>(shrinkableTuple)));
+    })*/;
 }
 
+template<size_t N, size_t Size, typename Tuple, std::enable_if_t<N >= Size-1, bool> = false >
+decltype(auto) ConcatHelper(Tuple&& shrinkableTuple) {
+    return mine<N>(std::move(shrinkableTuple));
+}
+
+template <size_t N, typename...Shrinkables>
+decltype(auto) rest(std::tuple<Shrinkables...>&& shrinkableTuple) {
+    using InTuple = std::tuple<Shrinkables...>;
+    using OutTuple = typename std::tuple<typename Shrinkables::type...>;
+    using Out = Shrinkable<OutTuple>;
+    using T = typename std::tuple_element<N, InTuple>::type;
+    static constexpr auto Size = sizeof...(Shrinkables);
+
+    return ConcatHelper<N, Size>(std::move(shrinkableTuple));
+}
 
 // generates (int, int)
 // and shrinks one parameter by one
@@ -95,26 +74,14 @@ decltype(auto) tuple(GENS&&...gens) {
     constexpr auto Size = sizeof...(GENS);
 
     // generator
-    return [&gens](Random& rand) {
+    return [&gens...](Random& rand) {
         auto shrinkableTuple = std::make_tuple(gens(rand)...);
         auto valueTuple = std::make_tuple(gens(rand).get()...);
         using ValueTuple = decltype(valueTuple);
+        return rest<0>(std::move(shrinkableTuple));
 
-        // stream of (shrinkable) <int...>, <string...>, ...
-        auto shrinksTuple = transformHeteroTuple<GetShrinks>(std::move(shrinkableTuple));
-
-        auto shrinks0 = std::get<0>(shrinksTuple);
-        shrinks0.transform<std::tuple<>>([shrinkableTuple](const Shrinkable<>& shrinkable) {
-            shrinkable.transform([](const T& value){
-                std::make_tuple(value, std::get<1>(shrinkableTuple).get());
-            }) // -> shrinks based on Shrinkable<T> only. deepmost (no more shrinking possible) should continue with next one
-        });
-
-        // aggregate to tuple
-        // (shrinkable) <int, string, ...>
-        auto shrinks = 1;
-        return make_shrinkable<ValueTuple>(valueTuple).with(shrinks)
-    }
+        // return make_shrinkable<ValueTuple>(valueTuple);//.with(shrinks);
+    };
 }
 
 

@@ -17,17 +17,14 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
 
     // given min, max, generate stream
     static genfunc_t genpos = [](INTTYPE min, INTTYPE max) {
-        INTTYPE mid = min/2 + max/2;
-        //std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
-        if(mid+1 >= max || min+1 >= mid)
+        INTTYPE mid = min/2 + max/2 + ((min % 2 != 0 && max % 2 != 0) ? 1 : 0);
+        // std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
+        if(min + 1 >= max) {
+            return stream_t::empty();
+        }
+        else if(min + 2 >= max) {
             return stream_t(make_shrinkable<INTTYPE>(mid));
-        else if(mid+1 >= max)
-            return stream_t(make_shrinkable<INTTYPE>(mid).with([=]() { return genpos(min, mid);}));
-        else if(min+1 >= mid)
-            return stream_t(
-                make_shrinkable<INTTYPE>(mid),
-                [=]() { return genpos(mid, max); }
-            );
+        }
         else
             return stream_t(
                 make_shrinkable<INTTYPE>(mid).with([=]() { return genpos(min, mid);}),
@@ -36,17 +33,14 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
     };
 
     static genfunc_t genneg = [](INTTYPE min, INTTYPE max) {
-        INTTYPE mid = min/2 + max/2;
-        //std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
-        if(mid+1 >= max || min+1 >= mid)
+        INTTYPE mid = min/2 + max/2 + ((min % 2 != 0 && max % 2 != 0) ? -1 : 0);
+        // std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
+        if(min + 1 >= max) {
+            return stream_t::empty();
+        }
+        else if(min + 2 >= max) {
             return stream_t(make_shrinkable<INTTYPE>(mid));
-        else if(mid+1 >= max)
-            return stream_t(make_shrinkable<INTTYPE>(mid).with([=]() { return genneg(mid, max);}));
-        else if(min+1 >= mid)
-            return stream_t(
-                make_shrinkable<INTTYPE>(mid),
-                [=]() { return genneg(min, mid); }
-            );
+        }
         else
             return stream_t(
                 make_shrinkable<INTTYPE>(mid).with([=]() { return genneg(mid, max);}),
@@ -56,14 +50,12 @@ decltype(auto) binarySearchShrinkable(INTTYPE value) {
 
     //std::cout << "      val0: " << value << std::endl;
     return make_shrinkable<INTTYPE>(value).with([value]() {
-        //std::cout << "      val1: " << value << std::endl;
-        return stream_t(make_shrinkable<INTTYPE>(0), [value]() {
-            //std::cout << "      val2: " << value << std::endl;
-            if(value >= 0)
-                return genpos(0, value);
-            else
-                return genpos(value, 0);
-        });
+        if(value == 0)
+            return stream_t::empty();
+        else if(value > 0)
+            return stream_t(make_shrinkable<INTTYPE>(0)).concat(genpos(0, value));
+        else
+            return stream_t(make_shrinkable<INTTYPE>(0)).concat(genneg(value, 0));
     });
 }
 

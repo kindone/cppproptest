@@ -19,7 +19,7 @@ Shrinkable<T> generateNumeric(Random& rand) {
 
     return binarySearchShrinkable<T>(value);
 }
-    
+
 
 template <>
 class PROPTEST_API Arbitrary<int8_t> : public Gen<int8_t>
