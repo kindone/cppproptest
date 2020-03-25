@@ -38,7 +38,7 @@ struct Shrinkable {
             });
         });
     }
-    
+
     // provide filtered generation, shrinking
     Shrinkable<T> filter(std::function<bool(const T&)> criteria) const {
         if(!criteria(getRef()))
@@ -65,6 +65,17 @@ struct Shrinkable {
                 return shr.concat(then);
             });
             return shrinkablesWithThen.concat(then());
+        });
+    }
+
+    Shrinkable<T> concat(std::function<Stream<Shrinkable<T>>(const Shrinkable<T>&)> then) const {
+        auto shrinks = this->shrinks();
+        auto copy = *this;
+        return with([copy, shrinks, then]() {
+            auto shrinkablesWithThen = shrinks.template transform<Shrinkable<T>>([then](const Shrinkable<T>& shr){
+                return shr.concat(then);
+            });
+            return shrinkablesWithThen.concat(then(copy));
         });
     }
 

@@ -272,6 +272,38 @@ TEST(PropTest, ShrinkableConcat) {
     exhaustive(concat, 0);
 }
 
+TEST(PropTest, ShrinkVector) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    using T = int;
+    int len = 8;
+    std::vector<T> vec;
+    vec.reserve(len);
+    for(int i = 0; i < len; i++)
+        vec.push_back(8);
+
+    //return make_shrinkable<std::vector<T>>(std::move(vec));
+
+    auto shrinkableVector = binarySearchShrinkable<int>(len).template transform<std::vector<T>>([vec](const int& len) {
+        if(len <= 0)
+            return std::vector<T>();
+
+        auto begin = vec.begin();
+        auto last = vec.begin() + len;
+        return std::vector<T>(begin, last);;
+    });
+
+    auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<std::vector<T>>& shr){
+        std::vector<T> copy = shr;
+        if(!copy.empty())
+            copy[0] /= 2;
+        return Stream<Shrinkable<std::vector<T>>>(make_shrinkable<std::vector<T>>(copy));
+    });
+
+    exhaustive(shrinkableVector, 0);
+    exhaustive(shrinkableVector2, 0);
+}
+
 struct GenSmallInt : public Gen<int32_t> {
     GenSmallInt() : step(0ULL) {
     }
