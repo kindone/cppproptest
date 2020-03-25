@@ -21,8 +21,11 @@ std::ostream& show(std::ostream& os, const uint64_t&);
 std::ostream& show(std::ostream& os, const float&);
 std::ostream& show(std::ostream& os, const double&);
 
+// forward declaration is needed to be available at call sites
 template <typename T>
 std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
+template <typename ...ARGS>
+std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple);
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
 
@@ -123,11 +126,8 @@ std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec) {
     os << "[ ";
-	
 	auto begin = vec.begin();
-	if(begin == vec.end()) {
-	}
-	else {
+	if(begin != vec.end()) {
 		show(os, *begin);
 		for(auto itr = ++begin; itr != vec.end(); itr++) {
 			os << ", ";
@@ -137,7 +137,5 @@ std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec) {
     os << " ]";
     return os;
 }
-
-
 
 }

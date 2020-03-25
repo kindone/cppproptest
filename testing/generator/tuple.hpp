@@ -10,10 +10,8 @@
 namespace PropertyBasedTesting
 {
 
-template <size_t N, typename...Shrinkables>
-decltype(auto) mine(std::tuple<Shrinkables...>&& shrinkableTuple);
-template <size_t N, typename...Shrinkables>
-decltype(auto) rest(std::tuple<Shrinkables...>&& shrinkableTuple);
+template <typename...ARGS>
+std::function<Shrinkable<std::tuple<ARGS...>>()> genTuple(const std::tuple<Shrinkable<ARGS>...>& shrinkableTuple);
 
 template <typename T>
 struct GetValueFromShrinkable {
@@ -22,50 +20,57 @@ struct GetValueFromShrinkable {
     }
 };
 
+template<size_t N, typename ...ARGS, typename Tuple, std::enable_if_t<N < sizeof...(ARGS), bool> = true >
+Stream<Shrinkable<std::tuple<ARGS...>>> ConcatHelper(const Stream<Shrinkable<std::tuple<ARGS...>>>& aggr, Tuple&& tuple) {
+    const Stream<Shrinkable<std::tuple<ARGS...>>>& base = aggr.concat(std::get<N>(tuple));
+    return ConcatHelper<N+1>(base, tuple);
+}
 
-template <size_t N, typename...Shrinkables>
-decltype(auto) mine(std::tuple<Shrinkables...>&& shrinkableTuple) {
-    using InTuple = std::tuple<Shrinkables...>;
-    using OutTuple = typename std::tuple<typename Shrinkables::type...>;
-    using Out = Shrinkable<OutTuple>;
-    using T = typename std::tuple_element<N, OutTuple>::type; // Shrinkable<T>::type == T
+template<size_t N, typename ...ARGS, typename Tuple, std::enable_if_t<N >= sizeof...(ARGS), bool> = false >
+Stream<Shrinkable<std::tuple<ARGS...>>> ConcatHelper(const Stream<Shrinkable<std::tuple<ARGS...>>>& aggr, Tuple&& shrinkableTuple) {
+    return aggr;
+}
 
-    // Shrinkable(8).with(...)
-    auto shrinkable = std::get<N>(shrinkableTuple);
-    // (0,4,6,7)...
-    auto shrinks = shrinkable.shrinks();
+template<size_t N, typename...ARGS>
+Stream<Shrinkable<std::tuple<ARGS...>>> joinShrinkables(const std::tuple<Shrinkable<ARGS>...>& shrinkableTuple) {
+    using ShrinkableTuple = std::tuple<Shrinkable<ARGS>...>;
+    using ShrinkableType = typename std::tuple_element<N, ShrinkableTuple>::type;
+    using OutTuple = std::tuple<ARGS...>;
+    using T = typename ShrinkableType::type;
 
-    // shrinkable to (0, 8, 8), (4, 8, 8), (6, 8, 8), (7, 8, 8)
-    return shrinkable.template transform<OutTuple>([shrinkableTuple](const T& value) -> OutTuple {
-        OutTuple valueTup = transformHeteroTuple<GetValueFromShrinkable>(std::move(shrinkableTuple));
-        std::get<N>(valueTup) = value;
-        return valueTup;
+    ShrinkableType shrinkable = std::get<N>(shrinkableTuple);
+    Stream<ShrinkableType> shrinks = shrinkable.shrinks();
+    return shrinks.template transform<Shrinkable<OutTuple>>([shrinkableTuple](const ShrinkableType& shr) mutable {
+        //FIXME: copy twice?
+        ShrinkableTuple copy = shrinkableTuple; // std::tuple<Shrinkable<ARGS>...>
+        // replace N's element in tuple
+        std::get<N>(copy) = shr;
+        return genTuple(copy)(); // Shrinkable<std::tuple<ARGS...>>
     });
 }
 
-
-template<size_t N, size_t Size, typename Tuple, std::enable_if_t<N < Size-1, bool> = true >
-decltype(auto) ConcatHelper(Tuple&& shrinkableTuple) {
-    return mine<N>(std::move(shrinkableTuple))/*.concat([shrinkableTuple]() {
-        return rest<N+1>(std::move(const_cast<Tuple&>(shrinkableTuple)));
-    })*/;
+template<typename...ARGS, std::size_t...index>
+Stream<Shrinkable<std::tuple<ARGS...>>> joinShrinkablesHelper(const std::tuple<Shrinkable<ARGS>...>& shrinkableTuple, std::index_sequence<index...>) {
+    auto joinedShrinkables = std::make_tuple(joinShrinkables<index>(shrinkableTuple)...);
+    Stream<Shrinkable<std::tuple<ARGS...>>>& base = std::get<0>(joinedShrinkables);
+    return ConcatHelper<1>(base, joinedShrinkables);
 }
 
-template<size_t N, size_t Size, typename Tuple, std::enable_if_t<N >= Size-1, bool> = false >
-decltype(auto) ConcatHelper(Tuple&& shrinkableTuple) {
-    return mine<N>(std::move(shrinkableTuple));
+template <typename...ARGS>
+std::function<Shrinkable<std::tuple<ARGS...>>()> genTuple(const std::tuple<Shrinkable<ARGS>...>& shrinkableTuple) {
+    using ShrinkableTuple = std::tuple<Shrinkable<ARGS>...>;
+    using OutTuple = std::tuple<ARGS...>;
+    static constexpr auto Size = sizeof...(ARGS);
+
+    return [&shrinkableTuple]() -> Shrinkable<OutTuple> {
+        OutTuple valueTup = transformHeteroTuple<GetValueFromShrinkable>(std::move(shrinkableTuple));
+        Stream<Shrinkable<OutTuple>> shrinks = joinShrinkablesHelper(shrinkableTuple, std::make_index_sequence<Size>{});
+        return make_shrinkable<OutTuple>(valueTup).with([shrinks]() {
+            return shrinks;
+        });
+    };
 }
 
-template <size_t N, typename...Shrinkables>
-decltype(auto) rest(std::tuple<Shrinkables...>&& shrinkableTuple) {
-    using InTuple = std::tuple<Shrinkables...>;
-    using OutTuple = typename std::tuple<typename Shrinkables::type...>;
-    using Out = Shrinkable<OutTuple>;
-    using T = typename std::tuple_element<N, InTuple>::type;
-    static constexpr auto Size = sizeof...(Shrinkables);
-
-    return ConcatHelper<N, Size>(std::move(shrinkableTuple));
-}
 
 // generates (int, int)
 // and shrinks one parameter by one
@@ -76,13 +81,17 @@ decltype(auto) tuple(GENS&&...gens) {
     // generator
     return [&gens...](Random& rand) {
         auto shrinkableTuple = std::make_tuple(gens(rand)...);
-        auto valueTuple = std::make_tuple(gens(rand).get()...);
-        using ValueTuple = decltype(valueTuple);
-        return rest<0>(std::move(shrinkableTuple));
-
-        // return make_shrinkable<ValueTuple>(valueTuple);//.with(shrinks);
+        return genTuple(shrinkableTuple)();
     };
 }
 
+template <typename ...ARGS>
+class PROPTEST_API Arbitrary< std::tuple<ARGS...>> : public Gen< std::tuple<ARGS...> >
+{
+public:
+    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) {
+        return tuple(Arbitrary<ARGS>()...)(rand);
+    }
+};
 
 }

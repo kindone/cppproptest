@@ -456,6 +456,18 @@ TEST(PropTest, TestVectorCheckFail) {
     });
 }
 
+TEST(PropTest, TestTupleCheckFail) {
+
+    check([](std::tuple<int, int> tuple) -> bool {
+        std::cout << "tuple: ";
+        show(std::cout, tuple);
+        std::cout << std::endl;
+        int a = std::get<0>(tuple);
+        int b = std::get<1>(tuple);
+        PROP_ASSERT((-10 < a && a < 100) || (-20 < b && b < 200), {});
+        return true;
+    });
+}
 
 bool propertyAsFunc(std::string a, int i, std::vector<int> v) {
     return true;
@@ -631,6 +643,17 @@ TEST(PropTest, TestOneOf) {
     Random rand(seed);
     for(int i = 0;  i < 10; i++)
         std::cout << gen(rand) << std::endl;
+}
+
+TEST(PropTest, TestTuple) {
+    auto intGen = Arbitrary<int>();
+    auto smallIntGen = GenSmallInt();
+
+    auto gen = tuple(intGen, smallIntGen);
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 0;  i < 10; i++)
+        std::cout << gen(rand).get() << std::endl;
 }
 
 

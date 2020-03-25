@@ -38,7 +38,7 @@ struct Shrinkable {
             });
         });
     }
-
+    
     // provide filtered generation, shrinking
     Shrinkable<T> filter(std::function<bool(const T&)> criteria) const {
         if(!criteria(getRef()))

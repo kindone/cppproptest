@@ -104,7 +104,7 @@ struct NonEmptyStream : public StreamImpl<T> {
         return Stream<T>::empty();
     }
 
-    Stream<T> concat(const Stream<T>& other) {
+    Stream<T> concat(const Stream<T>& other) const {
         auto self = *this;
         return Stream<T>(head(), [self, other]() {
             return Stream<T>(self.tail()).concat(other);
@@ -177,7 +177,7 @@ struct Stream {
         }
     }
 
-    Stream<T> concat(const Stream<T>& other) {
+    Stream<T> concat(const Stream<T>& other) const {
         if(isEmpty())
             return other;
         else {
