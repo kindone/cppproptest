@@ -74,7 +74,7 @@ static std::ostream& show(std::ostream& os, const T & obj)
 template <typename T>
 std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
 {
-    show(os, static_cast<T>(shrinkable));
+    show(os, shrinkable.getRef());
     return os;
 }
 

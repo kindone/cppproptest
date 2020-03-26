@@ -99,7 +99,8 @@ TEST(PropTest, GenUTF8String) {
 TEST(PropTest, GenLttVectorOfInt) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::vector<int>> gen(5);
+    Arbitrary<std::vector<int>> gen;
+    gen.maxLen = 5;
 
     for(int i = 0; i < 20; i++) {
         std::vector<int> val(gen(rand));
@@ -302,6 +303,18 @@ TEST(PropTest, ShrinkVector) {
 
     exhaustive(shrinkableVector, 0);
     exhaustive(shrinkableVector2, 0);
+}
+
+TEST(PropTest, ShrinkVectorFromGen) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    using T = int;
+    int len = 8;
+    auto genVec = Arbitrary<std::vector<int>>();
+    genVec.maxLen = 8;
+    auto vecShrinkable = genVec(rand);
+    //return make_shrinkable<std::vector<T>>(std::move(vec));
+    exhaustive(vecShrinkable, 0);
 }
 
 struct GenSmallInt : public Gen<int32_t> {

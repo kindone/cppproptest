@@ -28,7 +28,7 @@ struct Shrinkable {
     T* getPtr() const { return ptr.get(); }
     T& getRef() const { return *ptr.get(); }
 
-    template <typename U>
+    template <typename U = T>
     Shrinkable<U> transform(std::function<U(const T&)> transformer) const {
         auto shrinks = this->shrinks();
         auto shrinkable = make_shrinkable<U>(transformer(getRef()));

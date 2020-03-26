@@ -83,7 +83,7 @@ struct NonEmptyStream : public StreamImpl<T> {
         return Iterator<T>{Stream<T>{*this}};
     }
 
-    template <typename U>
+    template <typename U = T>
     NonEmptyStream<U> transform(std::function<U(const T&)>& transformer) {
         auto gen = tailGen;
         return NonEmptyStream<U>(transformer(_head), [transformer, gen]() -> Stream<U> {
