@@ -22,22 +22,27 @@ public:
 
     Shrinkable<std::vector<T>> operator()(Random& rand) {
         int len = rand.getRandomSize(0, maxLen+1);
-        std::vector<T> vec;
-        vec.reserve(len);
+        std::vector<Shrinkable<T>> shrinkVec;
+        shrinkVec.reserve(len);
         for(int i = 0; i < len; i++)
-            vec.push_back(elemGen(rand));
+            shrinkVec.push_back(elemGen(rand));
 
-        //return make_shrinkable<std::vector<T>>(std::move(vec));
-
-        return binarySearchShrinkable<int>(len).template transform<std::vector<T>>([vec](const int& len) {
+        // shrink with subvector using binary numeric shrink of lengths
+        return binarySearchShrinkable<int>(len).template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
             if(len <= 0)
-                return std::vector<T>();
+                return std::vector<Shrinkable<T>>();
 
-            auto begin = vec.begin();
-            auto last = vec.begin() + len;
-            return std::vector<T>(begin, last);;
+            auto begin = shrinkVec.begin();
+            auto last = shrinkVec.begin() + len;
+            return std::vector<Shrinkable<T>>(begin, last);;
+        // convert shrinkable<T> to T
+        }).template transform<std::vector<T>>([](const std::vector<Shrinkable<T>>& shrinkVec) {
+            std::vector<T> valueVec;
+            std::transform(shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueVec), [](const Shrinkable<T>& shr) -> T {
+                return shr.get();
+            });
+            return valueVec;
         });
-
     }
 
     int maxLen;
