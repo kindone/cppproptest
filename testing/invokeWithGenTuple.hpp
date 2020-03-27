@@ -9,10 +9,10 @@ decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genT
 
     auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...); 
     try {
-        return invokeWithArgTuple(std::move(f), std::move(valueTup));
+        return invokeWithArgTuple(std::forward<Function>(f), std::forward<decltype(valueTup)>(valueTup));
     }
     catch(const AssertFailed& e) {
-        throw PropertyFailed<decltype(valueTup)>(e, std::move(valueTup));
+        throw PropertyFailed<decltype(valueTup)>(e, std::forward<decltype(valueTup)>(valueTup));
     }
 }
 

@@ -22,22 +22,6 @@ public:
     Arbitrary(Arbitrary<T> _elemGen) : elemGen(_elemGen), maxLen(defaultMaxLen)  {
     }
 
-    static Stream<Shrinkable<std::vector<Shrinkable<T>> >> shrinkElement(const Shrinkable<std::vector<Shrinkable<T>>>& shrinkableVecShrinkable, size_t pos) {
-        std::vector<Shrinkable<T>> shrinkableVec = shrinkableVecShrinkable.getRef();
-        // replace with this one
-        Stream<Shrinkable<T>> streamShrinkableT = shrinkableVec[pos].shrinks();
-        //replace  with new one based on this shrinks
-        Stream<Shrinkable<std::vector<Shrinkable<T>>>> streamShrinkableVectorShrinkable = streamShrinkableT.template transform<Shrinkable<std::vector<Shrinkable<T>>>>([shrinkableVecShrinkable,pos](const Shrinkable<T>& shr) {
-            Shrinkable<std::vector<Shrinkable<T>>> copy = shrinkableVecShrinkable;
-            return copy.template transform<std::vector<Shrinkable<T>>>([shr,pos](const std::vector<Shrinkable<T>>& s){
-                auto c = s;
-                c[pos] = shr;
-                return c;
-            });
-        });
-        return streamShrinkableVectorShrinkable;
-    }
-
     Shrinkable<std::vector<T>> operator()(Random& rand) {
         int len = rand.getRandomSize(0, maxLen+1);
         std::vector<Shrinkable<T>> shrinkVec;
@@ -45,18 +29,18 @@ public:
         for(int i = 0; i < len; i++)
             shrinkVec.push_back(elemGen(rand));
 
-        std::vector<T> vec;
-        for(int i = 0; i < len; i++)
-            vec.push_back(elemGen(rand));
+        // std::vector<T> vec;
+        // for(int i = 0; i < len; i++)
+        //     vec.push_back(elemGen(rand));
 
-        return binarySearchShrinkable<int>(len).template transform<std::vector<T>>([vec](const int& len) {
-            if(len <= 0)
-                return std::vector<T>();
+        // return binarySearchShrinkable<int>(len).template transform<std::vector<T>>([vec](const int& len) {
+        //     if(len <= 0)
+        //         return std::vector<T>();
 
-            auto begin = vec.begin();
-            auto last = vec.begin() + len;
-            return std::vector<T>(begin, last);;
-        });
+        //     auto begin = vec.begin();
+        //     auto last = vec.begin() + len;
+        //     return std::vector<T>(begin, last);;
+        // });
 
         // shrink with subvector using binary numeric shrink of lengths
         auto shrinkableVecShrinkable =  binarySearchShrinkable<int>(len).template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
@@ -65,13 +49,31 @@ public:
 
             auto begin = shrinkVec.begin();
             auto last = shrinkVec.begin() + len;
-            return std::vector<Shrinkable<T>>(begin, last);;
+            return std::vector<Shrinkable<T>>(begin, last);
         });
 
+        // Shr([shr,...,shr]).with(Stream { shr([]), shr([shr,shr,shr,shr]), shr([shr,shr,shr,shr,shr,shr]), shr([shr,...,shr]) })
+
         // TODO: apply 0~size-1 and save to new var
-        shrinkableVecShrinkable = shrinkableVecShrinkable.concat([](const Shrinkable<std::vector<Shrinkable<T>>>& shrinkVecShrink) -> Stream<Shrinkable<std::vector<Shrinkable<T>>>>{
-            return shrinkElement(shrinkVecShrink, shrinkVecShrink.getRef().size()-1);
-        });
+        auto genElementalShrinks = [](const Shrinkable<std::vector<Shrinkable<T>>>& shvsh) -> Stream<Shrinkable<std::vector<Shrinkable<T>>>>{
+            // Shr([shr,...,shr]).with(Stream { shr([]), shr([shr,shr,shr,shr]), shr([shr,shr,shr,shr,shr,shr]), shr([shr,...,shr]) })
+            std::vector<Shrinkable<T>> vsh = shvsh.getRef();
+            if(vsh.empty())
+                return Stream<Shrinkable<std::vector<Shrinkable<T>>>>::empty();
+            const auto size = vsh.size();
+            Shrinkable<T> sh = vsh[size-1];
+            Stream<Shrinkable<T>> subshs = sh.shrinks();
+            // 1Dimensional transform {shr(0), shr(4), shr(6), shr(7)} -> shr([...,shr(0)]), shr([...,shr(4)]), shr([...,shr(6)]), shr([...,shr(7)])
+            auto shvshs = subshs.template transform<Shrinkable<std::vector<Shrinkable<T>>>>([vsh](const Shrinkable<T>& subsh) {
+                auto copyvsh = vsh;
+                const auto size = vsh.size();
+                copyvsh[size-1] = subsh;
+                return make_shrinkable<std::vector<Shrinkable<T>>>(copyvsh);
+            });
+            return shvshs;
+        };
+
+        shrinkableVecShrinkable = shrinkableVecShrinkable.concat(genElementalShrinks);
 
         auto vecShrinkable = shrinkableVecShrinkable.template transform<std::vector<T>>([](const std::vector<Shrinkable<T>>& shrinkVec) -> std::vector<T> {
             std::vector<T> valueVec;

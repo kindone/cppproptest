@@ -68,6 +68,7 @@ struct Shrinkable {
         });
     }
 
+    // extend shrinks stream with function taking parent as argument
     Shrinkable<T> concat(std::function<Stream<Shrinkable<T>>(const Shrinkable<T>&)> then) const {
         auto shrinks = this->shrinks();
         auto copy = *this;
