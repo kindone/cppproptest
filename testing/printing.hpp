@@ -94,20 +94,20 @@ bool toStreamFrontHelper(std::ostream& os, const T& t)
 }
 
 template <typename Tuple, std::size_t...index>
-void toStreamFront(std::ostream& os, Tuple&& tuple, std::index_sequence<index...>) {
+void toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>) {
     auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};
 }
 
 template <size_t Size, typename Tuple>
 struct ToStreamEach {
-    void get(std::ostream& os, Tuple&& tuple) {
-        toStreamFront(os, std::move(tuple), std::make_index_sequence<Size>{});
+    void get(std::ostream& os, const Tuple& tuple) {
+        toStreamFront(os, tuple, std::make_index_sequence<Size>{});
     }
 };
 
 template <typename Tuple>
 struct ToStreamEach<0,Tuple> {
-    void get(std::ostream& os, Tuple&& tuple) {
+    void get(std::ostream& os, const Tuple& tuple) {
     }
 };
 
@@ -116,8 +116,8 @@ std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)
 {
     constexpr auto Size = sizeof...(ARGS);
     os << "{ ";
-    ToStreamEach<Size-1, const std::tuple<ARGS...>> toStreamEach;
-    toStreamEach.get(os, std::move(tuple));
+    ToStreamEach<Size-1, std::tuple<ARGS...>> toStreamEach;
+    toStreamEach.get(os, tuple);
     toStreamLast(os, std::get<Size-1>(tuple));
     os << " }";
     return os;

@@ -492,6 +492,13 @@ TEST(PropTest, TestStringCheckFail) {
 
 TEST(PropTest, TestVectorCheckFail) {
 
+    std::vector<int> vec;
+    vec.push_back(5);
+    auto tup = std::make_tuple(vec);
+    std::cout << "tuple: ";
+    show(std::cout, tup);
+    std::cout << std::endl;
+
     check([](std::vector<int> a) -> bool {
         std::cout << "a: ";
         show(std::cout, a);
