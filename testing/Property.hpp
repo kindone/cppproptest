@@ -135,11 +135,13 @@ private:
 
     template <size_t N, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple) {
-        std::cout << "  shrinking arg " << N << ":" << std::endl;
+        std::cout << "  shrinking arg " << N << ":";
+        show(std::cout, valueTup);
+        std::cout << std::endl;
         auto shrinks = std::get<N>(shrinksTuple);
         // keep shrinking until no shrinking is possible
         while(!shrinks.isEmpty()) {
-            //printShrinks(shrinks);
+            printShrinks(shrinks);
             auto iter = shrinks.iterator();
             bool shrinkFound = false;
             // keep trying until failure is reproduced
@@ -150,6 +152,10 @@ private:
                     shrinks = next.shrinks();
                     std::get<N>(valueTup) = next;
                     shrinkFound = true;
+                    std::cout << "  shrinking arg " << N << " tested false: ";
+                    show(std::cout, valueTup);
+                    show(std::cout, next);
+                    std::cout << std::endl;
                     break;
                 }
             }
