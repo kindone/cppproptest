@@ -64,23 +64,26 @@ public:
 
         auto genElementalShrinks = [](const shrinkable_t& current) -> stream_t{
             // Shr([shr,...,shr]).with(Stream { shr([]), shr([shr,shr,shr,shr]), shr([shr,shr,shr,shr,shr,shr]), shr([shr,...,shr]) })
-            // TODO iterate through size-1 ... 0the element
+
+            vector_t curVec = current.getRef();
+            stream_t shrinks = stream_t::empty();
+
+            if(curVec.empty())
+                return shrinks;
+            const auto size = curVec.size();
+
+            for(int64_t i = size-1; i >= 0; i--)
             {
-                vector_t curVec = current.getRef();
-                if(curVec.empty())
-                    return stream_t::empty();
-                const auto size = curVec.size();
-                e_shrinkable_t element = curVec[size-1];
+                e_shrinkable_t& element = curVec[i];
                 e_stream_t elemShrinks = element.shrinks();
                 // 1Dimensional transform {shr(0), shr(4), shr(6), shr(7)} -> shr([...,shr(0)]), shr([...,shr(4)]), shr([...,shr(6)]), shr([...,shr(7)])
-                auto shrinks = elemShrinks.template transform<shrinkable_t>([curVec](const e_shrinkable_t& elemShrink) {
+                shrinks = shrinks.concat(elemShrinks.template transform<shrinkable_t>([curVec, i](const e_shrinkable_t& elemShrink) {
                     vector_t vecCopy = curVec;
-                    const auto size = vecCopy.size();
-                    vecCopy[size-1] = elemShrink;
+                    vecCopy[i] = elemShrink;
                     return make_shrinkable<std::vector<Shrinkable<T>>>(vecCopy);
-                });
-                return shrinks;
+                }));
             }
+            return shrinks;
         };
 
         shrinkableVecShrinkable = shrinkableVecShrinkable.concat(genElementalShrinks);

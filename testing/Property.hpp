@@ -152,10 +152,10 @@ private:
                     shrinks = next.shrinks();
                     std::get<N>(valueTup) = next;
                     shrinkFound = true;
-                    std::cout << "  shrinking arg " << N << " tested false: ";
-                    show(std::cout, valueTup);
-                    show(std::cout, next);
-                    std::cout << std::endl;
+                    // std::cout << "  shrinking arg " << N << " tested false: ";
+                    // show(std::cout, valueTup);
+                    // show(std::cout, next);
+                    // std::cout << std::endl;
                     break;
                 }
             }
