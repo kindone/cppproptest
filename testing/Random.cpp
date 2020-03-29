@@ -13,55 +13,70 @@ Random::Random(uint64_t seed) :
 }
 
 Random::Random(const Random& other) :
-   engine(other.engine), dist(other.dist) 
+   engine(other.engine), dist(other.dist)
 {
 }
 
 
 uint64_t Random::next8U() {
     auto value = dist(engine);
-    return value; 
+    return value;
 }
 
 bool Random::getRandomBool() {
     return (next8U() % 2 == 0);
 }
 
-int8_t Random::getRandomInt8() {
-    uint8_t unsignedVal = getRandomUInt8();
-    return *reinterpret_cast<int8_t*>(&unsignedVal);
+int8_t Random::getRandomInt8(int8_t min, int8_t max) {
+    uint64_t span = static_cast<uint64_t>(static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1);
+    uint8_t unsignedVal = (getRandomUInt8() % span);
+    return *reinterpret_cast<int8_t*>(&unsignedVal) + min;
 }
 
-uint8_t Random::getRandomUInt8() {
-    return (next8U() % (std::numeric_limits<uint8_t>::max()+1));
+uint8_t Random::getRandomUInt8(uint8_t min, uint8_t max) {
+    uint64_t span = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
+    return static_cast<uint8_t>((next8U() % span) + min);
 }
 
-int16_t Random::getRandomInt16() {
-    uint16_t unsignedVal = getRandomUInt16();
-    return *reinterpret_cast<int16_t*>(&unsignedVal);
+int16_t Random::getRandomInt16(int16_t min, int16_t max) {
+    uint64_t span = static_cast<uint64_t>(static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1);
+    uint16_t unsignedVal = (getRandomUInt16() % span);
+    return *reinterpret_cast<int16_t*>(&unsignedVal) + min;
 }
 
-uint16_t Random::getRandomUInt16() {
-    return (next8U() % (std::numeric_limits<uint16_t>::max()+1));
+uint16_t Random::getRandomUInt16(uint16_t min, uint16_t max) {
+    uint64_t span = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
+    return static_cast<uint16_t>((next8U() % span) + min);
 }
 
-int32_t Random::getRandomInt32() {
-    uint32_t unsignedVal = getRandomUInt32();
-    return *reinterpret_cast<int32_t*>(&unsignedVal);
-
+int32_t Random::getRandomInt32(int32_t min, int32_t max) {
+    uint64_t span = static_cast<uint64_t>(static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1);
+    uint32_t unsignedVal = (getRandomUInt32() % span);
+    return *reinterpret_cast<int32_t*>(&unsignedVal) + min;
 }
 
-uint32_t Random::getRandomUInt32() {
-    return (next8U() % (static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())+1));
+uint32_t Random::getRandomUInt32(uint32_t min, uint32_t max) {
+    uint64_t span = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
+    return static_cast<uint32_t>((next8U() % span) + min);
 }
 
-int64_t Random::getRandomInt64() {
-    uint64_t unsignedVal = getRandomUInt64();
-    return *reinterpret_cast<int64_t*>(&unsignedVal);
+int64_t Random::getRandomInt64(int64_t min, int64_t max) {
+    if(min == INT64_MIN && max == INT64_MAX)
+    {
+        uint64_t unsignedVal = getRandomUInt64();
+        return *reinterpret_cast<int64_t*>(&unsignedVal) + INT64_MIN;
+    }
+    uint64_t span = max - min + 1;
+    uint64_t unsignedVal = (getRandomUInt64() % span);
+    return *reinterpret_cast<int64_t*>(&unsignedVal) + min;
 }
 
-uint64_t Random::getRandomUInt64() {
-    return next8U();
+uint64_t Random::getRandomUInt64(uint64_t min, uint64_t max) {
+    if(min == 0 && max == UINT64_MAX)
+        return next8U();
+
+    uint64_t span = max - min + 1;
+    return static_cast<uint64_t>((next8U() % span) + min);
 }
 
 uint32_t Random::getRandomSize(size_t fromIncluded, size_t toExcluded) {
@@ -87,42 +102,42 @@ int64_t getCurrentTime() {
 }
 
 template <>
-int8_t Random::getRandom<int8_t>() {
-    return getRandomInt8();
+int8_t Random::getRandom<int8_t>(int64_t min, int64_t max) {
+    return getRandomInt8(min, max);
 }
 
 template <>
-int16_t Random::getRandom<int16_t>() {
-    return getRandomInt16();
+int16_t Random::getRandom<int16_t>(int64_t min, int64_t max) {
+    return getRandomInt16(min, max);
 }
 
 template <>
-int32_t Random::getRandom<int32_t>() {
-    return getRandomInt32();
+int32_t Random::getRandom<int32_t>(int64_t min, int64_t max) {
+    return getRandomInt32(min, max);
 }
 
 template <>
-int64_t Random::getRandom<int64_t>() {
-    return getRandomInt64();
+int64_t Random::getRandom<int64_t>(int64_t min, int64_t max) {
+    return getRandomInt64(min, max);
 }
 
 template <>
-uint8_t Random::getRandom<uint8_t>() {
-    return getRandomUInt8();
+uint8_t Random::getRandomU<uint8_t>(uint64_t min, uint64_t max) {
+    return getRandomUInt8(min, max);
 }
 
 template <>
-uint16_t Random::getRandom<uint16_t>() {
-    return getRandomUInt16();
+uint16_t Random::getRandomU<uint16_t>(uint64_t min, uint64_t max) {
+    return getRandomUInt16(min, max);
 }
 
 template <>
-uint32_t Random::getRandom<uint32_t>() {
-    return getRandomUInt32();
+uint32_t Random::getRandomU<uint32_t>(uint64_t min, uint64_t max) {
+    return getRandomUInt32(min, max);
 }
 
 template <>
-uint64_t Random::getRandom<uint64_t>() {
-    return getRandomUInt64();
+uint64_t Random::getRandomU<uint64_t>(uint64_t min, uint64_t max) {
+    return getRandomUInt64(min, max);
 }
 } // namespace

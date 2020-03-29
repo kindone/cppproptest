@@ -153,6 +153,13 @@ TEST(UtilTestCase, Stream) {
     EXPECT_TRUE(emptyIntStream.isEmpty());
     EXPECT_TRUE(emptyTransformed.isEmpty());
 
+    // empty transform
+    auto emptystrstream = emptyIntStream.transform<std::string>([](const int& value) {
+        return std::to_string(value);
+    });
+
+    EXPECT_TRUE(emptystrstream.isEmpty());
+
     auto strstream = stream.transform<std::string>([](const int& value) {
         return std::to_string(value);
     });
@@ -454,7 +461,7 @@ TEST(UtilTestCase, ObjectsWithConstraints) {
 }
 
 
-TEST(UtilTestCase, Random) {
+TEST(UtilTestCase, RandomBasic) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for(int i = 0; i < 5; i++) {
@@ -471,6 +478,132 @@ TEST(UtilTestCase, Random) {
         EXPECT_EQ(r1, r2);
         EXPECT_EQ(r2, r2);
     }
-
 }
 
+TEST(UtilTestCase, Random8) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    static auto getUInt8 = [](uint64_t num, uint8_t min, uint8_t max) -> uint8_t {
+        uint64_t span = max - min + 1;
+        return static_cast<uint8_t>((num % span) + min);
+    };
+
+    {
+    int i = 0;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, 0, UINT8_MAX)) << std::endl;
+    // UINT8_MAX
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, 0, UINT8_MAX)) << std::endl;
+    // UINT8_MAX
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, UINT8_MAX, UINT8_MAX)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, UINT8_MAX, UINT8_MAX)) << std::endl;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, 0, 0)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, 0, 0)) << std::endl;
+
+    }
+
+    static auto getInt8 = [](uint64_t num, int8_t min, int8_t max) -> int8_t{
+        uint64_t span = max - min + 1;
+        uint8_t unsignedVal = (getUInt8(num, 0, UINT8_MAX) % span);
+        return *reinterpret_cast<int8_t*>(&unsignedVal) + min;
+    };
+
+    {
+    int i = 0;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, 0, INT8_MAX)) << std::endl;
+    // INT8_MAX
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, 0, INT8_MAX)) << std::endl;
+
+    // INT8_MIN
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MIN, INT8_MAX)) << std::endl;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX+1, INT8_MIN, INT8_MAX)) << std::endl;
+    // INT8_MAX
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MIN, INT8_MAX)) << std::endl;
+
+    // INT8_MAX
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MAX, INT8_MAX)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, INT8_MAX, INT8_MAX)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MAX, INT8_MAX)) << std::endl;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, 0, 0)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, 0, 0)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, 0, 0)) << std::endl;
+    // INT8_MIN
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MIN, INT8_MIN)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, INT8_MIN, INT8_MIN)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MIN, INT8_MIN)) << std::endl;
+
+    }
+}
+
+TEST(UtilTestCase, Random64) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    static auto getUInt64 = [](uint64_t num, uint64_t min, uint64_t max) -> uint64_t {
+        if(min == 0 && max == UINT64_MAX)
+            return num;
+        uint64_t span = max - min + 1;
+        return static_cast<uint64_t>((num % span) + min);
+    };
+
+    {
+    int i = 0;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, 0, UINT64_MAX)) << std::endl;
+    // UINT64_MAX
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, 0, UINT64_MAX)) << std::endl;
+    // UINT64_MAX
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, UINT64_MAX, UINT64_MAX)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, UINT64_MAX, UINT64_MAX)) << std::endl;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, 0, 0)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, 0, 0)) << std::endl;
+
+    }
+
+    static auto getInt64 = [](uint64_t num, int64_t min, int64_t max) -> int64_t {
+        if(min == INT64_MIN && max == INT64_MAX)
+        {
+            uint64_t unsignedVal = getUInt64(num, 0, UINT64_MAX);
+            return *reinterpret_cast<int64_t*>(&unsignedVal) + INT64_MIN;
+        }
+
+        uint64_t span = max - min + 1;
+        uint64_t unsignedVal = (getUInt64(num, 0, UINT64_MAX) % span);
+        return *reinterpret_cast<int64_t*>(&unsignedVal) + min;
+    };
+
+    {
+    int i = 0;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, 0, INT64_MAX)) << std::endl;
+    // INT64_MAX
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, 0, INT64_MAX)) << std::endl;
+
+    // INT64_MIN
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MIN, INT64_MAX)) << std::endl;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(static_cast<uint64_t>(INT64_MAX)+1, INT64_MIN, INT64_MAX)) << std::endl;
+    // INT64_MAX
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MIN, INT64_MAX)) << std::endl;
+
+    // INT64_MAX
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MAX, INT64_MAX)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, INT64_MAX, INT64_MAX)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MAX, INT64_MAX)) << std::endl;
+    // 0
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, 0, 0)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, 0, 0)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, 0, 0)) << std::endl;
+    // INT8_MIN
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MIN, INT64_MIN)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, INT64_MIN, INT64_MIN)) << std::endl;
+    std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MIN, INT64_MIN)) << std::endl;
+
+    }
+}

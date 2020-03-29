@@ -17,6 +17,12 @@ struct Shrinkable {
     Shrinkable(const Shrinkable& other) : ptr(other.ptr), shrinks(other.shrinks) {
     }
 
+    Shrinkable& operator=(const Shrinkable& other) {
+         ptr = other.ptr;
+         shrinks = other.shrinks;
+         return *this;
+    }
+
     Shrinkable with(std::function<Stream<Shrinkable<T>>()> _shrinks) const {
         auto copy = *this;
         copy.shrinks = _shrinks;

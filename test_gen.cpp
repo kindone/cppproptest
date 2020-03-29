@@ -17,9 +17,17 @@ struct NumericTest : public testing::Test
     using NumericType = T;
 };
 
+template<typename T>
+struct IntegralTest : public testing::Test
+{
+    using NumericType = T;
+};
+
 using NumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t, float, double>;
+using IntegralTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t>;
 
 TYPED_TEST_CASE(NumericTest, NumericTypes);
+TYPED_TEST_CASE(IntegralTest, IntegralTypes);
 
 template <typename T>
 T abs(T t) {
@@ -56,10 +64,26 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int> &input)
 	return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<int8_t> &input)
+{
+	os << "[ ";
+	for (auto const& i: input) {
+		os << static_cast<int>(i) << " ";
+	}
+	os << "]";
+	return os;
+}
+
 
 template<typename ARG1, typename ARG2>
 std::ostream& operator << (std::ostream& os, const std::tuple<ARG1, ARG2>& tuple) {
     os << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+    return os;
+}
+
+template<typename ARG1, typename ARG2, typename ARG3>
+std::ostream& operator << (std::ostream& os, const std::tuple<ARG1, ARG2, ARG3>& tuple) {
+    os << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ", " << std::get<2>(tuple) << ")";
     return os;
 }
 
@@ -75,10 +99,27 @@ TEST(PropTest, GenerateBool) {
 }
 
 
-TYPED_TEST(NumericTest, NumericTypeGen) {
+TYPED_TEST(NumericTest, GenNumericType) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbitrary<TypeParam> gen;
+
+    for(int i = 0; i < 20; i++) {
+        TypeParam val = gen(rand);
+        std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
+    }
+}
+
+TYPED_TEST(IntegralTest, GenInRange) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    bool isSigned = std::numeric_limits<TypeParam>::min() < 0;
+
+    auto gen0 = isSigned ? inRange<TypeParam>(-10, 10) : inRange<TypeParam>(0, 20);
+    TypeParam min = gen0(rand).get();
+    TypeParam max = min + rand.getRandomInt32(0,10);
+    auto gen = inRange<TypeParam>(min, max);
+    std::cout << "min: " << min << ", max: " << max << std::endl;
 
     for(int i = 0; i < 20; i++) {
         TypeParam val = gen(rand);
@@ -305,13 +346,14 @@ TEST(PropTest, ShrinkVector) {
     exhaustive(shrinkableVector2, 0);
 }
 
+
+
 TEST(PropTest, ShrinkVectorFromGen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    using T = int;
-    int len = 8;
-    auto genVec = Arbitrary<std::vector<int>>();
-    genVec.maxLen = 8;
+    using T = int8_t;
+    auto genVec = Arbitrary<std::vector<int8_t>>();
+    genVec.maxLen = 4;
     auto vecShrinkable = genVec(rand);
     //return make_shrinkable<std::vector<T>>(std::move(vec));
     exhaustive(vecShrinkable, 0);
@@ -406,12 +448,13 @@ TEST(PropTest, TupleGen) {
     }
 
     while(true) {
-        auto tupleGen = tuple(Arbitrary<int>(), Arbitrary<int>());
+        auto tupleGen = tuple(Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>());
         auto shrinkable = tupleGen(rand);
         auto valueTup = shrinkable.get();
         auto arg1 = std::get<0>(valueTup);
         auto arg2 = std::get<1>(valueTup);
-        if(arg1 > -20 && arg1 < 20 && arg2 > -20 && arg2 < 20)
+        auto arg3 = std::get<2>(valueTup);
+        if(arg1 > -20 && arg1 < 20 && arg2 > -20 && arg2 < 20 && arg3 > -20 && arg3 < 20)
         {
             exhaustive(shrinkable, 0);
             break;

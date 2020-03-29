@@ -22,6 +22,13 @@ public:
     Arbitrary(Arbitrary<T> _elemGen) : elemGen(_elemGen), maxLen(defaultMaxLen)  {
     }
 
+    using vector_t = std::vector<Shrinkable<T>>;
+    using shrinkable_t = Shrinkable<vector_t>;
+    using stream_t = Stream<shrinkable_t>;
+    using element_t = T;
+    using e_shrinkable_t = Shrinkable<element_t>;
+    using e_stream_t = Stream<e_shrinkable_t>;
+
     Shrinkable<std::vector<T>> operator()(Random& rand) {
         int len = rand.getRandomSize(0, maxLen+1);
         std::vector<Shrinkable<T>> shrinkVec;
@@ -43,7 +50,7 @@ public:
         // });
 
         // shrink with subvector using binary numeric shrink of lengths
-        auto shrinkableVecShrinkable =  binarySearchShrinkable<int>(len).template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
+        shrinkable_t shrinkableVecShrinkable =  binarySearchShrinkable<int>(len).template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
             if(len <= 0)
                 return std::vector<Shrinkable<T>>();
 
@@ -52,41 +59,32 @@ public:
             return std::vector<Shrinkable<T>>(begin, last);
         });
 
-        // Shr([shr,...,shr]).with(Stream { shr([]), shr([shr,shr,shr,shr]), shr([shr,shr,shr,shr,shr,shr]), shr([shr,...,shr]) })
+        // concat shrinks with parent as argument
+        const auto maxSize = shrinkableVecShrinkable.getRef().size();
+        auto genStream = [](int i) {
+            return [i](const shrinkable_t& parent) {
+                vector_t parentRef = parent.getRef();
+                const size_t size = parentRef.size();
 
-        // TODO: apply 0~size-1 and save to new var
-        using vector_t = std::vector<Shrinkable<T>>;
-        using shrinkable_t = Shrinkable<vector_t>;
-        using stream_t = Stream<shrinkable_t>;
-        using element_t = T;
-        using e_shrinkable_t = Shrinkable<element_t>;
-        using e_stream_t = Stream<e_shrinkable_t>;
+                if(size == 0 || size - 1 < i)
+                    return stream_t::empty();
 
-        auto genElementalShrinks = [](const shrinkable_t& current) -> stream_t{
-            // Shr([shr,...,shr]).with(Stream { shr([]), shr([shr,shr,shr,shr]), shr([shr,shr,shr,shr,shr,shr]), shr([shr,...,shr]) })
-
-            vector_t curVec = current.getRef();
-            stream_t shrinks = stream_t::empty();
-
-            if(curVec.empty())
-                return shrinks;
-            const auto size = curVec.size();
-
-            for(int64_t i = size-1; i >= 0; i--)
-            {
-                e_shrinkable_t& element = curVec[i];
-                e_stream_t elemShrinks = element.shrinks();
-                // 1Dimensional transform {shr(0), shr(4), shr(6), shr(7)} -> shr([...,shr(0)]), shr([...,shr(4)]), shr([...,shr(6)]), shr([...,shr(7)])
-                shrinks = shrinks.concat(elemShrinks.template transform<shrinkable_t>([curVec, i](const e_shrinkable_t& elemShrink) {
-                    vector_t vecCopy = curVec;
-                    vecCopy[i] = elemShrink;
-                    return make_shrinkable<std::vector<Shrinkable<T>>>(vecCopy);
-                }));
-            }
-            return shrinks;
+                size_t pos = size - 1 - i;
+                e_shrinkable_t& elem = parentRef[pos];
+                // {0,2,3} to {[x,x,x,0], ...,[x,x,x,3]}
+                // make sure {1} shrinked from 2 is also transformed to [x,x,x,1]
+                shrinkable_t vecWithElems = elem.template transform<vector_t>([pos, parentRef](const element_t& val) {
+                    auto copy = parentRef;
+                    copy[pos] = make_shrinkable<element_t>(val);
+                    return copy;
+                });
+                return vecWithElems.shrinks();
+            };
         };
 
-        shrinkableVecShrinkable = shrinkableVecShrinkable.concat(genElementalShrinks);
+        for(size_t i = 0; i < maxSize; i++) {
+            shrinkableVecShrinkable = shrinkableVecShrinkable.concat(genStream(i));
+        }
 
         auto vecShrinkable = shrinkableVecShrinkable.template transform<std::vector<T>>([](const std::vector<Shrinkable<T>>& shrinkVec) -> std::vector<T> {
             std::vector<T> valueVec;
