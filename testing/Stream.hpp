@@ -111,6 +111,16 @@ struct NonEmptyStream : public StreamImpl<T> {
         });
     }
 
+    Stream<T> take(int n) const {
+        auto self = *this;
+        if(n == 0)
+            return Stream<T>::empty();
+
+        return Stream<T>(head(), [self, n]() {
+            return Stream<T>(self.tail()).take(n-1);
+        });
+    }
+
     T _head;
     std::function<Stream<T>()> tailGen;
 };
@@ -183,6 +193,13 @@ struct Stream {
         else {
             return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->concat(other);
         }
+    }
+
+    Stream<T> take(int n) const {
+        if(isEmpty())
+            return empty();
+        else
+            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->take(n);
     }
 
     std::shared_ptr<StreamImpl<T>> impl;

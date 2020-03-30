@@ -352,7 +352,7 @@ TEST(PropTest, ShrinkVectorFromGen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     using T = int8_t;
-    auto genVec = Arbitrary<std::vector<int8_t>>();
+    auto genVec = Arbitrary<std::vector<T>>(inRange<T>(-4, 4));
     genVec.maxLen = 4;
     auto vecShrinkable = genVec(rand);
     //return make_shrinkable<std::vector<T>>(std::move(vec));

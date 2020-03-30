@@ -16,10 +16,15 @@ class PROPTEST_API Arbitrary< std::vector<T>> : public Gen< std::vector<T> >
 public:
     static size_t defaultMaxLen;
 
-    Arbitrary() : maxLen(defaultMaxLen)  {
+    Arbitrary() : elemGen(Arbitrary<T>()), maxLen(defaultMaxLen)  {
     }
 
-    Arbitrary(Arbitrary<T> _elemGen) : elemGen(_elemGen), maxLen(defaultMaxLen)  {
+    Arbitrary(Arbitrary<T> _elemGen)
+     : elemGen([_elemGen](Random& rand)->Shrinkable<T>{ return _elemGen(rand); })
+     , maxLen(defaultMaxLen)  {
+    }
+
+    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen) : elemGen(_elemGen), maxLen(defaultMaxLen)  {
     }
 
     using vector_t = std::vector<Shrinkable<T>>;
@@ -98,7 +103,7 @@ public:
     }
 
     int maxLen;
-    Arbitrary<T> elemGen;
+    std::function<Shrinkable<T>(Random&)> elemGen;
 };
 
 template <typename T>
