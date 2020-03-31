@@ -9,11 +9,45 @@
 #include "testing/generator/util.hpp"
 
 #include <iostream>
+#include <map>
+
+#define PROP_TAG(KEY, VALUE) \
+do\
+{\
+  PropertyBase::tag(__FILE__, __LINE__, KEY, VALUE);\
+} while(false);
+
+#define PROP_CLASSIFY(condition, KEY, VALUE) \
+do\
+{\
+  if(condition) {\
+    PropertyBase::tag(__FILE__, __LINE__, KEY, VALUE);\
+  }\
+} while(false);
 
 namespace PropertyBasedTesting
 {
 
 class Random;
+
+struct Tag {
+    Tag(const char* f, const char* l, const std::string& v) : filename(f), lineno(l), value(v) {
+    }
+    const char* filename;
+    const char* lineno;
+    std::string value;
+};
+
+struct PropertyContext {
+    PropertyContext();
+    ~PropertyContext();
+
+    void tag(const char* filename, const char* lineno, std::string key, std::string value);
+    void printSummary();
+private:
+
+    std::map<std::string, Tag> tags;
+};
 
 class PROPTEST_API PropertyBase {
 public:
@@ -22,12 +56,18 @@ public:
     virtual ~PropertyBase() {}
 
 protected:
+    static void setContext(PropertyContext* context);
+    static void tag(const char* filename, const char* lineno, std::string key, std::string value);
+    static PropertyContext* context;
+
+protected:
     virtual void invoke(Random& rand) = 0;
     virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) = 0;
-protected:
+
     // TODO: configurations
     uint64_t seed;
 
+    friend struct PropertyContext;
 };
 
 
@@ -61,6 +101,7 @@ public:
 
     template <typename ...ARGS>
     bool example(ARGS&&... args) {
+        PropertyContext context;
         try {
             try {
                 auto valueTup = std::make_tuple(args...);
