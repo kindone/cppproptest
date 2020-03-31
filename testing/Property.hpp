@@ -31,11 +31,12 @@ namespace PropertyBasedTesting
 class Random;
 
 struct Tag {
-    Tag(const char* f, const char* l, const std::string& v) : filename(f), lineno(l), value(v) {
+    Tag(const char* f, const char* l, const std::string& v) : filename(f), lineno(l), value(v), count(1){
     }
     const char* filename;
     const char* lineno;
     std::string value;
+    size_t count;
 };
 
 struct PropertyContext {
@@ -46,7 +47,7 @@ struct PropertyContext {
     void printSummary();
 private:
 
-    std::map<std::string, Tag> tags;
+    std::map<std::string, std::map<std::string, Tag>> tags;
 };
 
 class PROPTEST_API PropertyBase {

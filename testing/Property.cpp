@@ -1,6 +1,7 @@
 #include "testing/Property.hpp"
 #include "testing/assert.hpp"
 #include <exception>
+#include <utility>
 
 namespace PropertyBasedTesting {
 
@@ -72,10 +73,45 @@ PropertyContext::~PropertyContext() {
 }
 
 void PropertyContext::tag(const char* file, const char* lineno, std::string key, std::string value) {
+    auto itr = tags.find(key);
+    // key already exists
+    if(itr != tags.end()) {
+        auto valueMap = itr->second;
+        auto valueItr = valueMap.find(value);
+        // value already exists
+        if(valueItr != valueMap.end()) {
+            auto tag = valueItr->second;
+            tag.count ++;
+        }
+        else {
+            std::map<std::string, Tag>& valueMap = itr->second;
+            valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
+        }
+    }
+    else {
+        std::map<std::string, Tag> valueMap;
+        valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
+        tags.insert(std::pair<std::string, std::map<std::string, Tag>>(key, valueMap));
+    }
 }
 
 void PropertyContext::printSummary() {
+    for(auto tagKV : tags) {
+        auto& key = tagKV.first;
+        auto& valueMap = tagKV.second;
+        std::cout << key << ": " << std::endl;
+        size_t total = 0;
+        for(auto valueKV : valueMap) {
+            auto tag = valueKV.second;
+            total += tag.count;
+        }
 
+        for(auto valueKV : valueMap) {
+            auto value = valueKV.first;
+            auto tag = valueKV.second;
+            std::cout << "  value = " << value << ": " << static_cast<double>(tag.count)/total*100 << "%" << std::endl;
+        }
+    }
 }
 
 } // namespace
