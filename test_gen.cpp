@@ -383,7 +383,7 @@ TEST(PropTest, TestCheckBasic) {
     });
 
     check([](int a) -> bool {
-        std::cout << "a: " << a << std::endl;
+        PROP_TAG("a > 0", a > 0);
         return true;
     });
 
@@ -407,27 +407,31 @@ TEST(PropTest, TestCheckBasic) {
 
 TEST(PropTest, TestCheckGen) {
 
-    check([](std::vector<int> a) -> bool {
+    /*check([](std::vector<int> a) -> bool {
         std::cout << "a: " << a << std::endl;
+        PROP_TAG("a.size() > 0", a.size() > 5);
         return true;
-    });
+    });*/
 
     // supply custom generator
     check([](int a, int b) -> bool {
-        std::cout << "custom a: " << a << ", custom b: " << b << std::endl;
+        PROP_TAG("a > 0", a > 0);
+        PROP_TAG("b > 0", b > 0);
         return true;
     }, GenSmallInt(), GenSmallInt());
 
     //
     check([](int a, int b) -> bool {
-        std::cout << "custom a: " << a << ", b: " << b << std::endl;
+        PROP_TAG("a > 0", a > 0);
+        PROP_TAG("b > 0", b > 0);
         return true;
     }, GenSmallInt());
 
     GenSmallInt genSmallInt;
 
     check([](int a, int b) -> bool {
-        std::cout << "a: " << a << ", b: " << b << std::endl;
+        PROP_TAG("a > 0", a > 0);
+        PROP_TAG("b > 0", b > 0);
         return true;
     }, genSmallInt, genSmallInt);
 }
