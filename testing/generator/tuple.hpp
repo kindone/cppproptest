@@ -80,9 +80,10 @@ template <typename ... GENS, std::enable_if_t<0 < sizeof...(GENS), bool> = true>
 decltype(auto) tuple(GENS&&...gens) {
     constexpr auto Size = sizeof...(GENS);
 
+    auto genTup = std::make_tuple(gens...);
     // generator
-    return [&gens...](Random& rand) {
-        auto elemTup = std::make_tuple(gens(rand)...);
+    return [genTup](Random& rand) mutable {
+        auto elemTup = transformHeteroTupleWithArg<Generate>(std::forward<decltype(genTup)>(genTup), rand);
         auto shrinkable = make_shrinkable<decltype(elemTup)>(elemTup);
         return generateTupleStream(shrinkable);
     };

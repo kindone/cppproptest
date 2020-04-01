@@ -143,7 +143,7 @@ public:
         auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTypeTup)::type_tuple;
         auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        shrink(std::forward<Random>(savedRand), failed.valueTup);
+        shrink(savedRand, failed.valueTup);
     }
 
 private:
@@ -228,12 +228,12 @@ private:
     }
 
     template <typename ValueTuple>
-    void shrink(Random&& savedRand, ValueTuple&& valueTup) {
+    void shrink(Random& savedRand, ValueTuple&& valueTup) {
         std::cout << "shrinking value: ";
         show(std::cout, valueTup);
         std::cout << std::endl;
 
-        auto generatedValueTup = transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), std::forward<Random>(savedRand));
+        auto generatedValueTup = transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
         //std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
         auto shrinksTuple = transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));

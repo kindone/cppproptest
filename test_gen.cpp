@@ -447,8 +447,9 @@ TEST(PropTest, TupleGen) {
         }
     }
 
+    auto smallIntGen = inRange(-40, 40);
+    auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
     while(true) {
-        auto tupleGen = tuple(Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>());
         auto shrinkable = tupleGen(rand);
         auto valueTup = shrinkable.get();
         auto arg1 = std::get<0>(valueTup);

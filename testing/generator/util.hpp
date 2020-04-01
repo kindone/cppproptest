@@ -76,7 +76,7 @@ template <typename T>
 struct Generate {
 
     // TOOD: check if Random can be turned to reference
-    static decltype(auto) transform(T&& gen, Random rand) {
+    static decltype(auto) transform(T&& gen, Random& rand) {
         return gen(rand);
     }
 };
