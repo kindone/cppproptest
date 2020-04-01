@@ -49,6 +49,9 @@ struct PropertyContext {
     ~PropertyContext();
 
     void tag(const char* filename, int lineno, std::string key, std::string value);
+    void tag(std::string key, std::string value) {
+        tag("?", -1, key, value);
+    }
     void printSummary();
 private:
 
