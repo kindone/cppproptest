@@ -378,7 +378,7 @@ constexpr int32_t GenSmallInt::boundaryValues[13];
 TEST(PropTest, TestCheckBasic) {
     check([](const int& a, const int& b) -> bool {
         EXPECT_EQ(a+b, b+a);
-        std::cout << "a: " << a << ", b: " << b << std::endl;
+        PROP_TAG("a+b > 0", a+b > 0);
         return true;
     });
 

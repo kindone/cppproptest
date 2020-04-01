@@ -9,12 +9,17 @@
 #include "testing/generator/util.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <map>
 
 #define PROP_TAG(KEY, VALUE) \
 do\
 {\
-  PropertyBase::tag(__FILE__, __LINE__, KEY, VALUE);\
+  std::stringstream key;\
+  key << (KEY);\
+  std::stringstream value;\
+  value << (VALUE);\
+  PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str());\
 } while(false);
 
 #define PROP_CLASSIFY(condition, KEY, VALUE) \
@@ -31,10 +36,10 @@ namespace PropertyBasedTesting
 class Random;
 
 struct Tag {
-    Tag(const char* f, const char* l, const std::string& v) : filename(f), lineno(l), value(v), count(1){
+    Tag(const char* f, int l, const std::string& v) : filename(f), lineno(l), value(v), count(1){
     }
     const char* filename;
-    const char* lineno;
+    const int lineno;
     std::string value;
     size_t count;
 };
@@ -43,7 +48,7 @@ struct PropertyContext {
     PropertyContext();
     ~PropertyContext();
 
-    void tag(const char* filename, const char* lineno, std::string key, std::string value);
+    void tag(const char* filename, int lineno, std::string key, std::string value);
     void printSummary();
 private:
 
@@ -55,10 +60,10 @@ public:
     PropertyBase();
     bool check();
     virtual ~PropertyBase() {}
+    static void tag(const char* filename, int lineno, std::string key, std::string value);
 
 protected:
     static void setContext(PropertyContext* context);
-    static void tag(const char* filename, const char* lineno, std::string key, std::string value);
     static PropertyContext* context;
 
 protected:

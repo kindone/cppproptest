@@ -74,5 +74,3 @@ struct Success : public std::logic_error {
     {                                                               \
         throw ::PropertyBasedTesting::Success(__FILE__, __LINE__, {}, "", nullptr);  \
     } while (false)
-
-

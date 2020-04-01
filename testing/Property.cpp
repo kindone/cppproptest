@@ -57,7 +57,7 @@ void PropertyBase::setContext(PropertyContext* ctx) {
     context  = ctx;
 }
 
-void PropertyBase::tag(const char* file, const char* lineno, std::string key, std::string value) {
+void PropertyBase::tag(const char* file, int lineno, std::string key, std::string value) {
     if(!context)
         throw std::runtime_error("context is not set");
 
@@ -72,7 +72,7 @@ PropertyContext::~PropertyContext() {
     PropertyBase::setContext(nullptr);
 }
 
-void PropertyContext::tag(const char* file, const char* lineno, std::string key, std::string value) {
+void PropertyContext::tag(const char* file, int lineno, std::string key, std::string value) {
     auto itr = tags.find(key);
     // key already exists
     if(itr != tags.end()) {
