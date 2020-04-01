@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/BUILD/test_proptest",
-            "args": [],
+            "args": ["--gtest_filter=*Vector*"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/BUILD",
             "environment": [],

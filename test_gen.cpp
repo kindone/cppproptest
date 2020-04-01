@@ -542,23 +542,27 @@ TEST(PropTest, TestVectorCheckFail) {
     show(std::cout, tup);
     std::cout << std::endl;
 
+    auto vecGen = Arbitrary<std::vector<int>>();
+    vecGen.maxLen = 32;
+
     check([](std::vector<int> a) -> bool {
         std::cout << "a: ";
         show(std::cout, a);
         std::cout << std::endl;
         PROP_ASSERT(a.size() < 5, {});
         return true;
-    });
+    }, vecGen);
 }
 
 TEST(PropTest, TestTupleCheckFail) {
 
-    check([](std::tuple<int, int> tuple) -> bool {
+    check([](std::tuple<int, std::tuple<int>> tuple) -> bool {
         std::cout << "tuple: ";
         show(std::cout, tuple);
         std::cout << std::endl;
         int a = std::get<0>(tuple);
-        int b = std::get<1>(tuple);
+        std::tuple<int> subtup = std::get<1>(tuple);
+        int b = std::get<0>(subtup);
         PROP_ASSERT((-10 < a && a < 100) || (-20 < b && b < 200), {});
         return true;
     });
