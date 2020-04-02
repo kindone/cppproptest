@@ -1,6 +1,7 @@
 #pragma once
 
 #include "testing/Seq.hpp"
+#include <functional>
 
 namespace PropertyBasedTesting
 {
@@ -33,6 +34,7 @@ struct Iterator {
 template <typename T>
 struct StreamImpl {
     using type = T;
+    virtual ~StreamImpl() {}
     virtual bool isEmpty() const = 0;
     virtual T head() const = 0;
     virtual std::shared_ptr<StreamImpl<T>> tail() const = 0;
@@ -43,6 +45,8 @@ struct StreamImpl {
 template <typename T>
 struct EmptyStream : public StreamImpl<T> {
     using type = T;
+
+    virtual ~EmptyStream() {}
 
     virtual bool isEmpty() const { return true; }
     virtual T head() const {
@@ -63,6 +67,8 @@ struct NonEmptyStream : public StreamImpl<T> {
 
     NonEmptyStream(const T& h, const std::function<Stream<T>()>& gen) :  _head(h), tailGen(gen) {
     }
+
+    virtual ~NonEmptyStream() {}
 
     virtual bool isEmpty() const {
         return false;

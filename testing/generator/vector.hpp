@@ -66,7 +66,7 @@ public:
 
         // concat shrinks with parent as argument
         const auto maxSize = shrinkableVecShrinkable.getRef().size();
-        auto genStream = [](int i) {
+        auto genStream = [](size_t i) {
             return [i](const shrinkable_t& parent) {
                 vector_t parentRef = parent.getRef();
                 const size_t size = parentRef.size();
@@ -102,8 +102,8 @@ public:
         return vecShrinkable;
     }
 
-    int maxLen;
     std::function<Shrinkable<T>(Random&)> elemGen;
+    int maxLen;
 };
 
 template <typename T>

@@ -21,6 +21,7 @@ struct Gen
     using type = T;
     Gen() {
     }
+    virtual ~Gen() {}
 
     virtual Shrinkable<T> operator()(Random& rand) = 0;
 };

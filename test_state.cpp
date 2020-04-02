@@ -12,6 +12,7 @@ class StateTestCase : public ::testing::Test {
 
 
 struct Action {
+    virtual ~Action() {}
     virtual bool precondition() {
         return true;
     }

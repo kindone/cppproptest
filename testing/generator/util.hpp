@@ -3,6 +3,7 @@
 #include "testing/Shrinkable.hpp"
 #include "testing/Stream.hpp"
 #include "testing/Random.hpp"
+#include <functional>
 
 namespace PropertyBasedTesting {
 

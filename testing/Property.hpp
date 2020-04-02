@@ -44,7 +44,7 @@ struct Tag {
     size_t count;
 };
 
-struct PropertyContext {
+struct PROPTEST_API PropertyContext {
     PropertyContext();
     ~PropertyContext();
 

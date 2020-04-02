@@ -18,15 +18,23 @@ struct NumericTest : public testing::Test
 };
 
 template<typename T>
+struct SignedNumericTest : public testing::Test
+{
+    using NumericType = T;
+};
+
+template<typename T>
 struct IntegralTest : public testing::Test
 {
     using NumericType = T;
 };
 
 using NumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t, float, double>;
+using SignedNumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, float, double>;
 using IntegralTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t>;
 
 TYPED_TEST_CASE(NumericTest, NumericTypes);
+TYPED_TEST_CASE(SignedNumericTest, SignedNumericTypes);
 TYPED_TEST_CASE(IntegralTest, IntegralTypes);
 
 template <typename T>
@@ -521,7 +529,7 @@ TEST(PropTest, TestPropertyExample) {
     prop.example(std::string("hello"), 10, std::string("world"));
 }
 
-TYPED_TEST(NumericTest, TestCheckFail) {
+TYPED_TEST(SignedNumericTest, TestCheckFail) {
 
     check([](TypeParam a, TypeParam b/*,std::string str, std::vector<int> vec*/) -> bool {
         PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200, {});
@@ -783,6 +791,7 @@ TEST(PropTest, TestShrinkable) {
         return make_shrinkable<Complicated>(5);
     };
 
+    shrink();
 }
 
 

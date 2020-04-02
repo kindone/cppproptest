@@ -2,12 +2,13 @@
 
 #include <random>
 #include <exception>
+#include "testing/api.hpp"
 
 namespace PropertyBasedTesting {
 
-int64_t getCurrentTime();
+PROPTEST_API int64_t getCurrentTime();
 
-class Random
+class PROPTEST_API Random
 {
 public:
     Random(uint64_t seed);
