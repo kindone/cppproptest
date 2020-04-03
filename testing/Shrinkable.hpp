@@ -99,6 +99,15 @@ struct Shrinkable {
         });
     }
 
+    Shrinkable<T> take(int n) const {
+        auto shrinks = this->shrinks().take(n);
+        return with([shrinks, n]() {
+            return shrinks.template transform<Shrinkable<T>>([n](const Shrinkable<T>& shr){
+                return shr.take(n);
+            });
+        });
+    }
+
 private:
     Shrinkable() {
         shrinks = []() {

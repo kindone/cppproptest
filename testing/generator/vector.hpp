@@ -83,7 +83,8 @@ public:
                     copy[pos] = make_shrinkable<element_t>(val);
                     return copy;
                 });
-                return vecWithElems.shrinks();
+                shrinkable_t cropped = vecWithElems;//.take(2);
+                return cropped.shrinks();
             };
         };
 

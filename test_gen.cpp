@@ -242,15 +242,18 @@ TEST(PropTest, ShrinkableAndThen) {
 }
 
 template <typename T>
-void exhaustive(const Shrinkable<T>& shrinkable, int level) {
-    for(int i = 0; i < level; i++)
-        std::cout << "  ";
-    std::cout<< "shrinkable: " << shrinkable.get() << std::endl;
+void exhaustive(const Shrinkable<T>& shrinkable, int level, bool print = true) {
+    if(print) {
+        for(int i = 0; i < level; i++)
+            std::cout << "  ";
+
+        std::cout<< "shrinkable: " << shrinkable.get() << std::endl;
+    }
 
     auto shrinks = shrinkable.shrinks();
     for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
         auto shrinkable2 = itr.next();
-        exhaustive(shrinkable2, level + 1);
+        exhaustive(shrinkable2, level + 1, print);
     }
 }
 
@@ -769,22 +772,42 @@ TEST(PropTest, TestTuple) {
 }
 
 
-class Complicated {
-public:
-    int value;
-    Complicated(int a) : value(a){
+
+
+TEST(PropTest, TestShrinkableVector) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto smallIntGen = inRange<int>(-8, 8);
+    auto vectorGen = Arbitrary<std::vector<int>>(smallIntGen);
+    for(size_t maxLen = 1; maxLen <4; maxLen++) {
+        while(true) {
+            vectorGen.maxLen = maxLen;
+            auto vec = vectorGen(rand);
+            if(vec.getRef().size() > (maxLen > 3 ? maxLen - 3 : 0)) {
+                exhaustive(vec, 0);
+                std::cout << "printed: " << maxLen << std::endl;
+                break;
+            }
+        }
     }
+}
 
-    Complicated(const Complicated&) = delete;
-    Complicated(Complicated&&) = default;
-private:
-    Complicated() {
-    }
-};
+TEST(PropTest, TestComplicated) {
 
+    class Complicated {
+    public:
+        int value;
+        Complicated(int a) : value(a){
+        }
 
-TEST(PropTest, TestShrinkable) {
-    auto vec = make_shrinkable<std::vector<int>>(std::vector<int>());
+        Complicated(const Complicated&) = delete;
+        Complicated(Complicated&&) = default;
+    private:
+        Complicated() {
+        }
+    };
+
     auto complicated = make_shrinkable<Complicated>(5);
 
     auto shrink = []() {
@@ -793,6 +816,5 @@ TEST(PropTest, TestShrinkable) {
 
     shrink();
 }
-
 
 
