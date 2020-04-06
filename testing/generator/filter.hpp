@@ -2,8 +2,29 @@
 
 namespace PropertyBasedTesting {
 
+template <typename GenT>
+class Filter : public GenT {
+public:
+    using T = typename GenT::type;
+    using FilterFunc = std::function<bool(T&)>;
 
-// FIXME: filter doesn't honor shrinking behavior
+    Filter(FilterFunc&& f) : filter(f) {
+    }
+    
+    Shrinkable<T> operator()(Random& rand) {
+        while(true) {
+            auto shrinkable = gen(rand);
+            if(filter(shrinkable.getRef())) {
+                return shrinkable;
+            }
+        }
+    }
+
+    GenT gen;
+    FilterFunc filter;
+};
+
+
 template <typename T, typename GEN>
 decltype(auto) filter(GEN&& gen, std::function<bool(const T&)> criteria) {
     return [=, &gen](Random& rand) {

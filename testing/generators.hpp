@@ -8,6 +8,7 @@
 #include "testing/generator/util.hpp"
 #include "testing/generator/filter.hpp"
 #include "testing/generator/transform.hpp"
+#include "testing/generator/construct.hpp"
 #include "testing/generator/oneof.hpp"
 #include "testing/generator/tuple.hpp"
 
