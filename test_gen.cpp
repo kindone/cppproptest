@@ -389,12 +389,12 @@ constexpr int32_t GenSmallInt::boundaryValues[13];
 TEST(PropTest, TestCheckBasic) {
     check([](const int& a, const int& b) -> bool {
         EXPECT_EQ(a+b, b+a);
-        PROP_TAG("a+b > 0", a+b > 0);
+        PROP_STAT(a+b > 0);
         return true;
     });
 
     check([](int a) -> bool {
-        PROP_TAG("a > 0", a > 0);
+        PROP_STAT(a > 0);
         return true;
     });
 
@@ -426,23 +426,23 @@ TEST(PropTest, TestCheckGen) {
 
     // supply custom generator
     check([](int a, int b) -> bool {
-        PROP_TAG("a > 0", a > 0);
-        PROP_TAG("b > 0", b > 0);
+        PROP_STAT(a > 0);
+        PROP_STAT(b > 0);
         return true;
     }, GenSmallInt(), GenSmallInt());
 
     //
     check([](int a, int b) -> bool {
-        PROP_TAG("a > 0", a > 0);
-        PROP_TAG("b > 0", b > 0);
+        PROP_STAT(a > 0);
+        PROP_STAT(b > 0);
         return true;
     }, GenSmallInt());
 
     GenSmallInt genSmallInt;
 
     check([](int a, int b) -> bool {
-        PROP_TAG("a > 0", a > 0);
-        PROP_TAG("b > 0", b > 0);
+        PROP_STAT(a > 0);
+        PROP_STAT(b > 0);
         return true;
     }, genSmallInt, genSmallInt);
 }
@@ -497,7 +497,7 @@ TEST(PropTest, TestCheckAssert) {
 TEST(PropTest, TestPropertyBasic) {
 
     property([](std::vector<int> a) -> bool {
-        std::cout << "a: " << a << std::endl;
+        PROP_STAT(a.size() > 5);
         return true;
     }).check();
 
@@ -510,7 +510,7 @@ TEST(PropTest, TestPropertyBasic) {
     check(func);
 
     auto prop = property([](std::string a, int i, std::string b) -> bool {
-        std::cout << "deferred check!" << std::endl;
+        PROP_STAT(i > 0);
         PROP_ASSERT(false, {});
         return true;
     });
@@ -523,7 +523,7 @@ TEST(PropTest, TestPropertyBasic) {
 
 TEST(PropTest, TestPropertyExample) {
     auto func = [](std::string a, int i, std::string b) -> bool {
-        std::cout << "deferred check!" << std::endl;
+        PROP_STAT(i > 0);
         PROP_ASSERT(false, {});
         return true;
     };
@@ -543,7 +543,7 @@ TYPED_TEST(SignedNumericTest, TestCheckFail) {
 TEST(PropTest, TestStringCheckFail) {
 
     check([](std::string a) -> bool {
-        std::cout << "a: " << a << std::endl;
+        PROP_STAT(a.size() > 3);
         PROP_ASSERT(a.size() < 5, {});
         return true;
     });
@@ -562,7 +562,7 @@ TEST(PropTest, TestVectorCheckFail) {
     vecGen.maxLen = 32;
 
     check([](std::vector<int> a) -> bool {
-        std::cout << "a: ";
+        PROP_STAT(a.size() > 3);
         show(std::cout, a);
         std::cout << std::endl;
         PROP_ASSERT(a.size() < 5, {});
@@ -653,7 +653,7 @@ TEST(PropTest, TestConstruct) {
     std::cout << "Gen animal: " << animal << std::endl;
 
     check([](Animal animal) -> bool {
-        std::cout << "animal: " << animal << std::endl;
+        PROP_STAT(animal.numFeet > 3);
         return true;
     }, gen);
 }
@@ -672,8 +672,9 @@ TEST(PropTest, TestCheckArbitraryWithConstruct) {
     Random rand(seed);
 
     check([](std::vector<Animal> animals) -> bool {
-        if(!animals.empty())
-            std::cout << "animal: " << animals[0] << std::endl;
+        if(!animals.empty()) {
+            PROP_STAT(animals.size() > 3);
+        }
         return true;
     });
 }

@@ -4,6 +4,8 @@
 #include "testing/Stream.hpp"
 #include "testing/Random.hpp"
 #include <functional>
+#include <utility>
+#include <tuple>
 
 namespace PropertyBasedTesting {
 

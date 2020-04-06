@@ -12,6 +12,16 @@
 #include <sstream>
 #include <map>
 
+#define PROP_STAT(VALUE) \
+do\
+{\
+  std::stringstream key;\
+  key << (#VALUE);\
+  std::stringstream value;\
+  value << (VALUE);\
+  PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str());\
+} while(false);
+
 #define PROP_TAG(KEY, VALUE) \
 do\
 {\
