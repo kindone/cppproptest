@@ -14,17 +14,19 @@ template <typename T>
 class PROPTEST_API Arbitrary< std::vector<T>> : public Gen< std::vector<T> >
 {
 public:
+    static size_t defaultMinLen;
     static size_t defaultMaxLen;
 
-    Arbitrary() : elemGen(Arbitrary<T>()), maxLen(defaultMaxLen)  {
+    Arbitrary() : elemGen(Arbitrary<T>()), minLen(defaultMinLen), maxLen(defaultMaxLen)  {
     }
 
     Arbitrary(Arbitrary<T> _elemGen)
      : elemGen([_elemGen](Random& rand)->Shrinkable<T>{ return _elemGen(rand); })
-     , maxLen(defaultMaxLen)  {
+     , minLen(defaultMinLen)
+     , maxLen(defaultMaxLen) {
     }
 
-    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen) : elemGen(_elemGen), maxLen(defaultMaxLen)  {
+    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen) : elemGen(_elemGen), minLen(defaultMinLen), maxLen(defaultMaxLen)  {
     }
 
     using vector_t = std::vector<Shrinkable<T>>;
@@ -75,13 +77,13 @@ public:
         return genStream(elemStreams);
     }
 
-    static shrinkable_t shrinkBulkRecursive(const shrinkable_t& shrinkable, size_t frompos, size_t topos) {
-        if(frompos >= topos) {
-            return shrinkable;
-        }
+    static shrinkable_t shrinkBulkRecursive(const shrinkable_t& shrinkable, size_t power, size_t offset) {
+        // if(frompos >= topos) {
+        //     return shrinkable;
+        // }
 
-        // entire
-        shrinkable_t newShrinkable = shrinkable.concat([frompos, topos](const shrinkable_t& shr) {
+        // entirety
+        shrinkable_t newShrinkable = shrinkable.concat([power, offset](const shrinkable_t& shr) {
             auto vecSize = shr.getRef().size();
             if(frompos >= vecSize)
                 return stream_t::empty();
@@ -111,7 +113,7 @@ public:
     }
 
     Shrinkable<std::vector<T>> operator()(Random& rand) {
-        int len = rand.getRandomSize(0, maxLen+1);
+        int len = rand.getRandomSize(minLen, maxLen+1);
         std::vector<Shrinkable<T>> shrinkVec;
         shrinkVec.reserve(len);
         for(int i = 0; i < len; i++)
@@ -172,9 +174,13 @@ public:
     }
 
     std::function<Shrinkable<T>(Random&)> elemGen;
+    int minLen;
     int maxLen;
+
 };
 
+template <typename T>
+size_t Arbitrary<std::vector<T>>::defaultMinLen = 0;
 template <typename T>
 size_t Arbitrary<std::vector<T>>::defaultMaxLen = 200;
 
