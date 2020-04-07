@@ -36,81 +36,81 @@ public:
     using e_shrinkable_t = Shrinkable<element_t>;
     using e_stream_t = Stream<e_shrinkable_t>;
 
-    static stream_t shrinkBulk(const shrinkable_t& parent, size_t frompos, size_t topos) {
-        static std::function<stream_t(const std::vector<e_stream_t>&)> genStream = [parent, frompos, topos](const std::vector<e_stream_t>& elemStreams) {
-            const size_t size = topos - frompos;
-            vector_t newVec = vector_t();
-                newVec.reserve(size);
-            std::vector<e_stream_t> newElemStreams;
-                newElemStreams.reserve(size);
+    // static stream_t shrinkBulk(const shrinkable_t& parent, size_t frompos, size_t topos) {
+    //     static std::function<stream_t(const std::vector<e_stream_t>&)> genStream = [parent, frompos, topos](const std::vector<e_stream_t>& elemStreams) {
+    //         const size_t size = topos - frompos;
+    //         vector_t newVec = vector_t();
+    //             newVec.reserve(size);
+    //         std::vector<e_stream_t> newElemStreams;
+    //             newElemStreams.reserve(size);
 
-            vector_t& parentVec = parent.getRef();
+    //         vector_t& parentVec = parent.getRef();
 
-            // shrink each element in frompos~topos, put parent if shrink no longer possible
-            for(size_t i = 0; i < elemStreams.size(); i++) {
-                if(elemStreams[i].isEmpty()) {
-                    newVec.push_back(parentVec[i]);
-                    newElemStreams.push_back(e_stream_t::empty());  // [1] -> []
-                }
-                else {
-                    newVec.push_back(elemStreams[i].head());
-                    newElemStreams.push_back(elemStreams[i].tail()); // [0,4,6,7] -> [4,6,7]
-                }
-            }
-            auto newShrinkable = make_shrinkable<vector_t>(newVec);
-            newShrinkable = newShrinkable.with([newShrinkable, frompos, topos]() {
-                return shrinkBulk(newShrinkable, frompos, topos);
-            });
-            return stream_t(newShrinkable, [newElemStreams]() {
-                return genStream(newElemStreams);
-            });
-        };
+    //         // shrink each element in frompos~topos, put parent if shrink no longer possible
+    //         for(size_t i = 0; i < elemStreams.size(); i++) {
+    //             if(elemStreams[i].isEmpty()) {
+    //                 newVec.push_back(parentVec[i]);
+    //                 newElemStreams.push_back(e_stream_t::empty());  // [1] -> []
+    //             }
+    //             else {
+    //                 newVec.push_back(elemStreams[i].head());
+    //                 newElemStreams.push_back(elemStreams[i].tail()); // [0,4,6,7] -> [4,6,7]
+    //             }
+    //         }
+    //         auto newShrinkable = make_shrinkable<vector_t>(newVec);
+    //         newShrinkable = newShrinkable.with([newShrinkable, frompos, topos]() {
+    //             return shrinkBulk(newShrinkable, frompos, topos);
+    //         });
+    //         return stream_t(newShrinkable, [newElemStreams]() {
+    //             return genStream(newElemStreams);
+    //         });
+    //     };
 
-        const size_t size = topos - frompos;
-        vector_t& parentVec = parent.getRef();
-        std::vector<e_stream_t> elemStreams;
-            elemStreams.reserve(size);
-        for(size_t i = frompos; i < topos; i++) {
-            elemStreams.push_back(parentVec[i]);
-        }
+    //     const size_t size = topos - frompos;
+    //     vector_t& parentVec = parent.getRef();
+    //     std::vector<e_stream_t> elemStreams;
+    //         elemStreams.reserve(size);
+    //     for(size_t i = frompos; i < topos; i++) {
+    //         elemStreams.push_back(parentVec[i]);
+    //     }
 
-        return genStream(elemStreams);
-    }
+    //     return genStream(elemStreams);
+    // }
 
-    static shrinkable_t shrinkBulkRecursive(const shrinkable_t& shrinkable, size_t power, size_t offset) {
-        // if(frompos >= topos) {
-        //     return shrinkable;
-        // }
+    // static shrinkable_t shrinkBulkRecursive(const shrinkable_t& shrinkable, size_t power, size_t offset) {
+    //     // if(frompos >= topos) {
+    //     //     return shrinkable;
+    //     // }
 
-        // entirety
-        shrinkable_t newShrinkable = shrinkable.concat([power, offset](const shrinkable_t& shr) {
-            auto vecSize = shr.getRef().size();
-            if(frompos >= vecSize)
-                return stream_t::empty();
-            else if(topos > vecSize)
-                return shrinkBulk(shr, frompos, vecSize);
-            else
-                return shrinkBulk(shr, frompos, topos);
-        });
+    //     // entirety
+    //     shrinkable_t newShrinkable = shrinkable.concat([power, offset](const shrinkable_t& shr) {
+    //         auto vecSize = shr.getRef().size();
+    //         if(frompos >= vecSize)
+    //             return stream_t::empty();
+    //         else if(topos > vecSize)
+    //             return shrinkBulk(shr, frompos, vecSize);
+    //         else
+    //             return shrinkBulk(shr, frompos, topos);
+    //     });
 
-        size_t midpos = frompos/2 + topos/2 + ((frompos % 2 != 0 && topos % 2 != 0) ? 1 : 0);
+    //     size_t midpos = frompos/2 + topos/2 + ((frompos % 2 != 0 && topos % 2 != 0) ? 1 : 0);
 
-        // front part
-        if(frompos < midpos) {
-            newShrinkable = newShrinkable.concat([frompos, midpos](const shrinkable_t& shr) {
-                return shrinkBulkRecursive(shr, frompos, midpos);
-            });
-        }
+    //     // front part
+    //     if(frompos < midpos) {
+    //         newShrinkable = newShrinkable.concat([frompos, midpos](const shrinkable_t& shr) {
+    //             return shrinkBulkRecursive(shr, frompos, midpos);
+    //         });
+    //     }
 
-        // rear part
-        if(midpos < topos) {
-            newShrinkable = newShrinkable.concat([midpos, topos](const shrinkable_t& shr) {
-                return shrinkBulkRecursive(shr, midpos, topos);
-            });
-        }
+    //     // rear part
+    //     if(midpos < topos) {
+    //         newShrinkable = newShrinkable.concat([midpos, topos](const shrinkable_t& shr) {
+    //             return shrinkBulkRecursive(shr, midpos, topos);
+    //         });
+    //     }
 
-        return newShrinkable;
-    }
+    //     return newShrinkable;
+    // }
 
     Shrinkable<std::vector<T>> operator()(Random& rand) {
         int len = rand.getRandomSize(minLen, maxLen+1);
@@ -120,7 +120,11 @@ public:
             shrinkVec.push_back(elemGen(rand));
 
         // shrink vector size with subvector using binary numeric shrink of lengths
-        shrinkable_t shrinkable = binarySearchShrinkable<int>(len).template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
+        int minLenCopy = minLen;
+        auto rangeShrinkable = binarySearchShrinkable<int>(len - minLenCopy).template transform<int>([minLenCopy](const int& len) {
+            return len + minLenCopy;
+        });
+        shrinkable_t shrinkable = rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
             if(len <= 0)
                 return std::vector<Shrinkable<T>>();
 
@@ -157,10 +161,10 @@ public:
             shrinkable = shrinkable.concat(genStream(i));
         }
 
-        shrinkable = shrinkable.concat([](const shrinkable_t& shr) {
-            auto vecSize = shr.getRef().size();
-            return shrinkBulkRecursive(shr, 0, 0);
-        });
+        // shrinkable = shrinkable.concat([](const shrinkable_t& shr) {
+        //     auto vecSize = shr.getRef().size();
+        //     return shrinkBulkRecursive(shr, 0, 0);
+        // });
 
         auto vecShrinkable = shrinkable.template transform<std::vector<T>>([](const std::vector<Shrinkable<T>>& shrinkVec) -> std::vector<T> {
             std::vector<T> valueVec;

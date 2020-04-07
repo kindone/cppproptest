@@ -99,6 +99,20 @@ struct Shrinkable {
         });
     }
 
+    Shrinkable<T> andThen(std::function<Stream<Shrinkable<T>>(const Shrinkable<T>&)> then) const {
+        auto shrinks = this->shrinks();
+        return with([shrinks, then]() {
+            return shrinks.template transform<Shrinkable<T>>([then](const Shrinkable<T>& shr){
+                if(shr.shrinks().isEmpty())
+                    return shr.with([shr, then]() {
+                        return then(shr);
+                    });
+                else
+                    return shr.andThen(then);
+            });
+        });
+    }
+
     Shrinkable<T> take(int n) const {
         auto shrinks = this->shrinks().take(n);
         return with([shrinks, n]() {

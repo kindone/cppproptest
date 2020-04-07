@@ -95,6 +95,12 @@ std::ostream& operator << (std::ostream& os, const std::tuple<ARG1, ARG2, ARG3>&
     return os;
 }
 
+template<typename ARG1, typename ARG2>
+std::ostream& operator << (std::ostream& os, const std::pair<ARG1, ARG2>& pair) {
+    os << "(" << pair.first << ", " << pair.second << ")";
+    return os;
+}
+
 TEST(PropTest, GenerateBool) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -759,6 +765,29 @@ TEST(PropTest, TestOneOf) {
     Random rand(seed);
     for(int i = 0;  i < 10; i++)
         std::cout << gen(rand) << std::endl;
+}
+
+TEST(PropTest, TestDependency) {
+    auto intGen = inRange(0, 10);
+    auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
+        auto intGen = inRange<int>(0,100);
+        auto vecGen = Arbitrary<std::vector<int>>(intGen);
+        vecGen.maxLen = in;
+        vecGen.minLen = in;
+        return vecGen;
+    });
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 0;  i < 10; i++) {
+        auto pair = pairGen(rand).get();
+        std::cout << "(" << pair.first << ", " << pair.second << ")" << std::endl;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        auto pairShr = pairGen(rand);
+        exhaustive(pairShr, 0);
+    }
 }
 
 TEST(PropTest, TestTuple) {
