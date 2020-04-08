@@ -44,22 +44,21 @@ public:
             if(size == 0)
                 return stream_t::empty();
 
-            vector_t newVec = vector_t();
-                newVec.reserve(size);
+
             std::vector<e_stream_t> newElemStreams;
                 newElemStreams.reserve(size);
 
-            vector_t& parentVec = parent.getRef();
+            vector_t newVec = parent.getRef();
 
             // shrink each element in frompos~topos, put parent if shrink no longer possible
             bool nothingTodo = true;
+
             for(size_t i = 0; i < elemStreams.size(); i++) {
                 if(elemStreams[i].isEmpty()) {
-                    newVec.push_back(parentVec[i]);
                     newElemStreams.push_back(e_stream_t::empty());  // [1] -> []
                 }
                 else {
-                    newVec.push_back(elemStreams[i].head());
+                    newVec[i+frompos] = elemStreams[i].head();
                     newElemStreams.push_back(elemStreams[i].tail()); // [0,4,6,7] -> [4,6,7]
                     nothingTodo = false;
                 }
