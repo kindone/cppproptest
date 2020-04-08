@@ -44,35 +44,36 @@ struct Remove : public Action {
 };
 
 
+//FIXME:
 
-template <typename T, typename... ARGS>
-std::shared_ptr<T> action(ARGS&&...args) {
-    return std::make_shared<T>(std::move(args)...);
-}
+// template <typename T, typename... ARGS>
+// Shrinkable<std::shared_ptr<T>> action(ARGS&&...args) {
+//     return make_shrinkable<std::shared_ptr<T>>(std::make_shared<T>(std::move(args)...));
+// }
 
-TEST(StateTest, States) {
+// TEST(StateTest, States) {
 
-// (int, int) ->
+// // (int, int) ->
 
-   auto actionGen = oneOf<std::shared_ptr<Action>>(
-        [](Random& rand) {
-            return action<PushBack>();
-        },
-        [](Random& rand) {
-            return action<Remove>();
-        },
-        [](Random& rand) {
-            return action<Clear>();
-        }
-    );
+//    auto actionGen = oneOf<std::shared_ptr<Action>>(
+//         [](Random& rand) {
+//             return action<PushBack>();
+//         },
+//         [](Random& rand) {
+//             return action<Remove>();
+//         },
+//         [](Random& rand) {
+//             return action<Clear>();
+//         }
+//     );
 
-    int64_t seed = getCurrentTime();
-    Random rand(seed);
+//     int64_t seed = getCurrentTime();
+//     Random rand(seed);
 
-    for(int i = 0; i < 100; i++) {
-        auto action = actionGen(rand);
-        if(action->precondition())
-            action->run();
-    }
+//     for(int i = 0; i < 100; i++) {
+//         auto action = actionGen(rand);
+//         if(action->precondition())
+//             action->run();
+//     }
 
-}
+// }

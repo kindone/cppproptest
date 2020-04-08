@@ -20,7 +20,7 @@ decltype(auto) invokeWithArgTuple(Function&& f, ArgTuple&& argTup) {
 
 template<size_t N, size_t M, typename Tuple, typename Replace, std::enable_if_t<N == M, bool> = true >
 decltype(auto) ReplaceHelper(Tuple&& valueTup, Replace&& replace) {
-    return replace;
+    return std::forward<Replace>(replace);
 }
 
 template<size_t N, size_t M, typename Tuple, typename Replace, std::enable_if_t<N != M, bool> = false >

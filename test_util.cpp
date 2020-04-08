@@ -164,7 +164,7 @@ TEST(UtilTestCase, StreamShrink) {
 
     for(auto itr = shr.shrinks().iterator(); itr.hasNext(); ) {
         auto shrinkable = itr.next();
-        std::cout << "streamshrink:" << shrinkable << std::endl;
+        std::cout << "streamshrink:" << shrinkable.get() << std::endl;
         for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
             std::cout << "  shrink: " << itr2.next().get() << std::endl;
         }
@@ -175,7 +175,7 @@ TEST(UtilTestCase, StreamShrink) {
         auto shrinks = value.shrinks;
         return make_shrinkable<std::string>(std::to_string(value.get())).with([shrinks]() {
             return shrinks().transform<Shrinkable<std::string>>([](const Shrinkable<int>& v) {
-                return make_shrinkable<std::string>(std::to_string(v));
+                return make_shrinkable<std::string>(std::to_string(v.get()));
             });
         });
     });
@@ -208,7 +208,7 @@ TEST(UtilTestCase, Shrinkable) {
     });
 
     for(auto itr = stream.iterator(); itr.hasNext(); ) {
-        std::cout << "stream:" << itr.next() << std::endl;
+        std::cout << "stream:" << itr.next().get() << std::endl;
     }
 
     auto shrinkable = make_shrinkable<int>(5).with([=]() {
@@ -217,7 +217,7 @@ TEST(UtilTestCase, Shrinkable) {
 
     auto stream2 = shrinkable.shrinks();
     for(auto itr = stream.iterator(); itr.hasNext(); ) {
-        std::cout << "stream2:" << itr.next() << std::endl;
+        std::cout << "stream2:" << itr.next().get() << std::endl;
     }
 }
 

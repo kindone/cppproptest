@@ -29,7 +29,7 @@ struct Shrinkable {
         return copy;
     }
 
-    operator T() const { return get(); }
+    // operator T() const { return get(); }
     T get() const { return *ptr; }
     T* getPtr() const { return ptr.get(); }
     T& getRef() const { return *ptr.get(); }

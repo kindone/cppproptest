@@ -168,7 +168,8 @@ private:
 
         bool result = false;
         try {
-            result = invokeWithArgTupleWithReplace<N>(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<ValueTuple>(valueTup), std::forward<Replace>(replace));
+            auto values = transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
+            result = invokeWithArgTupleWithReplace<N>(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<decltype(values)>(values), replace.get());
             //std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         }
         catch(const AssertFailed& e) {
@@ -278,7 +279,6 @@ auto property(Callable&& callable, EXPGENS&&... gens) {
     typename function_traits<Callable>::argument_type_list argument_type_list;
     auto genTup = createGenTuple(argument_type_list, gens...);
     return Property<CallableWrapper<Callable>, decltype(genTup)>(make_CallableWrapper(std::forward<Callable>(callable)), genTup);
-
 }
 
 template <typename Callable, typename ... EXPGENS>

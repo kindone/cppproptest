@@ -107,7 +107,7 @@ TEST(PropTest, GenerateBool) {
     Arbitrary<bool> gen;
 
     for(int i = 0; i < 20; i++) {
-        bool val = gen(rand);
+        bool val = gen(rand).get();
         std::cout << val << " " << std::endl;
     }
 }
@@ -119,7 +119,7 @@ TYPED_TEST(NumericTest, GenNumericType) {
     Arbitrary<TypeParam> gen;
 
     for(int i = 0; i < 20; i++) {
-        TypeParam val = gen(rand);
+        TypeParam val = gen(rand).get();
         std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
     }
 }
@@ -136,7 +136,7 @@ TYPED_TEST(IntegralTest, GenInRange) {
     std::cout << "min: " << min << ", max: " << max << std::endl;
 
     for(int i = 0; i < 20; i++) {
-        TypeParam val = gen(rand);
+        TypeParam val = gen(rand).getRef();
         std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
     }
 }
@@ -147,7 +147,7 @@ TEST(PropTest, GenUTF8String) {
     Arbitrary<UTF8String> gen(5);
 
     for(int i = 0; i < 20; i++) {
-        std::cout << "str: \"" << static_cast<UTF8String>(gen(rand)) << "\"" << std::endl;
+        std::cout << "str: \"" << static_cast<UTF8String>(gen(rand).getRef()) << "\"" << std::endl;
     }
 }
 
@@ -158,7 +158,7 @@ TEST(PropTest, GenLttVectorOfInt) {
     gen.maxLen = 5;
 
     for(int i = 0; i < 20; i++) {
-        std::vector<int> val(gen(rand));
+        std::vector<int> val(gen(rand).get());
         std::cout << "vec: ";
         for(size_t j = 0; j < val.size(); j++)
         {
@@ -180,7 +180,7 @@ TEST(PropTest, GenShrinks) {
     std::cout << "GenShrinks: " << shrinkable.get() << std::endl;
     auto shrinks = shrinkable.shrinks();
     for(auto itr = shrinks.iterator(); itr.hasNext();) {
-        std::cout << "  shrinks: " << itr.next() << std::endl;
+        std::cout << "  shrinks: " << itr.next().get() << std::endl;
     }
 }
 
@@ -203,7 +203,7 @@ TEST(PropTest, ShrinkableAndThen) {
             std::cout<< "initial: " << shrink.get() << std::endl;
             shrinks = shrink.shrinks();
             for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-                std::cout << "  shrinks: " << itr.next() << std::endl;
+                std::cout << "  shrinks: " << itr.next().get() << std::endl;
             }
         }
     }
@@ -222,7 +222,7 @@ TEST(PropTest, ShrinkableAndThen) {
             std::cout<< "andThen: " << shrink.get() << std::endl;
             shrinks = shrink.shrinks();
             for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-                std::cout << "  shrinks: " << itr.next() << std::endl;
+                std::cout << "  shrinks: " << itr.next().get() << std::endl;
             }
         }
     }
@@ -241,7 +241,7 @@ TEST(PropTest, ShrinkableAndThen) {
             std::cout<< "concat: " << shrink.get() << std::endl;
             shrinks = shrink.shrinks();
             for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-                std::cout << "  shrinks: " << itr.next() << std::endl;
+                std::cout << "  shrinks: " << itr.next().get() << std::endl;
             }
         }
     }
@@ -353,7 +353,7 @@ TEST(PropTest, ShrinkVector) {
     });
 
     auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<std::vector<T>>& shr){
-        std::vector<T> copy = shr;
+        std::vector<T> copy = shr.get();
         if(!copy.empty())
             copy[0] /= 2;
         return Stream<Shrinkable<std::vector<T>>>(make_shrinkable<std::vector<T>>(copy));
@@ -655,7 +655,7 @@ TEST(PropTest, TestConstruct) {
 
     using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
     auto gen = AnimalGen();
-    Animal animal = gen(rand);
+    Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
     check([](Animal animal) -> bool {
@@ -693,7 +693,7 @@ TEST(PropTest, TestFilter) {
         return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() == 3 && a.measures.size() < 10;
     });
 
-    std::cout << "filtered animal: " << filteredGen(rand) << std::endl;
+    std::cout << "filtered animal: " << filteredGen(rand).get() << std::endl;
 }
 
 
@@ -707,7 +707,7 @@ TEST(PropTest, TestFilter2) {
     });
 
     for(int i = 0; i < 10; i++) {
-        std::cout << "even: " << evenGen(rand) << std::endl;
+        std::cout << "even: " << evenGen(rand).get() << std::endl;
     }
 
     auto fours = filter<int>(evenGen, [](const int& value) {
@@ -716,7 +716,7 @@ TEST(PropTest, TestFilter2) {
     });
 
     for(int i = 0; i < 10; i++) {
-        std::cout << "four: " << fours(rand) << std::endl;
+        std::cout << "four: " << fours(rand).get() << std::endl;
     }
 
 }
@@ -764,7 +764,7 @@ TEST(PropTest, TestOneOf) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for(int i = 0;  i < 10; i++)
-        std::cout << gen(rand) << std::endl;
+        std::cout << gen(rand).get() << std::endl;
 }
 
 TEST(PropTest, TestDependency) {

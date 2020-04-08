@@ -1,6 +1,8 @@
 #pragma once
 
 #include "testing/invokeWithArgs.hpp"
+#include "testing/tuple.hpp"
+#include "testing/generator/util.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -9,7 +11,8 @@ decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genT
 
     auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...); 
     try {
-        return invokeWithArgTuple(std::forward<Function>(f), std::forward<decltype(valueTup)>(valueTup));
+        auto values = transformHeteroTuple<ShrinkableGet>(std::forward<decltype(valueTup)>(valueTup));
+        return invokeWithArgTuple(std::forward<Function>(f), std::forward<decltype(values)>(values));
     }
     catch(const AssertFailed& e) {
         throw PropertyFailed<decltype(valueTup)>(e, std::forward<decltype(valueTup)>(valueTup));
