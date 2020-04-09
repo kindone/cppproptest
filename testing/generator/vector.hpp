@@ -37,12 +37,15 @@ public:
     using e_shrinkable_t = Shrinkable<element_t>;
     using e_stream_t = Stream<e_shrinkable_t>;
 
-    static stream_t shrinkBulk(const shrinkable_t& parent, size_t power, size_t offset) {
+    static stream_t shrinkBulk(const shrinkable_t& ancestor, size_t power, size_t offset) {
 
-        static std::function<stream_t(size_t, size_t, const std::vector<e_stream_t>&)> genStream = [parent, power, offset](size_t frompos, size_t topos, const std::vector<e_stream_t>& elemStreams) {
+        static std::function<stream_t(const shrinkable_t&, size_t, size_t, const std::vector<e_stream_t>&)> genStream = [ancestor, power, offset](const shrinkable_t& parent, size_t frompos, size_t topos, const std::vector<e_stream_t>& elemStreams) {
             const size_t size = topos - frompos;
             if(size == 0)
                 return stream_t::empty();
+
+            if(elemStreams.size() != size)
+                throw std::runtime_error("element streams size error");
 
 
             std::vector<e_stream_t> newElemStreams;
@@ -51,31 +54,32 @@ public:
             vector_t newVec = parent.getRef();
 
             // shrink each element in frompos~topos, put parent if shrink no longer possible
-            bool nothingTodo = true;
+            bool nothingToDo = true;
 
             for(size_t i = 0; i < elemStreams.size(); i++) {
                 if(elemStreams[i].isEmpty()) {
+                    newVec[i+frompos] = make_shrinkable<T>(ancestor.getRef()[i+frompos].get());
                     newElemStreams.push_back(e_stream_t::empty());  // [1] -> []
                 }
                 else {
                     newVec[i+frompos] = elemStreams[i].head();
                     newElemStreams.push_back(elemStreams[i].tail()); // [0,4,6,7] -> [4,6,7]
-                    nothingTodo = false;
+                    nothingToDo = false;
                 }
             }
-            if(nothingTodo)
+            if(nothingToDo)
                 return stream_t::empty();
 
             auto newShrinkable = make_shrinkable<vector_t>(newVec);
-            // newShrinkable = newShrinkable.with([newShrinkable, power, offset]() {
-            //     return shrinkBulk(newShrinkable, power, offset);
-            // });
-            return stream_t(newShrinkable, [frompos, topos, newElemStreams]() {
-                return genStream(frompos, topos, newElemStreams);
+            newShrinkable = newShrinkable.with([newShrinkable, power, offset]() {
+                return shrinkBulk(newShrinkable, power, offset);
+            });
+            return stream_t(newShrinkable, [newShrinkable, frompos, topos, newElemStreams]() {
+                return genStream(newShrinkable, frompos, topos, newElemStreams);
             });
         };
 
-        size_t parentSize = parent.getRef().size();
+        size_t parentSize = ancestor.getRef().size();
         size_t numSplits = std::pow(2,power);
         if(parentSize / numSplits < 1)
             return stream_t::empty();
@@ -87,14 +91,22 @@ public:
         size_t topos = parentSize * (offset+1) / numSplits;
 
         const size_t size = topos - frompos;
-        vector_t& parentVec = parent.getRef();
+        vector_t& parentVec = ancestor.getRef();
         std::vector<e_stream_t> elemStreams;
             elemStreams.reserve(size);
+
+        bool nothingToDo = true;
         for(size_t i = frompos; i < topos; i++) {
-            elemStreams.push_back(parentVec[i]);
+            auto shrinks = parentVec[i].shrinks();
+            elemStreams.push_back(shrinks);
+            if(!shrinks.isEmpty())
+                nothingToDo = false;
         }
 
-        return genStream(frompos, topos, elemStreams);
+        if(nothingToDo)
+            return stream_t::empty();
+
+        return genStream(ancestor, frompos, topos, elemStreams);
     }
 
     static stream_t shrinkBulkRecursive(const shrinkable_t& shrinkable, size_t power, size_t offset) {
@@ -111,26 +123,29 @@ public:
             size_t numSplits = std::pow(2, power);
             if(vecSize / numSplits < 1 || offset >= numSplits)
                 return stream_t::empty();
+            // std::cout << "entire: " << power << ", " << offset << std::endl;
             return shrinkBulk(shr, power, offset);
         });
 
-        // front part
-        newShrinkable = newShrinkable.concat([power, offset](const shrinkable_t& shr) {
-            size_t vecSize = shr.getRef().size();
-            size_t numSplits = std::pow(2, power+1);
-            if(vecSize / numSplits < 1 || offset*2 >= numSplits)
-                return stream_t::empty();
-            return shrinkBulkRecursive(shr, power+1, offset*2);
-        });
+        // // front part
+        // newShrinkable = newShrinkable.concat([power, offset](const shrinkable_t& shr) {
+        //     size_t vecSize = shr.getRef().size();
+        //     size_t numSplits = std::pow(2, power+1);
+        //     if(vecSize / numSplits < 1 || offset*2 >= numSplits)
+        //         return stream_t::empty();
+        //     // std::cout << "front: " << power << ", " << offset << std::endl;
+        //     return shrinkBulkRecursive(shr, power+1, offset*2);
+        // });
 
-        // rear part
-        newShrinkable = newShrinkable.concat([power, offset](const shrinkable_t& shr) {
-            size_t vecSize = shr.getRef().size();
-            size_t numSplits = std::pow(2, power+1);
-            if(vecSize / numSplits < 1 || offset*2+1 >= numSplits)
-                return stream_t::empty();
-            return shrinkBulkRecursive(shr, power+1, offset*2+1);
-        });
+        // // rear part
+        // newShrinkable = newShrinkable.concat([power, offset](const shrinkable_t& shr) {
+        //     size_t vecSize = shr.getRef().size();
+        //     size_t numSplits = std::pow(2, power+1);
+        //     if(vecSize / numSplits < 1 || offset*2+1 >= numSplits)
+        //         return stream_t::empty();
+        //     // std::cout << "rear: " << power << ", " << offset << std::endl;
+        //     return shrinkBulkRecursive(shr, power+1, offset*2+1);
+        // });
 
         return newShrinkable.shrinks();
     }

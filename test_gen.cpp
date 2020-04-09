@@ -101,6 +101,23 @@ std::ostream& operator << (std::ostream& os, const std::pair<ARG1, ARG2>& pair) 
     return os;
 }
 
+template <typename T>
+void exhaustive(const Shrinkable<T>& shrinkable, int level, bool print = true) {
+    if(print) {
+        for(int i = 0; i < level; i++)
+            std::cout << "  ";
+
+        std::cout<< "shrinkable: " << shrinkable.get() << std::endl;
+    }
+
+    auto shrinks = shrinkable.shrinks();
+    for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
+        auto shrinkable2 = itr.next();
+        exhaustive(shrinkable2, level + 1, print);
+    }
+}
+
+
 TEST(PropTest, GenerateBool) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -154,18 +171,22 @@ TEST(PropTest, GenUTF8String) {
 TEST(PropTest, GenLttVectorOfInt) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::vector<int>> gen;
-    gen.maxLen = 5;
+    auto smallIntGen = inRange<int>(0,4);
+    Arbitrary<std::vector<int>> gen(smallIntGen);
+    gen.minLen = 3;
+    gen.maxLen = 3;
 
-    for(int i = 0; i < 20; i++) {
-        std::vector<int> val(gen(rand).get());
-        std::cout << "vec: ";
-        for(size_t j = 0; j < val.size(); j++)
-        {
-            std::cout << val[j] << ", ";
-        }
-        std::cout << std::endl;
-    }
+    // for(int i = 0; i < 20; i++) {
+    //     std::vector<int> val(gen(rand).get());
+    //     std::cout << "vec: ";
+    //     for(size_t j = 0; j < val.size(); j++)
+    //     {
+    //         std::cout << val[j] << ", ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    for(int i = 0; i < 1; i++)
+        exhaustive(gen(rand), 0);
 }
 
 TEST(PropTest, GenShrinks) {
@@ -244,22 +265,6 @@ TEST(PropTest, ShrinkableAndThen) {
                 std::cout << "  shrinks: " << itr.next().get() << std::endl;
             }
         }
-    }
-}
-
-template <typename T>
-void exhaustive(const Shrinkable<T>& shrinkable, int level, bool print = true) {
-    if(print) {
-        for(int i = 0; i < level; i++)
-            std::cout << "  ";
-
-        std::cout<< "shrinkable: " << shrinkable.get() << std::endl;
-    }
-
-    auto shrinks = shrinkable.shrinks();
-    for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-        auto shrinkable2 = itr.next();
-        exhaustive(shrinkable2, level + 1, print);
     }
 }
 
@@ -768,9 +773,9 @@ TEST(PropTest, TestOneOf) {
 }
 
 TEST(PropTest, TestDependency) {
-    auto intGen = inRange(0, 10);
+    auto intGen = inRange(0, 2);
     auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
-        auto intGen = inRange<int>(0,100);
+        auto intGen = inRange<int>(0,8);
         auto vecGen = Arbitrary<std::vector<int>>(intGen);
         vecGen.maxLen = in;
         vecGen.minLen = in;
@@ -783,6 +788,7 @@ TEST(PropTest, TestDependency) {
         auto pair = pairGen(rand).get();
         std::cout << "(" << pair.first << ", " << pair.second << ")" << std::endl;
     }
+    std::cout << "exhaustive: " << std::endl;
 
     for(int i = 0; i < 3; i++) {
         auto pairShr = pairGen(rand);
