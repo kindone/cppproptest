@@ -5,6 +5,19 @@
 #include <chrono>
 #include <iostream>
 
+#include <time.h>
+#include <sys/time.h>
+
+double getTime(){
+    struct timeval time;
+    if (gettimeofday(&time,NULL)){
+        //  Handle error
+        return 0;
+    }
+    return (double)time.tv_sec + (double)time.tv_usec * .000001;
+}
+
+
 using namespace PropertyBasedTesting;
 
 class PropTestCase : public ::testing::Test {
@@ -101,6 +114,41 @@ std::ostream& operator << (std::ostream& os, const std::pair<ARG1, ARG2>& pair) 
     return os;
 }
 
+struct TableData {
+    int num_rows;
+    uint16_t num_elements;
+    std::vector<std::tuple<uint16_t, bool>> indexes;
+};
+
+std::ostream& operator << (std::ostream& os, const TableData& td) {
+    os << "{ num_rows: " << td.num_rows << ", num_elements: " << td.num_elements << ", indexes: ";
+    os << "[ ";
+    if(!td.indexes.empty()) {
+        auto tup = td.indexes[0];
+        os << "{ first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+    }
+    for(size_t i = 1; i < td.indexes.size(); i++) {
+        auto tup = td.indexes[i];
+        os << ", { first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+    }
+    os << " ]";
+    return os;
+}
+
+std::ostream& operator << (std::ostream& os, const std::vector<std::tuple<uint16_t,bool>>& indexVec) {
+    os << "[ ";
+    if(!indexVec.empty()) {
+        auto tup = indexVec[0];
+        os << "{ first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+    }
+    for(size_t i = 0; i < indexVec.size(); i++) {
+        auto tup = indexVec[i];
+        os << ", { first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+    }
+    os << " ]";
+    return os;
+}
+
 template <typename T>
 void exhaustive(const Shrinkable<T>& shrinkable, int level, bool print = true) {
     if(print) {
@@ -116,6 +164,7 @@ void exhaustive(const Shrinkable<T>& shrinkable, int level, bool print = true) {
         exhaustive(shrinkable2, level + 1, print);
     }
 }
+
 
 
 TEST(PropTest, GenerateBool) {
@@ -208,7 +257,7 @@ TEST(PropTest, GenShrinks) {
 TEST(PropTest, ShrinkableAndThen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<int> intGen;
+    auto intGen = inRange<int>(0,16);
     auto evenGen = filter<int>(intGen, [](const int& val) -> bool{
         return val % 2 == 0;
     });
@@ -216,55 +265,43 @@ TEST(PropTest, ShrinkableAndThen) {
     auto evenShrinkable = evenGen(rand);
     std::cout<< "evenShrinkable: " << evenShrinkable.get() << std::endl;
     {
-        auto shrinks = evenShrinkable.shrinks();
-        while(!shrinks.isEmpty()) {
-            auto tempItr = shrinks.iterator();
-            tempItr.next(); // ignore first one
-            auto shrink = tempItr.hasNext() ? tempItr.next() : shrinks.head();
-            std::cout<< "initial: " << shrink.get() << std::endl;
-            shrinks = shrink.shrinks();
-            for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-                std::cout << "  shrinks: " << itr.next().get() << std::endl;
-            }
-        }
+        exhaustive(evenShrinkable, 0);
     }
 
     auto andThen = evenShrinkable.andThen([evenShrinkable]() {
         return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000));
     });
 
-    std::cout<< "andThen: " << andThen.get() << std::endl;
+    std::cout<< "even.andThen([1000]): " << andThen.get() << std::endl;
     {
-        auto shrinks = andThen.shrinks();
-        while(!shrinks.isEmpty()) {
-            auto tempItr = shrinks.iterator();
-            tempItr.next(); // ignore first one
-            auto shrink = tempItr.hasNext() ? tempItr.next() : shrinks.head();
-            std::cout<< "andThen: " << shrink.get() << std::endl;
-            shrinks = shrink.shrinks();
-            for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-                std::cout << "  shrinks: " << itr.next().get() << std::endl;
-            }
-        }
+        exhaustive(andThen, 0);
+    }
+
+    auto andThen2 = evenShrinkable.andThen([evenShrinkable](const Shrinkable<int>& parent) {
+        return Stream<Shrinkable<int>>::one(make_shrinkable<int>(parent.get()/2));
+    });
+
+    std::cout<< "even.andThen([n/2]): " << andThen2.get() << std::endl;
+    {
+        exhaustive(andThen2, 0);
     }
 
     auto concat = evenShrinkable.concat([evenShrinkable]() {
-        return evenShrinkable.shrinks();
+        return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000));
     });
 
-    std::cout<< "concat: " << concat.get() << std::endl;
+    std::cout<< "even.concat(1000): " << concat.get() << std::endl;
     {
-        auto shrinks = concat.shrinks();
-        while(!shrinks.isEmpty()) {
-            auto tempItr = shrinks.iterator();
-            tempItr.next(); // ignore first one
-            auto shrink = tempItr.hasNext() ? tempItr.next() : shrinks.head();
-            std::cout<< "concat: " << shrink.get() << std::endl;
-            shrinks = shrink.shrinks();
-            for(auto itr = shrinks.iterator(); itr.hasNext(); ) {
-                std::cout << "  shrinks: " << itr.next().get() << std::endl;
-            }
-        }
+        exhaustive(concat, 0);
+    }
+
+    auto concat2 = evenShrinkable.concat([evenShrinkable](const Shrinkable<int>& parent) {
+        return Stream<Shrinkable<int>>::one(make_shrinkable<int>(parent.get()/2));
+    });
+
+    std::cout<< "even.concat(n/2): " << concat2.get() << std::endl;
+    {
+        exhaustive(concat2, 0);
     }
 }
 
@@ -374,8 +411,9 @@ TEST(PropTest, ShrinkVectorFromGen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     using T = int8_t;
-    auto genVec = Arbitrary<std::vector<T>>(inRange<T>(-4, 4));
-    genVec.maxLen = 4;
+    auto genVec = Arbitrary<std::vector<T>>(inRange<T>(-8, 8));
+    genVec.maxLen = 8;
+    genVec.minLen = 0;
     auto vecShrinkable = genVec(rand);
     //return make_shrinkable<std::vector<T>>(std::move(vec));
     exhaustive(vecShrinkable, 0);
@@ -695,7 +733,7 @@ TEST(PropTest, TestFilter) {
     Random rand(seed);
 
     Filter<Arbitrary<Animal>> filteredGen([](Animal& a) -> bool {
-        return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() == 3 && a.measures.size() < 10;
+        return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() < 10 && a.measures.size() < 10;
     });
 
     std::cout << "filtered animal: " << filteredGen(rand).get() << std::endl;
@@ -794,6 +832,101 @@ TEST(PropTest, TestDependency) {
         auto pairShr = pairGen(rand);
         exhaustive(pairShr, 0);
     }
+}
+
+
+TEST(PropTest, GenTupleVector) {
+    using IndexVector = std::vector<std::tuple<uint16_t, bool>>;
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    int numRows = 8;
+    uint16_t numElements = 64;
+    auto firstGen = inRange<uint16_t>(0, numElements);
+    auto secondGen = Arbitrary<bool>();  //TODO true : false should be 2:1
+    auto indexGen = tuple(firstGen, secondGen);
+    auto indexVecGen = Arbitrary<IndexVector>(indexGen);
+    indexVecGen.maxLen = numRows;
+    indexVecGen.minLen = numRows/2;
+    auto shrinkable = indexVecGen(rand);
+    exhaustive(shrinkable, 0);
+}
+
+std::ostream& operator<<(std::ostream& os, const std::pair<std::tuple<int, uint16_t>, std::vector<std::tuple<uint16_t, bool>>> &input)
+{
+	os << "{ ";
+    auto tuple = input.first;
+    auto vector = input.second;
+    std::cout << "first: { " << std::get<0>(tuple) << ", " << std::get<1>(tuple) << " }, ";
+    std::cout << "second: [ ";
+    if(!vector.empty()) {
+        auto tup = vector[0];
+        std::cout << "{ " << std::get<0>(tup) << ", " << std::get<1>(tup) << " }";
+    }
+    for(size_t i = 1; i < vector.size(); i++) {
+        auto tup = vector[i];
+        std::cout << ", { " << std::get<0>(tup) << ", " << std::get<1>(tup) << " }";
+    }
+    std::cout << " ]";
+	os << " }";
+	return os;
+}
+
+TEST(PropTest, TestDependency2) {
+    using Dimension = std::tuple<int, uint16_t>;
+    using IndexVector = std::vector<std::tuple<uint16_t, bool>>;
+    using RawData = std::pair<Dimension, IndexVector>;
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    // auto numRowsGen = inRange<int>(1, 100000+1);
+    auto numRowsGen = inRange<int>(10000, 10000);
+    // auto numElementsGen = Arbitrary<uint16_t>();
+    auto numElementsGen = inRange<uint16_t>(60000, 60000);
+    auto dimGen = tuple(numRowsGen, numElementsGen);
+
+    auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](const Dimension& dimension) {
+        int numRows = std::get<0>(dimension);
+        uint16_t numElements = std::get<1>(dimension);
+        auto firstGen = inRange<uint16_t>(0, numElements);
+        auto secondGen = Arbitrary<bool>();  //TODO true : false should be 2:1
+        auto indexGen = tuple(firstGen, secondGen);
+        auto indexVecGen = Arbitrary<IndexVector>(indexGen);
+        indexVecGen.minLen = numRows;
+        indexVecGen.maxLen = numRows;
+        return indexVecGen;
+    });
+
+    std::cout << "raw." << std::endl;
+    double t0 = getTime();
+    for(int i = 0; i < 10; i ++) {
+        //std::cout << "rawGen: " << rawGen(rand).get() << " / raw " << i << std::endl;
+        rawGen(rand).get();
+        double time = getTime();
+        std::cout << "rawGen: " << i << " time: " << time - t0 << std::endl;
+        t0 = time;
+    }
+
+    auto tableDataGen = transform<RawData,TableData>(rawGen, [](const RawData& raw){
+        TableData tableData;
+        auto dimension = raw.first;
+        tableData.num_rows = std::get<0>(dimension);
+        tableData.num_elements = std::get<1>(dimension);
+        tableData.indexes = raw.second;
+        return tableData;
+    });
+    std::cout << "transformed." << std::endl;
+
+    for(int i = 0; i < 10; i ++) {
+        std::cout << "table: " << tableDataGen(rand).get() << " / table " << i << std::endl;
+    }
+    exhaustive(tableDataGen(rand), 0);
+
+    //DictionaryCompression::IQTypeInfo ti;
+    check([](TableData td) {
+        //column->set(&index[i].first, index[i].second);
+        return true;
+    }, tableDataGen);
 }
 
 TEST(PropTest, TestTuple) {

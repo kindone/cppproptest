@@ -31,9 +31,6 @@ decltype(auto) dependency(std::function<Shrinkable<T>(Random&)> gen1, std::funct
                 return std::make_pair(t, make_shrinkable<U>(u));
             });
             return newShrinkableU.shrinks();
-            // return shrinkableU.shrinks().template transform<Shrinkable<Intermediate>>([t](const Shrinkable<U>& shr) {
-            //     return make_shrinkable<Intermediate>(std::make_pair(t, shr));
-            // });
         });
 
         // reformat std::pair<T, Shrinkable<U>> to std::pair<T, U>

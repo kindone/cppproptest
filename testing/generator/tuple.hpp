@@ -5,6 +5,7 @@
 #include "testing/Shrinkable.hpp"
 #include "testing/tuple.hpp"
 #include <tuple>
+#include <memory>
 
 
 namespace PropertyBasedTesting
@@ -37,17 +38,17 @@ private:
         using element_t = typename e_shrinkable_t::type;
 
         return [](const shrinkable_t& parent) -> stream_t {
-            tuple_t parentRef = parent.getRef();
             if(Size == 0 || N > Size - 1)
                 return stream_t::empty();
 
-            e_shrinkable_t& elem = std::get<N>(parentRef);
+            std::shared_ptr<tuple_t> parentRef = std::make_shared<tuple_t>(parent.getRef());
+
+            e_shrinkable_t& elem = std::get<N>(*parentRef);
             // {0,2,3} to {[x,x,x,0], ...,[x,x,x,3]}
             // make sure {1} shrinked from 2 is also transformed to [x,x,x,1]
             shrinkable_t tupWithElems = elem.template transform<tuple_t>([parentRef](const element_t& val) {
-                auto copy = parentRef;
-                std::get<N>(copy) = make_shrinkable<element_t>(val);
-                return copy;
+                std::get<N>(*parentRef) = make_shrinkable<element_t>(val);
+                return *parentRef;
             });
             return tupWithElems.shrinks();
         };

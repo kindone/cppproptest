@@ -9,7 +9,7 @@ namespace PropertyBasedTesting {
 template< typename Function, typename GenTuple, std::size_t... index>
 decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...> index_sequence) {
 
-    auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...); 
+    auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...);
     try {
         auto values = transformHeteroTuple<ShrinkableGet>(std::forward<decltype(valueTup)>(valueTup));
         return invokeWithArgTuple(std::forward<Function>(f), std::forward<decltype(values)>(values));
