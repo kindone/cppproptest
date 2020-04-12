@@ -962,7 +962,7 @@ TEST(PropTest, TestDependency2) {
     for(int i = 0; i < 10; i ++) {
         std::cout << "table: " << tableDataGen(rand).get() << " / table " << i << std::endl;
     }
-    exhaustive(tableDataGen(rand), 0);
+    // exhaustive(tableDataGen(rand), 0);
 
     //DictionaryCompression::IQTypeInfo ti;
     check([](TableData td) {

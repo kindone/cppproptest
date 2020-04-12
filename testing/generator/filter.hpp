@@ -1,4 +1,7 @@
 #pragma once
+#include <functional>
+#include "testing/Shrinkable.hpp"
+
 
 namespace PropertyBasedTesting {
 
@@ -10,7 +13,7 @@ public:
 
     Filter(FilterFunc&& f) : filter(f) {
     }
-    
+
     Shrinkable<T> operator()(Random& rand) {
         while(true) {
             auto shrinkable = gen(rand);
@@ -27,7 +30,7 @@ public:
 
 template <typename T, typename GEN>
 decltype(auto) filter(GEN&& gen, std::function<bool(const T&)> criteria) {
-    return [=, &gen](Random& rand) {
+    return [criteria, &gen](Random& rand) {
         while(true) {
             Shrinkable<T> shrinkable = gen(rand);
             if(criteria(shrinkable.getRef())) {
