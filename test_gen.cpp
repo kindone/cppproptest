@@ -919,8 +919,8 @@ TEST(PropTest, TestDependency2) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto numRowsGen = inRange<int>(1, 100000+1);
-    // auto numRowsGen = inRange<int>(10000, 10000);
+    // auto numRowsGen = inRange<int>(1, 100000+1);
+    auto numRowsGen = inRange<int>(10000, 10000);
     auto numElementsGen = Arbitrary<uint16_t>();
     // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = tuple(numRowsGen, numElementsGen);

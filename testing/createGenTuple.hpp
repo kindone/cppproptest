@@ -27,17 +27,16 @@ decltype( auto ) createGenTuple(TypeList<ARGS...> argument_list ) {
 
 template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) == sizeof...(IMPARGS)), bool>::type = true >
 decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... gens) {
-    constexpr auto ExplicitSize = sizeof...(EXPARGS);    
-    auto explicits = std::make_tuple(gens...); 
+    constexpr auto ExplicitSize = sizeof...(EXPARGS);
+    auto explicits = std::make_tuple(gens...);
     return explicits;
 }
 
 template<typename ... IMPARGS, typename ... EXPARGS, typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) < sizeof...(IMPARGS)), bool>::type = true >
 decltype( auto ) createGenTuple(TypeList<IMPARGS...> fullArgTypes, EXPARGS&&... gens) {
-    
     constexpr auto ExplicitSize = sizeof...(EXPARGS);
     constexpr auto ImplicitSize = sizeof...(IMPARGS) - ExplicitSize;
-    auto explicits = std::make_tuple(gens...); 
+    auto explicits = std::make_tuple(gens...);
     using ArgsAsTuple = std::tuple<std::decay_t<IMPARGS>...>;
     auto implicits = createGenHelperListed<ArgsAsTuple>(
         std::make_index_sequence<ImplicitSize>{}
