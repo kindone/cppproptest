@@ -171,11 +171,11 @@ public:
         // this make sure shrinking is possible towards minLen
         shrinkable_t shrinkable = rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
             if(len <= 0)
-                return std::vector<Shrinkable<T>>();
+                return make_shrinkable<std::vector<Shrinkable<T>> >();
 
             auto begin = shrinkVec->begin();
             auto last = shrinkVec->begin() + len; // subvector of (0, len)
-            return std::vector<Shrinkable<T>>(begin, last);
+            return make_shrinkable<std::vector<Shrinkable<T>>>(begin, last);
         });
 
         // concat shrinks with parent as argument
@@ -210,12 +210,13 @@ public:
             return shrinkBulkRecursive(shr, 0, 0);
         });
 
-        auto vecShrinkable = shrinkable.template transform<std::vector<T>>([](const vector_t& shrinkVec) -> std::vector<T> {
-            std::vector<T> valueVec;
+        auto vecShrinkable = shrinkable.template transform<std::vector<T>>([](const vector_t& shrinkVec) {
+            auto value = make_shrinkable<std::vector<T>>();
+            std::vector<T>& valueVec = value.getRef();
             std::transform(shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueVec), [](const Shrinkable<T>& shr) -> T {
-                return shr.get();
+                return std::move(shr.getRef());
             });
-            return valueVec;
+            return value;
         });
 
         return vecShrinkable;

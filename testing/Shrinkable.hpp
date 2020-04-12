@@ -37,7 +37,18 @@ struct Shrinkable {
     template <typename U = T>
     Shrinkable<U> transform(std::function<U(const T&)> transformer) const {
         auto shrinks = this->shrinks();
-        auto shrinkable = make_shrinkable<U>(transformer(getRef()));
+        auto shrinkable = make_shrinkable<U>(std::move(transformer(getRef())));
+        return shrinkable.with([shrinks, transformer]() {
+            return shrinks.template transform<Shrinkable<U>>([transformer](const Shrinkable<T>& shr) {
+                return shr.transform(transformer);
+            });
+        });
+    }
+
+    template <typename U = T>
+    Shrinkable<U> transform(std::function<Shrinkable<U>(const T&)> transformer) const {
+        auto shrinks = this->shrinks();
+        auto shrinkable = transformer(getRef());
         return shrinkable.with([shrinks, transformer]() {
             return shrinks.template transform<Shrinkable<U>>([transformer](const Shrinkable<T>& shr) {
                 return shr.transform(transformer);

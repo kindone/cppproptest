@@ -18,7 +18,7 @@ decltype(auto) dependency(std::function<Shrinkable<T>(Random&)> gen1, std::funct
         Shrinkable<std::pair<T, Shrinkable<U>>> intermediate = shrinkableT.template transform<std::pair<T, Shrinkable<U>>>([&rand, gen2gen](const T& t) {
             auto gen2 = gen2gen(t);
             Shrinkable<U> shrinkableU = gen2(rand);
-            return std::make_pair(t, shrinkableU);
+            return make_shrinkable<std::pair<T, Shrinkable<U>> >(std::make_pair(t, shrinkableU));
         });
 
         // expand Shrinkable<U>
@@ -28,14 +28,14 @@ decltype(auto) dependency(std::function<Shrinkable<T>(Random&)> gen1, std::funct
             T& t = interpair.first;
             Shrinkable<U>& shrinkableU = interpair.second;
             Shrinkable<Intermediate> newShrinkableU = shrinkableU.template transform<Intermediate>([t](const U& u) mutable {
-                return std::make_pair(t, make_shrinkable<U>(u));
+                return make_shrinkable<std::pair<T, Shrinkable<U>> >(std::make_pair(t, make_shrinkable<U>(u)));
             });
             return newShrinkableU.shrinks();
         });
 
         // reformat std::pair<T, Shrinkable<U>> to std::pair<T, U>
-        return intermediate.template transform<std::pair<T, U>>([](const Intermediate& interpair) -> std::pair<T,U>{
-            return std::make_pair(interpair.first, interpair.second.getRef());
+        return intermediate.template transform<std::pair<T, U>>([](const Intermediate& interpair) -> Shrinkable<std::pair<T,U>>{
+            return make_shrinkable<std::pair<T, U>>(std::make_pair(interpair.first, interpair.second.getRef()));
         });
     };
 

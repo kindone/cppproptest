@@ -26,7 +26,7 @@ decltype(auto) autoCastTuple(FromTuple&& tuple) {
 
 template<typename Constructible, typename CastTuple, typename ValueTuple, std::size_t... index>
 decltype( auto ) constructByTupleType(ValueTuple&& valueTuple, std::index_sequence<index...> ) {
-    return Constructible(autoCastTuple<CastTuple,index>(valueTuple)...);
+    return make_shrinkable<Constructible>(autoCastTuple<CastTuple,index>(std::forward<ValueTuple>(valueTuple))...);
 }
 
 template<typename Constructible, typename ... ARGS, typename ValueTuple >
@@ -34,7 +34,7 @@ decltype( auto ) constructAccordingly(ValueTuple&& valueTuple) {
     using ArgsAsTuple = std::tuple<ARGS...>;
     constexpr auto arity = sizeof...(ARGS);
     return constructByTupleType<Constructible, ArgsAsTuple>(
-        valueTuple,
+        std::forward<ValueTuple>(valueTuple),
         std::make_index_sequence<arity>{} // {0,1,2,3,...,N-1}
     );
 }
@@ -61,8 +61,7 @@ public:
     }
 
     Shrinkable<CLASS> operator()(Random& rand) {
-        auto argTup = generateArgs(rand);
-        return make_shrinkable<CLASS>(constructAccordingly<CLASS, ARGTYPES...>(argTup));
+        return constructAccordingly<CLASS, ARGTYPES...>(generateArgs(rand));
     }
 private:
     GenTuple genTup;

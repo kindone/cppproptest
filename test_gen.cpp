@@ -834,6 +834,46 @@ TEST(PropTest, TestDependency) {
     }
 }
 
+TEST(PropTest, GenVectorPerf) {
+    struct Log {
+        Log() {
+            std::cout << "construct" << std::endl;
+            breaker();
+        }
+        Log(const Log& other) {
+            std::cout << "copy construct" << std::endl;
+            breaker();
+        }
+
+        Log(Log&& other) {
+            std::cout << "move construct" << std::endl;
+        }
+
+        Log& operator=(const Log& other) {
+            std::cout << "operator=()" << std::endl;
+            return *this;
+        }
+
+        void breaker() {
+            std::cout << "  break()" << std::endl;
+        }
+
+        ~Log() {
+            std::cout << "destruct" << std::endl;
+            breaker();
+        }
+    };
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    auto logGen = Construct<Log>();
+    auto vecGen = Arbitrary<std::vector<Log>>(logGen);
+    vecGen.maxLen = 1;
+    vecGen.minLen = 1;
+    auto shrinkable = vecGen(rand);
+
+    //exhaustive(shrinkable, 0);
+}
 
 TEST(PropTest, GenTupleVector) {
     using IndexVector = std::vector<std::tuple<uint16_t, bool>>;
@@ -879,8 +919,8 @@ TEST(PropTest, TestDependency2) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    // auto numRowsGen = inRange<int>(1, 100000+1);
-    auto numRowsGen = inRange<int>(10000, 10000);
+    auto numRowsGen = inRange<int>(1, 100000+1);
+    // auto numRowsGen = inRange<int>(10000, 10000);
     // auto numElementsGen = Arbitrary<uint16_t>();
     auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = tuple(numRowsGen, numElementsGen);
