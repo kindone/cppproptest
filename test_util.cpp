@@ -54,7 +54,6 @@ struct Transformer<std::string> {
         std::cout << "Transformer<string> - " << v << std::endl;
         return v.size();
     }
-
 };
 
 TEST(UtilTestCase, transformHeteroTest) {

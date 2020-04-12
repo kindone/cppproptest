@@ -39,7 +39,7 @@ TEST(PropTest, MockTest) {
     MockCat* cat = new MockCat();
     // general
     EXPECT_CALL(*cat, meow(_))
-        .WillOnce(Return(0));
+        .WillRepeatedly(Return(0));
 
     // specific
     EXPECT_CALL(*cat, meow(5))
@@ -47,6 +47,7 @@ TEST(PropTest, MockTest) {
 
     EXPECT_EQ(cat->meow(5), 5);
     EXPECT_EQ(cat->meow(4), 0);
+    EXPECT_EQ(cat->meow(3), 0);
 
     delete cat;
 }

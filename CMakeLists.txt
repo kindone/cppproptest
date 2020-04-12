@@ -40,7 +40,12 @@ TARGET_LINK_LIBRARIES(proptest
 
 ### tests
 SET(proptest_testsources
+    testbase.cpp
     test_gen.cpp
+    test_property.cpp
+    test_primitive.cpp
+    test_combinator.cpp
+    test_shrinkable.cpp
     test_mock.cpp
     test_util.cpp
     test_state.cpp
