@@ -2,6 +2,7 @@
 
 #include "testing/Seq.hpp"
 #include <functional>
+#include <memory>
 
 namespace PropertyBasedTesting
 {
@@ -65,7 +66,7 @@ template <typename T>
 struct NonEmptyStream : public StreamImpl<T> {
     using type = T;
 
-    NonEmptyStream(const T& h, const std::function<Stream<T>()>& gen) :  _head(h), tailGen(gen) {
+    NonEmptyStream(const T& h, const std::function<Stream<T>()>& gen) :  _head(h), tailGen(std::make_shared<std::function<Stream<T>()>>(gen)) {
     }
 
     virtual ~NonEmptyStream() {}
@@ -82,7 +83,7 @@ struct NonEmptyStream : public StreamImpl<T> {
         if(isEmpty())
             return std::make_shared<EmptyStream<T>>();
 
-        return tailGen().impl;
+        return (*tailGen)().impl;
     }
 
     virtual Iterator<T> iterator() const {
@@ -93,7 +94,7 @@ struct NonEmptyStream : public StreamImpl<T> {
     NonEmptyStream<U> transform(std::function<U(const T&)>& transformer) {
         auto gen = tailGen;
         return NonEmptyStream<U>(transformer(_head), [transformer, gen]() -> Stream<U> {
-            return gen().transform(transformer);
+            return (*gen)().transform(transformer);
         });
     }
 
@@ -128,7 +129,7 @@ struct NonEmptyStream : public StreamImpl<T> {
     }
 
     T _head;
-    std::function<Stream<T>()> tailGen;
+    std::shared_ptr<std::function<Stream<T>()>> tailGen;
 };
 
 

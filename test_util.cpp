@@ -172,9 +172,9 @@ TEST(UtilTestCase, StreamShrink) {
     }
 
     Stream<Shrinkable<std::string>> strstream = shr.shrinks().transform<Shrinkable<std::string>>([](const Shrinkable<int>& value) {
-        auto shrinks = value.shrinks;
-        return make_shrinkable<std::string>(std::to_string(value.get())).with([shrinks]() {
-            return shrinks().transform<Shrinkable<std::string>>([](const Shrinkable<int>& v) {
+        auto shrinksPtr = value.shrinksPtr;
+        return make_shrinkable<std::string>(std::to_string(value.get())).with([shrinksPtr]() {
+            return (*shrinksPtr)().transform<Shrinkable<std::string>>([](const Shrinkable<int>& v) {
                 return make_shrinkable<std::string>(std::to_string(v.get()));
             });
         });

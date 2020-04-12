@@ -921,8 +921,8 @@ TEST(PropTest, TestDependency2) {
 
     auto numRowsGen = inRange<int>(1, 100000+1);
     // auto numRowsGen = inRange<int>(10000, 10000);
-    // auto numElementsGen = Arbitrary<uint16_t>();
-    auto numElementsGen = inRange<uint16_t>(60000, 60000);
+    auto numElementsGen = Arbitrary<uint16_t>();
+    // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = tuple(numRowsGen, numElementsGen);
 
     auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](const Dimension& dimension) {
@@ -946,6 +946,8 @@ TEST(PropTest, TestDependency2) {
         std::cout << "rawGen: " << i << " time: " << time - t0 << std::endl;
         t0 = time;
     }
+
+    return;
 
     auto tableDataGen = transform<RawData,TableData>(rawGen, [](const RawData& raw){
         TableData tableData;

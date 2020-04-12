@@ -14,18 +14,18 @@ template <typename T>
 struct Shrinkable {
     using type = T;
 
-    Shrinkable(const Shrinkable& other) : ptr(other.ptr), shrinks(other.shrinks) {
+    Shrinkable(const Shrinkable& other) : ptr(other.ptr), shrinksPtr(other.shrinksPtr) {
     }
 
     Shrinkable& operator=(const Shrinkable& other) {
          ptr = other.ptr;
-         shrinks = other.shrinks;
+         shrinksPtr = other.shrinksPtr;
          return *this;
     }
 
     Shrinkable with(std::function<Stream<Shrinkable<T>>()> _shrinks) const {
         auto copy = *this;
-        copy.shrinks = _shrinks;
+        copy.shrinksPtr = std::make_shared<std::function<Stream<Shrinkable<T>>()>>(_shrinks);
         return copy;
     }
 
@@ -37,10 +37,22 @@ struct Shrinkable {
     template <typename U = T>
     Shrinkable<U> transform(std::function<U(const T&)> transformer) const {
         auto shrinks = this->shrinks();
+        auto transformerPtr = std::make_shared<std::function<U(const T&)>>(transformer);
         auto shrinkable = make_shrinkable<U>(std::move(transformer(getRef())));
-        return shrinkable.with([shrinks, transformer]() {
-            return shrinks.template transform<Shrinkable<U>>([transformer](const Shrinkable<T>& shr) {
-                return shr.transform(transformer);
+        return shrinkable.with([shrinks, transformerPtr]() {
+            return shrinks.template transform<Shrinkable<U>>([transformerPtr](const Shrinkable<T>& shr) {
+                return shr.transform(transformerPtr);
+            });
+        });
+    }
+
+    template <typename U = T>
+    Shrinkable<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr) const {
+        auto shrinks = this->shrinks();
+        auto shrinkable = make_shrinkable<U>(std::move((*transformerPtr)(getRef())));
+        return shrinkable.with([shrinks, transformerPtr]() {
+            return shrinks.template transform<Shrinkable<U>>([transformerPtr](const Shrinkable<T>& shr) {
+                return shr.transform(transformerPtr);
             });
         });
     }
@@ -48,10 +60,22 @@ struct Shrinkable {
     template <typename U = T>
     Shrinkable<U> transform(std::function<Shrinkable<U>(const T&)> transformer) const {
         auto shrinks = this->shrinks();
+        auto transformerPtr = std::make_shared<std::function<Shrinkable<U>(const T&)>>(transformer);
         auto shrinkable = transformer(getRef());
-        return shrinkable.with([shrinks, transformer]() {
-            return shrinks.template transform<Shrinkable<U>>([transformer](const Shrinkable<T>& shr) {
-                return shr.transform(transformer);
+        return shrinkable.with([shrinks, transformerPtr]() {
+            return shrinks.template transform<Shrinkable<U>>([transformerPtr](const Shrinkable<T>& shr) {
+                return shr.transform(transformerPtr);
+            });
+        });
+    }
+
+    template <typename U = T>
+    Shrinkable<U> transform(std::shared_ptr<std::function<Shrinkable<U>(const T&)>> transformerPtr) const {
+        auto shrinks = this->shrinks();
+        auto shrinkable = (*transformerPtr)(getRef());
+        return shrinkable.with([shrinks, transformerPtr]() {
+            return shrinks.template transform<Shrinkable<U>>([transformerPtr](const Shrinkable<T>& shr) {
+                return shr.transform(transformerPtr);
             });
         });
     }
@@ -135,19 +159,23 @@ struct Shrinkable {
 
 private:
     Shrinkable() {
-        shrinks = []() {
+        shrinksPtr = std::make_shared<std::function<Stream<Shrinkable<T>>()>>([]() {
             return Stream<Shrinkable<T>>::empty();
-        };
+        });
     }
     Shrinkable(std::shared_ptr<T>&& p) : ptr(p) {
-        shrinks = []() {
+        shrinksPtr = std::make_shared<std::function<Stream<Shrinkable<T>>()>>([]() {
             return Stream<Shrinkable<T>>::empty();
-        };
+        });
     }
 
     std::shared_ptr<T> ptr;
 public:
-    std::function<Stream<Shrinkable<T>>()> shrinks;
+    Stream<Shrinkable<T>> shrinks() const {
+        return (*shrinksPtr)();
+    }
+
+    std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> shrinksPtr;
 
     template <typename U, typename ...Args>
     friend Shrinkable<U> make_shrinkable(Args&&... args);
