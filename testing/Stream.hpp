@@ -91,20 +91,31 @@ struct NonEmptyStream : public StreamImpl<T> {
     }
 
     template <typename U = T>
-    NonEmptyStream<U> transform(std::function<U(const T&)>& transformer) {
-        auto gen = tailGen;
-        return NonEmptyStream<U>(transformer(_head), [transformer, gen]() -> Stream<U> {
-            return (*gen)().transform(transformer);
+    NonEmptyStream<U> transform(std::function<U(const T&)> transformer) {
+        auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
+        return transform<U>(transformerPtr);
+    }
+
+    template <typename U = T>
+    NonEmptyStream<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr) {
+        auto tailGen = this->tailGen;
+        return NonEmptyStream<U>((*transformerPtr)(_head), [transformerPtr, tailGen]() -> Stream<U> {
+            return (*tailGen)().transform(transformerPtr);
         });
     }
 
     Stream<T> filter(std::function<bool(const T&)> criteria) const {
+        auto criteriaPtr = std::make_shared<decltype(criteria)>(criteria);
+        return filter(criteriaPtr);
+    }
+
+    Stream<T> filter(std::shared_ptr<std::function<bool(const T&)>> criteriaPtr) const {
         for(auto itr = iterator(); itr.hasNext();) {
             auto value = itr.next();
-            if(criteria(value)) {
+            if((*criteriaPtr)(value)) {
                 auto tail = itr.stream;
-                return Stream<T>{value, [criteria, tail]() {
-                    return tail.filter(criteria);
+                return Stream<T>{value, [criteriaPtr, tail]() {
+                    return tail.filter(criteriaPtr);
                 }};
             }
         }
@@ -112,9 +123,8 @@ struct NonEmptyStream : public StreamImpl<T> {
     }
 
     Stream<T> concat(const Stream<T>& other) const {
-        auto self = *this;
-        return Stream<T>(head(), [self, other]() {
-            return Stream<T>(self.tail()).concat(other);
+        return Stream<T>(head(), [tailGen = this->tailGen, other]() {
+            return Stream<T>((*tailGen)()).concat(other);
         });
     }
 
@@ -177,20 +187,31 @@ struct Stream {
 
     template<typename U>
     Stream<U> transform(std::function<U(const T&)> transformer) const {
+        auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
+        return transform<U>(transformerPtr);
+    }
+
+    template<typename U>
+    Stream<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr) const {
         if(isEmpty()) {
             return Stream<U>::empty();
         }
         else {
-            return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->transform(transformer));
+            return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->transform(transformerPtr));
         }
     }
 
     Stream<T> filter(std::function<bool(const T&)> criteria) const {
+        auto criteriaPtr = std::make_shared<decltype(criteria)>(criteria);
+        return filter(criteriaPtr);
+    }
+
+    Stream<T> filter(std::shared_ptr<std::function<bool(const T&)>> criteriaPtr) const {
         if(isEmpty()) {
             return Stream::empty();
         }
         else {
-            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->filter(criteria);
+            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->filter(criteriaPtr);
         }
     }
 
