@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <tuple>
+#include <utility>
 #include <string>
 #include <vector>
 #include "testing/Shrinkable.hpp"
@@ -26,6 +27,8 @@ template <typename T>
 std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
 template <typename ...ARGS>
 std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple);
+template <typename ARG1, typename ARG2>
+std::ostream& show(std::ostream& os, const std::pair<ARG1,ARG2>& pair);
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
 
@@ -110,6 +113,15 @@ struct ToStreamEach<0,Tuple> {
     void get(std::ostream& os, const Tuple& tuple) {
     }
 };
+
+template <typename ARG1, typename ARG2>
+std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair) {
+    os << "( ";
+    show(os, pair.first);
+    os << ", ";
+    show(os, pair.second);
+    os << " )";
+}
 
 template <typename ...ARGS>
 std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)

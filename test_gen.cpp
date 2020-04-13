@@ -187,7 +187,16 @@ TEST(PropTest, ShrinkVectorFromGen) {
     //return make_shrinkable<std::vector<T>>(std::move(vec));
     exhaustive(vecShrinkable, 0);
 }
+TEST(PropTest, TuplePair1) {
+    auto intGen = Arbitrary<int>();
+    auto smallIntGen = GenSmallInt();
 
+    auto gen = pair(intGen, smallIntGen);
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 0;  i < 10; i++)
+        std::cout << gen(rand).get() << std::endl;
+}
 
 TEST(PropTest, TupleGen1) {
     auto intGen = Arbitrary<int>();
