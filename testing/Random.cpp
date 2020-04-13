@@ -23,8 +23,8 @@ uint64_t Random::next8U() {
     return value;
 }
 
-bool Random::getRandomBool() {
-    return (next8U() % 2 == 0);
+bool Random::getRandomBool(int dice) {
+    return (next8U() % dice == 0);
 }
 
 int8_t Random::getRandomInt8(int8_t min, int8_t max) {

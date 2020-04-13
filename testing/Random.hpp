@@ -13,7 +13,7 @@ class PROPTEST_API Random
 public:
     Random(uint64_t seed);
     Random(const Random& other);
-    bool getRandomBool();
+    bool getRandomBool(int dice = 2);
     int8_t getRandomInt8(int8_t min = INT8_MIN, int8_t max = INT8_MAX);
     uint8_t getRandomUInt8(uint8_t min = 0, uint8_t max = UINT8_MAX);
     int16_t getRandomInt16(int16_t min = INT16_MIN, int16_t max = INT16_MAX);
