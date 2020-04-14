@@ -139,7 +139,7 @@ public:
                 std::cerr << "Discard is not supported for single run" << std::endl;
             }
         } catch(const PropertyFailedBase& e) {
-            std::cerr << "Property failed: " << e.what() << std::endl;
+            std::cerr << "Property failed: " << e.what() <<  " (" << e.filename << ":" << e.lineno << ")" << std::endl;
             return false;
         } catch(const std::exception& e) {
             // skip shrinking?
@@ -186,7 +186,7 @@ private:
     template <typename Shrinks>
     static void printShrinks(const Shrinks& shrinks) {
         auto itr = shrinks.iterator();
-        std::cout << "    shrinks: " << std::endl;
+        // std::cout << "    shrinks: " << std::endl;
         for(int i = 0; i < 4 && itr.hasNext(); i++) {
             std::cout << "    ";
             show(std::cout, itr.next());
@@ -196,13 +196,13 @@ private:
 
     template <size_t N, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple) {
-        std::cout << "  shrinking arg " << N << ":";
-        show(std::cout, valueTup);
-        std::cout << std::endl;
+        // std::cout << "  shrinking arg " << N << ":";
+        // show(std::cout, valueTup);
+        // std::cout << std::endl;
         auto shrinks = std::get<N>(shrinksTuple);
         // keep shrinking until no shrinking is possible
         while(!shrinks.isEmpty()) {
-            printShrinks(shrinks);
+            // printShrinks(shrinks);
             auto iter = shrinks.iterator();
             bool shrinkFound = false;
             // keep trying until failure is reproduced
@@ -221,7 +221,7 @@ private:
                 }
             }
             if(shrinkFound) {
-                std::cout << "  shrinking arg " << N << " found: ";
+                // std::cout << "  shrinking arg " << N << " found: ";
                 show(std::cout, valueTup);
                 std::cout << std::endl;
             }
@@ -229,7 +229,7 @@ private:
                 break;
             }
         }
-        std::cout << "  no more shrinking found for arg " << N << std::endl;
+        // std::cout << "  no more shrinking found for arg " << N << std::endl;
         return std::get<N>(valueTup);
     }
 
@@ -240,9 +240,9 @@ private:
 
     template <typename ValueTuple>
     void shrink(Random& savedRand, ValueTuple&& valueTup) {
-        std::cout << "shrinking value: ";
-        show(std::cout, valueTup);
-        std::cout << std::endl;
+        // std::cout << "shrinking value: ";
+        // show(std::cout, valueTup);
+        // std::cout << std::endl;
 
         auto generatedValueTup = transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
         //std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
@@ -251,7 +251,9 @@ private:
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
                 std::forward<decltype(shrinksTuple)>(shrinksTuple),
                 std::make_index_sequence<Size>{});
-
+        std::cout << "shrunk: ";
+        show(std::cout, shrunk);
+        std::cout << std::endl;
     }
 
 private:

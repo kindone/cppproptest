@@ -10,20 +10,24 @@ struct AssertFailed : public std::logic_error {
                 const std::error_code& error,
                 const char* condition,
                 const void* caller)
-    : logic_error(condition) {
+    : filename(fname), lineno(line), logic_error(condition) {
     }
+
+    const char* filename;
+    int lineno;
 };
 
 struct PropertyFailedBase : public std::logic_error {
-    PropertyFailedBase(const std::logic_error& e) : logic_error(e) {
+    PropertyFailedBase(const AssertFailed& e) : logic_error(e), filename(e.filename), lineno(e.lineno) {
     }
+    const char* filename;
+    int lineno;
 };
 
 template <typename ValueTuple>
 struct PropertyFailed : public PropertyFailedBase {
-    PropertyFailed(const std::logic_error& e, ValueTuple&& v) : PropertyFailedBase(e), valueTup(std::move(v)) {
+    PropertyFailed(const AssertFailed& e, ValueTuple&& v) : PropertyFailedBase(e), valueTup(std::move(v)) {
     }
-
     ValueTuple valueTup;
 };
 

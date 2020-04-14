@@ -36,6 +36,7 @@ bool PropertyBase::check() {
             } while(!pass);
         }
     } catch(const PropertyFailedBase& e) {
+        std::cerr << "Property failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
         // shrink
         handleShrink(savedRand, e);
         return false;
