@@ -121,6 +121,7 @@ std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair) {
     os << ", ";
     show(os, pair.second);
     os << " )";
+    return os;
 }
 
 template <typename ...ARGS>
