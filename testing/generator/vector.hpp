@@ -22,7 +22,7 @@ public:
     Arbitrary() : elemGen(Arbitrary<T>()), minLen(defaultMinLen), maxLen(defaultMaxLen)  {
     }
 
-    Arbitrary(Arbitrary<T> _elemGen)
+    Arbitrary(const Arbitrary<T>& _elemGen)
      : elemGen([_elemGen](Random& rand)->Shrinkable<T>{ return _elemGen(rand); })
      , minLen(defaultMinLen)
      , maxLen(defaultMaxLen) {
