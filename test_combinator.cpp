@@ -7,8 +7,35 @@ TEST(PropTest, TestConstruct) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    using AnimalGen = Construct<Animal, int, std::string, std::vector<int>&>;
-    auto gen = AnimalGen();
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>();
+    Animal animal = gen(rand).get();
+    std::cout << "Gen animal: " << animal << std::endl;
+
+    check([](Animal animal) -> bool {
+        PROP_STAT(animal.numFeet > 3);
+        return true;
+    }, gen);
+}
+
+TEST(PropTest, TestConstruct2) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(inRange<int>(0,10), Arbitrary<std::string>(), Arbitrary<std::vector<int>>());
+    Animal animal = gen(rand).get();
+    std::cout << "Gen animal: " << animal << std::endl;
+
+    check([](Animal animal) -> bool {
+        PROP_STAT(animal.numFeet > 3);
+        return true;
+    }, gen);
+}
+
+TEST(PropTest, TestConstruct3) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(inRange<int>(0,10));
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 

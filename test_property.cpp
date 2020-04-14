@@ -124,6 +124,12 @@ TEST(PropTest, TestCheckWithGen) {
         PROP_STAT(b > 0);
         return true;
     }, genSmallInt, genSmallInt);
+
+    check([](int a, std::string b) -> bool {
+        PROP_STAT(a > 0);
+        PROP_STAT(b.size() > 0);
+        return true;
+    }, genSmallInt);
 }
 
 

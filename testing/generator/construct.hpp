@@ -1,8 +1,11 @@
 #pragma once
 #include "testing/gen.hpp"
+#include <type_traits>
 
 namespace PropertyBasedTesting
 {
+
+class Random;
 
 template <typename TO, typename SHRINKABLE, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
 decltype(auto) autoCast(SHRINKABLE&& shr) {
@@ -29,11 +32,14 @@ class Construct : public Gen<CLASS>
 {
 public:
     using ArgumentList = TypeList<ARGTYPES...>;
-    using GenTuple = std::tuple<Arbitrary<std::remove_reference_t<ARGTYPES>>...>;
+    using GenTuple = std::tuple<std::function<Shrinkable<std::remove_reference_t<ARGTYPES>>(Random&)>...>;
 
     static constexpr auto Size = sizeof...(ARGTYPES);
 
     Construct() : genTup(createGenTuple(ArgumentList{})) {
+    }
+
+    Construct(GenTuple g) : genTup(g) {
     }
 
     template <std::size_t... index>
@@ -68,6 +74,39 @@ private:
     GenTuple genTup;
 };
 
+// all implicits
+template <typename CLASS, typename ... ARGTYPES>
+decltype(auto) construct() {
+    constexpr auto ImplicitSize = sizeof...(ARGTYPES);
+    using ArgsAsTuple = std::tuple<std::decay_t<ARGTYPES>...>;
+    auto implicits = createGenHelperListed<ArgsAsTuple>(
+        std::make_index_sequence<ImplicitSize>{}
+    );
+    return Construct<CLASS, ARGTYPES...>(implicits);
+}
+
+// all explicits
+template <typename CLASS, typename ... ARGTYPES, typename ... EXPGENS, typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGTYPES)), bool>::type = true >
+decltype(auto) construct(EXPGENS&&... gens) {
+    constexpr auto ExplicitSize = sizeof...(EXPGENS);
+    auto explicits = std::make_tuple(gens...);
+    return Construct<CLASS, ARGTYPES...>(explicits);
+}
+
+
+// some explicits
+template <typename CLASS, typename ... ARGTYPES, typename ... EXPGENS, typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGTYPES)), bool>::type = true >
+decltype(auto) construct(EXPGENS&&... gens) {
+    constexpr auto ExplicitSize = sizeof...(EXPGENS);
+    constexpr auto ImplicitSize = sizeof...(ARGTYPES) - ExplicitSize;
+    auto explicits = std::make_tuple(genToFunc(gens)...);
+    using ArgsAsTuple = std::tuple<std::decay_t<ARGTYPES>...>;
+    auto implicits = createGenHelperListed<ArgsAsTuple>(
+        addOffset<ExplicitSize>(std::make_index_sequence<ImplicitSize>{})
+    );
+
+    return Construct<CLASS, ARGTYPES...>(std::tuple_cat(explicits, implicits));
+}
 
 
 } // namespace PropertyBasedTesting
