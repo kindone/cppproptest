@@ -85,11 +85,13 @@ TEST(PropTest, TestCheckBasic) {
         return true;
     });
 
-    check([](UTF8String a, UTF8String b) -> bool {
+    check([=](UTF8String a, UTF8String b) -> bool {
         std::string c/*(allocator())*/, d/*(allocator())*/;
         c = a+b;
         d = b+a;
         PROP_ASSERT(c.size() == d.size(), {});
+        EXPECT_EQ(c.size(), d.size());
+        // ASSERT_EQ(c.size(), d.size());
         //EXPECT_EQ(c, d);// << "a: " << a << " + b: " << b << ", a+b: " << (a+b) << ", b+a: " << (b+a);
         return true;
     });
