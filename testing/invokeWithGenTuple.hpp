@@ -10,9 +10,10 @@ template< typename Function, typename GenTuple, std::size_t... index>
 decltype( auto ) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...> index_sequence) {
 
     auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...);
-    auto valueTupPtr = std::make_shared<decltype(valueTup)>(valueTup);
+    // FIXME: more efficient way than copying in to shared?
+    auto valueTupPtr = std::make_shared<decltype(valueTup)>(std::move(valueTup));
+    auto values = transformHeteroTuple<ShrinkableGet>(std::forward<decltype(valueTup)>(valueTup));
     try {
-        auto values = transformHeteroTuple<ShrinkableGet>(std::forward<decltype(valueTup)>(valueTup));
         return invokeWithArgTuple(std::forward<Function>(f), std::forward<decltype(values)>(values));
     }
     catch(const AssertFailed& e) {

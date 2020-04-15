@@ -80,7 +80,7 @@ protected:
     static PropertyContext* context;
 
 protected:
-    virtual void invoke(Random& rand) = 0;
+    virtual bool invoke(Random& rand) = 0;
     virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) = 0;
 
     // TODO: configurations
@@ -109,8 +109,8 @@ public:
     Property(CallableWrapper&& c, const GenTuple& g) : callableWrapper(std::forward<CallableWrapper>(c)), genTup(g) {
     }
 
-    virtual void invoke(Random& rand) {
-        invokeWithGenTuple(rand, std::forward<decltype(callableWrapper.callable)>(callableWrapper.callable), genTup);
+    virtual bool invoke(Random& rand) {
+        return invokeWithGenTuple(rand, std::forward<decltype(callableWrapper.callable)>(callableWrapper.callable), genTup);
     }
 
     Property& setSeed(uint64_t s) {
