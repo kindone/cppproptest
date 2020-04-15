@@ -10,7 +10,7 @@ struct AssertFailed : public std::logic_error {
                 const std::error_code& error,
                 const char* condition,
                 const void* caller)
-    : filename(fname), lineno(line), logic_error(condition) {
+    : logic_error(condition), filename(fname), lineno(line) {
     }
 
     const char* filename;
