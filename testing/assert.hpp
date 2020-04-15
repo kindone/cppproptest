@@ -1,6 +1,7 @@
 #pragma once
 #include <exception>
 #include <system_error>
+#include <memory>
 
 namespace PropertyBasedTesting {
 
@@ -10,7 +11,7 @@ struct AssertFailed : public std::logic_error {
                 const std::error_code& error,
                 const char* condition,
                 const void* caller)
-    : logic_error(condition), filename(fname), lineno(line) {
+    : logic_error(condition), filename(fname), lineno(line)  {
     }
 
     const char* filename;
@@ -26,9 +27,9 @@ struct PropertyFailedBase : public std::logic_error {
 
 template <typename ValueTuple>
 struct PropertyFailed : public PropertyFailedBase {
-    PropertyFailed(const AssertFailed& e, ValueTuple&& v) : PropertyFailedBase(e), valueTup(std::move(v)) {
+    PropertyFailed(const AssertFailed& e, std::shared_ptr<ValueTuple> v) : PropertyFailedBase(e), valueTupPtr(v) {
     }
-    ValueTuple valueTup;
+    std::shared_ptr<ValueTuple> valueTupPtr;
 };
 
 

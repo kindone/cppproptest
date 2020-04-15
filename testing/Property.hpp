@@ -124,11 +124,12 @@ public:
         try {
             try {
                 auto valueTup = std::make_tuple(args...);
+                auto valueTupPtr = std::make_shared<decltype(valueTup)>(valueTup);
                 try {
                     return invokeWithArgs(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<ARGS>(args)...);
                 }
                 catch(const AssertFailed& e) {
-                    throw PropertyFailed<decltype(valueTup)>(e, std::forward<decltype(valueTup)>(valueTup));
+                    throw PropertyFailed<decltype(valueTup)>(e, valueTupPtr);
                 }
             }
             catch(const Success&) {
@@ -153,7 +154,7 @@ public:
         auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTypeTup)::type_tuple;
         auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        shrink(savedRand, failed.valueTup);
+        shrink(savedRand, *failed.valueTupPtr);
     }
 
 private:
