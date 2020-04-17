@@ -1,5 +1,8 @@
 #pragma once
+#include <vector>
+#include <functional>
 
+#include "testing/Random.hpp"
 
 namespace PropertyBasedTesting {
 

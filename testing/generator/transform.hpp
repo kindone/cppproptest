@@ -1,4 +1,8 @@
 #pragma once
+#include <functional>
+#include <memory>
+#include "testing/Random.hpp"
+#include "testing/Shrinkable.hpp"
 
 namespace PropertyBasedTesting {
 

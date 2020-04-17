@@ -1,5 +1,9 @@
 #pragma once
 
+#include <utility>
+#include <tuple>
+#include <type_traits>
+
 namespace PropertyBasedTesting {
 
 template<typename Function, typename Tuple, std::size_t...index>
