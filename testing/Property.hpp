@@ -121,10 +121,10 @@ public:
     template <typename ...ARGS>
     bool example(ARGS&&... args) {
         PropertyContext context;
+        auto valueTup = std::make_tuple(args...);
+        auto valueTupPtr = std::make_shared<decltype(valueTup)>(valueTup);
         try {
             try {
-                auto valueTup = std::make_tuple(args...);
-                auto valueTupPtr = std::make_shared<decltype(valueTup)>(valueTup);
                 try {
                     return invokeWithArgs(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<ARGS>(args)...);
                 }
@@ -168,8 +168,8 @@ private:
         //std::cout << std::endl;
 
         bool result = false;
+        auto values = transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
-            auto values = transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
             result = invokeWithArgTupleWithReplace<N>(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<decltype(values)>(values), replace.get());
             //std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         }
