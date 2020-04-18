@@ -7,13 +7,13 @@ Property-Based Testing Framework for C++
 `Property::check` performs property-based test using given callable (a function, a functor, or a lambda).
 
 
-```cpp
-check([](int a, int b) -> bool {
-    PROP_ASSERT(a+b == b+a);
-    PROP_STAT(a+b > 0);
-    return true;
-});
-```
+    ```cpp
+    check([](int a, int b) -> bool {
+        PROP_ASSERT(a+b == b+a);
+        PROP_STAT(a+b > 0);
+        return true;
+    });
+    ```
 
 is equivalent to 
 
