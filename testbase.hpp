@@ -36,10 +36,12 @@ struct IntegralTest : public testing::Test
 using NumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t, float, double>;
 using SignedNumericTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, float, double>;
 using IntegralTypes = testing::Types<int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t>;
+using FloatingTypes = testing::Types<float, double>;
 
 TYPED_TEST_CASE(NumericTest, NumericTypes);
 TYPED_TEST_CASE(SignedNumericTest, SignedNumericTypes);
 TYPED_TEST_CASE(IntegralTest, IntegralTypes);
+TYPED_TEST_CASE(FloatingTest, FloatingTypes);
 
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int> &input);

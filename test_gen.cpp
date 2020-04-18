@@ -74,6 +74,15 @@ TEST(PropTest, ShrinkableAndThen) {
     }
 }
 
+TEST(PropTest, FloatShrinkable) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    auto floatGen = Arbitrary<float>();
+    auto shrinkable = floatGen(rand);
+    std::cout << "float generated: " << std::endl;
+    exhaustive(shrinkable, 0);
+}
+
 TEST(PropTest, ShrinkableBinary) {
     {
         auto shrinkable = binarySearchShrinkable<int>(0);

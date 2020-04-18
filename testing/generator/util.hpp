@@ -12,7 +12,7 @@ namespace PropertyBasedTesting {
 class Random;
 
 template <typename INTTYPE>
-decltype(auto) binarySearchShrinkable(INTTYPE value) {
+Shrinkable<INTTYPE> binarySearchShrinkable(INTTYPE value) {
     using shrinkable_t = Shrinkable<INTTYPE>;
     using stream_t = Stream<shrinkable_t>;
     using func_t = typename std::function<stream_t()>;

@@ -1,5 +1,6 @@
 #pragma once
 #include "testing/gen.hpp"
+#include "testing/Stream.hpp"
 
 namespace PropertyBasedTesting
 {
@@ -9,7 +10,16 @@ class PROPTEST_API Arbitrary< bool > : public Gen< bool >
 {
 public:
     Shrinkable<bool> operator()(Random& rand) {
-        return make_shrinkable<bool>(rand.getRandomBool());
+        bool value = rand.getRandomBool();
+        if(value) {
+            return make_shrinkable<bool>(value).with([]() {
+                return Stream<Shrinkable<bool>>::one(make_shrinkable<bool>(false));
+            });
+        }
+        else {
+            return make_shrinkable<bool>(value);
+        }
+
     }
 };
 

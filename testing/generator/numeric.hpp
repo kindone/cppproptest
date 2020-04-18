@@ -8,7 +8,7 @@ namespace PropertyBasedTesting
 {
 
 template <typename T>
-Shrinkable<T> generateNumeric(Random& rand, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max()) {
+Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max()) {
     T value = 0;
     if(min == std::numeric_limits<T>::min() && max == std::numeric_limits<T>::max() && rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(Arbitrary<T>::boundaryValues) / sizeof(Arbitrary<T>::boundaryValues[0]));
@@ -35,6 +35,7 @@ Shrinkable<T> generateNumeric(Random& rand, T min = std::numeric_limits<T>::min(
         return binarySearchShrinkable<T>(value);
 
 }
+
 
 template <>
 class PROPTEST_API Arbitrary<int8_t> : public Gen<int8_t>
@@ -146,7 +147,7 @@ public:
 template <typename T>
 std::function<Shrinkable<T>(Random&rand)> inRange(T min, T max) {
     return [min, max](Random& rand) {
-        return generateNumeric<T>(rand, min, max);
+        return generateInteger<T>(rand, min, max);
     };
 }
 
