@@ -52,7 +52,7 @@ property([](int a) -> bool {
 }, myIntGenerator);
 ```
 
-Many primitive types and containers have their Aribtrary<T> defined by the framework for convenient use.
+Many primitive types and containers have their `Aribtrary<T>` defined by the framework for convenient use.
 
 ## Generators and Arbitraries
 
@@ -98,7 +98,7 @@ The framework provides `Arbitrary<T>` for following primitive types
 
 ### Generator Combinators
 
-Generator combinators are provided for building a new generator based on existing ones.
+Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
 * `pair<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
 
@@ -146,7 +146,7 @@ Generator combinators are provided for building a new generator based on existin
 * `oneOf<T>(gen1, ..., genN)`: generates a type `T` from multiple generators for type `T`, by choosing one of the generators randomly
 
 	```cpp
-	// returns a numeric within ranges (0,10), (100, 1000), (10000, 100000)
+	// generates a numeric within ranges (0,10), (100, 1000), (10000, 100000)
 	auto evenGen = oneOf<int>(inRange<int>(0, 10), inRange<int>(100, 1000), inRange<int>(10000, 100000));
 	```
 
