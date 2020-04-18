@@ -11,6 +11,15 @@ double getTime() {
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& input) {
+    os << "[ ";
+	for (auto const& i: input) {
+		os << i.a << " ";
+	}
+	os << "]";
+	return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const std::vector<int> &input)
 {
 	os << "[ ";

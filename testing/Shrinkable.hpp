@@ -31,6 +31,7 @@ struct Shrinkable {
     T get() const { return *ptr; }
     T* getPtr() const { return ptr.get(); }
     T& getRef() const { return *ptr.get(); }
+    std::shared_ptr<T> getSharedPtr() const { return ptr; }
 
     template <typename U = T>
     Shrinkable<U> transform(std::function<U(const T&)> transformer) const {
@@ -59,6 +60,23 @@ struct Shrinkable {
     Shrinkable<U> transform(std::shared_ptr<std::function<Shrinkable<U>(const T&)>> transformerPtr) const {
         auto shrinksPtr = this->shrinksPtr;
         auto shrinkable = (*transformerPtr)(getRef());
+        return shrinkable.with([shrinksPtr, transformerPtr]() {
+            return (*shrinksPtr)().template transform<Shrinkable<U>>([transformerPtr](const Shrinkable<T>& shr) {
+                return shr.transform(transformerPtr);
+            });
+        });
+    }
+
+    template <typename U = T>
+    Shrinkable<U> transform(std::function<Shrinkable<U>(const Shrinkable<T>&)> transformer) const {
+        auto transformerPtr = std::make_shared<std::function<Shrinkable<U>(const Shrinkable<T>&)>>(transformer);
+        return transform<U>(transformerPtr);
+    }
+
+    template <typename U = T>
+    Shrinkable<U> transform(std::shared_ptr<std::function<Shrinkable<U>(const Shrinkable<T>&)>> transformerPtr) const {
+        auto shrinksPtr = this->shrinksPtr;
+        auto shrinkable = (*transformerPtr)(*this);
         return shrinkable.with([shrinksPtr, transformerPtr]() {
             return (*shrinksPtr)().template transform<Shrinkable<U>>([transformerPtr](const Shrinkable<T>& shr) {
                 return shr.transform(transformerPtr);

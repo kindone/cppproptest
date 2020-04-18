@@ -1,8 +1,9 @@
 #include "testbase.hpp"
+#include <iostream>
 
 using namespace PropertyBasedTesting;
 
-TEST(PropTest, GenLttVectorOfInt) {
+TEST(PropTest, GenVectorOfInt) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto smallIntGen = inRange<int>(0,4);
@@ -19,6 +20,19 @@ TEST(PropTest, GenLttVectorOfInt) {
     //     }
     //     std::cout << std::endl;
     // }
+    for(int i = 0; i < 1; i++)
+        exhaustive(gen(rand), 0);
+}
+
+TEST(PropTest, GenVectorWithNoArbitrary) {
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    auto fooGen = construct<Foo, int>(inRange<int>(0,4));
+    Arbitrary<std::vector<Foo>> gen(fooGen);
+    gen.minLen = 3;
+    gen.maxLen = 3;
+
     for(int i = 0; i < 1; i++)
         exhaustive(gen(rand), 0);
 }

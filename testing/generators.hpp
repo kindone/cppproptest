@@ -13,5 +13,6 @@
 #include "testing/generator/construct.hpp"
 #include "testing/generator/oneof.hpp"
 #include "testing/generator/dependency.hpp"
+#include "testing/generator/shared_ptr.hpp"
 
 #endif

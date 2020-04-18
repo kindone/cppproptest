@@ -77,3 +77,12 @@ TEST(PropTest, GenUTF8String) {
         std::cout << "str: \"" << static_cast<UTF8String>(gen(rand).getRef()) << "\"" << std::endl;
     }
 }
+
+TEST(PropTest, GenSharedPtr) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<std::shared_ptr<int>> gen;
+    for(int i = 0; i < 20; i++) {
+        std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    }
+}

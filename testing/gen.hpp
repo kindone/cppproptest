@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <tuple>
+#include <stdexcept>
 #include "testing/function_traits.hpp"
 #include "testing/api.hpp"
 #include "testing/Random.hpp"
@@ -23,7 +24,9 @@ struct Gen
     }
     virtual ~Gen() {}
 
-    virtual Shrinkable<T> operator()(Random& rand) = 0;
+    virtual Shrinkable<T> operator()(Random& rand) {
+        throw std::runtime_error('operator() should be defined for Gen')
+    }
 };
 
 template <typename T, typename ElemGen = void>

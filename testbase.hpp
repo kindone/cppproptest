@@ -90,6 +90,13 @@ struct Animal2 {
     std::string name;
 };
 
+struct Foo {
+    Foo(int a) :a(a) {
+    }
+    int a;
+};
+
+
 
 struct GenSmallInt : public PropertyBasedTesting::Gen<int32_t> {
     GenSmallInt() : step(0ULL) {
@@ -112,8 +119,10 @@ class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector
 
 }
 
-std::ostream& operator<< (std::ostream& os, const TableData& td);
-std::ostream& operator<< (std::ostream& os, const std::vector<std::tuple<uint16_t,bool>>& indexVec);
+
+std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& vec);
+std::ostream& operator<<(std::ostream& os, const TableData& td);
+std::ostream& operator<<(std::ostream& os, const std::vector<std::tuple<uint16_t,bool>>& indexVec);
 std::ostream& operator<<(std::ostream& os, const Animal &input);
 std::ostream& operator<<(std::ostream& os, const std::pair<std::tuple<int, uint16_t>, std::vector<std::tuple<uint16_t, bool>>> &input);
 
