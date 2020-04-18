@@ -6,14 +6,13 @@ Property-Based Testing Framework for C++
 `property` defines a property with optional configuration and `check` is shorthand for`Property::check`.
 `Property::check` performs property-based test using given callable (a function, a functor, or a lambda).
 
-
-    ```cpp
-    check([](int a, int b) -> bool {
-        PROP_ASSERT(a+b == b+a);
-        PROP_STAT(a+b > 0);
-        return true;
-    });
-    ```
+```cpp
+check([](int a, int b) -> bool {
+    PROP_ASSERT(a+b == b+a);
+    PROP_STAT(a+b > 0);
+    return true;
+});
+```
 
 is equivalent to 
 
