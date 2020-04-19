@@ -266,7 +266,7 @@ template <class Callable>
 class CallableWrapper {
 public:
     using T = Callable;
-    Callable&& callable;
+    Callable callable;
     CallableWrapper(Callable&& c) : callable(std::forward<Callable>(c)) {
     }
 };
