@@ -10,70 +10,103 @@ using namespace PropertyBasedTesting;
 class StateTestCase : public ::testing::Test {
 };
 
+struct EmptyModel {
+    static EmptyModel value;
+};
 
+template <typename SYSTEM, typename MODEL>
 struct Action {
     virtual ~Action() {}
-    virtual bool precondition() {
+    virtual bool precondition(const SYSTEM& system, const MODEL& model) {
         return true;
     }
 
-    virtual bool run() {
+    virtual bool run(SYSTEM& system, MODEL& model) {
         return true;
     };
 };
 
-struct PushBack : public Action {
-    virtual bool run() {
+template <typename SYSTEM>
+struct ActionWithoutModel {
+    virtual ~ActionWithoutModel() {}
+    virtual bool precondition(const SYSTEM& system) {
+        return true;
+    }
+
+    virtual bool run(SYSTEM& system) {
+        return true;
+    };
+};
+
+struct VectorAction : public ActionWithoutModel<std::vector<int>> {
+};
+
+struct PushBack : public VectorAction {
+    PushBack(int value) : value(value) {
+    }
+
+    virtual bool run(std::vector<int>& system) {
         std::cout << "PushBack" << std::endl;
+        auto size = system.size();
+        system.push_back(value);
+        PROP_ASSERT(system.size() == size+1, {});
         return true;
     }
+
+    int value;
 };
 
-struct Clear : public Action {
-    virtual bool run() {
+struct Clear : public VectorAction {
+    virtual bool run(std::vector<int>& system) {
         std::cout << "Clear" << std::endl;
+        system.clear();
+        PROP_ASSERT(system.size() == 0, {});
         return true;
     }
 };
 
-struct Remove : public Action {
-    virtual bool run() {
-        std::cout << "Remove" << std::endl;
+struct PopBack : public VectorAction {
+    virtual bool run(std::vector<int>& system) {
+        std::cout << "PopBack" << std::endl;
+        auto size = system.size();
+        if(system.empty())
+            return true;
+        system.pop_back();
+        PROP_ASSERT(system.size() == size-1, {});
         return true;
     }
 };
 
+template <typename T, typename... ARGS>
+Shrinkable<std::shared_ptr<VectorAction>> action(ARGS&&...args) {
+    return make_shrinkable<std::shared_ptr<VectorAction>>(std::make_shared<T>(std::forward<ARGS>(args)...));
+}
 
-//FIXME:
+TEST(StateTest, States) {
 
-// template <typename T, typename... ARGS>
-// Shrinkable<std::shared_ptr<T>> action(ARGS&&...args) {
-//     return make_shrinkable<std::shared_ptr<T>>(std::make_shared<T>(std::move(args)...));
-// }
+// (int, int) ->
 
-// TEST(StateTest, States) {
+    auto actionGen = oneOf<std::shared_ptr<VectorAction>>(
+        transform<int, std::shared_ptr<VectorAction>>(Arbitrary<int>(), [](const int& value) -> std::shared_ptr<VectorAction> {
+            return std::make_shared<PushBack>(value);
+        }),
+        [](Random& rand) {
+            return action<PopBack>();
+        },
+        [](Random& rand) {
+            return action<Clear>();
+        }
+    );
 
-// // (int, int) ->
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
 
-//    auto actionGen = oneOf<std::shared_ptr<Action>>(
-//         [](Random& rand) {
-//             return action<PushBack>();
-//         },
-//         [](Random& rand) {
-//             return action<Remove>();
-//         },
-//         [](Random& rand) {
-//             return action<Clear>();
-//         }
-//     );
+    std::vector<int> initialVec;
 
-//     int64_t seed = getCurrentTime();
-//     Random rand(seed);
+    for(int i = 0; i < 100; i++) {
+        auto action = actionGen(rand).get();
+        if(action->precondition(initialVec))
+            action->run(initialVec);
+    }
 
-//     for(int i = 0; i < 100; i++) {
-//         auto action = actionGen(rand);
-//         if(action->precondition())
-//             action->run();
-//     }
-
-// }
+}

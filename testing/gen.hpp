@@ -25,7 +25,7 @@ struct Gen
     virtual ~Gen() {}
 
     virtual Shrinkable<T> operator()(Random& rand) {
-        throw std::runtime_error('operator() should be defined for Gen')
+        throw std::runtime_error("operator() should be defined for Gen");
     }
 };
 
