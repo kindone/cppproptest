@@ -15,5 +15,6 @@
 #include "testing/generator/dependency.hpp"
 #include "testing/generator/shared_ptr.hpp"
 #include "testing/generator/just.hpp"
+#include "testing/generator/stateful.hpp"
 
 #endif
