@@ -4,7 +4,7 @@ constexpr int32_t GenSmallInt::boundaryValues[13];
 
 double getTime() {
     struct timeval time;
-    if (gettimeofday(&time,NULL)){
+    if (gettimeofday(&time, nullptr)){
         //  Handle error
         return 0;
     }
