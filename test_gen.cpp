@@ -8,8 +8,7 @@ TEST(PropTest, GenVectorOfInt) {
     Random rand(seed);
     auto smallIntGen = inRange<int>(0,4);
     Arbitrary<std::vector<int>> gen(smallIntGen);
-    gen.minLen = 3;
-    gen.maxLen = 3;
+    gen.setSize(3);
 
     // for(int i = 0; i < 20; i++) {
     //     std::vector<int> val(gen(rand).get());
@@ -30,8 +29,7 @@ TEST(PropTest, GenVectorWithNoArbitrary) {
     Random rand(seed);
     auto fooGen = construct<Foo, int>(inRange<int>(0,4));
     Arbitrary<std::vector<Foo>> gen(fooGen);
-    gen.minLen = 3;
-    gen.maxLen = 3;
+    gen.setSize(3);
 
     for(int i = 0; i < 1; i++)
         exhaustive(gen(rand), 0);
@@ -204,8 +202,8 @@ TEST(PropTest, ShrinkVectorFromGen) {
     Random rand(seed);
     using T = int8_t;
     auto genVec = Arbitrary<std::vector<T>>(inRange<T>(-8, 8));
-    genVec.maxLen = 8;
-    genVec.minLen = 0;
+    genVec.setMaxSize(8);
+    genVec.setMinSize(0);
     auto vecShrinkable = genVec(rand);
     //return make_shrinkable<std::vector<T>>(std::move(vec));
     exhaustive(vecShrinkable, 0);
@@ -299,8 +297,7 @@ TEST(PropTest, GenVectorPerf) {
     Random rand(seed);
     auto logGen = Construct<Log>();
     auto vecGen = Arbitrary<std::vector<Log>>(logGen);
-    vecGen.maxLen = 1;
-    vecGen.minLen = 1;
+    vecGen.setSize(1);
     auto shrinkable = vecGen(rand);
 
     //exhaustive(shrinkable, 0);
@@ -317,8 +314,8 @@ TEST(PropTest, GenTupleVector) {
     auto secondGen = Arbitrary<bool>();  //TODO true : false should be 2:1
     auto indexGen = tuple(firstGen, secondGen);
     auto indexVecGen = Arbitrary<IndexVector>(indexGen);
-    indexVecGen.maxLen = numRows;
-    indexVecGen.minLen = numRows/2;
+    indexVecGen.setMaxSize(numRows);
+    indexVecGen.setMinSize(numRows/2);
     auto shrinkable = indexVecGen(rand);
     exhaustive(shrinkable, 0);
 }
@@ -331,7 +328,7 @@ TEST(PropTest, GenVectorAndShrink) {
     auto vectorGen = Arbitrary<std::vector<int>>(smallIntGen);
     for(size_t maxLen = 1; maxLen <4; maxLen++) {
         while(true) {
-            vectorGen.maxLen = maxLen;
+            vectorGen.setMaxSize(maxLen);
             auto vec = vectorGen(rand);
             if(vec.getRef().size() > (maxLen > 3 ? maxLen - 3 : 0)) {
                 exhaustive(vec, 0);

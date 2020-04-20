@@ -16,19 +16,19 @@ template <typename T>
 class PROPTEST_API Arbitrary< std::vector<T>> : public Gen< std::vector<T> >
 {
 public:
-    static size_t defaultMinLen;
-    static size_t defaultMaxLen;
+    static size_t defaultMinSize;
+    static size_t defaultMaxSize;
 
-    Arbitrary() : elemGen(Arbitrary<T>()), minLen(defaultMinLen), maxLen(defaultMaxLen)  {
+    Arbitrary() : elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize)  {
     }
 
     Arbitrary(const Arbitrary<T>& _elemGen)
      : elemGen([_elemGen](Random& rand)->Shrinkable<T>{ return _elemGen(rand); })
-     , minLen(defaultMinLen)
-     , maxLen(defaultMaxLen) {
+     , minSize(defaultMinSize)
+     , maxSize(defaultMaxSize) {
     }
 
-    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen) : elemGen(_elemGen), minLen(defaultMinLen), maxLen(defaultMaxLen)  {
+    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen) : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)  {
     }
 
     using vector_t = std::vector<Shrinkable<T>>;
@@ -157,14 +157,14 @@ public:
     }
 
     Shrinkable<std::vector<T>> operator()(Random& rand) {
-        int len = rand.getRandomSize(minLen, maxLen+1);
+        int len = rand.getRandomSize(minSize, maxSize+1);
         std::shared_ptr<vector_t> shrinkVec = std::make_shared<vector_t>();
         shrinkVec->reserve(len);
         for(int i = 0; i < len; i++)
             shrinkVec->push_back(elemGen(rand));
 
         // shrink vector size with subvector using binary numeric shrink of lengths
-        int minLenCopy = minLen;
+        int minLenCopy = minSize;
         auto rangeShrinkable = binarySearchShrinkable<int>(len - minLenCopy).template transform<int>([minLenCopy](const int& len) {
             return len + minLenCopy;
         });
@@ -222,16 +222,32 @@ public:
         return vecShrinkable;
     }
 
+    Arbitrary<std::vector<T>> setMinSize(int size) {
+        minSize = size;
+        return *this;
+    }
+
+    Arbitrary<std::vector<T>> setMaxSize(int size) {
+        maxSize = size;
+        return *this;
+    }
+
+    Arbitrary<std::vector<T>> setSize(int size) {
+        minSize = size;
+        maxSize = size;
+        return *this;
+    }
+
     std::function<Shrinkable<T>(Random&)> elemGen;
-    int minLen;
-    int maxLen;
+    int minSize;
+    int maxSize;
 
 };
 
 template <typename T>
-size_t Arbitrary<std::vector<T>>::defaultMinLen = 0;
+size_t Arbitrary<std::vector<T>>::defaultMinSize = 0;
 template <typename T>
-size_t Arbitrary<std::vector<T>>::defaultMaxLen = 200;
+size_t Arbitrary<std::vector<T>>::defaultMaxSize = 200;
 
 
 } // namespace PropertyBasedTesting

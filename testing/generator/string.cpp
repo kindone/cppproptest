@@ -18,7 +18,7 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
         });
     }
     else {
-        int len = rand.getRandomSize(0, maxLen+1);
+        int len = rand.getRandomSize(0, maxSize+1);
         std::string str(len, ' '/*, allocator()*/);
         for(int i = 0; i < len; i++)
             str[i] = rand.getRandomSize(0, 128);
@@ -151,7 +151,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand) {
         return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i]/*, allocator()*/));
     }
 
-    int len = rand.getRandomSize(0, maxLen+1);
+    int len = rand.getRandomSize(0, maxSize+1);
     std::vector<uint8_t> chars/*, allocator()*/;
     std::vector<uint8_t> nums/*, allocator()*/;
     chars.reserve(len*4);

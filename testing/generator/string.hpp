@@ -10,13 +10,13 @@ template <>
 class PROPTEST_API Arbitrary<std::string> : public Gen<std::string>
 {
 public:
-    Arbitrary(int _maxLen = 300) : maxLen(_maxLen) {
+    Arbitrary(int _maxLen = 300) : maxSize(_maxLen) {
     }
 
     Shrinkable<std::string> operator()(Random& rand);
     static std::string boundaryValues[1];
 
-    int maxLen;
+    int maxSize;
 };
 
 class PROPTEST_API UTF8String : public std::string
@@ -31,13 +31,13 @@ template <>
 class PROPTEST_API Arbitrary<UTF8String> : public Gen<UTF8String>
 {
 public:
-    Arbitrary(int _maxLen = 300) : maxLen(_maxLen) {
+    Arbitrary(int _maxLen = 300) : maxSize(_maxLen) {
     }
 
     Shrinkable<UTF8String> operator()(Random& rand);
     static std::string boundaryValues[1];
 
-    int maxLen;
+    int maxSize;
 };
 } // namespace PropertyBasedTesting
 

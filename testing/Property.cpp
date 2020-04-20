@@ -6,8 +6,9 @@
 namespace PropertyBasedTesting {
 
 PropertyContext* PropertyBase::context = nullptr;
+uint32_t PropertyBase::defaultNumRuns = 100;
 
-PropertyBase::PropertyBase() : seed(getCurrentTime()) {
+PropertyBase::PropertyBase() : seed(getCurrentTime()), numRuns(defaultNumRuns) {
 }
 
 bool PropertyBase::check() {
@@ -15,9 +16,10 @@ bool PropertyBase::check() {
     Random savedRand(seed);
     std::cout << "rand seed: " << seed << std::endl;
     PropertyContext context;
+    int i = 0;
     try {
         // TODO: configurable runs
-        for(int i = 0; i < 100; i++) {
+        for(; i < numRuns; i++) {
             bool pass = true;
             do {
                 pass = true;
@@ -36,17 +38,19 @@ bool PropertyBase::check() {
             } while(!pass);
         }
     } catch(const PropertyFailedBase& e) {
-        std::cerr << "Property failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
+        std::cerr << "Falsifiable, after " << i << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
+        
         // shrink
         handleShrink(savedRand, e);
         return false;
     } catch(const std::exception& e) {
         // skip shrinking?
-        std::cerr << "std::exception occurred: " << e.what() << std::endl;
+        std::cerr << "Falsifiable, after " << i << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
         return false;
     }
 
+    std::cout << "OK, passed " << numRuns << " tests" << std::endl;
     context.printSummary();
     return true;
 }
@@ -100,7 +104,7 @@ void PropertyContext::printSummary() {
     for(auto tagKV : tags) {
         auto& key = tagKV.first;
         auto& valueMap = tagKV.second;
-        std::cout << key << ": " << std::endl;
+        std::cout << "  " << key << ": " << std::endl;
         size_t total = 0;
         for(auto valueKV : valueMap) {
             auto tag = valueKV.second;
@@ -110,7 +114,7 @@ void PropertyContext::printSummary() {
         for(auto valueKV : valueMap) {
             auto value = valueKV.first;
             auto tag = valueKV.second;
-            std::cout << "  value = " << value << ": " << static_cast<double>(tag.count)/total*100 << "%" << std::endl;
+            std::cout << "    " <<  value << ": " << static_cast<double>(tag.count)/total*100 << "%" << std::endl;
         }
     }
 }

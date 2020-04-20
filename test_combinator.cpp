@@ -149,8 +149,8 @@ TEST(PropTest, TestDependency) {
     auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
         auto intGen = inRange<int>(0,8);
         auto vecGen = Arbitrary<std::vector<int>>(intGen);
-        vecGen.maxLen = in;
-        vecGen.minLen = in;
+        vecGen.maxSize = in;
+        vecGen.minSize = in;
         return vecGen;
     });
 
@@ -189,8 +189,8 @@ TEST(PropTest, TestDependency2) {
         auto secondGen = Arbitrary<bool>();  //TODO true : false should be 2:1
         auto indexGen = tuple(firstGen, secondGen);
         auto indexVecGen = Arbitrary<IndexVector>(indexGen);
-        indexVecGen.minLen = numRows;
-        indexVecGen.maxLen = numRows;
+        indexVecGen.minSize = numRows;
+        indexVecGen.maxSize = numRows;
         return indexVecGen;
     });
 

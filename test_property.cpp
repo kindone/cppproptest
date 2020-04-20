@@ -191,7 +191,7 @@ TEST(PropTest, TestVectorCheckFail) {
     std::cout << std::endl;
 
     auto vecGen = Arbitrary<std::vector<int>>();
-    vecGen.maxLen = 32;
+    vecGen.setMaxSize(32);
 
     check([](std::vector<int> a) -> bool {
         PROP_STAT(a.size() > 3);

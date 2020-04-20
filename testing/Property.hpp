@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 #include <map>
 
 #define PROP_STAT(VALUE) \
@@ -18,6 +19,7 @@ do\
   std::stringstream key;\
   key << (#VALUE);\
   std::stringstream value;\
+  value << std::boolalpha;\
   value << (VALUE);\
   PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str());\
 } while(false);
@@ -28,6 +30,7 @@ do\
   std::stringstream key;\
   key << (KEY);\
   std::stringstream value;\
+  value << std::boolalpha;\
   value << (VALUE);\
   PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str());\
 } while(false);
@@ -74,6 +77,7 @@ public:
     bool check();
     virtual ~PropertyBase() {}
     static void tag(const char* filename, int lineno, std::string key, std::string value);
+    static void setDefaultNumRuns(uint32_t);
 
 protected:
     static void setContext(PropertyContext* context);
@@ -83,8 +87,11 @@ protected:
     virtual bool invoke(Random& rand) = 0;
     virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) = 0;
 
+    static uint32_t defaultNumRuns;
+
     // TODO: configurations
     uint64_t seed;
+    uint32_t numRuns;
 
     friend struct PropertyContext;
 };
@@ -115,6 +122,11 @@ public:
 
     Property& setSeed(uint64_t s) {
         seed = s;
+        return *this;
+    }
+
+    Property& setNumRuns(uint32_t runs) {
+        numRuns = runs;
         return *this;
     }
 
