@@ -43,10 +43,10 @@ TYPED_TEST(IntegralTest, GenInRange) {
     Random rand(seed);
     bool isSigned = std::numeric_limits<TypeParam>::min() < 0;
 
-    auto gen0 = isSigned ? inRange<TypeParam>(-10, 10) : inRange<TypeParam>(0, 20);
+    auto gen0 = isSigned ? fromTo<TypeParam>(-10, 10) : fromTo<TypeParam>(0, 20);
     TypeParam min = gen0(rand).get();
     TypeParam max = min + rand.getRandomInt32(0,10);
-    auto gen = inRange<TypeParam>(min, max);
+    auto gen = fromTo<TypeParam>(min, max);
     std::cout << "min: " << min << ", max: " << max << std::endl;
 
     for(int i = 0; i < 20; i++) {

@@ -144,12 +144,22 @@ public:
 
 };
 
+// generates numeric in [a, b]
 template <typename T>
-std::function<Shrinkable<T>(Random&rand)> inRange(T min, T max) {
+std::function<Shrinkable<T>(Random& rand)> fromTo(T min, T max) {
     return [min, max](Random& rand) {
         return generateInteger<T>(rand, min, max);
     };
 }
+
+// generates numeric in [a, b)
+template <typename T>
+std::function<Shrinkable<T>(Random& rand)> inRange(T fromInclusive, T toExclusive) {
+    return [fromInclusive, toExclusive](Random& rand) {
+        return generateInteger<T>(rand, fromInclusive, toExclusive-1);
+    };
+}
+
 
 template <>
 struct PROPTEST_API Arbitrary<float> : public Gen<float>

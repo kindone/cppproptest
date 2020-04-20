@@ -14,7 +14,7 @@ check([](int a, int b) -> bool {
 });
 ```
 
-is equivalent to 
+is equivalent to
 
 ```cpp
 property([](int a, int b) -> bool {
@@ -90,7 +90,7 @@ struct Arbitrary<Car> : Gen<Car> {
 
 ### Predefined Arbitraries
 
-The framework provides `Arbitrary<T>` for following primitive types 
+The framework provides `Arbitrary<T>` for following primitive types
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
 * String types: `std::string`, `UTF8String`
@@ -125,7 +125,7 @@ Generator combinators are provided for building a new generator based on existin
 	auto coordinateGen2 = construct<Coordinate, int, int>(inRange(-10, 10)); // y is generated with Arbitrary<int>
 	```
 
-* `filter<T>(gen, condition_predicate)`:  generates a type `T` that satisfies condition predicate (`condition_predicate` returns `true`) 
+* `filter<T>(gen, condition_predicate)`:  generates a type `T` that satisfies condition predicate (`condition_predicate` returns `true`)
 
 	```cpp
 	// generates even numbers

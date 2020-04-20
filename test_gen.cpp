@@ -6,7 +6,7 @@ using namespace PropertyBasedTesting;
 TEST(PropTest, GenVectorOfInt) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto smallIntGen = inRange<int>(0,4);
+    auto smallIntGen = fromTo<int>(0,4);
     Arbitrary<std::vector<int>> gen(smallIntGen);
     gen.setSize(3);
 
@@ -27,7 +27,7 @@ TEST(PropTest, GenVectorWithNoArbitrary) {
 
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto fooGen = construct<Foo, int>(inRange<int>(0,4));
+    auto fooGen = construct<Foo, int>(fromTo<int>(0,4));
     Arbitrary<std::vector<Foo>> gen(fooGen);
     gen.setSize(3);
 
@@ -38,7 +38,7 @@ TEST(PropTest, GenVectorWithNoArbitrary) {
 TEST(PropTest, ShrinkableAndThen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto intGen = inRange<int>(0,16);
+    auto intGen = fromTo<int>(0,16);
     auto evenGen = filter<int>(intGen, [](const int& val) -> bool{
         return val % 2 == 0;
     });
@@ -201,7 +201,7 @@ TEST(PropTest, ShrinkVectorFromGen) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     using T = int8_t;
-    auto genVec = Arbitrary<std::vector<T>>(inRange<T>(-8, 8));
+    auto genVec = Arbitrary<std::vector<T>>(fromTo<T>(-8, 8));
     genVec.setMaxSize(8);
     genVec.setMinSize(0);
     auto vecShrinkable = genVec(rand);
@@ -244,7 +244,7 @@ TEST(PropTest, TupleGen2) {
         }
     }
 
-    auto smallIntGen = inRange(-40, 40);
+    auto smallIntGen = fromTo(-40, 40);
     auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
     while(true) {
         auto shrinkable = tupleGen(rand);
@@ -310,7 +310,7 @@ TEST(PropTest, GenTupleVector) {
 
     int numRows = 8;
     uint16_t numElements = 64;
-    auto firstGen = inRange<uint16_t>(0, numElements);
+    auto firstGen = fromTo<uint16_t>(0, numElements);
     auto secondGen = Arbitrary<bool>();  //TODO true : false should be 2:1
     auto indexGen = tuple(firstGen, secondGen);
     auto indexVecGen = Arbitrary<IndexVector>(indexGen);
@@ -324,7 +324,7 @@ TEST(PropTest, GenVectorAndShrink) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto smallIntGen = inRange<int>(-8, 8);
+    auto smallIntGen = fromTo<int>(-8, 8);
     auto vectorGen = Arbitrary<std::vector<int>>(smallIntGen);
     for(size_t maxLen = 1; maxLen <4; maxLen++) {
         while(true) {

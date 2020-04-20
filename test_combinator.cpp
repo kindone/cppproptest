@@ -21,7 +21,7 @@ TEST(PropTest, TestConstruct2) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(inRange<int>(0,10), Arbitrary<std::string>(), Arbitrary<std::vector<int>>());
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(fromTo<int>(0,10), Arbitrary<std::string>(), Arbitrary<std::vector<int>>());
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
@@ -35,7 +35,7 @@ TEST(PropTest, TestConstruct3) {
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(inRange<int>(0,10));
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(fromTo<int>(0,10));
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
@@ -144,10 +144,23 @@ TEST(PropTest, TestOneOf) {
         std::cout << gen(rand).get() << std::endl;
 }
 
+
+TEST(PropTest, TestOneOfWeighted) {
+    auto intGen = Arbitrary<int>();
+    auto smallIntGen = GenSmallInt();
+
+    auto gen = oneOf<int>(just<int>([](){ return 0; }), weighted<int>(just<int>([](){ return 1; }), 0.2));
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 0;  i < 10; i++)
+        std::cout << gen(rand).get() << std::endl;
+}
+
+
 TEST(PropTest, TestDependency) {
-    auto intGen = inRange(0, 2);
+    auto intGen = fromTo(0, 2);
     auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
-        auto intGen = inRange<int>(0,8);
+        auto intGen = fromTo<int>(0,8);
         auto vecGen = Arbitrary<std::vector<int>>(intGen);
         vecGen.maxSize = in;
         vecGen.minSize = in;
@@ -177,7 +190,7 @@ TEST(PropTest, TestDependency2) {
     Random rand(seed);
 
     // auto numRowsGen = inRange<int>(1, 100000+1);
-    auto numRowsGen = inRange<int>(10000, 10000);
+    auto numRowsGen = fromTo<int>(10000, 10000);
     auto numElementsGen = Arbitrary<uint16_t>();
     // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = tuple(numRowsGen, numElementsGen);
@@ -185,7 +198,7 @@ TEST(PropTest, TestDependency2) {
     auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](const Dimension& dimension) {
         int numRows = std::get<0>(dimension);
         uint16_t numElements = std::get<1>(dimension);
-        auto firstGen = inRange<uint16_t>(0, numElements);
+        auto firstGen = fromTo<uint16_t>(0, numElements);
         auto secondGen = Arbitrary<bool>();  //TODO true : false should be 2:1
         auto indexGen = tuple(firstGen, secondGen);
         auto indexVecGen = Arbitrary<IndexVector>(indexGen);
