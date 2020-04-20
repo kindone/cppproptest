@@ -1,14 +1,14 @@
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-cmake_minimum_required(VERSION 3.0.2)
+SET(CMAKE_VERBOSE_MAKEFILE ON)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0.2)
 
-project("PropertyBasedTesting"  VERSION 1.0)
+PROJECT("PropertyBasedTesting"  VERSION 1.0)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "")
-set(CMAKE_CXX_STANDARD 14)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -stdlib=libc++ -std=c++14")
-#set(CMAKE_CXX_LDFLAGS "${CMAKE_CXX_LDFLAGS} -lc++")
+SET(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+SET(CMAKE_CXX_FLAGS_RELEASE "")
+SET(CMAKE_CXX_STANDARD 14)
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -stdlib=libc++ -std=c++14")
+#SET(CMAKE_CXX_LDFLAGS "${CMAKE_CXX_LDFLAGS} -lc++")
 
 add_subdirectory("googletest")
 
