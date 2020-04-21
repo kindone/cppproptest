@@ -136,17 +136,37 @@ TEST(StateTest, StatesWithModel) {
     prop.check();
 }
 
-decltype(auto) dummyProperty() {
-    using Type = std::function<int()>;
-    std::shared_ptr<Type> modelPtr = std::make_shared<Type>([]() {return 0;});
-    return property([modelPtr](int dummy) {
-        auto model = *modelPtr;
-        PROP_STAT(model() > 2);
-        return true;
+template <typename ActionType, typename GEN>
+decltype(auto) toSharedPtrGen(GEN&& gen) {
+    return transform<ActionType*, std::shared_ptr<ActionType>>(gen, [](const ActionType* actionType) {
+        std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
+        return sharedPtr;
     });
 }
 
-TEST(StateTest, PropertyCapture) {
-    auto prop = dummyProperty();
+template <typename ActionType, typename... GENS>
+std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions2(GENS&&... gens) {
+    auto actionGen = oneOf<std::shared_ptr<ActionType>>(toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
+    auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
+    return actionVecGen;
+}
+
+TEST(StateTest, StatesWithModel2) {
+
+    auto actionsGen = actions2<VectorAction2>(
+        transform<int, VectorAction2*>(Arbitrary<int>(), [](const int& value) {
+            return new PushBack2(value);
+        }),
+        just<VectorAction2*>([]() {
+            return new PopBack2();
+        }),
+        just<VectorAction2*>([]() {
+            return new Clear2();
+        })
+    );
+
+    auto prop = statefulProperty<VectorAction2>(Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) {
+        return VectorModel(sys.size());
+    }, actionsGen);
     prop.check();
 }

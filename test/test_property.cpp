@@ -256,3 +256,18 @@ TEST(PropTest, TestCheckArbitraryWithConstruct) {
         return true;
     });
 }
+
+decltype(auto) dummyProperty() {
+    using Type = std::function<int()>;
+    std::shared_ptr<Type> modelPtr = std::make_shared<Type>([]() {return 0;});
+    return property([modelPtr](int dummy) {
+        auto model = *modelPtr;
+        PROP_STAT(model() > 2);
+        return true;
+    });
+}
+
+TEST(StateTest, PropertyCapture) {
+    auto prop = dummyProperty();
+    prop.check();
+}
