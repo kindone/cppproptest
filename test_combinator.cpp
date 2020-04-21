@@ -149,7 +149,10 @@ TEST(PropTest, TestOneOfWeighted) {
     auto intGen = Arbitrary<int>();
     auto smallIntGen = GenSmallInt();
 
-    auto gen = oneOf<int>(just<int>([](){ return 0; }), weighted<int>(just<int>([](){ return 1; }), 0.2));
+    auto gen = oneOf<int>(
+        just<int>([](){ return 0; }),
+        weighted<int>(just<int>([](){ return 1; }), 0.2)
+    );
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for(int i = 0;  i < 10; i++)
