@@ -51,3 +51,27 @@ TEST(PropTest, MockTest) {
 
     delete cat;
 }
+
+TEST(PropTest, MockOnCall) {
+    NiceMock<MockCat> cat;
+    // general
+    ON_CALL(cat, meow(_))
+        .WillByDefault(Return(0));
+
+    // specific
+    ON_CALL(cat, meow(5))
+        .WillByDefault(Return(5));
+
+    int count = 0;
+    ON_CALL(cat, meow(0))
+        .WillByDefault([&count](int loudness) {
+            return count ++;
+        });
+
+    EXPECT_EQ(cat.meow(5), 5);
+    EXPECT_EQ(cat.meow(4), 0);
+    EXPECT_EQ(cat.meow(3), 0);
+
+    EXPECT_EQ(cat.meow(0), 0);
+    EXPECT_EQ(cat.meow(0), 1);
+}
