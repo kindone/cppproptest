@@ -149,6 +149,13 @@ Generator combinators are provided for building a new generator based on existin
 	// generates a numeric within ranges (0,10), (100, 1000), (10000, 100000)
 	auto evenGen = oneOf<int>(inRange<int>(0, 10), inRange<int>(100, 1000), inRange<int>(10000, 100000));
 	```
+	
+	* `oneOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
+	
+	```cpp
+	// generates a numeric within ranges (0,10), (100, 1000), (10000, 100000)
+	auto evenGen = oneOf<int>(weighted(inRange<int>(0, 10), 0.8), weighted(inRange<int>(100, 1000), 0.15), inRange<int>(10000, 100000)/* weight automatically becomes 1.0 - (0.8 + 0.15) == 0.05 */);
+	```
 
 * `dependency<T,U>(gen1, gen2generator)`: generates a `std::pair<T,U>` with a generator `gen1` for type `T` and `gen2generator`. `gen2generator` receives a type `T` and returns a generator for type `U`.
 
