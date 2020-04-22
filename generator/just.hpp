@@ -23,7 +23,7 @@ std::function<Shrinkable<T>(Random&)> just(LazyEval&& lazyEval) {
 // }
 
 template <typename T, typename U = T>
-std::function<Shrinkable<T>(Random&)> just3(U* valuePtr) {
+std::function<Shrinkable<T>(Random&)> just(U* valuePtr) {
     std::shared_ptr<T> sharedPtr(valuePtr);
     return [sharedPtr](Random& rand) {
         return make_shrinkable<T>(sharedPtr);
