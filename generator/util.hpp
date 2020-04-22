@@ -1,8 +1,8 @@
 #pragma once
-#include "api.hpp"
-#include "Shrinkable.hpp"
-#include "Stream.hpp"
-#include "Random.hpp"
+#include "../api.hpp"
+#include "../Shrinkable.hpp"
+#include "../Stream.hpp"
+#include "../Random.hpp"
 #include <functional>
 #include <utility>
 #include <tuple>

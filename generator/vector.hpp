@@ -1,9 +1,9 @@
 #pragma once
 
-#include "gen.hpp"
-#include "Random.hpp"
-#include "printing.hpp"
-#include "generator/util.hpp"
+#include "../gen.hpp"
+#include "../Random.hpp"
+#include "../printing.hpp"
+#include "util.hpp"
 #include <vector>
 #include <iostream>
 #include <cmath>

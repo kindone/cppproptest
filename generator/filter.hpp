@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "Shrinkable.hpp"
+#include "../Shrinkable.hpp"
 
 
 namespace PropertyBasedTesting {

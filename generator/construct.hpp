@@ -1,5 +1,5 @@
 #pragma once
-#include "gen.hpp"
+#include "../gen.hpp"
 #include <type_traits>
 
 namespace PropertyBasedTesting

@@ -1,8 +1,8 @@
-#include "gen.hpp"
-#include "generator/numeric.hpp"
-#include "generator/bool.hpp"
-#include "generator/util.hpp"
-#include "generator/tuple.hpp"
+#include "../gen.hpp"
+#include "numeric.hpp"
+#include "bool.hpp"
+#include "util.hpp"
+#include "tuple.hpp"
 #include <string>
 #include <functional>
 #include <cmath>

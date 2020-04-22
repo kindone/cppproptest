@@ -1,8 +1,8 @@
 #pragma once
 
-#include "gen.hpp"
-#include "Random.hpp"
-#include "Shrinkable.hpp"
+#include "../gen.hpp"
+#include "../Random.hpp"
+#include "../Shrinkable.hpp"
 #include <utility>
 #include <memory>
 

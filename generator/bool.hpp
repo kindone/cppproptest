@@ -1,6 +1,6 @@
 #pragma once
-#include "gen.hpp"
-#include "Stream.hpp"
+#include "../gen.hpp"
+#include "../Stream.hpp"
 
 namespace PropertyBasedTesting
 {

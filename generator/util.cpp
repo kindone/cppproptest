@@ -1,4 +1,4 @@
-#include "generator/util.hpp"
+#include "util.hpp"
 
 namespace PropertyBasedTesting {
 

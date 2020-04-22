@@ -1,9 +1,9 @@
 #pragma once
 
-#include "gen.hpp"
-#include "Random.hpp"
-#include "Shrinkable.hpp"
-#include "tuple.hpp"
+#include "../gen.hpp"
+#include "../Random.hpp"
+#include "../Shrinkable.hpp"
+#include "../tuple.hpp"
 #include <tuple>
 #include <memory>
 

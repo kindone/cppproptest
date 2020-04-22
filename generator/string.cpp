@@ -1,6 +1,6 @@
-#include "gen.hpp"
-#include "generator/string.hpp"
-#include "generator/util.hpp"
+#include "../gen.hpp"
+#include "./string.hpp"
+#include "./util.hpp"
 #include <vector>
 
 namespace PropertyBasedTesting {

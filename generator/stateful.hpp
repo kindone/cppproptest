@@ -4,8 +4,8 @@
 #include <vector>
 #include <memory>
 #include <functional>
-#include "Shrinkable.hpp"
-#include "Random.hpp"
+#include "../Shrinkable.hpp"
+#include "../Random.hpp"
 
 namespace PropertyBasedTesting {
 

@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 
-#include "Random.hpp"
+#include "../Random.hpp"
 
 namespace PropertyBasedTesting {
 
