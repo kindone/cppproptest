@@ -136,24 +136,12 @@ TEST(StateTest, StatesWithModel) {
     prop.check();
 }
 
-template <typename ActionType, typename GEN>
-decltype(auto) toSharedPtrGen(GEN&& gen) {
-    return transform<ActionType*, std::shared_ptr<ActionType>>(gen, [](const ActionType* actionType) {
-        std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
-        return sharedPtr;
-    });
-}
-
-template <typename ActionType, typename... GENS>
-std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions2(GENS&&... gens) {
-    auto actionGen = oneOf<std::shared_ptr<ActionType>>(toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
-    auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
-    return actionVecGen;
-}
-
 TEST(StateTest, StatesWithModel2) {
 
-    auto actionsGen = actions2<VectorAction2>(
+    auto actionsGen = actions<VectorAction2>(
+        transform<int, std::shared_ptr<VectorAction2>>(Arbitrary<int>(), [](const int& value) {
+            return std::make_shared<PushBack2>(value);
+        }),
         transform<int, VectorAction2*>(Arbitrary<int>(), [](const int& value) {
             return new PushBack2(value);
         }),

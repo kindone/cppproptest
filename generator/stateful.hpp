@@ -42,12 +42,34 @@ struct ActionWithoutModel : public Action<SYSTEM, EmptyModel>{
 };
 
 
+// template <typename ActionType, typename... GENS>
+// std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions(GENS&&... gens) {
+//     auto actionGen = oneOf<std::shared_ptr<ActionType>>(std::forward<GENS>(gens)...);
+//     auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
+//     return actionVecGen;
+// }
+
+
+template <typename ActionType, typename GEN, std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value, bool> = true>
+decltype(auto) toSharedPtrGen(GEN&& gen) {
+    return transform<ActionType*, std::shared_ptr<ActionType>>(gen, [](const ActionType* actionType) {
+        std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
+        return sharedPtr;
+    });
+}
+
+template <typename ActionType, typename GEN, std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::type>::value, bool> = true>
+decltype(auto) toSharedPtrGen(GEN&& gen) {
+    return std::forward<GEN>(gen);
+}
+
 template <typename ActionType, typename... GENS>
 std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions(GENS&&... gens) {
-    auto actionGen = oneOf<std::shared_ptr<ActionType>>(std::forward<GENS>(gens)...);
+    auto actionGen = oneOf<std::shared_ptr<ActionType>>(toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
     auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
     return actionVecGen;
 }
+
 
 template <typename ActionType, typename InitialGen, typename ActionsGen>
 decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen) {
@@ -68,6 +90,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
     using SystemType = typename ActionType::SystemType;
     using ModelFactoryFunction = std::function<ModelType(SystemType&)>;
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr = std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
+
     return property([modelFactoryPtr](SystemType obj, std::vector<std::shared_ptr<ActionType>> actions) {
         auto model = (*modelFactoryPtr)(obj);
         for(auto action : actions) {
