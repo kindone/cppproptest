@@ -94,3 +94,12 @@ TEST(PropTest, GenSharedPtr)
         std::cout << "int: " << *gen(rand).getRef() << std::endl;
     }
 }
+
+TEST(PropTest, GenSet) {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<std::set<int>> gen;
+    // for (int i = 0; i < 20; i++) {
+    //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    // }
+}

@@ -7,6 +7,7 @@
 #include "generator/vector.hpp"
 #include "generator/pair.hpp"
 #include "generator/tuple.hpp"
+#include "generator/set.hpp"
 #include "generator/util.hpp"
 #include "generator/filter.hpp"
 #include "generator/transform.hpp"
