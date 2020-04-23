@@ -11,8 +11,7 @@
 #include "assert.hpp"
 #include "Seq.hpp"
 
-namespace PropertyBasedTesting
-{
+namespace PropertyBasedTesting {
 
 class Random;
 
@@ -20,23 +19,19 @@ template <typename T>
 struct Gen
 {
     using type = T;
-    Gen() {
-    }
+    Gen() {}
     virtual ~Gen() {}
 
-    virtual Shrinkable<T> operator()(Random& rand) {
-        throw std::runtime_error("operator() should be defined for Gen");
-    }
+    virtual Shrinkable<T> operator()(Random& rand) { throw std::runtime_error("operator() should be defined for Gen"); }
 };
 
 template <typename T, typename ElemGen = void>
-struct Arbitrary : public Gen<T>{
+struct Arbitrary : public Gen<T>
+{
 };
 
-
-} // namespace PropertyBasedTesting
+}  // namespace PropertyBasedTesting
 
 #include "invokeWithArgs.hpp"
 #include "invokeWithGenTuple.hpp"
 #include "createGenTuple.hpp"
-

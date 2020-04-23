@@ -8,10 +8,10 @@ namespace PropertyBasedTesting {
 PropertyContext* PropertyBase::context = nullptr;
 uint32_t PropertyBase::defaultNumRuns = 100;
 
-PropertyBase::PropertyBase() : seed(getCurrentTime()), numRuns(defaultNumRuns) {
-}
+PropertyBase::PropertyBase() : seed(getCurrentTime()), numRuns(defaultNumRuns) {}
 
-bool PropertyBase::check() {
+bool PropertyBase::check()
+{
     Random rand(seed);
     Random savedRand(seed);
     std::cout << "rand seed: " << seed << std::endl;
@@ -19,7 +19,7 @@ bool PropertyBase::check() {
     int i = 0;
     try {
         // TODO: configurable runs
-        for(; i < numRuns; i++) {
+        for (; i < numRuns; i++) {
             bool pass = true;
             do {
                 pass = true;
@@ -27,23 +27,22 @@ bool PropertyBase::check() {
                     savedRand = rand;
                     invoke(rand);
                     pass = true;
-                }
-                catch(const Success&) {
+                } catch (const Success&) {
                     pass = true;
-                }
-                catch(const Discard&) {
+                } catch (const Discard&) {
                     // silently discard combination
                     pass = false;
                 }
-            } while(!pass);
+            } while (!pass);
         }
-    } catch(const PropertyFailedBase& e) {
-        std::cerr << "Falsifiable, after " << i << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
-        
+    } catch (const PropertyFailedBase& e) {
+        std::cerr << "Falsifiable, after " << i << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
+                  << ")" << std::endl;
+
         // shrink
         handleShrink(savedRand, e);
         return false;
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         // skip shrinking?
         std::cerr << "Falsifiable, after " << i << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
@@ -55,68 +54,72 @@ bool PropertyBase::check() {
     return true;
 }
 
-void PropertyBase::setContext(PropertyContext* ctx) {
-    if((context && ctx) || (!context && !ctx))
+void PropertyBase::setContext(PropertyContext* ctx)
+{
+    if ((context && ctx) || (!context && !ctx))
         throw std::runtime_error("invalid argument or property context state");
 
-    context  = ctx;
+    context = ctx;
 }
 
-void PropertyBase::tag(const char* file, int lineno, std::string key, std::string value) {
-    if(!context)
+void PropertyBase::tag(const char* file, int lineno, std::string key, std::string value)
+{
+    if (!context)
         throw std::runtime_error("context is not set");
 
     context->tag(file, lineno, key, value);
 }
 
-PropertyContext::PropertyContext() {
+PropertyContext::PropertyContext()
+{
     PropertyBase::setContext(this);
 }
 
-PropertyContext::~PropertyContext() {
+PropertyContext::~PropertyContext()
+{
     PropertyBase::setContext(nullptr);
 }
 
-void PropertyContext::tag(const char* file, int lineno, std::string key, std::string value) {
+void PropertyContext::tag(const char* file, int lineno, std::string key, std::string value)
+{
     auto itr = tags.find(key);
     // key already exists
-    if(itr != tags.end()) {
+    if (itr != tags.end()) {
         auto valueMap = itr->second;
         auto valueItr = valueMap.find(value);
         // value already exists
-        if(valueItr != valueMap.end()) {
+        if (valueItr != valueMap.end()) {
             auto tag = valueItr->second;
-            tag.count ++;
-        }
-        else {
+            tag.count++;
+        } else {
             std::map<std::string, Tag>& valueMap = itr->second;
             valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
         }
-    }
-    else {
+    } else {
         std::map<std::string, Tag> valueMap;
         valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
         tags.insert(std::pair<std::string, std::map<std::string, Tag>>(key, valueMap));
     }
 }
 
-void PropertyContext::printSummary() {
-    for(auto tagKV : tags) {
+void PropertyContext::printSummary()
+{
+    for (auto tagKV : tags) {
         auto& key = tagKV.first;
         auto& valueMap = tagKV.second;
         std::cout << "  " << key << ": " << std::endl;
         size_t total = 0;
-        for(auto valueKV : valueMap) {
+        for (auto valueKV : valueMap) {
             auto tag = valueKV.second;
             total += tag.count;
         }
 
-        for(auto valueKV : valueMap) {
+        for (auto valueKV : valueMap) {
             auto value = valueKV.first;
             auto tag = valueKV.second;
-            std::cout << "    " <<  value << ": " << static_cast<double>(tag.count)/total*100 << "%" << std::endl;
+            std::cout << "    " << value << ": " << static_cast<double>(tag.count) / total * 100 << "%" << std::endl;
         }
     }
 }
 
-} // namespace
+}  // namespace PropertyBasedTesting

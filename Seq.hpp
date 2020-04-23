@@ -2,9 +2,6 @@
 
 #include <list>
 
-namespace PropertyBasedTesting
-{
+namespace PropertyBasedTesting {
 
-
-} // namespace
-
+}  // namespace PropertyBasedTesting

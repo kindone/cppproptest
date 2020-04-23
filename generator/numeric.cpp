@@ -9,36 +9,43 @@
 
 namespace PropertyBasedTesting {
 
-
-Shrinkable<int8_t> Arbitrary<int8_t>::operator()(Random& rand) {
+Shrinkable<int8_t> Arbitrary<int8_t>::operator()(Random& rand)
+{
     return generateInteger<int8_t>(rand);
 }
 
-Shrinkable<int16_t> Arbitrary<int16_t>::operator()(Random& rand) {
+Shrinkable<int16_t> Arbitrary<int16_t>::operator()(Random& rand)
+{
     return generateInteger<int16_t>(rand);
 }
 
-Shrinkable<int32_t> Arbitrary<int32_t>::operator()(Random& rand) {
+Shrinkable<int32_t> Arbitrary<int32_t>::operator()(Random& rand)
+{
     return generateInteger<int32_t>(rand);
 }
 
-Shrinkable<int64_t> Arbitrary<int64_t>::operator()(Random& rand) {
+Shrinkable<int64_t> Arbitrary<int64_t>::operator()(Random& rand)
+{
     return generateInteger<int64_t>(rand);
 }
 
-Shrinkable<uint8_t> Arbitrary<uint8_t>::operator()(Random& rand) {
+Shrinkable<uint8_t> Arbitrary<uint8_t>::operator()(Random& rand)
+{
     return generateInteger<uint8_t>(rand);
 }
 
-Shrinkable<uint16_t> Arbitrary<uint16_t>::operator()(Random& rand) {
+Shrinkable<uint16_t> Arbitrary<uint16_t>::operator()(Random& rand)
+{
     return generateInteger<uint16_t>(rand);
 }
 
-Shrinkable<uint32_t> Arbitrary<uint32_t>::operator()(Random& rand) {
+Shrinkable<uint32_t> Arbitrary<uint32_t>::operator()(Random& rand)
+{
     return generateInteger<uint32_t>(rand);
 }
 
-Shrinkable<uint64_t> Arbitrary<uint64_t>::operator()(Random& rand) {
+Shrinkable<uint64_t> Arbitrary<uint64_t>::operator()(Random& rand)
+{
     return generateInteger<uint64_t>(rand);
 }
 
@@ -48,12 +55,14 @@ template <typename FLOATTYPE>
 FLOATTYPE decomposeFloat(FLOATTYPE value, int* exp);
 
 template <>
-float decomposeFloat<float>(float value, int* exp) {
+float decomposeFloat<float>(float value, int* exp)
+{
     return frexpf(value, exp);
 }
 
 template <>
-double decomposeFloat<double>(double value, int* exp) {
+double decomposeFloat<double>(double value, int* exp)
+{
     return frexp(value, exp);
 }
 
@@ -61,58 +70,53 @@ template <typename FLOATTYPE>
 FLOATTYPE composeFloat(FLOATTYPE value, int exp);
 
 template <>
-float composeFloat<float>(float value, int exp) {
+float composeFloat<float>(float value, int exp)
+{
     return ldexpf(value, exp);
 }
 
 template <>
-double composeFloat<double>(double value, int exp) {
+double composeFloat<double>(double value, int exp)
+{
     return ldexp(value, exp);
 }
 
-} // namespace util
-
-
+}  // namespace util
 
 template <typename FLOATTYPE>
-Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value) {
+Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
+{
     int exp = 0;
-    if(value == 0.0f) {
+    if (value == 0.0f) {
         return Stream<Shrinkable<FLOATTYPE>>::empty();
-    }
-    else if(std::isnan(value)) {
+    } else if (std::isnan(value)) {
         return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
-    }
-    else if(std::isinf(value)) {
+    } else if (std::isinf(value)) {
         // FIXME shrink from max
-        if(value > 0) {
+        if (value > 0) {
             auto max = std::numeric_limits<FLOATTYPE>::max();
-        }
-        else {
+        } else {
             auto min = std::numeric_limits<FLOATTYPE>::lowest();
             FLOATTYPE fraction = util::decomposeFloat(min, &exp);
         }
 
         return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
-    }
-    else {
+    } else {
         FLOATTYPE fraction = util::decomposeFloat(value, &exp);
         auto expShrinkable = binarySearchShrinkable(exp);
         // shrink exponent
-        auto floatShrinkable = expShrinkable.transform<FLOATTYPE>([fraction](const int& exp) {
-            return util::composeFloat(fraction, exp);
-        });
+        auto floatShrinkable = expShrinkable.transform<FLOATTYPE>(
+            [fraction](const int& exp) { return util::composeFloat(fraction, exp); });
         // shrink fraction (0.0 and 0.5)
         floatShrinkable = floatShrinkable.andThen([](const Shrinkable<FLOATTYPE>& shr) {
             auto value = shr.get();
             int exp = 0;
             FLOATTYPE fraction = util::decomposeFloat(value, &exp);
-            if(value == 0.0f)
+            if (value == 0.0f)
                 return Stream<Shrinkable<FLOATTYPE>>::empty();
-            else if(value > 0) {
+            else if (value > 0) {
                 return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(0.5f, exp)));
-            }
-            else {
+            } else {
                 return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
             }
         });
@@ -121,22 +125,20 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value) {
     }
 }
 
-Shrinkable<float> Arbitrary<float>::operator()(Random& rand) {
+Shrinkable<float> Arbitrary<float>::operator()(Random& rand)
+{
     auto raw = rand.getRandomUInt32();
     float value = *reinterpret_cast<float*>(&raw);
 
-    return make_shrinkable<float>(value).with([value]() {
-        return shrinkFloat(value);
-    });
+    return make_shrinkable<float>(value).with([value]() { return shrinkFloat(value); });
 }
 
-Shrinkable<double> Arbitrary<double>::operator()(Random& rand) {
+Shrinkable<double> Arbitrary<double>::operator()(Random& rand)
+{
     auto raw = rand.getRandomUInt64();
     double value = *reinterpret_cast<double*>(&raw);
 
-    return make_shrinkable<double>(value).with([value]() {
-        return shrinkFloat(value);
-    });
+    return make_shrinkable<double>(value).with([value]() { return shrinkFloat(value); });
     // double value = rand.getRandomDouble();
     // return make_shrinkable<double>(value).with([value]() {
     //     if(value == 0.0)
@@ -169,4 +171,4 @@ template struct Arbitrary<uint64_t>;
 template struct Arbitrary<float>;
 template struct Arbitrary<double>;
 */
-} // namespace PropertyBasedTesting
+}  // namespace PropertyBasedTesting

@@ -6,9 +6,7 @@
 #include <utility>
 #include <memory>
 
-
-namespace PropertyBasedTesting
-{
+namespace PropertyBasedTesting {
 
 namespace util {
 
@@ -20,7 +18,8 @@ class PairGenUtility {
     using stream_t = Stream<shrinkable_t>;
 
 private:
-    static std::function<stream_t(const shrinkable_t&)> genStream1() {
+    static std::function<stream_t(const shrinkable_t&)> genStream1()
+    {
         using e_shrinkable_t = Shrinkable<ARG1>;
         using element_t = typename e_shrinkable_t::type;
 
@@ -36,7 +35,8 @@ private:
         };
     };
 
-    static std::function<stream_t(const shrinkable_t&)> genStream2() {
+    static std::function<stream_t(const shrinkable_t&)> genStream2()
+    {
         using e_shrinkable_t = Shrinkable<ARG2>;
         using element_t = typename e_shrinkable_t::type;
 
@@ -53,25 +53,29 @@ private:
     };
 
 public:
-    static Shrinkable<out_pair_t> generateStream(const shrinkable_t& shrinkable) {
+    static Shrinkable<out_pair_t> generateStream(const shrinkable_t& shrinkable)
+    {
         auto concatenated = shrinkable.concat(genStream1()).concat(genStream2());
-        return concatenated.template transform<out_pair_t>([](const pair_t& pair){
+        return concatenated.template transform<out_pair_t>([](const pair_t& pair) {
             return make_shrinkable<out_pair_t>(std::make_pair(pair.first.get(), pair.second.get()));
         });
     }
 };
 
 template <typename ARG1, typename ARG2>
-Shrinkable<std::pair<ARG1, ARG2>> generatePairStream(const Shrinkable<std::pair<Shrinkable<ARG1>, Shrinkable<ARG2>>>& shrinkable) {
-    return PairGenUtility<ARG1,ARG2>::generateStream(shrinkable);
+Shrinkable<std::pair<ARG1, ARG2>> generatePairStream(
+    const Shrinkable<std::pair<Shrinkable<ARG1>, Shrinkable<ARG2>>>& shrinkable)
+{
+    return PairGenUtility<ARG1, ARG2>::generateStream(shrinkable);
 }
 
-} // namespace util
+}  // namespace util
 
 // generates e.g. (int, int)
 // and shrinks one parameter by one and then continues to the next
 template <typename GEN1, typename GEN2>
-decltype(auto) pair(GEN1&& gen1, GEN2&& gen2) {
+decltype(auto) pair(GEN1&& gen1, GEN2&& gen2)
+{
     auto genPair = std::make_pair(gen1, gen2);
     // generator
     return [genPair](Random& rand) mutable {
@@ -82,12 +86,12 @@ decltype(auto) pair(GEN1&& gen1, GEN2&& gen2) {
 }
 
 template <typename ARG1, typename ARG2>
-class PROPTEST_API Arbitrary< std::pair<ARG1,ARG2>> : public Gen< std::pair<ARG1, ARG2> >
-{
+class PROPTEST_API Arbitrary<std::pair<ARG1, ARG2>> : public Gen<std::pair<ARG1, ARG2>> {
 public:
-    Shrinkable<std::pair<ARG1, ARG2>> operator()(Random& rand) {
+    Shrinkable<std::pair<ARG1, ARG2>> operator()(Random& rand)
+    {
         return pair(Arbitrary<ARG1>(), Arbitrary<ARG2>())(rand);
     }
 };
 
-}
+}  // namespace PropertyBasedTesting

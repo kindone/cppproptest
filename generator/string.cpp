@@ -5,30 +5,25 @@
 
 namespace PropertyBasedTesting {
 
-
 std::string Arbitrary<std::string>::boundaryValues[1] = {""};
 
-Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
-    if(rand.getRandomBool()) {
+Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
+{
+    if (rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         std::string str = std::string(boundaryValues[i]);
         int len = str.size();
-        return binarySearchShrinkable<int>(len).transform<std::string>([str](const int& len) {
-            return str.substr(0, len);
-        });
-    }
-    else {
-        int len = rand.getRandomSize(0, maxSize+1);
-        std::string str(len, ' '/*, allocator()*/);
-        for(int i = 0; i < len; i++)
+        return binarySearchShrinkable<int>(len).transform<std::string>(
+            [str](const int& len) { return str.substr(0, len); });
+    } else {
+        int len = rand.getRandomSize(0, maxSize + 1);
+        std::string str(len, ' ' /*, allocator()*/);
+        for (int i = 0; i < len; i++)
             str[i] = rand.getRandomSize(0, 128);
 
-        return binarySearchShrinkable<int>(len).transform<std::string>([str](const int& len) {
-            return str.substr(0, len);
-        });
-
+        return binarySearchShrinkable<int>(len).transform<std::string>(
+            [str](const int& len) { return str.substr(0, len); });
     }
-
 
     /*
     return make_shrinkable<std::string>(str).with([str]() -> stream_t {
@@ -36,7 +31,6 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
     });
     */
 }
-
 
 /*
  * legal utf-8 byte sequence
@@ -56,176 +50,151 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand) {
  */
 std::string Arbitrary<UTF8String>::boundaryValues[1] = {""};
 
-bool isValidUTF8(std::vector<uint8_t>& chars) {
-    for(size_t i = 0; i < chars.size(); i++) {
-        if(chars[i] <= 0x7f) {
+bool isValidUTF8(std::vector<uint8_t>& chars)
+{
+    for (size_t i = 0; i < chars.size(); i++) {
+        if (chars[i] <= 0x7f) {
             continue;
-        }
-        else if(i+1 >= chars.size()) {
+        } else if (i + 1 >= chars.size()) {
             return false;
-        }
-        else if(0xc2 <= chars[i] && chars[i] <= 0xdf) {
-            if(0x80 <= chars[i+1] && chars[i+1] <= 0xbf)
-            {
+        } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
                 i++;
-            }
-            else
+            } else
                 return false;
-        }
-        else if(i+2 >= chars.size()) {
+        } else if (i + 2 >= chars.size()) {
             return false;
-        }
-        else if(0xe0 == chars[i]) {
-            if(0xa0 <= chars[i+1] && chars[i+1] <= 0xbf
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf) {
-                i+=2;
-            }
-            else
+        } else if (0xe0 == chars[i]) {
+            if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                i += 2;
+            } else
                 return false;
-        }
-        else if(0xe1 <= chars[i] && chars[i] <= 0xec) {
-            if(0x80 <= chars[i+1] && chars[i+1] <= 0xbf
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf) {
-                i+=2;
-            }
-            else
+        } else if (0xe1 <= chars[i] && chars[i] <= 0xec) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                i += 2;
+            } else
                 return false;
-        }
-        else if(0xed == chars[i]) {
-            if(0x80 <= chars[i+1] && chars[i+1] <= 0x9f
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf) {
-                i+=2;
-            }
-            else
+        } else if (0xed == chars[i]) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x9f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                i += 2;
+            } else
                 return false;
-        }
-        else if(0xee <= chars[i] && chars[i] <= 0xef) {
-            if(0x80 <= chars[i+1] && chars[i+1] <= 0xbf
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf) {
-                i+=2;
-            }
-            else
+        } else if (0xee <= chars[i] && chars[i] <= 0xef) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                i += 2;
+            } else
                 return false;
-        }
-        else if(i+3 >= chars.size()) {
+        } else if (i + 3 >= chars.size()) {
             return false;
-        }
-        else if(0xf0 == chars[i]) {
-            if(0x90 <= chars[i+1] && chars[i+1] <= 0xbf
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf
-                && 0x80 <= chars[i+3] && chars[i+3] <= 0xbf) {
-                i+=3;
-            }
-            else
+        } else if (0xf0 == chars[i]) {
+            if (0x90 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
+                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
+                i += 3;
+            } else
                 return false;
-        }
-        else if(0xf1 <= chars[i] && chars[i] <= 0xf3) {
-            if(0x80 <= chars[i+1] && chars[i+1] <= 0xbf
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf
-                && 0x80 <= chars[i+3] && chars[i+3] <= 0xbf) {
-                i+=3;
-            }
-            else
+        } else if (0xf1 <= chars[i] && chars[i] <= 0xf3) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
+                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
+                i += 3;
+            } else
                 return false;
 
-        }
-        else if(0xf4 == chars[i]) {
-            if(0x80 <= chars[i+1] && chars[i+1] <= 0xbf
-                && 0x80 <= chars[i+2] && chars[i+2] <= 0xbf
-                && 0x80 <= chars[i+3] && chars[i+3] <= 0xbf) {
-                i+=3;
-            }
-            else
+        } else if (0xf4 == chars[i]) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
+                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
+                i += 3;
+            } else
                 return false;
 
-        }
-        else
+        } else
             return false;
     }
     return true;
 }
 
-Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand) {
-    if(rand.getRandomBool()) {
+Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
+{
+    if (rand.getRandomBool()) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i]/*, allocator()*/));
+        return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i] /*, allocator()*/));
     }
 
-    int len = rand.getRandomSize(0, maxSize+1);
-    std::vector<uint8_t> chars/*, allocator()*/;
-    std::vector<uint8_t> nums/*, allocator()*/;
-    chars.reserve(len*4);
+    int len = rand.getRandomSize(0, maxSize + 1);
+    std::vector<uint8_t> chars /*, allocator()*/;
+    std::vector<uint8_t> nums /*, allocator()*/;
+    chars.reserve(len * 4);
 
-    const int ranges[][2] = {{0, 0x7f}, {0xc2,0xdf}, {0xe0,0xe0}, {0xe1,0xec}, {0xed, 0xed}, {0xee,0xef}, {0xf0,0xf0}, {0xf1,0xf3}, {0xf4,0xf4}};
-    const int numRanges = sizeof(ranges)/sizeof(ranges[0]);
+    const int ranges[][2] = {{0, 0x7f},    {0xc2, 0xdf}, {0xe0, 0xe0}, {0xe1, 0xec}, {0xed, 0xed},
+                             {0xee, 0xef}, {0xf0, 0xf0}, {0xf1, 0xf3}, {0xf4, 0xf4}};
+    const int numRanges = sizeof(ranges) / sizeof(ranges[0]);
 
     int numbers = 0;
-    for(int i = 0 ; i < numRanges; i++) {
+    for (int i = 0; i < numRanges; i++) {
         numbers += (ranges[i][1] - ranges[i][0] + 1);
     }
 
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         uint8_t n = rand.getRandomSize(0, numbers);
         nums.push_back(n);
-        if(n <= 0x7f) {
+        if (n <= 0x7f) {
             chars.push_back(0x0 + n);
             continue;
         }
-        n -= (0x7f+1);
-        if(n < (0xdf-0xc2+1)) {
+        n -= (0x7f + 1);
+        if (n < (0xdf - 0xc2 + 1)) {
             chars.push_back(0xc2 + n);
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
-        n -= (0xdf-0xc2+1);
-        if(n < 1) {
+        n -= (0xdf - 0xc2 + 1);
+        if (n < 1) {
             chars.push_back(0xe0);
-            chars.push_back(rand.getRandomSize(0xa0, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0xa0, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
         n -= 1;
-        if(n < (0xec-0xe1+1)) {
+        if (n < (0xec - 0xe1 + 1)) {
             chars.push_back(0xe1 + n);
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
-        n -= (0xec-0xe1+1);
-        if(n < 1) {
+        n -= (0xec - 0xe1 + 1);
+        if (n < 1) {
             chars.push_back(0xed);
-            chars.push_back(rand.getRandomSize(0x80, 0x9f+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0x80, 0x9f + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
         n -= 1;
-        if(n < (0xef - 0xee + 1)) {
+        if (n < (0xef - 0xee + 1)) {
             chars.push_back(0xee + n);
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
         n -= (0xef - 0xee + 1);
-        if(n < 1) {
+        if (n < 1) {
             chars.push_back(0xf0);
-            chars.push_back(rand.getRandomSize(0x90, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0x90, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
         n -= 1;
-        if(n < (0xf3-0xf1+1)) {
+        if (n < (0xf3 - 0xf1 + 1)) {
             chars.push_back(0xf1 + n);
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-            chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+            chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
-        n -= (0xf3-0xf1+1);
+        n -= (0xf3 - 0xf1 + 1);
         chars.push_back(0xf4);
-        chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-        chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
-        chars.push_back(rand.getRandomSize(0x80, 0xbf+1));
+        chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+        chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+        chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
     }
 
     /*
@@ -244,12 +213,12 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand) {
     }
     */
 
-    UTF8String str(chars.size(), ' '/*, allocator()*/);
-    for(size_t i = 0; i < chars.size(); i++) {
+    UTF8String str(chars.size(), ' ' /*, allocator()*/);
+    for (size_t i = 0; i < chars.size(); i++) {
         str[i] = chars[i];
     }
 
     return make_shrinkable<UTF8String>(str);
 }
 
-} // namespace PropertyBasedTesting
+}  // namespace PropertyBasedTesting

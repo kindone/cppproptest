@@ -7,13 +7,11 @@
 #include <tuple>
 #include <memory>
 
-
-namespace PropertyBasedTesting
-{
+namespace PropertyBasedTesting {
 
 namespace util {
 
-template <typename ...ARGS>
+template <typename... ARGS>
 class TupleGenUtility {
     using out_tuple_t = std::tuple<ARGS...>;
     using tuple_t = std::tuple<Shrinkable<ARGS>...>;
@@ -21,26 +19,28 @@ class TupleGenUtility {
     using stream_t = Stream<shrinkable_t>;
 
     static constexpr auto Size = sizeof...(ARGS);
+
 private:
-
-
-    template<size_t N, std::enable_if_t<N < sizeof...(ARGS), bool> = true >
-    static shrinkable_t ConcatHelper(const shrinkable_t& aggr) {
-        return ConcatHelper<N+1>(aggr.concat(genStream<N>()));
+    template <size_t N, std::enable_if_t<N<sizeof...(ARGS), bool> = true> static shrinkable_t ConcatHelper(
+                            const shrinkable_t& aggr)
+    {
+        return ConcatHelper<N + 1>(aggr.concat(genStream<N>()));
     }
 
-    template<size_t N, std::enable_if_t<N >= sizeof...(ARGS), bool> = false >
-    static shrinkable_t ConcatHelper(const shrinkable_t& aggr) {
+    template <size_t N, std::enable_if_t<N >= sizeof...(ARGS), bool> = false>
+    static shrinkable_t ConcatHelper(const shrinkable_t& aggr)
+    {
         return aggr;
     }
 
     template <size_t N>
-    static std::function<stream_t(const shrinkable_t&)> genStream() {
+    static std::function<stream_t(const shrinkable_t&)> genStream()
+    {
         using e_shrinkable_t = typename std::tuple_element<N, tuple_t>::type;
         using element_t = typename e_shrinkable_t::type;
 
         return [](const shrinkable_t& parent) -> stream_t {
-            if(Size == 0 || N > Size - 1)
+            if (Size == 0 || N > Size - 1)
                 return stream_t::empty();
 
             std::shared_ptr<tuple_t> parentRef = std::make_shared<tuple_t>(parent.getRef());
@@ -58,30 +58,32 @@ private:
 
 public:
     template <typename T>
-    struct GetValueFromShrinkable {
-        static decltype(auto) transform(T&& shr) {
-            return shr.get();
-        }
+    struct GetValueFromShrinkable
+    {
+        static decltype(auto) transform(T&& shr) { return shr.get(); }
     };
 
-    static Shrinkable<out_tuple_t> generateStream(const shrinkable_t& shrinkable) {
-        return ConcatHelper<0>(shrinkable).template transform<out_tuple_t>([](const tuple_t& tuple){
+    static Shrinkable<out_tuple_t> generateStream(const shrinkable_t& shrinkable)
+    {
+        return ConcatHelper<0>(shrinkable).template transform<out_tuple_t>([](const tuple_t& tuple) {
             return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(std::move(tuple)));
         });
     }
 };
 
-template <typename...ARGS>
-Shrinkable<std::tuple<ARGS...>> generateTupleStream(const Shrinkable<std::tuple<Shrinkable<ARGS>...>>& shrinkable) {
+template <typename... ARGS>
+Shrinkable<std::tuple<ARGS...>> generateTupleStream(const Shrinkable<std::tuple<Shrinkable<ARGS>...>>& shrinkable)
+{
     return TupleGenUtility<ARGS...>::generateStream(shrinkable);
 }
 
-} // namespace util
+}  // namespace util
 
 // generates e.g. (int, int)
 // and shrinks one parameter by one and then continues to the next
-template <typename ... GENS, std::enable_if_t<0 < sizeof...(GENS), bool> = true>
-decltype(auto) tuple(GENS&&...gens) {
+template <typename... GENS, std::enable_if_t<0 < sizeof...(GENS), bool> = true>
+decltype(auto) tuple(GENS&&... gens)
+{
     constexpr auto Size = sizeof...(GENS);
 
     auto genTup = std::make_tuple(gens...);
@@ -93,13 +95,10 @@ decltype(auto) tuple(GENS&&...gens) {
     };
 }
 
-template <typename ...ARGS>
-class PROPTEST_API Arbitrary< std::tuple<ARGS...>> : public Gen< std::tuple<ARGS...> >
-{
+template <typename... ARGS>
+class PROPTEST_API Arbitrary<std::tuple<ARGS...>> : public Gen<std::tuple<ARGS...>> {
 public:
-    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) {
-        return tuple(Arbitrary<ARGS>()...)(rand);
-    }
+    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) { return tuple(Arbitrary<ARGS>()...)(rand); }
 };
 
-}
+}  // namespace PropertyBasedTesting

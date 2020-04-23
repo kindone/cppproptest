@@ -8,8 +8,7 @@ namespace PropertyBasedTesting {
 
 PROPTEST_API int64_t getCurrentTime();
 
-class PROPTEST_API Random
-{
+class PROPTEST_API Random {
 public:
     Random(uint64_t seed);
     Random(const Random& other);
@@ -27,22 +26,23 @@ public:
     uint32_t getRandomSize(size_t fromIncluded, size_t toExcluded);
 
     template <typename T>
-    T getRandom(int64_t min, int64_t max) {
+    T getRandom(int64_t min, int64_t max)
+    {
         throw std::bad_exception();
     }
 
     template <typename T>
-    T getRandomU(uint64_t min, uint64_t max) {
+    T getRandomU(uint64_t min, uint64_t max)
+    {
         throw std::bad_exception();
     }
+
 private:
     uint64_t next8U();
-    //std::default_random_engine engine;
+    // std::default_random_engine engine;
     std::mt19937_64 engine;
     std::uniform_int_distribution<uint64_t> dist;
-
 };
-
 
 template <>
 int8_t Random::getRandom<int8_t>(int64_t min, int64_t max);
@@ -68,5 +68,4 @@ uint32_t Random::getRandomU<uint32_t>(uint64_t min, uint64_t max);
 template <>
 uint64_t Random::getRandomU<uint64_t>(uint64_t min, uint64_t max);
 
-} // namespace PropertyBasedTesting
-
+}  // namespace PropertyBasedTesting
