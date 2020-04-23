@@ -88,7 +88,7 @@ struct Arbitrary<Car> : Gen<Car> {
 }
 ```
 
-### Predefined Arbitraries
+### Arbitraries
 
 The framework provides `Arbitrary<T>` for following primitive types
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
@@ -99,6 +99,8 @@ The framework provides `Arbitrary<T>` for following primitive types
 ### Generator Combinators
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
+
+* `just<T>(T*)` or `just<T>(function<T()>)`: always generates specific value
 
 * `pair<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
 
