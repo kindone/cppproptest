@@ -91,18 +91,20 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
         return Stream<Shrinkable<FLOATTYPE>>::empty();
     } else if (std::isnan(value)) {
         return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
-    } else if (std::isinf(value)) {
-        // FIXME shrink from max
-        if (value > 0) {
-            auto max = std::numeric_limits<FLOATTYPE>::max();
+    } else {
+        FLOATTYPE fraction = 0.0f;
+        if (std::isinf(value)) {
+            if (value > 0) {
+                auto max = std::numeric_limits<FLOATTYPE>::max();
+                fraction = util::decomposeFloat(max, &exp);
+            } else {
+                auto min = std::numeric_limits<FLOATTYPE>::lowest();
+                fraction = util::decomposeFloat(min, &exp);
+            }
         } else {
-            auto min = std::numeric_limits<FLOATTYPE>::lowest();
-            FLOATTYPE fraction = util::decomposeFloat(min, &exp);
+            fraction = util::decomposeFloat(value, &exp);
         }
 
-        return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
-    } else {
-        FLOATTYPE fraction = util::decomposeFloat(value, &exp);
         auto expShrinkable = binarySearchShrinkable(exp);
         // shrink exponent
         auto floatShrinkable = expShrinkable.transform<FLOATTYPE>(
@@ -119,6 +121,15 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
             } else {
                 return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
             }
+        });
+
+        // integerfy
+        floatShrinkable = floatShrinkable.andThen([](const Shrinkable<FLOATTYPE>& shr) {
+            auto value = shr.get();
+            if (std::abs(static_cast<int>(value)) < std::abs(value)) {
+                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(static_cast<int>(value)));
+            } else
+                return Stream<Shrinkable<FLOATTYPE>>::empty();
         });
 
         return floatShrinkable.shrinks();

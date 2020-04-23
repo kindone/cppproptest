@@ -251,6 +251,7 @@ public:
     Shrinkable<float> operator()(Random& rand);
     static constexpr float boundaryValues[] = {0.0, 1.0, -1.0};
 };
+
 template <>
 struct PROPTEST_API Arbitrary<double> : public Gen<double>
 {
