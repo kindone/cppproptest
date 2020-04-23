@@ -5,6 +5,7 @@
 #include <type_traits>
 
 namespace PropertyBasedTesting {
+namespace util {
 
 template<typename Function, typename Tuple, std::size_t...index>
 decltype(auto) invokeHelper(Function&& f, Tuple&& valueTup, std::index_sequence<index...>) {
@@ -61,4 +62,5 @@ decltype(auto) invokeWithArgs(Function&& f, Args&& ... args) {
             std::make_index_sequence<Size>{});
 }
 
-}
+} // namespace util
+} // namespace PropertyBasedTesting

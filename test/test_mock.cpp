@@ -33,6 +33,7 @@ using namespace PropertyBasedTesting;
 using ::testing::AssertionResult;
 using ::testing::NiceMock;
 using ::testing::Return;
+using ::testing::Invoke;
 using ::testing::_;
 
 TEST(PropTest, MockTest) {
@@ -64,9 +65,9 @@ TEST(PropTest, MockOnCall) {
 
     int count = 0;
     ON_CALL(cat, meow(0))
-        .WillByDefault([&count](int loudness) {
+        .WillByDefault(Invoke([&count](int loudness) {
             return count ++;
-        });
+        }));
 
     EXPECT_EQ(cat.meow(5), 5);
     EXPECT_EQ(cat.meow(4), 0);

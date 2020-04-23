@@ -11,6 +11,8 @@
 namespace PropertyBasedTesting
 {
 
+namespace util {
+
 template <typename ...ARGS>
 class TupleGenUtility {
     using out_tuple_t = std::tuple<ARGS...>;
@@ -69,11 +71,12 @@ public:
     }
 };
 
-
 template <typename...ARGS>
 Shrinkable<std::tuple<ARGS...>> generateTupleStream(const Shrinkable<std::tuple<Shrinkable<ARGS>...>>& shrinkable) {
     return TupleGenUtility<ARGS...>::generateStream(shrinkable);
 }
+
+} // namespace util
 
 // generates e.g. (int, int)
 // and shrinks one parameter by one and then continues to the next
@@ -84,9 +87,9 @@ decltype(auto) tuple(GENS&&...gens) {
     auto genTup = std::make_tuple(gens...);
     // generator
     return [genTup](Random& rand) mutable {
-        auto elemTup = transformHeteroTupleWithArg<Generate>(std::forward<decltype(genTup)>(genTup), rand);
+        auto elemTup = util::transformHeteroTupleWithArg<Generate>(std::forward<decltype(genTup)>(genTup), rand);
         auto shrinkable = make_shrinkable<decltype(elemTup)>(elemTup);
-        return generateTupleStream(shrinkable);
+        return util::generateTupleStream(shrinkable);
     };
 }
 

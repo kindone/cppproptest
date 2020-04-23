@@ -42,6 +42,8 @@ Shrinkable<uint64_t> Arbitrary<uint64_t>::operator()(Random& rand) {
     return generateInteger<uint64_t>(rand);
 }
 
+namespace util {
+
 template <typename FLOATTYPE>
 FLOATTYPE decomposeFloat(FLOATTYPE value, int* exp);
 
@@ -68,6 +70,10 @@ double composeFloat<double>(double value, int exp) {
     return ldexp(value, exp);
 }
 
+} // namespace util
+
+
+
 template <typename FLOATTYPE>
 Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value) {
     int exp = 0;
@@ -84,30 +90,30 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value) {
         }
         else {
             auto min = std::numeric_limits<FLOATTYPE>::lowest();
-            FLOATTYPE fraction = decomposeFloat(min, &exp);
+            FLOATTYPE fraction = util::decomposeFloat(min, &exp);
         }
 
         return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
     }
     else {
-        FLOATTYPE fraction = decomposeFloat(value, &exp);
+        FLOATTYPE fraction = util::decomposeFloat(value, &exp);
         auto expShrinkable = binarySearchShrinkable(exp);
         // shrink exponent
         auto floatShrinkable = expShrinkable.transform<FLOATTYPE>([fraction](const int& exp) {
-            return composeFloat(fraction, exp);
+            return util::composeFloat(fraction, exp);
         });
         // shrink fraction (0.0 and 0.5)
         floatShrinkable = floatShrinkable.andThen([](const Shrinkable<FLOATTYPE>& shr) {
             auto value = shr.get();
             int exp = 0;
-            FLOATTYPE fraction = decomposeFloat(value, &exp);
+            FLOATTYPE fraction = util::decomposeFloat(value, &exp);
             if(value == 0.0f)
                 return Stream<Shrinkable<FLOATTYPE>>::empty();
             else if(value > 0) {
-                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(composeFloat(0.5f, exp)));
+                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(0.5f, exp)));
             }
             else {
-                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(composeFloat(-0.5f, exp)));
+                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
             }
         });
 

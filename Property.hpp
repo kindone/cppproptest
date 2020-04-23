@@ -96,6 +96,7 @@ protected:
     friend struct PropertyContext;
 };
 
+namespace util {
 
 template <typename T>
 decltype(auto) ReturnTypeOf() {
@@ -109,6 +110,8 @@ decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup) {
     return typeList;
 }
 
+}
+
 
 template <typename CallableWrapper, typename GenTuple>
 class Property : public PropertyBase {
@@ -117,7 +120,7 @@ public:
     }
 
     virtual bool invoke(Random& rand) {
-        return invokeWithGenTuple(rand, std::forward<decltype(callableWrapper.callable)>(callableWrapper.callable), genTup);
+        return util::invokeWithGenTuple(rand, std::forward<decltype(callableWrapper.callable)>(callableWrapper.callable), genTup);
     }
 
     Property& setSeed(uint64_t s) {
@@ -138,7 +141,7 @@ public:
         try {
             try {
                 try {
-                    return invokeWithArgs(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<ARGS>(args)...);
+                    return util::invokeWithArgs(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<ARGS>(args)...);
                 }
                 catch(const AssertFailed& e) {
                     throw PropertyFailed<decltype(valueTup)>(e, valueTupPtr);
@@ -163,7 +166,7 @@ public:
     }
 
     virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) {
-        auto retTypeTup = ReturnTypeTupleFromGenTup(genTup);
+        auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTypeTup)::type_tuple;
         auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
         shrink(savedRand, *failed.valueTupPtr);
@@ -180,9 +183,9 @@ private:
         //std::cout << std::endl;
 
         bool result = false;
-        auto values = transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
+        auto values = util::transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
-            result = invokeWithArgTupleWithReplace<N>(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<decltype(values)>(values), replace.get());
+            result = util::invokeWithArgTupleWithReplace<N>(std::forward<typename CallableWrapper::T>(callableWrapper.callable), std::forward<decltype(values)>(values), replace.get());
             //std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         }
         catch(const AssertFailed& e) {
@@ -257,10 +260,10 @@ private:
         // show(std::cout, valueTup);
         // std::cout << std::endl;
 
-        auto generatedValueTup = transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
+        auto generatedValueTup = util::transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
         //std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
-        auto shrinksTuple = transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
+        auto shrinksTuple = util::transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
                 std::forward<decltype(shrinksTuple)>(shrinksTuple),
                 std::make_index_sequence<Size>{});
@@ -292,7 +295,7 @@ template <typename Callable, typename ... EXPGENS>
 auto property(Callable&& callable, EXPGENS&&... gens) {
     // acquire full tuple of generators
     typename function_traits<Callable>::argument_type_list argument_type_list;
-    auto genTup = createGenTuple(argument_type_list, gens...);
+    auto genTup = util::createGenTuple(argument_type_list, gens...);
     return Property<CallableWrapper<Callable>, decltype(genTup)>(make_CallableWrapper(std::forward<Callable>(callable)), genTup);
 }
 

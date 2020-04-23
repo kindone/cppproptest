@@ -7,6 +7,8 @@ namespace PropertyBasedTesting
 
 class Random;
 
+namespace util {
+
 template <typename TO, typename SHRINKABLE, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
 decltype(auto) autoCast(SHRINKABLE&& shr) {
     return shr.get();
@@ -27,6 +29,8 @@ decltype(auto) autoCastTuple(FromTuple&& tuple) {
     return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple));
 }
 
+} // namespace util
+
 template <class CLASS, typename ...ARGTYPES>
 class Construct : public Gen<CLASS>
 {
@@ -36,11 +40,17 @@ public:
 
     static constexpr auto Size = sizeof...(ARGTYPES);
 
-    Construct() : genTup(createGenTuple(ArgumentList{})) {
+    Construct() : genTup(util::createGenTuple(ArgumentList{})) {
     }
 
     Construct(GenTuple g) : genTup(g) {
     }
+
+
+    Shrinkable<CLASS> operator()(Random& rand) {
+        return constructAccordingly(generateArgs(rand));
+    }
+private:
 
     template <std::size_t... index>
     decltype(auto) generateArgsHelper(Random& rand, std::index_sequence<index...>) {
@@ -51,14 +61,9 @@ public:
         return generateArgsHelper(rand, std::make_index_sequence<Size>{});
     }
 
-    Shrinkable<CLASS> operator()(Random& rand) {
-        return constructAccordingly(generateArgs(rand));
-    }
-private:
-
     template<typename CastTuple, typename ValueTuple, std::size_t... index>
     static Shrinkable<CLASS> constructByTupleType(ValueTuple&& valueTuple, std::index_sequence<index...> ) {
-        return make_shrinkable<CLASS>(autoCastTuple<CastTuple,index>(std::forward<ValueTuple>(valueTuple))...);
+        return make_shrinkable<CLASS>(util::autoCastTuple<CastTuple,index>(std::forward<ValueTuple>(valueTuple))...);
     }
 
     template<typename ValueTuple>
@@ -79,7 +84,7 @@ template <typename CLASS, typename ... ARGTYPES>
 decltype(auto) construct() {
     constexpr auto ImplicitSize = sizeof...(ARGTYPES);
     using ArgsAsTuple = std::tuple<std::decay_t<ARGTYPES>...>;
-    auto implicits = createGenHelperListed<ArgsAsTuple>(
+    auto implicits = util::createGenHelperListed<ArgsAsTuple>(
         std::make_index_sequence<ImplicitSize>{}
     );
     return Construct<CLASS, ARGTYPES...>(implicits);
@@ -99,10 +104,10 @@ template <typename CLASS, typename ... ARGTYPES, typename ... EXPGENS, typename 
 decltype(auto) construct(EXPGENS&&... gens) {
     constexpr auto ExplicitSize = sizeof...(EXPGENS);
     constexpr auto ImplicitSize = sizeof...(ARGTYPES) - ExplicitSize;
-    auto explicits = std::make_tuple(genToFunc(gens)...);
+    auto explicits = std::make_tuple(util::genToFunc(gens)...);
     using ArgsAsTuple = std::tuple<std::decay_t<ARGTYPES>...>;
-    auto implicits = createGenHelperListed<ArgsAsTuple>(
-        addOffset<ExplicitSize>(std::make_index_sequence<ImplicitSize>{})
+    auto implicits = util::createGenHelperListed<ArgsAsTuple>(
+        util::addOffset<ExplicitSize>(std::make_index_sequence<ImplicitSize>{})
     );
 
     return Construct<CLASS, ARGTYPES...>(std::tuple_cat(explicits, implicits));

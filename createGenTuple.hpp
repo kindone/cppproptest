@@ -9,6 +9,7 @@ namespace PropertyBasedTesting {
 
 class Random;
 
+namespace util {
 
 template <std::size_t O, std::size_t ... Is>
 std::index_sequence<(O + Is)...> addOffset(std::index_sequence<Is...>)
@@ -63,4 +64,6 @@ decltype( auto ) createGenTuple(TypeList<ARGS...> fullArgTypes, EXPARGS&&... gen
     return std::tuple_cat(explicits, implicits);
 }
 
-}
+} // namespace util
+
+} // namespace PropertyBasedTesting

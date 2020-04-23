@@ -6,6 +6,14 @@
 
 namespace PropertyBasedTesting {
 
+namespace util {
+template <typename T> struct Weighted;
+}
+
+template <typename T, typename GEN> util::Weighted<T> weighted(GEN&& gen, float weight);
+
+namespace util {
+
 template <typename T>
 struct Weighted {
     using FuncType = std::function<Shrinkable<T>(Random&)>;
@@ -17,13 +25,6 @@ struct Weighted {
     float weight;
 };
 
-template <typename T, typename GEN>
-Weighted<T> weighted(GEN&& gen, float weight) {
-    using FuncType = std::function<Shrinkable<T>(Random&)>;
-    std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
-    return Weighted<T>(funcPtr, weight);
-}
-
 template <typename T, typename GEN, std::enable_if_t<!std::is_same<GEN, Weighted<T>>::value, bool> = true>
 Weighted<T> GenToWeighted(GEN&& gen) {
     return weighted<T>(std::forward<GEN>(gen), 0.0);
@@ -34,12 +35,21 @@ Weighted<T> GenToWeighted(Weighted<T>&& weighted) {
     return std::forward<Weighted<T>>(weighted);
 }
 
+} // namespace util
+
+
+template <typename T, typename GEN>
+util::Weighted<T> weighted(GEN&& gen, float weight) {
+    using FuncType = std::function<Shrinkable<T>(Random&)>;
+    std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
+    return util::Weighted<T>(funcPtr, weight);
+}
 
 // a GEN can be a generator or a weighted(GEN, weight)
 template <typename T, typename... GENS>
 decltype(auto) oneOf(GENS&&... gens) {
-    using WeightedVec = std::vector<Weighted<T>>;
-    std::shared_ptr<WeightedVec> genVecPtr(new WeightedVec{GenToWeighted<T>(std::forward<GENS>(gens))...});
+    using WeightedVec = std::vector<util::Weighted<T>>;
+    std::shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(std::forward<GENS>(gens))...});
 
     // calculate and assign unassigned weights
     float sum = 0.0f;
@@ -66,7 +76,7 @@ decltype(auto) oneOf(GENS&&... gens) {
     return [genVecPtr](Random& rand) {
         while(true) {
             auto dice = rand.getRandomSize(0, genVecPtr->size());
-            const Weighted<T>& weighted = (*genVecPtr)[dice];
+            const util::Weighted<T>& weighted = (*genVecPtr)[dice];
             if(rand.getRandomBool(weighted.weight))
                 return (*weighted.funcPtr)(rand);
         };

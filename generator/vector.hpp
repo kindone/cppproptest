@@ -133,26 +133,6 @@ public:
             return shrinkBulk(shr, power, offset);
         });
 
-        // // front part
-        // newShrinkable = newShrinkable.concat([power, offset](const shrinkable_t& shr) {
-        //     size_t vecSize = shr.getRef().size();
-        //     size_t numSplits = std::pow(2, power+1);
-        //     if(vecSize / numSplits < 1 || offset*2 >= numSplits)
-        //         return stream_t::empty();
-        //     // std::cout << "front: " << power << ", " << offset << std::endl;
-        //     return shrinkBulkRecursive(shr, power+1, offset*2);
-        // });
-
-        // // rear part
-        // newShrinkable = newShrinkable.concat([power, offset](const shrinkable_t& shr) {
-        //     size_t vecSize = shr.getRef().size();
-        //     size_t numSplits = std::pow(2, power+1);
-        //     if(vecSize / numSplits < 1 || offset*2+1 >= numSplits)
-        //         return stream_t::empty();
-        //     // std::cout << "rear: " << power << ", " << offset << std::endl;
-        //     return shrinkBulkRecursive(shr, power+1, offset*2+1);
-        // });
-
         return newShrinkable.shrinks();
     }
 
@@ -177,34 +157,6 @@ public:
             auto last = shrinkVec->begin() + len; // subvector of (0, len)
             return make_shrinkable<std::vector<Shrinkable<T>>>(begin, last);
         });
-
-        // concat shrinks with parent as argument
-        // const auto maxSize = shrinkable.getRef().size();
-        // auto genStream = [](size_t i) {
-        //     return [i](const shrinkable_t& parent) {
-        //         vector_t parentRef = parent.getRef();
-        //         const size_t size = parentRef.size();
-
-        //         if(size == 0 || size - 1 < i)
-        //             return stream_t::empty();
-
-        //         size_t pos = size - 1 - i;
-        //         e_shrinkable_t& elem = parentRef[pos];
-        //         // {0,2,3} to {[x,x,x,0], ...,[x,x,x,3]}
-        //         // make sure {1} shrinked from 2 is also transformed to [x,x,x,1]
-        //         shrinkable_t vecWithElems = elem.template transform<vector_t>([pos, parentRef](const T& val) {
-        //             auto copy = parentRef;
-        //             copy[pos] = make_shrinkable<T>(val);
-        //             return copy;
-        //         });
-        //         shrinkable_t cropped = vecWithElems;//.take(2);
-        //         return cropped.shrinks();
-        //     };
-        // };
-
-        // for(size_t i = 0; i < maxSize; i++) {
-        //     shrinkable = shrinkable.concat(genStream(i));
-        // }
 
         shrinkable = shrinkable.andThen([](const shrinkable_t& shr) {
             return shrinkBulkRecursive(shr, 0, 0);

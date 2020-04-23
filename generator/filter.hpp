@@ -28,16 +28,24 @@ public:
 };
 
 
-template <typename T, typename GEN>
-decltype(auto) filter(GEN&& gen, std::function<bool(const T&)> criteria) {
-    return [criteria, &gen](Random& rand) {
+template <typename T, typename GEN, typename Criteria>
+decltype(auto) filter(GEN&& gen, Criteria&& criteria) {
+    auto genPtr = std::make_shared<std::function<Shrinkable<T>(Random&)> >(std::forward<GEN>(gen));
+    auto criteriaPtr = std::make_shared<std::function<bool(const T&)>>(std::forward<Criteria>(criteria));
+    return [criteriaPtr, genPtr](Random& rand) {
         while(true) {
-            Shrinkable<T> shrinkable = gen(rand);
-            if(criteria(shrinkable.getRef())) {
-                return shrinkable.filter(criteria);
+            Shrinkable<T> shrinkable = (*genPtr)(rand);
+            if((*criteriaPtr)(shrinkable.getRef())) {
+                return shrinkable.filter(criteriaPtr);
             }
         }
     };
+}
+
+// alias for filter
+template <typename T, typename GEN, typename Criteria>
+decltype(auto) suchThat(GEN&& gen, Criteria&& criteria) {
+    return filter<T, GEN, Criteria>(std::forward<GEN>(gen), std::forward<Criteria>(criteria));
 }
 
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 
 namespace PropertyBasedTesting {
+namespace util {
 
 template <size_t N, typename Tuple>
 decltype(auto) forwardNth(Tuple&& tup) {
@@ -68,4 +69,5 @@ decltype( auto ) transformHeteroTupleWithArg(Tuple&& tup, Arg&& arg) {
 
 }
 
-}
+} // namespace util
+} // namespace PropertyBasedTesting

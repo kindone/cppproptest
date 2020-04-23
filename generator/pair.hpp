@@ -10,6 +10,8 @@
 namespace PropertyBasedTesting
 {
 
+namespace util {
+
 template <typename ARG1, typename ARG2>
 class PairGenUtility {
     using out_pair_t = std::pair<ARG1, ARG2>;
@@ -59,11 +61,12 @@ public:
     }
 };
 
-
 template <typename ARG1, typename ARG2>
 Shrinkable<std::pair<ARG1, ARG2>> generatePairStream(const Shrinkable<std::pair<Shrinkable<ARG1>, Shrinkable<ARG2>>>& shrinkable) {
     return PairGenUtility<ARG1,ARG2>::generateStream(shrinkable);
 }
+
+} // namespace util
 
 // generates e.g. (int, int)
 // and shrinks one parameter by one and then continues to the next
@@ -74,7 +77,7 @@ decltype(auto) pair(GEN1&& gen1, GEN2&& gen2) {
     return [genPair](Random& rand) mutable {
         auto elemPair = std::make_pair(genPair.first(rand), genPair.second(rand));
         auto shrinkable = make_shrinkable<decltype(elemPair)>(elemPair);
-        return generatePairStream(shrinkable);
+        return util::generatePairStream(shrinkable);
     };
 }
 

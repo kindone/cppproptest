@@ -32,6 +32,7 @@ std::ostream& show(std::ostream& os, const std::pair<ARG1,ARG2>& pair);
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
 
+namespace util {
 
 struct HasShowImpl {
     template <typename T, typename CRITERIA = decltype(show(std::cout, std::declval<T>()))>
@@ -65,14 +66,15 @@ struct ShowDefault<T, false> {
 	}
 };
 
+} // namespace util
+
+
 template <typename T>
 static std::ostream& show(std::ostream& os, const T & obj)
 {
-	ShowDefault<T>::show(os, obj);;
+	util::ShowDefault<T>::show(os, obj);;
 	return os;
 }
-
-
 
 template <typename T>
 std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
@@ -80,6 +82,8 @@ std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
     show(os, shrinkable.getRef());
     return os;
 }
+
+namespace util {
 
 template <typename T>
 bool toStreamLast(std::ostream& os, const T& t)
@@ -114,6 +118,10 @@ struct ToStreamEach<0,Tuple> {
     }
 };
 
+} // namespace util
+
+
+
 template <typename ARG1, typename ARG2>
 std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair) {
     os << "( ";
@@ -129,9 +137,9 @@ std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)
 {
     constexpr auto Size = sizeof...(ARGS);
     os << "{ ";
-    ToStreamEach<Size-1, std::tuple<ARGS...>> toStreamEach;
+    util::ToStreamEach<Size-1, std::tuple<ARGS...>> toStreamEach;
     toStreamEach.get(os, tuple);
-    toStreamLast(os, std::get<Size-1>(tuple));
+    util::toStreamLast(os, std::get<Size-1>(tuple));
     os << " }";
     return os;
 }

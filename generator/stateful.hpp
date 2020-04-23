@@ -41,7 +41,6 @@ struct ActionWithoutModel : public Action<SYSTEM, EmptyModel>{
     virtual ~ActionWithoutModel() {}
 };
 
-
 // template <typename ActionType, typename... GENS>
 // std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions(GENS&&... gens) {
 //     auto actionGen = oneOf<std::shared_ptr<ActionType>>(std::forward<GENS>(gens)...);
@@ -49,6 +48,7 @@ struct ActionWithoutModel : public Action<SYSTEM, EmptyModel>{
 //     return actionVecGen;
 // }
 
+namespace util {
 
 template <typename ActionType, typename GEN, std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value, bool> = true>
 decltype(auto) toSharedPtrGen(GEN&& gen) {
@@ -63,9 +63,12 @@ decltype(auto) toSharedPtrGen(GEN&& gen) {
     return std::forward<GEN>(gen);
 }
 
+} // namespace
+
+
 template <typename ActionType, typename... GENS>
 std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions(GENS&&... gens) {
-    auto actionGen = oneOf<std::shared_ptr<ActionType>>(toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
+    auto actionGen = oneOf<std::shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
     auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
     return actionVecGen;
 }
