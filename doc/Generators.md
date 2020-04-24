@@ -1,4 +1,6 @@
-### Arbitraries
+# Using and Defining Generators 
+
+## Arbitraries
 
 The framework provides `Arbitrary<T>` for following primitive types
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
@@ -6,7 +8,7 @@ The framework provides `Arbitrary<T>` for following primitive types
 * String types: `std::string`, `UTF8String`
 * Standard containers: `std::vector`, `std::pair`, `std::tuple`
 
-### Generator Combinators
+## Generator Combinators
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
