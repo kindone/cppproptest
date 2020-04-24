@@ -37,7 +37,7 @@ Generator combinators are provided for building a new generator based on existin
 	auto coordinateGen2 = construct<Coordinate, int, int>(inRange(-10, 10)); // y is generated with Arbitrary<int>
 	```
 
-* `filter<T>(gen, condition_predicate)`:  generates a type `T` that satisfies condition predicate (`condition_predicate` returns `true`)
+* `suchThat<T>` or `filter<T>(gen, condition_predicate)`:  generates a type `T` that satisfies condition predicate (`condition_predicate` returns `true`)
 
 	```cpp
 	// generates even numbers
