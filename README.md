@@ -1,10 +1,14 @@
 # proptest
 
+`proptest` is a properby-based testing framework for C++. 
+
+&nbsp;
+
 ## Property-based testing
 
 Property-based testing originated from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) of Haskell. 
 Its basic idea is to quickly prove a theorem, as the name suggests. 
-User can define an abstract property of the system under test, letting the test framework prove or disprove the property with massive input combinations.
+You can define an abstract property of the system under test, letting the test framework prove or disprove the property with massive input combinations.
 
 A property is in the form of function `(Input0, ... , InputN) -> bool`
 
@@ -24,7 +28,7 @@ or
 >   a = 4,
 >   b = -4
 
-
+&nbsp;
 
 ## `property` and `check`
 
@@ -68,6 +72,8 @@ property([](int a) -> bool {
 ```
 
 Many primitive types and containers have their `Aribtrary<T>` defined by the framework for convenience.
+
+&nbsp;
 
 ## Generators and Arbitraries
 
@@ -115,8 +121,7 @@ auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
 });
 ```
 
-
-
+&nbsp;
 
 ## Further topics and details of the framework can be found in:
 
