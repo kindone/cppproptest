@@ -82,3 +82,21 @@ std::ostream& operator<<(std::ostream& os, const Animal& input)
     os << " }";
     return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
+{
+    os << "{ ";
+    if (input.size() == 1) {
+        os << *input.begin();
+    } else if (input.size() > 0) {
+        os << *input.begin();
+        auto second = input.begin();
+        second++;
+        for (auto itr = second; itr != input.end(); ++itr) {
+            os << ", " << *itr;
+        }
+    }
+
+    os << " }";
+    return os;
+}

@@ -141,26 +141,26 @@ public:
 
     Shrinkable<std::vector<T>> operator()(Random& rand)
     {
-        int len = rand.getRandomSize(minSize, maxSize + 1);
+        int size = rand.getRandomSize(minSize, maxSize + 1);
         std::shared_ptr<vector_t> shrinkVec = std::make_shared<vector_t>();
-        shrinkVec->reserve(len);
-        for (int i = 0; i < len; i++)
+        shrinkVec->reserve(size);
+        for (int i = 0; i < size; i++)
             shrinkVec->push_back(elemGen(rand));
 
-        // shrink vector size with subvector using binary numeric shrink of lengths
-        int minLenCopy = minSize;
+        // shrink vector size with subvector using binary numeric shrink of sizes
+        int minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable<int>(len - minLenCopy).template transform<int>([minLenCopy](const int& len) {
-                return len + minLenCopy;
+            binarySearchShrinkable<int>(size - minSizeCopy).template transform<int>([minSizeCopy](const int& size) {
+                return size + minSizeCopy;
             });
-        // this make sure shrinking is possible towards minLen
+        // this make sure shrinking is possible towards minSize
         shrinkable_t shrinkable =
-            rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& len) {
-                if (len <= 0)
+            rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& size) {
+                if (size <= 0)
                     return make_shrinkable<std::vector<Shrinkable<T>>>();
 
                 auto begin = shrinkVec->begin();
-                auto last = shrinkVec->begin() + len;  // subvector of (0, len)
+                auto last = shrinkVec->begin() + size;  // subvector of (0, size)
                 return make_shrinkable<std::vector<Shrinkable<T>>>(begin, last);
             });
 

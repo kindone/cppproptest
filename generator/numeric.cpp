@@ -110,6 +110,7 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
         auto floatShrinkable = expShrinkable.transform<FLOATTYPE>(
             [fraction](const int& exp) { return util::composeFloat(fraction, exp); });
 
+        // prepend 0.0
         floatShrinkable = floatShrinkable.with([shrinksPtr = floatShrinkable.shrinksPtr]() {
             auto zero = Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
             return zero.concat((*shrinksPtr)());

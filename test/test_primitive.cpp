@@ -95,10 +95,14 @@ TEST(PropTest, GenSharedPtr)
     }
 }
 
-TEST(PropTest, GenSet) {
+TEST(PropTest, GenSet)
+{
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbitrary<std::set<int>> gen;
+    gen.setMaxSize(8);
+    auto shr = gen(rand);
+    exhaustive(shr, 0);
     // for (int i = 0; i < 20; i++) {
     //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
     // }

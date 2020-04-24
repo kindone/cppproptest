@@ -4,6 +4,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <set>
 #include "Shrinkable.hpp"
 
 namespace PropertyBasedTesting {
@@ -29,6 +30,8 @@ template <typename ARG1, typename ARG2>
 std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair);
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
+template <typename T, typename Compare, typename Allocator>
+std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input);
 
 namespace util {
 
@@ -157,6 +160,25 @@ std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec)
         }
     }
     os << " ]";
+    return os;
+}
+
+template <typename T, typename Compare, typename Allocator>
+std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input)
+{
+    os << "{ ";
+    if (input.size() == 1) {
+        os << *input.begin();
+    } else if (input.size() > 0) {
+        os << *input.begin();
+        auto second = input.begin();
+        second++;
+        for (auto itr = second; itr != input.end(); ++itr) {
+            os << ", " << *itr;
+        }
+    }
+
+    os << " }";
     return os;
 }
 
