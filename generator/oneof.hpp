@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "../Random.hpp"
+#include "../assert.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -82,8 +83,16 @@ decltype(auto) oneOf(GENS&&... gens)
         while (true) {
             auto dice = rand.getRandomSize(0, genVecPtr->size());
             const util::Weighted<T>& weighted = (*genVecPtr)[dice];
-            if (rand.getRandomBool(weighted.weight))
-                return (*weighted.funcPtr)(rand);
+            if (rand.getRandomBool(weighted.weight)) {
+                // retry the same generator if an exception is thrown
+                while (true) {
+                    try {
+                        return (*weighted.funcPtr)(rand);
+                    } catch (const Discard&) {
+                        // TODO: trace level low
+                    }
+                }
+            }
         };
     };
 }

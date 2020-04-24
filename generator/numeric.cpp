@@ -109,7 +109,13 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
         // shrink exponent
         auto floatShrinkable = expShrinkable.transform<FLOATTYPE>(
             [fraction](const int& exp) { return util::composeFloat(fraction, exp); });
-        // shrink fraction (0.0 and 0.5)
+
+        floatShrinkable = floatShrinkable.with([shrinksPtr = floatShrinkable.shrinksPtr]() {
+            auto zero = Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
+            return zero.concat((*shrinksPtr)());
+        });
+
+        // shrink fraction within (0.0 and 0.5)
         floatShrinkable = floatShrinkable.andThen([](const Shrinkable<FLOATTYPE>& shr) {
             auto value = shr.get();
             int exp = 0;
@@ -126,8 +132,9 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
         // integerfy
         floatShrinkable = floatShrinkable.andThen([](const Shrinkable<FLOATTYPE>& shr) {
             auto value = shr.get();
-            if (std::abs(static_cast<int>(value)) < std::abs(value)) {
-                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(static_cast<int>(value)));
+            auto intValue = static_cast<int>(value);
+            if (intValue != 0 && std::abs(intValue) < std::abs(value)) {
+                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(intValue));
             } else
                 return Stream<Shrinkable<FLOATTYPE>>::empty();
         });
