@@ -77,7 +77,7 @@ A generator is a callable (function, functor, or lambda) with following signatur
 (Random&) -> Shrinkable<T>
 ```
 
-You can refer to [`Shrinkable`](doc/Shrinking.md) for further detail, but you can basically treat it as a wrapper for a type T here. So a generator generates a value of type T from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
+You can refer to [`Shrinkable`](doc/Shrinking.md) for further detail, but you can basically treat it as a wrapper for a value of type T here. So a generator generates a value of type T from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
 
 ```cpp
 auto myIntGen = [](Random& rand) {
@@ -86,7 +86,7 @@ auto myIntGen = [](Random& rand) {
 };
 ```
 
-An `Arbitrary` refers to default generators for a type. You can additionaly define an `Arbitrary<T>` for your type `T`. By defining an `Arbitrary`, you can omit a custom generator to be passed everytime you define a property for that type. Following shows an example for defining an `Arbitrary`
+An `Arbitrary` refers to default generators for a type. You can additionaly define an `Arbitrary<T>` for your type `T`. By defining an `Arbitrary`, you can omit the custom generator argument that was needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `PropertyBasedTesting` namespace in order to be accessible in the framework.
 
 ```cpp
 namespace PropertyBasedTesting {
@@ -100,6 +100,21 @@ struct Arbitrary<Car> : Gen<Car> {
 
 }
 ```
+
+There are useful helpers for creating new generators from existing ones. You can find the full list in [Generators](doc/Generators.md) page. 
+
+`suchThat` is such a helper. It selectively generates values that satisfies a criteria function. Following is an even number generator from the integer `Arbitrary`.
+
+```cpp
+auto anyIntGen = Arbitrary<int>();
+// generates even numbers
+auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
+    return num % 2 == 0;
+});
+```
+
+
+
 
 ## Further topics and details of the framework can be found in:
 
