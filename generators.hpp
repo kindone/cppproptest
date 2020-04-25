@@ -5,6 +5,7 @@
 #include "generator/bool.hpp"
 #include "generator/string.hpp"
 #include "generator/vector.hpp"
+#include "generator/list.hpp"
 #include "generator/pair.hpp"
 #include "generator/tuple.hpp"
 #include "generator/set.hpp"

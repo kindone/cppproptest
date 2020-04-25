@@ -3,6 +3,7 @@
 #include <tuple>
 #include <utility>
 #include <string>
+#include <list>
 #include <vector>
 #include <set>
 #include "Shrinkable.hpp"
@@ -30,6 +31,8 @@ template <typename ARG1, typename ARG2>
 std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair);
 template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
+template <typename T, typename Allocator>
+std::ostream& show(std::ostream& os, const std::list<T, Allocator>& list);
 template <typename T, typename Compare, typename Allocator>
 std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input);
 
@@ -148,13 +151,29 @@ std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)
 }
 
 template <typename T, typename Allocator>
-std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec)
+std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& seq)
 {
     os << "[ ";
-    auto begin = vec.begin();
-    if (begin != vec.end()) {
+    auto begin = seq.begin();
+    if (begin != seq.end()) {
         show(os, *begin);
-        for (auto itr = ++begin; itr != vec.end(); itr++) {
+        for (auto itr = ++begin; itr != seq.end(); itr++) {
+            os << ", ";
+            show(os, *itr);
+        }
+    }
+    os << " ]";
+    return os;
+}
+
+template <typename T, typename Allocator>
+std::ostream& show(std::ostream& os, const std::list<T, Allocator>& seq)
+{
+    os << "[ ";
+    auto begin = seq.begin();
+    if (begin != seq.end()) {
+        show(os, *begin);
+        for (auto itr = ++begin; itr != seq.end(); itr++) {
             os << ", ";
             show(os, *itr);
         }

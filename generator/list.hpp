@@ -4,6 +4,7 @@
 #include "../Random.hpp"
 #include "../printing.hpp"
 #include "util.hpp"
+#include <list>
 #include <vector>
 #include <iostream>
 #include <cmath>
@@ -12,7 +13,7 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class PROPTEST_API Arbitrary<std::vector<T>> : public Gen<std::vector<T>> {
+class PROPTEST_API Arbitrary<std::list<T>> : public Gen<std::list<T>> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
@@ -139,7 +140,7 @@ public:
         return newShrinkable.shrinks();
     }
 
-    Shrinkable<std::vector<T>> operator()(Random& rand)
+    Shrinkable<std::list<T>> operator()(Random& rand)
     {
         int size = rand.getRandomSize(minSize, maxSize + 1);
         std::shared_ptr<vector_t> shrinkVec = std::make_shared<vector_t>();
@@ -166,30 +167,30 @@ public:
 
         shrinkable = shrinkable.andThen([](const shrinkable_t& shr) { return shrinkBulkRecursive(shr, 0, 0); });
 
-        auto vecShrinkable = shrinkable.template transform<std::vector<T>>([](const vector_t& shrinkVec) {
-            auto value = make_shrinkable<std::vector<T>>();
-            std::vector<T>& valueVec = value.getRef();
-            std::transform(shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueVec),
+        auto listShrinkable = shrinkable.template transform<std::list<T>>([](const vector_t& shrinkVec) {
+            auto value = make_shrinkable<std::list<T>>();
+            std::list<T>& valueList = value.getRef();
+            std::transform(shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueList),
                            [](const Shrinkable<T>& shr) -> T { return std::move(shr.getRef()); });
             return value;
         });
 
-        return vecShrinkable;
+        return listShrinkable;
     }
 
-    Arbitrary<std::vector<T>> setMinSize(int size)
+    Arbitrary<std::list<T>> setMinSize(int size)
     {
         minSize = size;
         return *this;
     }
 
-    Arbitrary<std::vector<T>> setMaxSize(int size)
+    Arbitrary<std::list<T>> setMaxSize(int size)
     {
         maxSize = size;
         return *this;
     }
 
-    Arbitrary<std::vector<T>> setSize(int size)
+    Arbitrary<std::list<T>> setSize(int size)
     {
         minSize = size;
         maxSize = size;
@@ -203,8 +204,8 @@ public:
 };
 
 template <typename T>
-size_t Arbitrary<std::vector<T>>::defaultMinSize = 0;
+size_t Arbitrary<std::list<T>>::defaultMinSize = 0;
 template <typename T>
-size_t Arbitrary<std::vector<T>>::defaultMaxSize = 200;
+size_t Arbitrary<std::list<T>>::defaultMaxSize = 200;
 
 }  // namespace PropertyBasedTesting

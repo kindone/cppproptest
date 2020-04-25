@@ -100,3 +100,13 @@ std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
     os << " }";
     return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
+{
+    os << "[ ";
+    for (auto const& i : input) {
+        os << i << " ";
+    }
+    os << "]";
+    return os;
+}
