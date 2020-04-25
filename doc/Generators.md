@@ -8,7 +8,7 @@ Built-in generators are called Arbitraries. `proptest` provides a set of Arbitra
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
 * String types: `std::string`, `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbitrary<UTF8String>`)
-* Standard containers: `std::vector`, `std::pair`, `std::tuple`
+* Standard containers: `std::vector`, `std::list`, `std::set`, `std::pair`, `std::tuple`
 	* Arbitraries for containers can optionally take a generator for their element types
 		```cpp
 		// You can supply a specific generator for integers
@@ -20,6 +20,13 @@ Built-in generators are called Arbitraries. `proptest` provides a set of Arbitra
    	* Containers provide methods for container size configuration
 		* `setMinSize(size)`, `setMaxSize(size)` for restricting to specific range of sizes
 		* `setSize(size)` for restricting to specific size 
+		
+		```cpp
+		auto vecInt = Arbitrary<std::vector<int>>();
+		vecInt.setSize(10); // generated vector will always have size 10
+		vecInt.setMinSize(1); // generated vector will have size greater than or equal to 1
+		vecInt.setMaxSize(10); // generated vector will have size less than or equal to 10
+		```
 
 ## Generator Combinators
 
