@@ -14,7 +14,7 @@ bool PropertyBase::check()
 {
     Random rand(seed);
     Random savedRand(seed);
-    std::cout << "rand seed: " << seed << std::endl;
+    std::cout << "random seed: " << seed << std::endl;
     PropertyContext context;
     int i = 0;
     try {

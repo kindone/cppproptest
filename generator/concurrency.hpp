@@ -5,105 +5,157 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 #include "../api.hpp"
+#include "../PropertyContext.hpp"
 #include <memory>
+#include <list>
 #include <type_traits>
+#include <iostream>
+#include <thread>
 
 namespace PropertyBasedTesting {
 
 template <typename ActionType>
 struct ConcurrentActions
 {
-    std::vector<std::shared_ptr<ActionType>> front;
-    std::vector<std::shared_ptr<ActionType>> rear1;
-    std::vector<std::shared_ptr<ActionType>> rear2;
+    std::list<std::shared_ptr<ActionType>> front;
+    std::list<std::shared_ptr<ActionType>> rear1;
+    std::list<std::shared_ptr<ActionType>> rear2;
 };
 
 template <typename ActionType>
-class PROPTEST_API Arbitrary<ConcurrentActions<ActionType>> : public Gen<ConcurrentActions<ActionType>> {
+class PROPTEST_API Concurrency {
 public:
-    static size_t defaultMinSize;
-    static size_t defaultMaxSize;
+    using SystemType = typename ActionType::SystemType;
+    using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using Actions = std::vector<std::shared_ptr<ActionType>>;
+    using ActionsGen = std::function<Shrinkable<Actions>(Random&)>;
 
-    Arbitrary(std::function<Shrinkable<std::shared_ptr<ActionType>>(Random&)> elemGen)
-        : elemGen(elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
+    static constexpr uint32_t defaultNumRuns = 100;
+
+    Concurrency(std::shared_ptr<SystemTypeGen> initialGenPtr, std::shared_ptr<ActionsGen> actionsGenPtr)
+        : initialGenPtr(initialGenPtr), actionsGenPtr(actionsGenPtr), seed(getCurrentTime()), numRuns(defaultNumRuns)
     {
     }
 
-    Shrinkable<ConcurrentActions<ActionType>> operator()(Random& rand)
+    bool check();
+    bool invoke(Random& rand);
+    void handleShrink(Random& savedRand, const PropertyFailedBase& e);
+
+    Concurrency& setSeed(uint64_t s)
     {
-        // auto vecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(elemGen);
-        // auto front = vecGen(rand);
-        // auto rear1 = vecGen(rand);
-        // auto rear2 = vecGen(rand);
-        // 1. generate front, rears vectors
-        // 2. shrink rears (move to front 1 by 1)
-
-        using vector_t = std::vector<Shrinkable<std::shared_ptr<ActionType>>>;
-
-        int size = rand.getRandomSize(minSize, maxSize + 1);
-        std::shared_ptr<vector_t> shrinkVec = std::make_shared<vector_t>();
-        shrinkVec->reserve(size);
-        for (int i = 0; i < size; i++)
-            shrinkVec->push_back(elemGen(rand));
-
-        // 2. shrink rears (move to front 1 by 1)
-        auto shrink = [](const ConcurrentActions& ca) { ca.front; };
-
-        return make_shrinkable<ConcurrentActions<ActionType>>();
-    }
-
-    Arbitrary<ConcurrentActions<ActionType>> setMinSize(int size)
-    {
-        minSize = size;
+        seed = s;
         return *this;
     }
 
-    Arbitrary<ConcurrentActions<ActionType>> setMaxSize(int size)
+    Concurrency& setNumRuns(uint32_t runs)
     {
-        maxSize = size;
+        numRuns = runs;
         return *this;
     }
 
-    Arbitrary<ConcurrentActions<ActionType>> setSize(int size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
-    // FIXME: turn to shared_ptr
-    std::function<Shrinkable<std::shared_ptr<ActionType>>(Random&)> elemGen;
-    int minSize;
-    int maxSize;
+private:
+    std::shared_ptr<SystemTypeGen> initialGenPtr;
+    std::shared_ptr<ActionsGen> actionsGenPtr;
+    uint64_t seed;
+    int numRuns;
 };
 
 template <typename ActionType>
-size_t Arbitrary<ConcurrentActions<ActionType>>::defaultMinSize = 1;
-template <typename ActionType>
-size_t Arbitrary<ConcurrentActions<ActionType>>::defaultMaxSize = 200;
-
-template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
-decltype(auto) concurrentProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
+bool Concurrency<ActionType>::check()
 {
-    using ModelType = typename ActionType::ModelType;
-    using SystemType = typename ActionType::SystemType;
-    using ModelFactoryFunction = std::function<ModelType(SystemType&)>;
-    std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
-        std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
+    Random rand(seed);
+    Random savedRand(seed);
+    std::cout << "random seed: " << seed << std::endl;
+    int i = 0;
+    try {
+        for (; i < numRuns; i++) {
+            bool pass = true;
+            do {
+                pass = true;
+                try {
+                    savedRand = rand;
+                    invoke(rand);
+                    pass = true;
+                } catch (const Success&) {
+                    pass = true;
+                } catch (const Discard&) {
+                    // silently discard combination
+                    pass = false;
+                }
+            } while (!pass);
+        }
+    } catch (const PropertyFailedBase& e) {
+        std::cerr << "Falsifiable, after " << i << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
+                  << ")" << std::endl;
 
-    return property(
-        [modelFactoryPtr](SystemType obj, ConcurrentActions<ActionType> actions) {
-            auto model = (*modelFactoryPtr)(obj);
-            // execute front in serial
-            for (auto action : actions.front) {
-                if (action->precondition(obj, model))
-                    action->run(obj, model);
-            }
-            // execute rear in parallel
-            // TODO
-            return true;
-        },
-        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionsGen));
+        // shrink
+        handleShrink(savedRand, e);
+        return false;
+    } catch (const std::exception& e) {
+        std::cerr << "Falsifiable, after " << i << " tests - std::exception occurred: " << e.what() << std::endl;
+        std::cerr << "    seed: " << seed << std::endl;
+        return false;
+    }
+
+    std::cout << "OK, passed " << numRuns << " tests" << std::endl;
+
+    return true;
+}
+
+template <typename ActionType>
+bool Concurrency<ActionType>::invoke(Random& rand)
+{
+    Shrinkable<SystemType> initialShr = (*initialGenPtr)(rand);
+    SystemType& obj = initialShr.getRef();
+    Shrinkable<Actions> frontShr = (*actionsGenPtr)(rand);
+    Shrinkable<Actions> rear1Shr = (*actionsGenPtr)(rand);
+    Shrinkable<Actions> rear2Shr = (*actionsGenPtr)(rand);
+    Actions& front = frontShr.getRef();
+    Actions& rear1 = rear1Shr.getRef();
+    Actions& rear2 = rear2Shr.getRef();
+
+    // front
+    for (auto action : front) {
+        if (action->precondition(obj))
+            action->run(obj);
+        PROP_ASSERT(action->postcondition(obj), {});
+    }
+
+    std::thread rearRunner([obj, rear2]() mutable {
+        for (auto action : rear2) {
+            if (action->precondition(obj))
+                action->run(obj);
+            PROP_ASSERT(action->postcondition(obj), {});
+        }
+    });
+    std::this_thread::yield();
+
+    for (auto action : rear1) {
+        if (action->precondition(obj))
+            action->run(obj);
+        PROP_ASSERT(action->postcondition(obj), {});
+    }
+
+    rearRunner.join();
+
+    return true;
+}
+
+template <typename ActionType>
+void Concurrency<ActionType>::handleShrink(Random& savedRand, const PropertyFailedBase& e)
+{
+}
+
+template <typename ActionType, typename InitialGen, typename ActionsGen>
+decltype(auto) concurrency(InitialGen&& initialGen, ActionsGen&& actionsGen)
+{
+    using SystemType = typename ActionType::SystemType;
+    using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using Actions = std::vector<std::shared_ptr<ActionType>>;
+    auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
+    auto actionsGenPtr =
+        std::make_shared<std::function<Shrinkable<Actions>(Random&)>>(std::forward<ActionsGen>(actionsGen));
+    return Concurrency<ActionType>(initialGenPtr, actionsGenPtr);
 }
 
 }  // namespace PropertyBasedTesting
