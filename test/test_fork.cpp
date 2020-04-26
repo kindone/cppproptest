@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdexcept>
 
 class ForkTestCase : public ::testing::Test {
 };
@@ -12,6 +13,91 @@ struct A {
     int a;
     int b;
 };
+
+template <typename RET>
+RET safeCall(std::function<RET()> func) {
+    // prepare pipe for communication
+    int ctop[2];
+    if (pipe(ctop)==-1)
+        throw std::runtime_error("cannot initialize pipe");
+
+    // fork here
+    pid_t pid = fork();
+
+    // fork failed
+    if (pid < 0)
+    {
+        throw std::runtime_error("unable to fork");
+    }
+    // child
+    else if (pid == 0)
+    {
+        try {
+            auto result = func();
+            write(ctop[1], &result, sizeof(result));
+            close(ctop[0]);
+            close(ctop[1]);
+            exit(0);
+            return result;
+        }
+        catch(...) {
+            close(ctop[0]);
+            close(ctop[1]);
+            exit(-1);
+        }
+    }
+    // parent
+    else
+    {
+        int state = 0;
+        pid_t got_pid = waitpid(pid, &state, 0);
+        RET result;
+        printf("WIFEXITED: %d\n", WIFEXITED(state));  // 3
+        printf("WEXITSTATUS: %d\n", WEXITSTATUS(state)); // 4
+        printf("WIFSIGNALED: %d\n", WIFSIGNALED(state)); // 5
+        printf("WIFSTOPPED: %d\n", WIFSTOPPED(state)); // 6
+        printf("WTERMSIG: %d\n", WTERMSIG(state));
+        if(WIFEXITED(state) == 0 || WEXITSTATUS(state) != 0) {
+            std::cerr << "forked process ended with error" << std::endl;
+        }
+        else {
+            std::cout << "reading:" << std::endl;
+            read(ctop[0], &result, sizeof(result));
+        }
+        close(ctop[1]);
+        close(ctop[0]);
+        std::cout << "forked process ended: " << state << std::endl;
+        return result;
+    }
+}
+
+// template <typename RET, typename ...ARGS>
+// RET safeCall(std::function<RET(ARGS...)> func, ARGS&&...args) {
+
+// }
+
+TEST(ForkTestCase, SafeCall) {
+    int result = safeCall<int>([]() {
+        return 5;
+    });
+
+    std::cout << "safe call result: " << result << std::endl;
+
+    result = safeCall<int>([]() {
+        throw std::runtime_error("error!");
+        return 4;
+    });
+
+    std::cout << "safe call result: " << result << std::endl;
+
+    result = safeCall<int>([]() {
+        int* a = nullptr;
+        *a = 5;
+        return *a;
+    });
+
+    std::cout << "safe call result: " << result << std::endl;
+}
 
 TEST(ForkTestCase, Fork)
 {
