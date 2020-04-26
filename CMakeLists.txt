@@ -51,6 +51,7 @@ SET(proptest_testsources
     test/test_state.cpp
     test/test_concurrency.cpp
     test/test_stream.cpp
+    test/test_fork.cpp
 )
 
 
