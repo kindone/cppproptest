@@ -59,6 +59,9 @@ RET safeCall(std::function<RET()> func) {
         printf("WTERMSIG: %d\n", WTERMSIG(state));
         if(WIFEXITED(state) == 0 || WEXITSTATUS(state) != 0) {
             std::cerr << "forked process ended with error" << std::endl;
+            close(ctop[1]);
+            close(ctop[0]);
+            throw std::runtime_error("forked process ended with error");
         }
         else {
             std::cout << "reading:" << std::endl;
@@ -76,27 +79,27 @@ RET safeCall(std::function<RET()> func) {
 
 // }
 
-TEST(ForkTestCase, SafeCall) {
-    int result = safeCall<int>([]() {
+TEST(ForkTestCase, SafeCall1) {
+    auto  result = safeCall<int>([]() {
         return 5;
     });
 
-    std::cout << "safe call result: " << result << std::endl;
+    EXPECT_EQ(result, 5);
+}
 
-    result = safeCall<int>([]() {
+TEST(ForkTestCase, SafeCall2) {
+    EXPECT_ANY_THROW(safeCall<int>([]() {
         throw std::runtime_error("error!");
         return 4;
-    });
+    }));
+}
 
-    std::cout << "safe call result: " << result << std::endl;
-
-    result = safeCall<int>([]() {
+TEST(ForkTestCase, SafeCall3) {
+    EXPECT_ANY_THROW(safeCall<int>([]() {
         int* a = nullptr;
         *a = 5;
         return *a;
-    });
-
-    std::cout << "safe call result: " << result << std::endl;
+    }));
 }
 
 TEST(ForkTestCase, Fork)
