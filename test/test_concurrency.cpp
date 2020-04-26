@@ -2,7 +2,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
-#include "../generator/concurrency.hpp"
+#include "../combinator/concurrency.hpp"
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -54,11 +54,12 @@ struct PopBack : public VectorAction
 
 TEST(ConcurrencyTest, States)
 {
-    auto actionsGen =
-        actions<VectorAction>(transform<int, std::shared_ptr<VectorAction>>(
-                                  Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
-                              just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); }),
-                              just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); }));
+    auto pushBackActionGen = transform<int, std::shared_ptr<VectorAction>>(
+        Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack>(value); });
+    auto popBackActionGen = just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); });
+    auto clearActionGen = just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); });
+
+    auto actionsGen = actions<VectorAction>(pushBackActionGen, popBackActionGen, clearActionGen);
 
     auto prop = concurrency<VectorAction>(Arbitrary<std::vector<int>>(), actionsGen);
     prop.check();
