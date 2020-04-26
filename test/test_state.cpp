@@ -24,7 +24,7 @@ struct PushBack : public VectorAction
         std::cout << "PushBack(" << value << ")" << std::endl;
         auto size = system.size();
         system.push_back(value);
-        PROP_ASSERT(system.size() == size + 1, {});
+        PROP_ASSERT(system.size() == size + 1);
         return true;
     }
 
@@ -37,7 +37,7 @@ struct Clear : public VectorAction
     {
         std::cout << "Clear" << std::endl;
         system.clear();
-        PROP_ASSERT(system.size() == 0, {});
+        PROP_ASSERT(system.size() == 0);
         return true;
     }
 };
@@ -51,7 +51,7 @@ struct PopBack : public VectorAction
         if (system.empty())
             return true;
         system.pop_back();
-        PROP_ASSERT(system.size() == size - 1, {});
+        PROP_ASSERT(system.size() == size - 1);
         return true;
     }
 };
@@ -88,7 +88,7 @@ struct PushBack2 : public VectorAction2
         auto size = system.size();
         system.push_back(value);
         model.size++;
-        PROP_ASSERT(model.size == system.size(), {});
+        PROP_ASSERT(model.size == system.size());
         return true;
     }
 
@@ -102,7 +102,7 @@ struct Clear2 : public VectorAction2
         std::cout << "Clear" << std::endl;
         system.clear();
         model.size = 0;
-        PROP_ASSERT(model.size == system.size(), {});
+        PROP_ASSERT(model.size == system.size());
         return true;
     }
 };
@@ -116,7 +116,7 @@ struct PopBack2 : public VectorAction2
             return true;
         system.pop_back();
         model.size--;
-        PROP_ASSERT(model.size == system.size(), {});
+        PROP_ASSERT(model.size == system.size());
         return true;
     }
 };

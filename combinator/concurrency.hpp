@@ -118,14 +118,14 @@ bool Concurrency<ActionType>::invoke(Random& rand)
     for (auto action : front) {
         if (action->precondition(obj))
             action->run(obj);
-        PROP_ASSERT(action->postcondition(obj), {});
+        PROP_ASSERT(action->postcondition(obj));
     }
 
     std::thread rearRunner([obj, rear2]() mutable {
         for (auto action : rear2) {
             if (action->precondition(obj))
                 action->run(obj);
-            PROP_ASSERT(action->postcondition(obj), {});
+            PROP_ASSERT(action->postcondition(obj));
         }
     });
     std::this_thread::yield();
@@ -133,7 +133,7 @@ bool Concurrency<ActionType>::invoke(Random& rand)
     for (auto action : rear1) {
         if (action->precondition(obj))
             action->run(obj);
-        PROP_ASSERT(action->postcondition(obj), {});
+        PROP_ASSERT(action->postcondition(obj));
     }
 
     rearRunner.join();

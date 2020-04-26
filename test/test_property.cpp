@@ -32,7 +32,7 @@ TEST(PropTest, TestPropertyBasic)
 
     auto prop = property([](std::string a, int i, std::string b) -> bool {
         PROP_STAT(i > 0);
-        PROP_ASSERT(false, {});
+        PROP_ASSERT(false);
         return true;
     });
 
@@ -46,7 +46,7 @@ TEST(PropTest, TestPropertyExample)
 {
     auto func = [](std::string a, int i, std::string b) -> bool {
         PROP_STAT(i > 0);
-        PROP_ASSERT(false, {});
+        PROP_ASSERT(false);
         return true;
     };
     auto prop = property(func);
@@ -57,7 +57,7 @@ TEST(PropTest, TestPropertyExample)
 TYPED_TEST(SignedNumericTest, TestCheckFail)
 {
     check([](TypeParam a, TypeParam b /*,std::string str, std::vector<int> vec*/) -> bool {
-        PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200, {});
+        PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200);
         return true;
     });
 }
@@ -87,7 +87,7 @@ TEST(PropTest, TestCheckBasic)
         std::string c /*(allocator())*/, d /*(allocator())*/;
         c = a + b;
         d = b + a;
-        PROP_ASSERT(c.size() == d.size(), {});
+        PROP_ASSERT(c.size() == d.size());
         EXPECT_EQ(c.size(), d.size());
         // ASSERT_EQ(c.size(), d.size());
         // EXPECT_EQ(c, d);// << "a: " << a << " + b: " << b << ", a+b: " << (a+b) << ", b+a: " << (b+a);
@@ -178,7 +178,7 @@ TEST(PropTest, TestStringCheckFail)
 {
     check([](std::string a) -> bool {
         PROP_STAT(a.size() > 3);
-        PROP_ASSERT(a.size() < 5, {});
+        PROP_ASSERT(a.size() < 5);
         return true;
     });
 }
@@ -200,7 +200,7 @@ TEST(PropTest, TestVectorCheckFail)
             PROP_STAT(a.size() > 3);
             show(std::cout, a);
             std::cout << std::endl;
-            PROP_ASSERT(a.size() < 5, {});
+            PROP_ASSERT(a.size() < 5);
             return true;
         },
         vecGen);
@@ -215,7 +215,7 @@ TEST(PropTest, TestTupleCheckFail)
         int a = std::get<0>(tuple);
         std::tuple<int> subtup = std::get<1>(tuple);
         int b = std::get<0>(subtup);
-        PROP_ASSERT((-10 < a && a < 100) || (-20 < b && b < 200), {});
+        PROP_ASSERT((-10 < a && a < 100) || (-20 < b && b < 200));
         return true;
     });
 }

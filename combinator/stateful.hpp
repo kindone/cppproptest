@@ -86,7 +86,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen
             for (auto action : actions) {
                 if (action->precondition(obj))
                     action->run(obj);
-                PROP_ASSERT(action->postcondition(obj), {});
+                PROP_ASSERT(action->postcondition(obj));
             }
             return true;
         },
@@ -108,7 +108,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
             for (auto action : actions) {
                 if (action->precondition(obj, model))
                     action->run(obj, model);
-                PROP_ASSERT(action->postcondition(obj, model), {});
+                PROP_ASSERT(action->postcondition(obj, model));
             }
             return true;
         },

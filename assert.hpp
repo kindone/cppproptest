@@ -56,7 +56,7 @@ struct Success : public std::logic_error
         }                                                                                                              \
     } while (false)
 
-#define PROP_ASSERT(condition, code) PROP_ASSERT_VARGS(condition, code)
+#define PROP_ASSERT(condition) PROP_ASSERT_VARGS(condition, {})
 
 #define PROP_DISCARD()                                                              \
     do {                                                                            \
