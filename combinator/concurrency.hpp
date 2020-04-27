@@ -133,9 +133,11 @@ bool Concurrency<ActionType>::invoke(Random& rand)
         cv.notify_all();
 
         for (auto action : rear2) {
-            if (action->precondition(obj))
-                action->run(obj);
+            if (!action->precondition(obj))
+                continue;
+            action->run(obj);
             std::cout << "rear2" << std::endl;
+            std::this_thread::yield();
             PROP_ASSERT(action->postcondition(obj));
         }
     });
@@ -145,9 +147,11 @@ bool Concurrency<ActionType>::invoke(Random& rand)
     // std::this_thread::yield();
 
     for (auto action : rear1) {
-        if (action->precondition(obj))
-            action->run(obj);
+        if (!action->precondition(obj))
+            continue;
+        action->run(obj);
         std::cout << "rear1" << std::endl;
+        std::this_thread::yield();
         PROP_ASSERT(action->postcondition(obj));
     }
 
