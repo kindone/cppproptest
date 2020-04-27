@@ -22,6 +22,7 @@ SET(proptest_sources
     Property.cpp
     Random.cpp
     printing.cpp
+    fork.cpp
 )
 
 ADD_LIBRARY(proptest
