@@ -12,17 +12,17 @@ using namespace PropertyBasedTesting;
 class ConcurrencyTest : public ::testing::Test {
 };
 
-struct VectorAction : public ActionWithoutModel<std::vector<int>>
+struct VectorAction3 : public ActionWithoutModel<std::vector<int>>
 {
 };
 
-struct PushBack : public VectorAction
+struct PushBack3 : public VectorAction3
 {
-    PushBack(int value) : value(value) {}
+    PushBack3(int value) : value(value) {}
 
     virtual bool run(std::vector<int>& system)
     {
-        std::cout << "PushBack(" << value << ")" << std::endl;
+        // std::cout << "PushBack(" << value << ")" << std::endl;
         system.push_back(value);
         return true;
     }
@@ -30,21 +30,21 @@ struct PushBack : public VectorAction
     int value;
 };
 
-struct Clear : public VectorAction
+struct Clear3 : public VectorAction3
 {
     virtual bool run(std::vector<int>& system)
     {
-        std::cout << "Clear" << std::endl;
+        // std::cout << "Clear" << std::endl;
         system.clear();
         return true;
     }
 };
 
-struct PopBack : public VectorAction
+struct PopBack3 : public VectorAction3
 {
     virtual bool run(std::vector<int>& system)
     {
-        std::cout << "PopBack" << std::endl;
+        // std::cout << "PopBack" << std::endl;
         if (system.empty())
             return true;
         system.pop_back();
@@ -54,13 +54,13 @@ struct PopBack : public VectorAction
 
 TEST(ConcurrencyTest, States)
 {
-    auto pushBackActionGen = transform<int, std::shared_ptr<VectorAction>>(
-        Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack>(value); });
-    auto popBackActionGen = just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); });
-    auto clearActionGen = just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); });
+    auto pushBackActionGen = transform<int, std::shared_ptr<VectorAction3>>(
+        Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack3>(value); });
+    auto popBackActionGen = just<std::shared_ptr<VectorAction3>>([]() { return std::make_shared<PopBack3>(); });
+    auto clearActionGen = just<std::shared_ptr<VectorAction3>>([]() { return std::make_shared<Clear3>(); });
 
-    auto actionsGen = actions<VectorAction>(pushBackActionGen, popBackActionGen, clearActionGen);
+    auto actionsGen = actions<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
 
-    auto prop = concurrency<VectorAction>(Arbitrary<std::vector<int>>(), actionsGen);
+    auto prop = concurrency<VectorAction3>(Arbitrary<std::vector<int>>(), actionsGen);
     prop.check();
 }

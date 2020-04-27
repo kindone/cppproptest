@@ -11,6 +11,8 @@
 #include <type_traits>
 #include <iostream>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 namespace PropertyBasedTesting {
 
@@ -121,18 +123,31 @@ bool Concurrency<ActionType>::invoke(Random& rand)
         PROP_ASSERT(action->postcondition(obj));
     }
 
-    std::thread rearRunner([obj, rear2]() mutable {
+    std::mutex mtx;
+    std::condition_variable cv;
+    bool ready = false;
+
+    std::thread rearRunner([obj, rear2, &ready, &mtx, &cv]() mutable {
+        std::unique_lock<std::mutex> lck(mtx);
+        ready = true;
+        cv.notify_all();
+
         for (auto action : rear2) {
             if (action->precondition(obj))
                 action->run(obj);
+            std::cout << "rear2" << std::endl;
             PROP_ASSERT(action->postcondition(obj));
         }
     });
-    std::this_thread::yield();
+
+    std::unique_lock<std::mutex> lck(mtx);
+    while (!ready) cv.wait(lck);
+    // std::this_thread::yield();
 
     for (auto action : rear1) {
         if (action->precondition(obj))
             action->run(obj);
+        std::cout << "rear1" << std::endl;
         PROP_ASSERT(action->postcondition(obj));
     }
 
