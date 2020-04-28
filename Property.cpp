@@ -36,7 +36,7 @@ bool PropertyBase::check()
             } while (!pass);
         }
     } catch (const PropertyFailedBase& e) {
-        std::cerr << "Falsifiable, after " << i << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
+        std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
                   << ")" << std::endl;
 
         // shrink
@@ -44,7 +44,7 @@ bool PropertyBase::check()
         return false;
     } catch (const std::exception& e) {
         // skip shrinking?
-        std::cerr << "Falsifiable, after " << i << " tests - std::exception occurred: " << e.what() << std::endl;
+        std::cerr << "Falsifiable, after " << (i + 1) << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
         return false;
     }
