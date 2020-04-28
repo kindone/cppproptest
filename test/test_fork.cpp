@@ -68,7 +68,8 @@ TEST(ForkTestCase, Fork)
             printf("message from parent: %s\n", message_from_parent);
         close(ptoc[0]);
 
-        write(ctop[1], "hello from child", 20);
+        if (0 >= write(ctop[1], "hello from child", 20))
+            throw std::runtime_error("write error");
 
         int* a = nullptr;
         printf("a: %d\n", *a);  // kill
@@ -78,7 +79,8 @@ TEST(ForkTestCase, Fork)
         close(ptoc[0]);
         close(ctop[1]);
 
-        write(ptoc[1], "hello from parent", 20);
+        if (0 >= write(ptoc[1], "hello from parent", 20))
+            throw std::runtime_error("write error");
         close(ptoc[1]);
 
         printf("parent process: counter=%d\n", ++counter);
