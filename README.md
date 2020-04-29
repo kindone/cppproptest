@@ -127,7 +127,7 @@ auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
 
 * [Using and Defining Generators](doc/Generators.md)
 * [Counter Examples and Shrinking](doc/Shrinking.md)
-* [Stateful Testing with Property-based Testing Framework](doc/statefulTesting.md)
+* [Stateful Testing with Property-based Testing Framework](doc/StatefulTesting.md)
 * [Concurrency Testing with Property-based Testing Framework](doc/ConcurrencyTesting.md)
 * [Advanced Mocking with Property-based Testing Framework](doc/Mocking.md)
 
