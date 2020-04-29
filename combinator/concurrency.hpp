@@ -143,7 +143,8 @@ bool Concurrency<ActionType>::invoke(Random& rand)
     });
 
     std::unique_lock<std::mutex> lck(mtx);
-    while (!ready) cv.wait(lck);
+    while (!ready)
+        cv.wait(lck);
     // std::this_thread::yield();
 
     for (auto action : rear1) {

@@ -59,7 +59,7 @@ protected:
 
 protected:
     virtual bool invoke(Random& rand) = 0;
-    virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e) = 0;
+    virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/) = 0;
 
     static uint32_t defaultNumRuns;
 
@@ -142,12 +142,12 @@ public:
         return false;
     }
 
-    virtual void handleShrink(Random& savedRand, const PropertyFailedBase& e)
+    virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/)
     {
         auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTypeTup)::type_tuple;
-        auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        shrink(savedRand, *failed.valueTupPtr);
+        // auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
+        shrink(savedRand /*, *failed.valueTupPtr*/);
     }
 
 private:
@@ -235,8 +235,8 @@ private:
             shrinkN<index>(std::forward<ValueTuple>(valueTup), std::forward<ShrinksTuple>(shrinksTup))...);
     }
 
-    template <typename ValueTuple>
-    void shrink(Random& savedRand, ValueTuple&& valueTup)
+    // template <typename ValueTuple>
+    void shrink(Random& savedRand /*, ValueTuple&& valueTup*/)
     {
         // std::cout << "shrinking value: ";
         // show(std::cout, valueTup);
@@ -244,7 +244,7 @@ private:
 
         auto generatedValueTup = util::transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
         // std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
-        static constexpr auto Size = std::tuple_size<std::decay_t<ValueTuple>>::value;
+        static constexpr auto Size = std::tuple_size<GenTuple>::value;
         auto shrinksTuple =
             util::transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
