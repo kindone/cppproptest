@@ -53,13 +53,15 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     //         [str](const int& len) { return str.substr(0, len); });
     // }
 
-    int len = rand.getRandomSize(0, maxSize + 1);
-    std::string str(len, ' ' /*, allocator()*/);
-    for (int i = 0; i < len; i++)
+    int size = rand.getRandomSize(minSize, maxSize + 1);
+    std::string str(size, ' ' /*, allocator()*/);
+    for (int i = 0; i < size; i++)
         str[i] = rand.getRandomSize(0, 128);
 
-    return binarySearchShrinkable<int>(len).transform<std::string>(
-        [str](const int& len) { return str.substr(0, len); });
+    int minSizeCopy = minSize;
+    return binarySearchShrinkable<int>(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const int& size) {
+        return str.substr(0, size + minSizeCopy);
+    });
 
     /*
     return make_shrinkable<std::string>(str).with([str]() -> stream_t {
@@ -84,6 +86,9 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
  * U+100000..U+10FFFF F4       80..8F   80..BF   80..BF
  *
  */
+size_t Arbitrary<UTF8String>::defaultMinSize = 0;
+size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
+
 std::string Arbitrary<UTF8String>::boundaryValues[1] = {""};
 
 bool isValidUTF8(std::vector<uint8_t>& chars)
@@ -150,12 +155,12 @@ bool isValidUTF8(std::vector<uint8_t>& chars)
 
 Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
 {
-    if (rand.getRandomBool()) {
-        size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i] /*, allocator()*/));
-    }
+    // if (rand.getRandomBool()) {
+    //     size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
+    //     return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i] /*, allocator()*/));
+    // }
 
-    int len = rand.getRandomSize(0, maxSize + 1);
+    int len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;
     std::vector<uint8_t> nums /*, allocator()*/;
     chars.reserve(len * 4);
@@ -254,6 +259,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
         str[i] = chars[i];
     }
 
+    // TODO: shrinking
     return make_shrinkable<UTF8String>(str);
 }
 

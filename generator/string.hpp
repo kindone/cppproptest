@@ -37,11 +37,34 @@ public:
 template <>
 class PROPTEST_API Arbitrary<UTF8String> : public Gen<UTF8String> {
 public:
-    Arbitrary(int _maxLen = 300) : maxSize(_maxLen) {}
+    static size_t defaultMinSize;
+    static size_t defaultMaxSize;
+
+    Arbitrary() : minSize(defaultMinSize), maxSize(defaultMaxSize) {}
 
     Shrinkable<UTF8String> operator()(Random& rand);
     static std::string boundaryValues[1];
 
+    Arbitrary setMinSize(int size)
+    {
+        minSize = size;
+        return *this;
+    }
+
+    Arbitrary setMaxSize(int size)
+    {
+        maxSize = size;
+        return *this;
+    }
+
+    Arbitrary setSize(int size)
+    {
+        minSize = size;
+        maxSize = size;
+        return *this;
+    }
+
+    int minSize;
     int maxSize;
 };
 }  // namespace PropertyBasedTesting

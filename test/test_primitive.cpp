@@ -74,11 +74,24 @@ TEST(PropTest, GenerateBool)
     }
 }
 
+TEST(PropTest, GenString)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<std::string> gen;
+    gen.setSize(5);
+
+    for (int i = 0; i < 20; i++) {
+        std::cout << "str: \"" << static_cast<std::string>(gen(rand).getRef()) << "\"" << std::endl;
+    }
+}
+
 TEST(PropTest, GenUTF8String)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<UTF8String> gen(5);
+    Arbitrary<UTF8String> gen;
+    gen.setSize(5);
 
     for (int i = 0; i < 20; i++) {
         std::cout << "str: \"" << static_cast<UTF8String>(gen(rand).getRef()) << "\"" << std::endl;

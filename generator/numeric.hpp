@@ -229,6 +229,18 @@ public:
                                                   UINT8_MAX + 1};
 };
 
+template <typename T>
+std::function<Shrinkable<T>(Random& rand)> nonZero(T max = std::numeric_limits<T>::max())
+{
+    return [max](Random& rand) { return generateInteger<T>(rand, 1, max); };
+}
+
+template <typename T>
+std::function<Shrinkable<T>(Random& rand)> nonNegative(T max = std::numeric_limits<T>::max())
+{
+    return [max](Random& rand) { return generateInteger<T>(rand, 0, max); };
+}
+
 // generates numeric in [a, b]
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> fromTo(T min, T max)
