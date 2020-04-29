@@ -145,6 +145,13 @@ public:
 };
 
 template <>
+class PROPTEST_API Arbitrary<char> : public Gen<char> {
+public:
+    Shrinkable<char> operator()(Random& rand);
+    static constexpr char boundaryValues[] = {0};
+};
+
+template <>
 class PROPTEST_API Arbitrary<uint8_t> : public Gen<uint8_t> {
 public:
     Shrinkable<uint8_t> operator()(Random& rand);

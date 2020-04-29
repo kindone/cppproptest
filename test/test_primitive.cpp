@@ -78,7 +78,8 @@ TEST(PropTest, GenString)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::string> gen;
+    auto alphabets = inRange<char>('A', 'z');
+    Arbitrary<std::string> gen(alphabets);
     gen.setSize(5);
 
     for (int i = 0; i < 20; i++) {

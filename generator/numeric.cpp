@@ -9,6 +9,11 @@
 
 namespace PropertyBasedTesting {
 
+Shrinkable<char> Arbitrary<char>::operator()(Random& rand)
+{
+    return generateInteger<char>(rand);
+}
+
 Shrinkable<int8_t> Arbitrary<int8_t>::operator()(Random& rand)
 {
     return generateInteger<int8_t>(rand);
@@ -167,6 +172,7 @@ Shrinkable<double> Arbitrary<double>::operator()(Random& rand)
     // });
 }
 
+constexpr char Arbitrary<char>::boundaryValues[];
 constexpr int8_t Arbitrary<int8_t>::boundaryValues[];
 constexpr int16_t Arbitrary<int16_t>::boundaryValues[];
 constexpr int32_t Arbitrary<int32_t>::boundaryValues[];
