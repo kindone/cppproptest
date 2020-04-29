@@ -1,5 +1,4 @@
-#ifndef __PROPTEST_GENERATORS_HPP__
-#define __PROPTEST_GENERATORS_HPP__
+#pragma once
 
 #include "generator/numeric.hpp"
 #include "generator/bool.hpp"
@@ -18,5 +17,3 @@
 #include "combinator/dependency.hpp"
 #include "combinator/just.hpp"
 #include "combinator/stateful.hpp"
-
-#endif

@@ -16,7 +16,7 @@ Shrinkable<INTTYPE> binarySearchShrinkable(INTTYPE value)
 {
     using shrinkable_t = Shrinkable<INTTYPE>;
     using stream_t = Stream<shrinkable_t>;
-    using func_t = typename std::function<stream_t()>;
+    // using func_t = typename std::function<stream_t()>;
     using genfunc_t = typename std::function<stream_t(INTTYPE, INTTYPE)>;
 
     // given min, max, generate stream

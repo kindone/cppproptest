@@ -92,7 +92,7 @@ template <
     typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGTYPES)), bool>::type = true>
 decltype(auto) construct(EXPGENS&&... gens)
 {
-    constexpr auto ExplicitSize = sizeof...(EXPGENS);
+    // constexpr auto ExplicitSize = sizeof...(EXPGENS);
     auto explicits = std::make_tuple(gens...);
     return Construct<CLASS, ARGTYPES...>(explicits);
 }
