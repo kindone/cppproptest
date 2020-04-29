@@ -14,8 +14,8 @@ Arbitrary<std::string>::Arbitrary() : elemGen(Arbitrary<char>()), minSize(defaul
 
 Arbitrary<std::string>::Arbitrary(Arbitrary<char>& _elemGen)
     : elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); }),
-        minSize(defaultMinSize),
-        maxSize(defaultMaxSize)
+      minSize(defaultMinSize),
+      maxSize(defaultMaxSize)
 {
 }
 
@@ -45,21 +45,21 @@ Arbitrary<std::string> Arbitrary<std::string>::setSize(int size)
 
 Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
 {
-    if (rand.getRandomBool(0.05)) {
-        size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-        std::string str = std::string(boundaryValues[i]);
-        int len = str.size();
-        return binarySearchShrinkable<int>(len).transform<std::string>(
-            [str](const int& len) { return str.substr(0, len); });
-    } else {
-        int len = rand.getRandomSize(0, maxSize + 1);
-        std::string str(len, ' ' /*, allocator()*/);
-        for (int i = 0; i < len; i++)
-            str[i] = rand.getRandomSize(0, 128);
+    // if (minSize == 0 && rand.getRandomBool(0.05)) {
+    //     size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
+    //     std::string str = std::string(boundaryValues[i]);
+    //     int len = str.size();
+    //     return binarySearchShrinkable<int>(len).transform<std::string>(
+    //         [str](const int& len) { return str.substr(0, len); });
+    // }
 
-        return binarySearchShrinkable<int>(len).transform<std::string>(
-            [str](const int& len) { return str.substr(0, len); });
-    }
+    int len = rand.getRandomSize(0, maxSize + 1);
+    std::string str(len, ' ' /*, allocator()*/);
+    for (int i = 0; i < len; i++)
+        str[i] = rand.getRandomSize(0, 128);
+
+    return binarySearchShrinkable<int>(len).transform<std::string>(
+        [str](const int& len) { return str.substr(0, len); });
 
     /*
     return make_shrinkable<std::string>(str).with([str]() -> stream_t {
