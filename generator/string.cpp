@@ -1,15 +1,51 @@
 #include "../gen.hpp"
-#include "./string.hpp"
-#include "./util.hpp"
+#include "string.hpp"
+#include "util.hpp"
+#include "numeric.hpp"
 #include <vector>
 
 namespace PropertyBasedTesting {
 
 std::string Arbitrary<std::string>::boundaryValues[1] = {""};
+size_t Arbitrary<std::string>::defaultMinSize = 0;
+size_t Arbitrary<std::string>::defaultMaxSize = 200;
+
+Arbitrary<std::string>::Arbitrary() : elemGen(Arbitrary<char>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+
+Arbitrary<std::string>::Arbitrary(Arbitrary<char>& _elemGen)
+    : elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); }),
+        minSize(defaultMinSize),
+        maxSize(defaultMaxSize)
+{
+}
+
+Arbitrary<std::string>::Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen)
+    : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
+{
+}
+
+Arbitrary<std::string> Arbitrary<std::string>::setMinSize(int size)
+{
+    minSize = size;
+    return *this;
+}
+
+Arbitrary<std::string> Arbitrary<std::string>::setMaxSize(int size)
+{
+    maxSize = size;
+    return *this;
+}
+
+Arbitrary<std::string> Arbitrary<std::string>::setSize(int size)
+{
+    minSize = size;
+    maxSize = size;
+    return *this;
+}
 
 Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
 {
-    if (rand.getRandomBool()) {
+    if (rand.getRandomBool(0.05)) {
         size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
         std::string str = std::string(boundaryValues[i]);
         int len = str.size();

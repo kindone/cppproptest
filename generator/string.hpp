@@ -7,11 +7,23 @@ namespace PropertyBasedTesting {
 template <>
 class PROPTEST_API Arbitrary<std::string> : public Gen<std::string> {
 public:
-    Arbitrary(int _maxLen = 300) : maxSize(_maxLen) {}
+    static size_t defaultMinSize;
+    static size_t defaultMaxSize;
+
+    Arbitrary();
+    Arbitrary(Arbitrary<char>& _elemGen);
+    Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen);
 
     Shrinkable<std::string> operator()(Random& rand);
     static std::string boundaryValues[1];
 
+    Arbitrary setMinSize(int size);
+    Arbitrary setMaxSize(int size);
+    Arbitrary setSize(int size);
+
+    // FIXME: turn to shared_ptr
+    std::function<Shrinkable<char>(Random&)> elemGen;
+    int minSize;
     int maxSize;
 };
 
