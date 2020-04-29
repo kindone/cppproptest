@@ -1,6 +1,6 @@
 # proptest
 
-`proptest` is a properby-based testing framework for C++. 
+`proptest` is a property-based testing framework for C++. 
 
 &nbsp;
 
@@ -14,7 +14,7 @@ A property is in the form of function `(Input0, ... , InputN) -> bool`
 
 ```cpp
 [](int a, int b) -> bool {
-    return a + b == b+ a;
+    return a + b == b + a;
 }
 ```
 
@@ -71,7 +71,7 @@ property([](int a) -> bool {
 }, myIntGenerator);
 ```
 
-Many primitive types and containers have their `Aribtrary<T>` defined by the framework for convenience.
+Many primitive types and containers have their `Arbitrary<T>` defined by the framework for convenience.
 
 &nbsp;
 
