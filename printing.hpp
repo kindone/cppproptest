@@ -108,9 +108,10 @@ bool toStreamFrontHelper(std::ostream& os, const T& t)
 }
 
 template <typename Tuple, std::size_t... index>
-void toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>)
+decltype(auto) toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>)
 {
     auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};
+    return dummy;
 }
 
 template <size_t Size, typename Tuple>

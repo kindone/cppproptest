@@ -25,7 +25,7 @@ struct Gen
     virtual Shrinkable<T> operator()(Random& rand) { throw std::runtime_error("operator() should be defined for Gen"); }
 };
 
-template <typename T, typename ElemGen = void>
+template <typename T>
 struct Arbitrary : public Gen<T>
 {
 };

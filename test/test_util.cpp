@@ -130,7 +130,7 @@ TEST(UtilTestCase, StreamShrink)
     // recursive
     using shrinkable_t = Shrinkable<int>;
     using stream_t = Stream<shrinkable_t>;
-    using func_t = typename std::function<stream_t()>;
+    // using func_t = typename std::function<stream_t()>;
     using genfunc_t = typename std::function<stream_t(int, int)>;
 
     // given min, val, generate stream
