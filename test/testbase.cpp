@@ -1,4 +1,5 @@
 #include "testbase.hpp"
+#include "string.hpp"
 
 constexpr int32_t GenSmallInt::boundaryValues[13];
 
@@ -10,6 +11,15 @@ double getTime()
         return 0;
     }
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
+}
+
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String& str) {
+    os << "\"";
+    os << str.c_str() << " (";
+    PropertyBasedTesting::decodeUTF8(os, str);
+    os << ")\"";
+    // os << "\"" << str << "\"";
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& input)

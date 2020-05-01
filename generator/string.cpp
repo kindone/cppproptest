@@ -1,8 +1,12 @@
 #include "../gen.hpp"
+#include "../string.hpp"
 #include "string.hpp"
 #include "util.hpp"
 #include "numeric.hpp"
 #include <vector>
+#include <iostream>
+#include <ios>
+#include <iomanip>
 
 namespace PropertyBasedTesting {
 
@@ -70,6 +74,12 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     */
 }
 
+
+size_t Arbitrary<UTF8String>::defaultMinSize = 0;
+size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
+
+std::string Arbitrary<UTF8String>::boundaryValues[1] = {""};
+
 /*
  * legal utf-8 byte sequence
  * http://www.unicode.org/versions/Unicode6.0.0/ch03.pdf - page 94
@@ -86,73 +96,6 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
  * U+100000..U+10FFFF F4       80..8F   80..BF   80..BF
  *
  */
-size_t Arbitrary<UTF8String>::defaultMinSize = 0;
-size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
-
-std::string Arbitrary<UTF8String>::boundaryValues[1] = {""};
-
-bool isValidUTF8(std::vector<uint8_t>& chars)
-{
-    for (size_t i = 0; i < chars.size(); i++) {
-        if (chars[i] <= 0x7f) {
-            continue;
-        } else if (i + 1 >= chars.size()) {
-            return false;
-        } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
-            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
-                i++;
-            } else
-                return false;
-        } else if (i + 2 >= chars.size()) {
-            return false;
-        } else if (0xe0 == chars[i]) {
-            if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                i += 2;
-            } else
-                return false;
-        } else if (0xe1 <= chars[i] && chars[i] <= 0xec) {
-            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                i += 2;
-            } else
-                return false;
-        } else if (0xed == chars[i]) {
-            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x9f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                i += 2;
-            } else
-                return false;
-        } else if (0xee <= chars[i] && chars[i] <= 0xef) {
-            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                i += 2;
-            } else
-                return false;
-        } else if (i + 3 >= chars.size()) {
-            return false;
-        } else if (0xf0 == chars[i]) {
-            if (0x90 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
-                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
-                i += 3;
-            } else
-                return false;
-        } else if (0xf1 <= chars[i] && chars[i] <= 0xf3) {
-            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
-                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
-                i += 3;
-            } else
-                return false;
-
-        } else if (0xf4 == chars[i]) {
-            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
-                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
-                i += 3;
-            } else
-                return false;
-
-        } else
-            return false;
-    }
-    return true;
-}
-
 Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
 {
     // if (rand.getRandomBool()) {
@@ -163,9 +106,12 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     int len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;
     std::vector<uint8_t> nums /*, allocator()*/;
+    std::vector<int> positions /*, allocator()*/;
     chars.reserve(len * 4);
+    nums.reserve(len);
+    positions.reserve(len);
 
-    const int ranges[][2] = {{0, 0x7f},    {0xc2, 0xdf}, {0xe0, 0xe0}, {0xe1, 0xec}, {0xed, 0xed},
+    const int ranges[][2] = {{0, 0x7f}, {0xc2, 0xdf}, {0xe0, 0xe0}, {0xe1, 0xec}, {0xed, 0xed},
                              {0xee, 0xef}, {0xf0, 0xf0}, {0xf1, 0xf3}, {0xf4, 0xf4}};
     const int numRanges = sizeof(ranges) / sizeof(ranges[0]);
 
@@ -177,6 +123,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     for (int i = 0; i < len; i++) {
         uint8_t n = rand.getRandomSize(0, numbers);
         nums.push_back(n);
+        positions.push_back(chars.size());
         if (n <= 0x7f) {
             chars.push_back(0x0 + n);
             continue;
@@ -231,9 +178,9 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
             chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
             continue;
         }
-        n -= (0xf3 - 0xf1 + 1);
+        // n -= (0xf3 - 0xf1 + 1);
         chars.push_back(0xf4);
-        chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
+        chars.push_back(rand.getRandomSize(0x80, 0x8f + 1));
         chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
         chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
     }
@@ -254,13 +201,27 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     }
     */
 
+
+   std::cout << "hex = '";
+   UTF8ToHex(std::cout, chars);
+   std::cout << "', decoded = '";
+
+   decodeUTF8(std::cout, chars);
+   std::cout << "'" << std::endl;
+
     UTF8String str(chars.size(), ' ' /*, allocator()*/);
     for (size_t i = 0; i < chars.size(); i++) {
         str[i] = chars[i];
     }
 
-    // TODO: shrinking
-    return make_shrinkable<UTF8String>(str);
+    // substring shrinking
+    int minSizeCopy = minSize;
+    return binarySearchShrinkable<int>(len - minSizeCopy).template transform<UTF8String>([str, minSizeCopy, positions](const int& size) -> UTF8String{
+        if(positions.empty())
+            return UTF8String();
+        else
+            return UTF8String(std::move(str.substr(0, positions[size + minSizeCopy])));
+    });
 }
 
 }  // namespace PropertyBasedTesting

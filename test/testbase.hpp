@@ -3,6 +3,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
+#include "string.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -123,6 +124,7 @@ class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector
 
 }  // namespace PropertyBasedTesting
 
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String&);
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& vec);
 std::ostream& operator<<(std::ostream& os, const TableData& td);
 std::ostream& operator<<(std::ostream& os, const std::vector<std::tuple<uint16_t, bool>>& indexVec);

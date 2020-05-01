@@ -1,11 +1,15 @@
 #include "printing.hpp"
 #include "api.hpp"
+#include "string.hpp"
 
 namespace PropertyBasedTesting {
 
 PROPTEST_API std::ostream& show(std::ostream& os, const std::string& str)
 {
-    os << "\"" << str << "\"";
+    os << "\"";
+    decodeUTF8(os, str);
+    os << "\"";
+    // os << "\"" << str << "\"";
     return os;
 }
 
