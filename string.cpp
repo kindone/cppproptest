@@ -17,7 +17,15 @@ IosFlagSaver::~IosFlagSaver() {
 
 
 std::ostream& validChar(std::ostream& os, uint8_t c) {
-    os << c;
+    if(static_cast<char>(c) == '\\')
+        os << "\\\\";
+    else if(c < 0x20) {
+        util::IosFlagSaver iosFlagSaver(os);
+        os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c);
+    }
+    else
+        os << static_cast<char>(c);
+
     return os;
 }
 
@@ -62,6 +70,30 @@ std::ostream& charAsHex(std::ostream& os, uint8_t c) {
     return os;
 }
 
+std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2) {
+    util::IosFlagSaver iosFlagSaver(os);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2);
+    return os;
+}
+
+std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3) {
+    util::IosFlagSaver iosFlagSaver(os);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c3);
+    return os;
+}
+
+std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4) {
+    util::IosFlagSaver iosFlagSaver(os);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c3);
+    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c4);
+    return os;
+}
+
 std::ostream& UTF8ToHex(std::ostream& os, std::vector<uint8_t>& chars) {
     util::IosFlagSaver iosFlagSaver(os);
 
@@ -83,7 +115,7 @@ std::ostream& decodeUTF8(std::ostream& os, const std::string& str) {
 
 /*
  * legal utf-8 byte sequence
- * http://www.unicode.org/versions/Unicode6.0.0/ch03.pdf - page 94
+ * http://www.unicode.org/versions/Unicode6.0.0/ch03.pdf
  *
  *  Code Points        1st       2s       3s       4s
  * U+0000..U+007F     00..7F
@@ -102,7 +134,8 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
     for (size_t i = 0; i < chars.size(); i++) {
         //U+0000..U+007F
         if (chars[i] <= 0x7f) {
-            os << static_cast<char>(chars[i]);
+            validChar(os, chars[i]);
+            // os << static_cast<char>(chars[i]);
         } else if (i + 1 >= chars.size()) {
             charAsHex(os, chars[i]);
         // U+0080..U+07FF
@@ -110,6 +143,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
                 // validChar(os, chars[i] - 0xc2, chars[i+1]);
                 codepage(os, 0x80 + (chars[i]-0xc2)*(0xbf-0x80+1) + (chars[i+1]-0x80));
+                // charAsHex(os, chars[i], chars[i+1]);
                 i++;
             } else {
                 charAsHex(os, chars[i]);
@@ -122,6 +156,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                 // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 codepage(os, 0x0800 + (chars[i]-0xe0)*(0xbf-0xa0+1)*(0xbf-0x80+1)
                  + (chars[i+1]-0xa0)*(0xbf-0x80+1) + (chars[i+2]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
                 i += 2;
             } else
                 charAsHex(os, chars[i]);
@@ -131,6 +166,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                 // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 codepage(os, 0x1000 + (chars[i]-0xe1)*(0xbf-0x80+1)*(0xbf-0x80+1)
                  + (chars[i+1]-0x80)*(0xbf-0x80+1) + (chars[i+2]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
                 i += 2;
             } else
                 charAsHex(os, chars[i]);
@@ -140,6 +176,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                 // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 codepage(os, 0xD000 + (chars[i]-0xed)*(0x9f-0x80+1)*(0xbf-0x80+1)
                  + (chars[i+1]-0x80)*(0xbf-0x80+1) + (chars[i+2]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
                 i += 2;
             } else
                 charAsHex(os, chars[i]);
@@ -149,6 +186,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                 // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 codepage(os, 0xe000 + (chars[i]-0xee)*(0xbf-0x80+1)*(0xbf-0x80+1)
                  + (chars[i+1]-0x80)*(0xbf-0x80+1) + (chars[i+2]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
                 i += 2;
             } else
                 charAsHex(os, chars[i]);
@@ -163,6 +201,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                  + (chars[i+1]-0x90)*(0xbf-0x80+1)*(0xbf-0x80+1)
                  + (chars[i+2]-0x80)*(0xbf-0x80+1)
                  + (chars[i+3]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
                 i += 3;
             } else
                 charAsHex(os, chars[i]);
@@ -175,6 +214,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                  + (chars[i+1]-0x80)*(0xbf-0x80+1)*(0xbf-0x80+1)
                  + (chars[i+2]-0x80)*(0xbf-0x80+1)
                  + (chars[i+3]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
                 i += 3;
             } else
                 charAsHex(os, chars[i]);
@@ -187,6 +227,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                  + (chars[i+1]-0x80)*(0xbf-0x80+1)*(0xbf-0x80+1)
                  + (chars[i+2]-0x80)*(0xbf-0x80+1)
                  + (chars[i+3]-0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
                 i += 3;
             } else {
                 charAsHex(os, chars[i]);

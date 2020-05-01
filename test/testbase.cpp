@@ -15,7 +15,7 @@ double getTime()
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String& str) {
     os << "\"";
-    os << str.c_str() << " (";
+    os << static_cast<std::string>(str) << "\" (";
     PropertyBasedTesting::decodeUTF8(os, str);
     os << ")\"";
     // os << "\"" << str << "\"";

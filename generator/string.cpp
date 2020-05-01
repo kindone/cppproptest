@@ -82,7 +82,7 @@ std::string Arbitrary<UTF8String>::boundaryValues[1] = {""};
 
 /*
  * legal utf-8 byte sequence
- * http://www.unicode.org/versions/Unicode6.0.0/ch03.pdf - page 94
+ * http://www.unicode.org/versions/Unicode6.0.0/ch03.pdf
  *
  *  Code Points        1st       2s       3s       4s
  * U+0000..U+007F     00..7F
