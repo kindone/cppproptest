@@ -5,10 +5,26 @@
 
 namespace PropertyBasedTesting {
 
+namespace util {
+
+uint64_t getGlobalSeed() {
+    static const char* env_seed = std::getenv("PROPTEST_SEED");
+    if(env_seed) {
+       return atoll(env_seed);
+    }
+    else {
+        static uint64_t time = getCurrentTime();
+        return time;
+    }
+}
+
+}
+
+
 PropertyContext* PropertyBase::context = nullptr;
 uint32_t PropertyBase::defaultNumRuns = 100;
 
-PropertyBase::PropertyBase() : seed(getCurrentTime()), numRuns(defaultNumRuns) {}
+PropertyBase::PropertyBase() : seed(util::getGlobalSeed()), numRuns(defaultNumRuns) {}
 
 bool PropertyBase::check()
 {
