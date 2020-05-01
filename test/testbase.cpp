@@ -14,11 +14,23 @@ double getTime()
 }
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String& str) {
+    // os << "\"";
+    // os << static_cast<std::string>(str) << "\" (";
+    // PropertyBasedTesting::decodeUTF8(os, str);
+    // os << ")\"";
+
+    os << "hex = {";
+    std::vector<uint8_t> chars;
+    chars.reserve(str.size());
+    for(size_t i = 0; i < str.size(); i++)
+        chars.push_back(str[i]);
+
+    PropertyBasedTesting::UTF8ToHex(os, chars);
+    std::cout << "}, decoded = \"";
+
+    PropertyBasedTesting::decodeUTF8(os, chars);
     os << "\"";
-    os << static_cast<std::string>(str) << "\" (";
-    PropertyBasedTesting::decodeUTF8(os, str);
-    os << ")\"";
-    // os << "\"" << str << "\"";
+
     return os;
 }
 

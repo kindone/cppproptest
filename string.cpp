@@ -97,14 +97,25 @@ std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, ui
 std::ostream& UTF8ToHex(std::ostream& os, std::vector<uint8_t>& chars) {
     util::IosFlagSaver iosFlagSaver(os);
 
-    for(size_t i = 0; i < chars.size(); i++) {
-        os << /*"\\x" <<*/ std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[i]);
+    if(chars.size() > 0)
+        os << /*"\\x" <<*/ std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[0]);
+    for(size_t i = 1; i < chars.size(); i++) {
+        os << " " << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[i]);
     }
 
     return os;
 }
 
 std::ostream& decodeUTF8(std::ostream& os, const std::string& str) {
+    std::vector<uint8_t> chars;
+    chars.reserve(str.size());
+    for(size_t i = 0; i < str.size(); i++) {
+        chars.push_back(str[i]);
+    }
+    return decodeUTF8(os, chars);
+}
+
+std::ostream& decodeUTF8(std::ostream& os, const UTF8String& str) {
     std::vector<uint8_t> chars;
     chars.reserve(str.size());
     for(size_t i = 0; i < str.size(); i++) {

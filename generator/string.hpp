@@ -1,5 +1,6 @@
 #pragma once
 #include "../gen.hpp"
+#include "../string.hpp"
 #include <string>
 
 namespace PropertyBasedTesting {
@@ -25,13 +26,6 @@ public:
     std::function<Shrinkable<char>(Random&)> elemGen;
     int minSize;
     int maxSize;
-};
-
-class PROPTEST_API UTF8String : public std::string {
-public:
-    explicit UTF8String(std::string&& other) : std::string(other) {}
-    explicit UTF8String(std::string& other) : std::string(other) {}
-    using std::string::string;
 };
 
 template <>

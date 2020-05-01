@@ -3,26 +3,6 @@
 
 using namespace PropertyBasedTesting;
 
-TEST(PropTest, GenUTF8String2)
-{
-    int64_t seed = getCurrentTime();
-    Random rand(seed);
-    Arbitrary<UTF8String> gen;
-    gen.setMaxSize(8);
-
-    // for(int i = 0; i < 20; i++) {
-    //     std::vector<int> val(gen(rand).get());
-    //     std::cout << "vec: ";
-    //     for(size_t j = 0; j < val.size(); j++)
-    //     {
-    //         std::cout << val[j] << ", ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-    for (int i = 0; i < 3; i++)
-        exhaustive(gen(rand), 0);
-}
-
 TEST(PropTest, GenVectorOfInt)
 {
     int64_t seed = getCurrentTime();

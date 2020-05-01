@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ios>
 #include <iomanip>
+#include <sstream>
 
 namespace PropertyBasedTesting {
 
@@ -107,9 +108,12 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     std::vector<uint8_t> chars /*, allocator()*/;
     std::vector<uint8_t> nums /*, allocator()*/;
     std::vector<int> positions /*, allocator()*/;
+
     chars.reserve(len * 4);
     nums.reserve(len);
     positions.reserve(len);
+
+    std::cout << "utf8 gen, len = " << len << std::endl;
 
     const int ranges[][2] = {{0, 0x7f}, {0xc2, 0xdf}, {0xe0, 0xe0}, {0xe1, 0xec}, {0xed, 0xed},
                              {0xee, 0xef}, {0xf0, 0xf0}, {0xf1, 0xf3}, {0xf4, 0xf4}};
@@ -184,35 +188,36 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
         chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
         chars.push_back(rand.getRandomSize(0x80, 0xbf + 1));
     }
+    positions.push_back(chars.size());
 
-    /*
+
     if(!isValidUTF8(chars)) {
-        _STL::ostringstream os;
+        std::stringstream os;
         os << "not a valid utf8 string: ";
         printf("not a valid utf8 string: ");
         for(size_t i = 0; i < chars.size(); i++) {
             os << static_cast<int>(chars[i]) << " ";
             printf("%x(%d) ", chars[i], nums[i]);
         }
-
         printf("\n");
 
-        throw std::runtime_error(__FILE__, __LINE__, os.c_str());
+        throw std::runtime_error(os.str());
     }
-    */
 
 
-   std::cout << "hex = '";
-   UTF8ToHex(std::cout, chars);
-   std::cout << "', decoded = '";
 
-   decodeUTF8(std::cout, chars);
-   std::cout << "'" << std::endl;
+    std::cout << "hex = {";
+    UTF8ToHex(std::cout, chars);
+    std::cout << "}, decoded = \"";
+    decodeUTF8(std::cout, chars);
+    std::cout << "\"" << std::endl;
 
     UTF8String str(chars.size(), ' ' /*, allocator()*/);
     for (size_t i = 0; i < chars.size(); i++) {
         str[i] = chars[i];
     }
+
+    // str.substr(0, positions[len]);
 
     // substring shrinking
     int minSizeCopy = minSize;
