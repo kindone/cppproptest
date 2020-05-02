@@ -8,6 +8,7 @@
 #include "generator/pair.hpp"
 #include "generator/tuple.hpp"
 #include "generator/set.hpp"
+#include "generator/map.hpp"
 #include "generator/util.hpp"
 #include "generator/shared_ptr.hpp"
 #include "combinator/filter.hpp"

@@ -142,6 +142,19 @@ TEST(PropTest, GenSet)
     // }
 }
 
+TEST(PropTest, GenMap)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<std::map<int, int>> gen;
+    gen.setMaxSize(8);
+    auto shr = gen(rand);
+    exhaustive(shr, 0);
+    // for (int i = 0; i < 20; i++) {
+    //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    // }
+}
+
 TEST(PropTest, GenList)
 {
     int64_t seed = getCurrentTime();

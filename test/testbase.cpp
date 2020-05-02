@@ -123,6 +123,27 @@ std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::map<int,int>& input)
+{
+    os << "Map { ";
+    if (input.size() == 1) {
+        auto& pair = *input.begin();
+        os << "{" << pair.first << " -> " << pair.second << "}";
+    } else if (input.size() > 0) {
+        auto &firstPair = *input.begin();
+        os << "{" << firstPair.first << " -> " << firstPair.second << "}";
+        auto second = input.begin();
+        second++;
+        for (auto itr = second; itr != input.end(); ++itr) {
+            auto& pair = *itr;
+            os << ", {" << pair.first << " -> " << pair.second << "}";
+        }
+    }
+
+    os << " }";
+    return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
 {
     os << "[ ";

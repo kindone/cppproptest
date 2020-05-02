@@ -132,6 +132,7 @@ std::ostream& operator<<(std::ostream& os, const Animal& input);
 std::ostream& operator<<(std::ostream& os,
                          const std::pair<std::tuple<int, uint16_t>, std::vector<std::tuple<uint16_t, bool>>>& input);
 std::ostream& operator<<(std::ostream& os, const std::set<int>& input);
+std::ostream& operator<<(std::ostream& os, const std::map<int,int>& input);
 std::ostream& operator<<(std::ostream& os, const std::list<int>& input);
 
 template <typename T>
