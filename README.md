@@ -28,12 +28,43 @@ or
 >   a = 4,
 >   b = -4
 
+Among many other benefits, property-based tests can immediately replace dull dummy-based tests, such as:
+
+```cpp
+// typical dummy-based test 
+TEST(Suite, test) {
+    // a text encoded and then decoded must be identical to original
+    MyEncoder encoder;
+    MyDecoder decoder;    
+    auto original = "Hello world";
+    auto encoded = encoder.encode(original);
+    auto decoded = decoder.decode(encoded);
+    ASSERT_EQ(original, decoded);
+}
+```
+
+This can be turned into a property-based test, which fully tests againt arbitrary input strings:
+
+```cpp
+// property test 
+TEST(Suite, test) {
+    check([](std::string original) {
+        // a text encoded and then decoded must be identical to original
+        MyEncoder encoder;
+        MyDecoder decoder;    
+        auto encoded = encoder.encode(original);
+        auto decoded = decoder.decode(encoded);
+        return original == decoded;
+    });
+}
+```
+
 &nbsp;
 
 ## `property` and `check`
 
-`property` defines a property with optional configuration and `check` is shorthand for`Property::check`.
-`Property::check` performs property-based test using given callable (function, functor, or lambda).
+`property` defines a property with optional configuration and `check` is the shorthand for `Property::check`.
+`Property::check` performs property-based test using supplied callable (function, functor, or lambda).
 
 ```cpp
 check([](int a, int b) -> bool {
