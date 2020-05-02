@@ -17,20 +17,6 @@ public:
 
     Arbitrary() : keyGen(Arbitrary<Key>()), elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
 
-    // TODO add setElemGen, setKeyGen separate methods
-
-    // Arbitrary(const Arbitrary<T>& _elemGen)
-    //     : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); }),
-    //       minSize(defaultMinSize),
-    //       maxSize(defaultMaxSize)
-    // {
-    // }
-
-    // Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen)
-    //     : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
-    // {
-    // }
-
     Shrinkable<Map> operator()(Random& rand)
     {
         // generate random Ts using elemGen
@@ -79,6 +65,26 @@ public:
 
             return value;
         });
+    }
+
+    Arbitrary<Map> setKeyGen(const Arbitrary<Key>& _keyGen) {
+        keyGen = _keyGen;
+        return *this;
+    }
+
+    Arbitrary<Map> setElemGen(const Arbitrary<T>& _elemGen) {
+        elemGen = _elemGen;
+        return *this;
+    }
+
+    Arbitrary<Map> setKeyGen(std::function<Shrinkable<Key>(Random&)> _keyGen) {
+        keyGen = _keyGen;
+        return *this;
+    }
+
+    Arbitrary<Map> setElemGen(std::function<Shrinkable<T>(Random&)> _elemGen) {
+        elemGen = _elemGen;
+        return *this;
     }
 
     Arbitrary<Map> setMinSize(int size)
