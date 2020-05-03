@@ -132,7 +132,10 @@ public:
                 std::cerr << "Discard is not supported for single run" << std::endl;
             }
         } catch (const PropertyFailedBase& e) {
-            std::cerr << "Property failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
+            std::cerr << "Property have failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
+            std::cout << "  with args: ";
+            show(std::cout, valueTup);
+             std::cout << std::endl;
             return false;
         } catch (const std::exception& e) {
             // skip shrinking?
@@ -146,6 +149,7 @@ public:
     {
         auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
         using ValueTuple = typename decltype(retTypeTup)::type_tuple;
+
         // auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
         shrink(savedRand /*, *failed.valueTupPtr*/);
     }
@@ -217,7 +221,7 @@ private:
                 }
             }
             if (shrinkFound) {
-                // std::cout << "  shrinking arg " << N << " found: ";
+                std::cout << "  shrinking found simpler failing arg " << N << ": ";
                 show(std::cout, valueTup);
                 std::cout << std::endl;
             } else {
@@ -243,13 +247,17 @@ private:
         // std::cout << std::endl;
 
         auto generatedValueTup = util::transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
+
+        std::cout << "  with args: ";
+        show(std::cout, generatedValueTup);
+        std::cout << std::endl;
         // std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<GenTuple>::value;
         auto shrinksTuple =
             util::transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
                                  std::forward<decltype(shrinksTuple)>(shrinksTuple), std::make_index_sequence<Size>{});
-        std::cout << "shrunk: ";
+        std::cout << "  found shrunk args: ";
         show(std::cout, shrunk);
         std::cout << std::endl;
     }

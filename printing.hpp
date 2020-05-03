@@ -11,6 +11,8 @@
 namespace PropertyBasedTesting {
 
 std::ostream& show(std::ostream& os, const std::string&);
+std::ostream& show(std::ostream& os, const bool&);
+std::ostream& show(std::ostream& os, const char&);
 std::ostream& show(std::ostream& os, const int8_t&);
 std::ostream& show(std::ostream& os, const uint8_t&);
 std::ostream& show(std::ostream& os, const int16_t&);

@@ -188,7 +188,7 @@ TEST(PropTest, TestVectorCheckFail)
     std::vector<int> vec;
     vec.push_back(5);
     auto tup = std::make_tuple(vec);
-    std::cout << "tuple: ";
+    // std::cout << "tuple: ";
     show(std::cout, tup);
     std::cout << std::endl;
 
@@ -209,9 +209,9 @@ TEST(PropTest, TestVectorCheckFail)
 TEST(PropTest, TestTupleCheckFail)
 {
     check([](std::tuple<int, std::tuple<int>> tuple) -> bool {
-        std::cout << "tuple: ";
-        show(std::cout, tuple);
-        std::cout << std::endl;
+        // std::cout << "tuple: ";
+        // show(std::cout, tuple);
+        // std::cout << std::endl;
         int a = std::get<0>(tuple);
         std::tuple<int> subtup = std::get<1>(tuple);
         int b = std::get<0>(subtup);
