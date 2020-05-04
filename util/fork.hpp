@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "api.hpp"
 #include <sys/wait.h>
 #include <stdexcept>
 #include <functional>
 #include <iostream>
+
+#include "../api.hpp"
 
 namespace PropertyBasedTesting {
 namespace util {

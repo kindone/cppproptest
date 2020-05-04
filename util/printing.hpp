@@ -6,7 +6,7 @@
 #include <list>
 #include <vector>
 #include <set>
-#include "Shrinkable.hpp"
+#include "../Shrinkable.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -113,7 +113,7 @@ template <typename Tuple, std::size_t... index>
 decltype(auto) toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>)
 {
     auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};
-    // return dummy;
+    return dummy;
 }
 
 template <size_t Size, typename Tuple>

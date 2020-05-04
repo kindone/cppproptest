@@ -2,7 +2,7 @@
 
 #include "invokeWithArgs.hpp"
 #include "tuple.hpp"
-#include "generator/util.hpp"
+#include "../generator/util.hpp"
 
 namespace PropertyBasedTesting {
 namespace util {
