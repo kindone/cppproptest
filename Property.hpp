@@ -148,7 +148,7 @@ public:
 
     virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/)
     {
-        auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
+        // auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
         // using ValueTuple = typename decltype(retTypeTup)::type_tuple;
 
         // auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);

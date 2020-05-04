@@ -1,6 +1,5 @@
 #pragma once
 #include "../gen.hpp"
-#include "../Seq.hpp"
 #include "../Stream.hpp"
 #include "util.hpp"
 

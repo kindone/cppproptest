@@ -9,7 +9,6 @@
 #include "typelist.hpp"
 #include "Shrinkable.hpp"
 #include "assert.hpp"
-#include "Seq.hpp"
 
 namespace PropertyBasedTesting {
 
