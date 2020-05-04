@@ -385,6 +385,11 @@ TEST(UtilTestCase, RandomBasic)
         EXPECT_EQ(r1, r2);
         EXPECT_EQ(r2, r2);
     }
+
+    for (int i = 0; i < 10; i++) {
+        auto r = rand.getRandomSize(0, 2);
+        std::cout << "randomSize(0, 1) : " << r << std::endl;
+    }
 }
 
 TEST(UtilTestCase, Random8)

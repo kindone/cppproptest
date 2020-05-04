@@ -80,6 +80,7 @@ uint64_t Random::getRandomUInt64(uint64_t min, uint64_t max)
     return static_cast<uint64_t>((next8U() % span) + min);
 }
 
+// [fromIncluded, toExclued)
 uint32_t Random::getRandomSize(size_t fromIncluded, size_t toExcluded)
 {
     return (next8U() % (toExcluded - fromIncluded)) + fromIncluded;

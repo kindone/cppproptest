@@ -61,7 +61,7 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     int size = rand.getRandomSize(minSize, maxSize + 1);
     std::string str(size, ' ' /*, allocator()*/);
     for (int i = 0; i < size; i++)
-        str[i] = rand.getRandomSize(0, 128);
+        str[i] = rand.getRandomSize(0x1, 0xff);
 
     int minSizeCopy = minSize;
     return binarySearchShrinkable<int>(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const int& size) {
@@ -124,7 +124,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     }
 
     for (int i = 0; i < len; i++) {
-        uint8_t n = rand.getRandomSize(0, numbers);
+        uint8_t n = rand.getRandomSize(1, numbers);
         nums.push_back(n);
         positions.push_back(chars.size());
         if (n <= 0x7f) {
