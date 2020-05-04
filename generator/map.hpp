@@ -8,7 +8,7 @@
 
 namespace PropertyBasedTesting {
 template <typename Key, typename T>
-class Arbitrary<std::map<Key, T>> : public Gen<std::map<Key, T>> {
+class Arbitrary<std::map<Key, T>> final : public Gen<std::map<Key, T>> {
     using Map = typename std::map<Key, T>;
 
 public:
@@ -17,7 +17,7 @@ public:
 
     Arbitrary() : keyGen(Arbitrary<Key>()), elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
 
-    Shrinkable<Map> operator()(Random& rand)
+    Shrinkable<Map> operator()(Random& rand) override
     {
         // generate random Ts using elemGen
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
@@ -35,19 +35,19 @@ public:
         }
 
         // shrink map size with submap using binary numeric shrink of sizes
-        int minSizeCopy = minSize;
+        size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable<int>(size - minSizeCopy).template transform<int>([minSizeCopy](const int& size) {
+            binarySearchShrinkable<size_t>(size - minSizeCopy).template transform<size_t>([minSizeCopy](const size_t& size) {
                 return size + minSizeCopy;
             });
 
         // this make sure shrinking is possible towards minSize
         Shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>> shrinkable =
-            rangeShrinkable.template transform<std::map<Shrinkable<Key>,Shrinkable<T>>>([shrinkMap](const int& size) {
-                if (size <= 0)
+            rangeShrinkable.template transform<std::map<Shrinkable<Key>,Shrinkable<T>>>([shrinkMap](const size_t& size) {
+                if (size == 0)
                     return make_shrinkable<std::map<Shrinkable<Key>,Shrinkable<T>>>(); // empty map
 
-                int i = 0;
+                size_t i = 0;
                 auto begin = shrinkMap->begin();
                 auto last = shrinkMap->begin();
                 for (; last != shrinkMap->end() && i < size; ++last, ++i) {}
@@ -87,19 +87,19 @@ public:
         return *this;
     }
 
-    Arbitrary<Map> setMinSize(int size)
+    Arbitrary<Map> setMinSize(size_t size)
     {
         minSize = size;
         return *this;
     }
 
-    Arbitrary<Map> setMaxSize(int size)
+    Arbitrary<Map> setMaxSize(size_t size)
     {
         maxSize = size;
         return *this;
     }
 
-    Arbitrary<Map> setSize(int size)
+    Arbitrary<Map> setSize(size_t size)
     {
         minSize = size;
         maxSize = size;
@@ -108,8 +108,8 @@ public:
 
     std::function<Shrinkable<Key>(Random&)> keyGen;
     std::function<Shrinkable<T>(Random&)> elemGen;
-    int minSize;
-    int maxSize;
+    size_t minSize;
+    size_t maxSize;
 };
 
 template <typename Key, typename T>

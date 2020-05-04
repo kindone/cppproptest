@@ -7,7 +7,7 @@ namespace PropertyBasedTesting {
 
 struct AssertFailed : public std::logic_error
 {
-    AssertFailed(const char* fname, int line, const std::error_code& error, const char* condition, const void* caller)
+    AssertFailed(const char* fname, int line, const std::error_code& /*error*/, const char* condition, const void* /*caller*/)
         : logic_error(condition), filename(fname), lineno(line)
     {
     }
@@ -32,7 +32,7 @@ struct PropertyFailed : public PropertyFailedBase
 
 struct Discard : public std::logic_error
 {
-    Discard(const char* fname, int line, const std::error_code& error, const char* condition, const void* caller)
+    Discard(const char* /*fname*/, int /*line*/, const std::error_code& /*error*/, const char* /*condition*/, const void* /*caller*/)
         : logic_error("Discard")
     {
     }
@@ -40,7 +40,7 @@ struct Discard : public std::logic_error
 
 struct Success : public std::logic_error
 {
-    Success(const char* fname, int line, const std::error_code& error, const char* condition, const void* caller)
+    Success(const char* /*fname*/, int /*line*/, const std::error_code& /*error*/, const char* /*condition*/, const void* /*caller*/)
         : logic_error("Success")
     {
     }

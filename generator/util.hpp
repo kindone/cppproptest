@@ -21,7 +21,7 @@ Shrinkable<INTTYPE> binarySearchShrinkable(INTTYPE value)
 
     // given min, max, generate stream
     static genfunc_t genpos = [](INTTYPE min, INTTYPE max) {
-        INTTYPE mid = min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? 1 : 0);
+        INTTYPE mid = static_cast<INTTYPE>(min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? 1 : 0));
         // std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
         if (min + 1 >= max) {
             return stream_t::empty();
@@ -33,7 +33,7 @@ Shrinkable<INTTYPE> binarySearchShrinkable(INTTYPE value)
     };
 
     static genfunc_t genneg = [](INTTYPE min, INTTYPE max) {
-        INTTYPE mid = min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? -1 : 0);
+        INTTYPE mid = static_cast<INTTYPE>(min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? -1 : 0));
         // std::cout << "      min: " << min << ", mid: " << mid << ", max: " << max << std::endl;
         if (min + 1 >= max) {
             return stream_t::empty();

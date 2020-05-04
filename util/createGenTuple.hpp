@@ -38,7 +38,7 @@ decltype(auto) createGenHelperPacked(std::index_sequence<index...>)
 
 // returns a std::Tuple<Arbitrary<ARGS...>>
 template <typename... ARGS>
-decltype(auto) createGenTuple(TypeList<ARGS...> argument_list)
+decltype(auto) createGenTuple(TypeList<ARGS...> /*argument_list*/)
 {
     using ArgsAsTuple = std::tuple<std::decay_t<ARGS>...>;
     constexpr auto Size = std::tuple_size<ArgsAsTuple>::value;
@@ -47,7 +47,7 @@ decltype(auto) createGenTuple(TypeList<ARGS...> argument_list)
 
 template <typename... ARGS, typename... EXPARGS,
           typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) == sizeof...(ARGS)), bool>::type = true>
-decltype(auto) createGenTuple(TypeList<ARGS...> fullArgTypes, EXPARGS&&... gens)
+decltype(auto) createGenTuple(TypeList<ARGS...>, EXPARGS&&... gens)
 {
     // constexpr auto ExplicitSize = sizeof...(EXPARGS);
     auto explicits = std::make_tuple(gens...);
@@ -56,7 +56,7 @@ decltype(auto) createGenTuple(TypeList<ARGS...> fullArgTypes, EXPARGS&&... gens)
 
 template <typename... ARGS, typename... EXPARGS,
           typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) < sizeof...(ARGS)), bool>::type = true>
-decltype(auto) createGenTuple(TypeList<ARGS...> fullArgTypes, EXPARGS&&... gens)
+decltype(auto) createGenTuple(TypeList<ARGS...>, EXPARGS&&... gens)
 {
     constexpr auto ExplicitSize = sizeof...(EXPARGS);
     constexpr auto ImplicitSize = sizeof...(ARGS) - ExplicitSize;

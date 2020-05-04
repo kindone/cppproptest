@@ -11,7 +11,7 @@ decltype(auto) forwardNth(Tuple&& tup)
 }
 
 template <typename Function, typename Tuple, std::size_t... index>
-decltype(auto) transformTupleHelper(Function&& f, Tuple&& tup, std::index_sequence<index...> index_sequence)
+decltype(auto) transformTupleHelper(Function&& f, Tuple&& tup, std::index_sequence<index...>)
 {
     return std::make_tuple(f(forwardNth<index, Tuple>(std::forward<Tuple>(tup)))...);
 }
@@ -33,7 +33,7 @@ decltype(auto) callTransform(Tuple&& tup)
 }
 
 template <template <typename> class FunctionTemplate, typename Tuple, std::size_t... index>
-decltype(auto) transformHeteroTupleHelper(Tuple&& tup, std::index_sequence<index...> index_sequence)
+decltype(auto) transformHeteroTupleHelper(Tuple&& tup, std::index_sequence<index...>)
 {
     return std::make_tuple(callTransform<FunctionTemplate, Tuple, index>(std::forward<Tuple>(tup))...);
 }
@@ -54,7 +54,7 @@ decltype(auto) callTransformWithArg(Tuple&& tup, Arg&& arg)
 }
 
 template <template <typename> class FunctionTemplate, typename Tuple, typename Arg, std::size_t... index>
-decltype(auto) transformHeteroTupleWithArgHelper(Tuple&& tup, Arg&& arg, std::index_sequence<index...> index_sequence)
+decltype(auto) transformHeteroTupleWithArgHelper(Tuple&& tup, Arg&& arg, std::index_sequence<index...>)
 {
     return std::make_tuple(
         callTransformWithArg<FunctionTemplate, Tuple, Arg, index>(std::forward<Tuple>(tup), std::forward<Arg>(arg))...);

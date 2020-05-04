@@ -21,17 +21,17 @@ struct Action
     using ModelType = MODEL;
 
     virtual ~Action() {}
-    virtual bool precondition(const SYSTEM& system, const MODEL& model) { return precondition(system); }
+    virtual bool precondition(const SYSTEM& system, const MODEL&) { return precondition(system); }
 
-    virtual bool precondition(const SYSTEM& system) { return true; }
+    virtual bool precondition(const SYSTEM&) { return true; }
 
-    virtual bool run(SYSTEM& system, MODEL& model) { return run(system); }
+    virtual bool run(SYSTEM& system, MODEL&) { return run(system); }
 
-    virtual bool run(SYSTEM& system) { throw std::runtime_error("attempt to call undefined run"); };
+    virtual bool run(SYSTEM&) { throw std::runtime_error("attempt to call undefined run"); };
 
-    virtual bool postcondition(const SYSTEM& system, const MODEL& model) { return postcondition(system); }
+    virtual bool postcondition(const SYSTEM& system, const MODEL&) { return postcondition(system); }
 
-    virtual bool postcondition(const SYSTEM& system) { return true; }
+    virtual bool postcondition(const SYSTEM&) { return true; }
 };
 
 template <typename SYSTEM>

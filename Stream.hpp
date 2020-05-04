@@ -40,21 +40,21 @@ struct StreamImpl
 };
 
 template <typename T>
-struct EmptyStream : public StreamImpl<T>
+struct EmptyStream final : public StreamImpl<T>
 {
     using type = T;
 
     virtual ~EmptyStream() {}
 
-    virtual bool isEmpty() const { return true; }
-    virtual T head() const { throw std::invalid_argument("attempt to take head from empty stream"); }
-    virtual std::shared_ptr<StreamImpl<T>> tail() const { return std::make_shared<EmptyStream>(); }
+    virtual bool isEmpty() const override { return true; }
+    virtual T head() const override { throw std::invalid_argument("attempt to take head from empty stream"); }
+    virtual std::shared_ptr<StreamImpl<T>> tail() const override { return std::make_shared<EmptyStream>(); }
 
-    virtual Iterator<T> iterator() const { return Iterator<T>{Stream<T>(*this)}; }
+    virtual Iterator<T> iterator() const override { return Iterator<T>{Stream<T>(*this)}; }
 };
 
 template <typename T>
-struct NonEmptyStream : public StreamImpl<T>
+struct NonEmptyStream final : public StreamImpl<T>
 {
     using type = T;
 
@@ -65,11 +65,11 @@ struct NonEmptyStream : public StreamImpl<T>
 
     virtual ~NonEmptyStream() {}
 
-    virtual bool isEmpty() const { return false; }
+    virtual bool isEmpty() const override { return false; }
 
-    virtual T head() const { return _head; }
+    virtual T head() const override { return _head; }
 
-    virtual std::shared_ptr<StreamImpl<T>> tail() const
+    virtual std::shared_ptr<StreamImpl<T>> tail() const override
     {
         if (isEmpty())
             return std::make_shared<EmptyStream<T>>();
@@ -77,7 +77,7 @@ struct NonEmptyStream : public StreamImpl<T>
         return (*tailGen)().impl;
     }
 
-    virtual Iterator<T> iterator() const { return Iterator<T>{Stream<T>{*this}}; }
+    virtual Iterator<T> iterator() const override { return Iterator<T>{Stream<T>{*this}}; }
 
     template <typename U = T>
     NonEmptyStream<U> transform(std::function<U(const T&)> transformer)

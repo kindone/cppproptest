@@ -5,9 +5,9 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<bool> : public Gen<bool> {
+class PROPTEST_API Arbitrary<bool> final : public Gen<bool> {
 public:
-    Shrinkable<bool> operator()(Random& rand)
+    Shrinkable<bool> operator()(Random& rand) override
     {
         bool value = rand.getRandomBool();
         if (value) {

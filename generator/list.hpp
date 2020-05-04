@@ -13,7 +13,7 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class PROPTEST_API Arbitrary<std::list<T>> : public Gen<std::list<T>> {
+class PROPTEST_API Arbitrary<std::list<T>> final : public Gen<std::list<T>> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
@@ -86,7 +86,7 @@ public:
             };
 
         size_t parentSize = ancestor.getRef().size();
-        size_t numSplits = std::pow(2, power);
+        size_t numSplits = static_cast<size_t>(std::pow(2, power));
         if (parentSize / numSplits < 1)
             return stream_t::empty();
 
@@ -124,13 +124,13 @@ public:
             return stream_t::empty();
 
         size_t vecSize = shrinkable.getRef().size();
-        size_t numSplits = std::pow(2, power);
+        size_t numSplits = static_cast<size_t>(std::pow(2, power));
         if (vecSize / numSplits < 1 || offset >= numSplits)
             return stream_t::empty();
         // entirety
         shrinkable_t newShrinkable = shrinkable.concat([power, offset](const shrinkable_t& shr) {
             size_t vecSize = shr.getRef().size();
-            size_t numSplits = std::pow(2, power);
+            size_t numSplits = static_cast<size_t>(std::pow(2, power));
             if (vecSize / numSplits < 1 || offset >= numSplits)
                 return stream_t::empty();
             // std::cout << "entire: " << power << ", " << offset << std::endl;
@@ -140,24 +140,24 @@ public:
         return newShrinkable.shrinks();
     }
 
-    Shrinkable<std::list<T>> operator()(Random& rand)
+    Shrinkable<std::list<T>> operator()(Random& rand) override
     {
-        int size = rand.getRandomSize(minSize, maxSize + 1);
+        size_t size = rand.getRandomSize(minSize, maxSize + 1);
         std::shared_ptr<vector_t> shrinkVec = std::make_shared<vector_t>();
         shrinkVec->reserve(size);
-        for (int i = 0; i < size; i++)
+        for (size_t i = 0; i < size; i++)
             shrinkVec->push_back(elemGen(rand));
 
         // shrink vector size with subvector using binary numeric shrink of sizes
-        int minSizeCopy = minSize;
+        size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable<int>(size - minSizeCopy).template transform<int>([minSizeCopy](const int& size) {
+            binarySearchShrinkable<size_t>(size - minSizeCopy).template transform<size_t>([minSizeCopy](const size_t& size) {
                 return size + minSizeCopy;
             });
         // this make sure shrinking is possible towards minSize
         shrinkable_t shrinkable =
-            rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const int& size) {
-                if (size <= 0)
+            rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const size_t& size) {
+                if (size == 0)
                     return make_shrinkable<std::vector<Shrinkable<T>>>();
 
                 auto begin = shrinkVec->begin();
@@ -178,19 +178,19 @@ public:
         return listShrinkable;
     }
 
-    Arbitrary<std::list<T>> setMinSize(int size)
+    Arbitrary<std::list<T>> setMinSize(size_t size)
     {
         minSize = size;
         return *this;
     }
 
-    Arbitrary<std::list<T>> setMaxSize(int size)
+    Arbitrary<std::list<T>> setMaxSize(size_t size)
     {
         maxSize = size;
         return *this;
     }
 
-    Arbitrary<std::list<T>> setSize(int size)
+    Arbitrary<std::list<T>> setSize(size_t size)
     {
         minSize = size;
         maxSize = size;
@@ -199,8 +199,8 @@ public:
 
     // FIXME: turn to shared_ptr
     std::function<Shrinkable<T>(Random&)> elemGen;
-    int minSize;
-    int maxSize;
+    size_t minSize;
+    size_t maxSize;
 };
 
 template <typename T>

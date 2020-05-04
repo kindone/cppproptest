@@ -6,7 +6,7 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<std::string> : public Gen<std::string> {
+class PROPTEST_API Arbitrary<std::string> final : public Gen<std::string> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
@@ -15,50 +15,50 @@ public:
     Arbitrary(Arbitrary<char>& _elemGen);
     Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen);
 
-    Shrinkable<std::string> operator()(Random& rand);
+    Shrinkable<std::string> operator()(Random& rand) override;
     static std::string boundaryValues[1];
 
-    Arbitrary setMinSize(int size);
-    Arbitrary setMaxSize(int size);
-    Arbitrary setSize(int size);
+    Arbitrary setMinSize(size_t size);
+    Arbitrary setMaxSize(size_t size);
+    Arbitrary setSize(size_t size);
 
     // FIXME: turn to shared_ptr
     std::function<Shrinkable<char>(Random&)> elemGen;
-    int minSize;
-    int maxSize;
+    size_t minSize;
+    size_t maxSize;
 };
 
 template <>
-class PROPTEST_API Arbitrary<UTF8String> : public Gen<UTF8String> {
+class PROPTEST_API Arbitrary<UTF8String> final : public Gen<UTF8String> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
     Arbitrary() : minSize(defaultMinSize), maxSize(defaultMaxSize) {}
 
-    Shrinkable<UTF8String> operator()(Random& rand);
+    Shrinkable<UTF8String> operator()(Random& rand) override;
     static std::string boundaryValues[1];
 
-    Arbitrary setMinSize(int size)
+    Arbitrary setMinSize(size_t size)
     {
         minSize = size;
         return *this;
     }
 
-    Arbitrary setMaxSize(int size)
+    Arbitrary setMaxSize(size_t size)
     {
         maxSize = size;
         return *this;
     }
 
-    Arbitrary setSize(int size)
+    Arbitrary setSize(size_t size)
     {
         minSize = size;
         maxSize = size;
         return *this;
     }
 
-    int minSize;
-    int maxSize;
+    size_t minSize;
+    size_t maxSize;
 };
 }  // namespace PropertyBasedTesting

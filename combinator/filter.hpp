@@ -12,7 +12,7 @@ public:
 
     Filter(FilterFunc&& f) : filter(f) {}
 
-    Shrinkable<T> operator()(Random& rand)
+    Shrinkable<T> operator()(Random& rand) override
     {
         while (true) {
             auto shrinkable = gen(rand);

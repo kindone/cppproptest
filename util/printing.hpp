@@ -58,7 +58,7 @@ struct HasShow
 template <typename T, bool = !HasShow<T>::value>
 struct ShowDefault
 {
-    static std::ostream& show(std::ostream& os, const T& obj)
+    static std::ostream& show(std::ostream& os, const T&)
     {
         os << "<\?\?\?>";
         return os;
@@ -112,8 +112,7 @@ bool toStreamFrontHelper(std::ostream& os, const T& t)
 template <typename Tuple, std::size_t... index>
 decltype(auto) toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>)
 {
-    auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};
-    return dummy;
+    [[maybe_unused]] auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};
 }
 
 template <size_t Size, typename Tuple>
@@ -125,7 +124,7 @@ struct ToStreamEach
 template <typename Tuple>
 struct ToStreamEach<0, Tuple>
 {
-    void get(std::ostream& os, const Tuple& tuple) {}
+    void get(std::ostream&, const Tuple&) {}
 };
 
 }  // namespace util

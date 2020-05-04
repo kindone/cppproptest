@@ -76,7 +76,7 @@ decltype(auto) oneOf(GENS&&... gens)
         for (size_t i = 0; i < genVecPtr->size(); i++) {
             float& weight = (*genVecPtr)[i].weight;
             if (weight == 0.0f)
-                weight = (1.0f - sum) / numUnassigned;
+                weight = (1.0f - sum) / static_cast<float>(numUnassigned);
         }
 
     return [genVecPtr](Random& rand) {

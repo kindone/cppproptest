@@ -89,11 +89,11 @@ decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup)
 }  // namespace util
 
 template <typename CallableWrapper, typename GenTuple>
-class Property : public PropertyBase {
+class Property final : public PropertyBase {
 public:
     Property(CallableWrapper&& c, const GenTuple& g) : callableWrapper(std::forward<CallableWrapper>(c)), genTup(g) {}
 
-    virtual bool invoke(Random& rand)
+    virtual bool invoke(Random& rand) override
     {
         return util::invokeWithGenTuple(
             rand, std::forward<decltype(callableWrapper.callable)>(callableWrapper.callable), genTup);
@@ -146,7 +146,7 @@ public:
         return false;
     }
 
-    virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/)
+    virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/) override
     {
         // auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
         // using ValueTuple = typename decltype(retTypeTup)::type_tuple;

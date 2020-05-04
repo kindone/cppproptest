@@ -23,25 +23,24 @@ struct TypeList<First, Ts...>
 };
 
 namespace TypeListItemAt {
-template <class List, int Index>
+template <class List, size_t Index>
 struct AtHelper;
 template <template <class...> class List, class First, class... Rest>
 struct AtHelper<List<First, Rest...>, 0>
 {
     using type = First;
 };
-template <template <class...> class List, class First, class... Rest, int Index>
+template <template <class...> class List, class First, class... Rest, size_t Index>
 struct AtHelper<List<First, Rest...>, Index>
 {
     using type = typename AtHelper<List<Rest...>, Index - 1>::type;
 };
-template <class, int>
+template <class, size_t>
 struct At;
-template <template <class...> class List, class... Ts, int Index>
+template <template <class...> class List, class... Ts, size_t Index>
 struct At<List<Ts...>, Index>
 {
-    static_assert(Index >= 0, "Index connot be negative.");
-    static_assert(Index < static_cast<int>(sizeof...(Ts)),
+    static_assert(Index < sizeof...(Ts),
                   "List "
                   "has "
                   "less "
@@ -53,7 +52,7 @@ struct At<List<Ts...>, Index>
 
 }  // namespace TypeListItemAt
 
-template <class List, int Index>
+template <class List, size_t Index>
 using itemAt = typename TypeListItemAt::At<List, Index>::type;
 
 #endif

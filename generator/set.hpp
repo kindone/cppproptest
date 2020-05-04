@@ -22,7 +22,7 @@ public:
 namespace PropertyBasedTesting {
 
 template <typename T>
-class Arbitrary<std::set<T>> : public Gen<std::set<T>> {
+class Arbitrary<std::set<T>> final : public Gen<std::set<T>> {
     using Set = typename std::set<T>;
 
 public:
@@ -43,7 +43,7 @@ public:
     {
     }
 
-    Shrinkable<Set> operator()(Random& rand)
+    Shrinkable<Set> operator()(Random& rand) override
     {
         // generate random Ts using elemGen
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
@@ -54,18 +54,18 @@ public:
             shrinkSet->insert(elem);
         }
         // shrink set size with subset using binary numeric shrink of sizes
-        int minSizeCopy = minSize;
+        size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable<int>(size - minSizeCopy).template transform<int>([minSizeCopy](const int& size) {
+            binarySearchShrinkable<size_t>(size - minSizeCopy).template transform<size_t>([minSizeCopy](const size_t& size) {
                 return size + minSizeCopy;
             });
         // this make sure shrinking is possible towards minSize
         Shrinkable<std::set<Shrinkable<T>>> shrinkable =
-            rangeShrinkable.template transform<std::set<Shrinkable<T>>>([shrinkSet](const int& size) {
-                if (size <= 0)
+            rangeShrinkable.template transform<std::set<Shrinkable<T>>>([shrinkSet](const size_t& size) {
+                if (size == 0)
                     return make_shrinkable<std::set<Shrinkable<T>>>();
 
-                int i = 0;
+                size_t i = 0;
                 auto begin = shrinkSet->begin();
                 auto last = shrinkSet->begin();
                 for (; last != shrinkSet->end() && i < size; ++last, ++i) {}
@@ -84,19 +84,19 @@ public:
         });
     }
 
-    Arbitrary<std::set<T>> setMinSize(int size)
+    Arbitrary<std::set<T>> setMinSize(size_t size)
     {
         minSize = size;
         return *this;
     }
 
-    Arbitrary<std::set<T>> setMaxSize(int size)
+    Arbitrary<std::set<T>> setMaxSize(size_t size)
     {
         maxSize = size;
         return *this;
     }
 
-    Arbitrary<std::set<T>> setSize(int size)
+    Arbitrary<std::set<T>> setSize(size_t size)
     {
         minSize = size;
         maxSize = size;
@@ -104,8 +104,8 @@ public:
     }
 
     std::function<Shrinkable<T>(Random&)> elemGen;
-    int minSize;
-    int maxSize;
+    size_t minSize;
+    size_t maxSize;
 };
 
 template <typename T>

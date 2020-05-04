@@ -46,7 +46,7 @@ public:
 
     Construct(GenTuple g) : genTup(g) {}
 
-    Shrinkable<CLASS> operator()(Random& rand) { return constructAccordingly(generateArgs(rand)); }
+    Shrinkable<CLASS> operator()(Random& rand) override { return constructAccordingly(generateArgs(rand)); }
 
 private:
     template <std::size_t... index>

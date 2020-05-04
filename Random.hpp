@@ -26,13 +26,13 @@ public:
     uint32_t getRandomSize(size_t fromIncluded, size_t toExcluded);
 
     template <typename T>
-    T getRandom(int64_t min, int64_t max)
+    T getRandom(int64_t /*min*/, int64_t /*max*/)
     {
         throw std::runtime_error("getRandom for type not defined");
     }
 
     template <typename T>
-    T getRandomU(uint64_t min, uint64_t max)
+    T getRandomU(uint64_t /*min*/, uint64_t /*max*/)
     {
         throw std::runtime_error("getRandom for type not defined");
     }

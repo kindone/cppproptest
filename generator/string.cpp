@@ -32,19 +32,19 @@ Arbitrary<std::string>::Arbitrary(std::function<Shrinkable<char>(Random&)> _elem
 {
 }
 
-Arbitrary<std::string> Arbitrary<std::string>::setMinSize(int size)
+Arbitrary<std::string> Arbitrary<std::string>::setMinSize(size_t size)
 {
     minSize = size;
     return *this;
 }
 
-Arbitrary<std::string> Arbitrary<std::string>::setMaxSize(int size)
+Arbitrary<std::string> Arbitrary<std::string>::setMaxSize(size_t size)
 {
     maxSize = size;
     return *this;
 }
 
-Arbitrary<std::string> Arbitrary<std::string>::setSize(int size)
+Arbitrary<std::string> Arbitrary<std::string>::setSize(size_t size)
 {
     minSize = size;
     maxSize = size;
@@ -61,13 +61,13 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     //         [str](const int& len) { return str.substr(0, len); });
     // }
 
-    int size = rand.getRandomSize(minSize, maxSize + 1);
+    size_t size = rand.getRandomSize(minSize, maxSize + 1);
     std::string str(size, ' ' /*, allocator()*/);
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
         str[i] = elemGen(rand).get();
 
-    int minSizeCopy = minSize;
-    return binarySearchShrinkable<int>(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const int& size) {
+    size_t minSizeCopy = minSize;
+    return binarySearchShrinkable<size_t>(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const size_t& size) {
         return str.substr(0, size + minSizeCopy);
     });
 
@@ -106,7 +106,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     //     return make_shrinkable<UTF8String>(UTF8String(boundaryValues[i] /*, allocator()*/));
     // }
 
-    int len = rand.getRandomSize(minSize, maxSize + 1);
+    size_t len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;
     std::vector<uint8_t> nums /*, allocator()*/;
     std::vector<int> positions /*, allocator()*/;
@@ -126,7 +126,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
         numbers += (ranges[i][1] - ranges[i][0] + 1);
     }
 
-    for (int i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         uint8_t n = rand.getRandomSize(1, numbers);
         nums.push_back(n);
         positions.push_back(chars.size());
@@ -219,9 +219,9 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     // str.substr(0, positions[len]);
 
     // substring shrinking
-    int minSizeCopy = minSize;
-    return binarySearchShrinkable<int>(len - minSizeCopy)
-        .template transform<UTF8String>([str, minSizeCopy, positions](const int& size) -> UTF8String {
+    size_t minSizeCopy = minSize;
+    return binarySearchShrinkable<size_t>(len - minSizeCopy)
+        .template transform<UTF8String>([str, minSizeCopy, positions](const size_t& size) -> UTF8String {
             if (positions.empty())
                 return UTF8String();
             else
