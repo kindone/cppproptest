@@ -3,7 +3,7 @@
 #include "../gen.hpp"
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
-#include "util/tuple.hpp"
+#include "../util/tuple.hpp"
 #include <tuple>
 #include <memory>
 
