@@ -15,7 +15,10 @@ std::string Arbitrary<std::string>::boundaryValues[1] = {""};
 size_t Arbitrary<std::string>::defaultMinSize = 0;
 size_t Arbitrary<std::string>::defaultMaxSize = 200;
 
-Arbitrary<std::string>::Arbitrary() : elemGen(Arbitrary<char>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+// defaults to ascii characters
+Arbitrary<std::string>::Arbitrary() : elemGen(fromTo<char>(0x1, 0x7f)), minSize(defaultMinSize), maxSize(defaultMaxSize)
+{
+}
 
 Arbitrary<std::string>::Arbitrary(Arbitrary<char>& _elemGen)
     : elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); }),
@@ -61,7 +64,7 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     int size = rand.getRandomSize(minSize, maxSize + 1);
     std::string str(size, ' ' /*, allocator()*/);
     for (int i = 0; i < size; i++)
-        str[i] = rand.getRandomSize(0x1, 0xff);
+        str[i] = elemGen(rand).get();
 
     int minSizeCopy = minSize;
     return binarySearchShrinkable<int>(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const int& size) {

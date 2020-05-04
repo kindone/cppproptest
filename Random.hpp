@@ -28,13 +28,13 @@ public:
     template <typename T>
     T getRandom(int64_t min, int64_t max)
     {
-        throw std::bad_exception();
+        throw std::runtime_error("getRandom for type not defined");
     }
 
     template <typename T>
     T getRandomU(uint64_t min, uint64_t max)
     {
-        throw std::bad_exception();
+        throw std::runtime_error("getRandom for type not defined");
     }
 
 private:
@@ -43,6 +43,9 @@ private:
     std::mt19937_64 engine;
     std::uniform_int_distribution<uint64_t> dist;
 };
+
+template <>
+char Random::getRandom<char>(int64_t min, int64_t max);
 
 template <>
 int8_t Random::getRandom<int8_t>(int64_t min, int64_t max);
@@ -55,6 +58,9 @@ int32_t Random::getRandom<int32_t>(int64_t min, int64_t max);
 
 template <>
 int64_t Random::getRandom<int64_t>(int64_t min, int64_t max);
+
+template <>
+char Random::getRandomU<char>(uint64_t min, uint64_t max);
 
 template <>
 uint8_t Random::getRandomU<uint8_t>(uint64_t min, uint64_t max);

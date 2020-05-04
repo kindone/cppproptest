@@ -107,6 +107,12 @@ int64_t getCurrentTime()
 }
 
 template <>
+char Random::getRandom<char>(int64_t min, int64_t max)
+{
+    return static_cast<char>(getRandomUInt8(min, max));
+}
+
+template <>
 int8_t Random::getRandom<int8_t>(int64_t min, int64_t max)
 {
     return getRandomInt8(min, max);
@@ -128,6 +134,12 @@ template <>
 int64_t Random::getRandom<int64_t>(int64_t min, int64_t max)
 {
     return getRandomInt64(min, max);
+}
+
+template <>
+char Random::getRandomU<char>(uint64_t min, uint64_t max)
+{
+    return static_cast<char>(getRandomUInt8(min, max));
 }
 
 template <>
