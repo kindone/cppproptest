@@ -250,12 +250,24 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    check([](std::vector<Animal> animals) -> bool {
-        if (!animals.empty()) {
-            PROP_STAT(animals.size() > 3);
-        }
-        return true;
-    });
+    int i = 0;
+
+    auto vecGen = Arbitrary<std::vector<int>>();
+    vecGen.setMaxSize(20);
+    auto animal =
+        construct<Animal, int, std::string, std::vector<int>&>(Arbitrary<int>(), Arbitrary<std::string>(), vecGen);
+    auto animalVecGen = Arbitrary<std::vector<Animal>>(animal);
+    animalVecGen.setMaxSize(20);
+
+    check(
+        [&i](std::vector<Animal> animals) -> bool {
+            std::cout << "animal " << i++ << std::endl;
+            if (!animals.empty()) {
+                PROP_STAT(animals.size() > 3);
+            }
+            return true;
+        },
+        animalVecGen);
 }
 
 decltype(auto) dummyProperty()
