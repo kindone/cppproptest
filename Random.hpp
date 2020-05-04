@@ -1,7 +1,7 @@
 #pragma once
 
 #include <random>
-#include <exception>
+#include <stdexcept>
 #include "api.hpp"
 
 namespace PropertyBasedTesting {
