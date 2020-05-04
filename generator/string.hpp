@@ -1,6 +1,6 @@
 #pragma once
 #include "../gen.hpp"
-#include "../string.hpp"
+#include "util/string.hpp"
 #include <string>
 
 namespace PropertyBasedTesting {

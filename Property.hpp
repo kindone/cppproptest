@@ -2,12 +2,12 @@
 
 #include "api.hpp"
 #include "gen.hpp"
-#include "function_traits.hpp"
-#include "tuple.hpp"
-#include "Stream.hpp"
-#include "printing.hpp"
+#include "util/function_traits.hpp"
+#include "util/tuple.hpp"
+#include "util/printing.hpp"
 #include "generator/util.hpp"
 #include "PropertyContext.hpp"
+#include "Stream.hpp"
 
 #include <iostream>
 #include <sstream>

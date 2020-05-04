@@ -1,6 +1,6 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "fork.hpp"
+#include "util/fork.hpp"
 
 class ForkTestCase : public ::testing::Test {
 };

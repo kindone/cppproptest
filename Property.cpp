@@ -1,6 +1,6 @@
 #include "Property.hpp"
 #include "assert.hpp"
-#include "tuple.hpp"
+#include "util/tuple.hpp"
 #include <exception>
 #include <utility>
 
@@ -8,19 +8,18 @@ namespace PropertyBasedTesting {
 
 namespace util {
 
-uint64_t getGlobalSeed() {
+uint64_t getGlobalSeed()
+{
     static const char* env_seed = std::getenv("PROPTEST_SEED");
-    if(env_seed) {
-       return atoll(env_seed);
-    }
-    else {
+    if (env_seed) {
+        return atoll(env_seed);
+    } else {
         static uint64_t time = getCurrentTime();
         return time;
     }
 }
 
-}
-
+}  // namespace util
 
 PropertyContext* PropertyBase::context = nullptr;
 uint32_t PropertyBase::defaultNumRuns = 100;

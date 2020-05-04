@@ -3,10 +3,10 @@
 #include <functional>
 #include <tuple>
 #include <stdexcept>
-#include "function_traits.hpp"
+#include "util/function_traits.hpp"
+#include "util/typelist.hpp"
 #include "api.hpp"
 #include "Random.hpp"
-#include "typelist.hpp"
 #include "Shrinkable.hpp"
 #include "assert.hpp"
 
@@ -31,6 +31,6 @@ struct Arbitrary : public Gen<T>
 
 }  // namespace PropertyBasedTesting
 
-#include "invokeWithArgs.hpp"
-#include "invokeWithGenTuple.hpp"
-#include "createGenTuple.hpp"
+#include "util/invokeWithArgs.hpp"
+#include "util/invokeWithGenTuple.hpp"
+#include "util/createGenTuple.hpp"

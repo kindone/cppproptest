@@ -19,11 +19,11 @@ SET(proptest_sources
     generator/numeric.cpp
     generator/string.cpp
     generator/util.cpp
+    util/fork.cpp
+    util/printing.cpp
+    util/string.cpp
     Property.cpp
     Random.cpp
-    printing.cpp
-    string.cpp
-    fork.cpp
 )
 
 ADD_LIBRARY(proptest

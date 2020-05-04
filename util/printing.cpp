@@ -1,6 +1,6 @@
 #include "printing.hpp"
 #include "api.hpp"
-#include "string.hpp"
+#include "util/string.hpp"
 
 namespace PropertyBasedTesting {
 

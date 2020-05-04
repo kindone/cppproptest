@@ -1,5 +1,5 @@
 #include "testbase.hpp"
-#include "string.hpp"
+#include "util/string.hpp"
 
 constexpr int32_t GenSmallInt::boundaryValues[13];
 

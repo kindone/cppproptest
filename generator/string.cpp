@@ -1,5 +1,5 @@
 #include "../gen.hpp"
-#include "../string.hpp"
+#include "util/string.hpp"
 #include "string.hpp"
 #include "util.hpp"
 #include "numeric.hpp"
@@ -75,7 +75,6 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     */
 }
 
-
 size_t Arbitrary<UTF8String>::defaultMinSize = 0;
 size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
 
@@ -115,7 +114,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
 
     std::cout << "utf8 gen, len = " << len << std::endl;
 
-    const int ranges[][2] = {{0, 0x7f}, {0xc2, 0xdf}, {0xe0, 0xe0}, {0xe1, 0xec}, {0xed, 0xed},
+    const int ranges[][2] = {{0, 0x7f},    {0xc2, 0xdf}, {0xe0, 0xe0}, {0xe1, 0xec}, {0xed, 0xed},
                              {0xee, 0xef}, {0xf0, 0xf0}, {0xf1, 0xf3}, {0xf4, 0xf4}};
     const int numRanges = sizeof(ranges) / sizeof(ranges[0]);
 
@@ -190,12 +189,11 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     }
     positions.push_back(chars.size());
 
-
-    if(!isValidUTF8(chars)) {
+    if (!isValidUTF8(chars)) {
         std::stringstream os;
         os << "not a valid utf8 string: ";
         printf("not a valid utf8 string: ");
-        for(size_t i = 0; i < chars.size(); i++) {
+        for (size_t i = 0; i < chars.size(); i++) {
             os << static_cast<int>(chars[i]) << " ";
             printf("%x(%d) ", chars[i], nums[i]);
         }
@@ -203,8 +201,6 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
 
         throw std::runtime_error(os.str());
     }
-
-
 
     std::cout << "hex = {";
     UTF8ToHex(std::cout, chars);
@@ -221,12 +217,13 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
 
     // substring shrinking
     int minSizeCopy = minSize;
-    return binarySearchShrinkable<int>(len - minSizeCopy).template transform<UTF8String>([str, minSizeCopy, positions](const int& size) -> UTF8String{
-        if(positions.empty())
-            return UTF8String();
-        else
-            return UTF8String(std::move(str.substr(0, positions[size + minSizeCopy])));
-    });
+    return binarySearchShrinkable<int>(len - minSizeCopy)
+        .template transform<UTF8String>([str, minSizeCopy, positions](const int& size) -> UTF8String {
+            if (positions.empty())
+                return UTF8String();
+            else
+                return UTF8String(std::move(str.substr(0, positions[size + minSizeCopy])));
+        });
 }
 
 }  // namespace PropertyBasedTesting
