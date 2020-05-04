@@ -125,7 +125,7 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
         floatShrinkable = floatShrinkable.andThen([](const Shrinkable<FLOATTYPE>& shr) {
             auto value = shr.get();
             int exp = 0;
-            FLOATTYPE fraction = util::decomposeFloat(value, &exp);
+            /*FLOATTYPE fraction = */ util::decomposeFloat(value, &exp);
             if (value == 0.0f)
                 return Stream<Shrinkable<FLOATTYPE>>::empty();
             else if (value > 0) {

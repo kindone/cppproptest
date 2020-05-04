@@ -88,6 +88,7 @@ struct PushBack2 : public VectorAction2
         auto size = system.size();
         system.push_back(value);
         model.size++;
+        PROP_ASSERT(size + 1 = system.size());
         PROP_ASSERT(model.size == system.size());
         return true;
     }

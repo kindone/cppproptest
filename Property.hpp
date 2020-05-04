@@ -132,10 +132,11 @@ public:
                 std::cerr << "Discard is not supported for single run" << std::endl;
             }
         } catch (const PropertyFailedBase& e) {
-            std::cerr << "Property have failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
+            std::cerr << "Property have failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")"
+                      << std::endl;
             std::cout << "  with args: ";
             show(std::cout, valueTup);
-             std::cout << std::endl;
+            std::cout << std::endl;
             return false;
         } catch (const std::exception& e) {
             // skip shrinking?
@@ -148,7 +149,7 @@ public:
     virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/)
     {
         auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
-        using ValueTuple = typename decltype(retTypeTup)::type_tuple;
+        // using ValueTuple = typename decltype(retTypeTup)::type_tuple;
 
         // auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
         shrink(savedRand /*, *failed.valueTupPtr*/);
