@@ -21,7 +21,9 @@ SET(proptest_sources
     generator/util.cpp
     util/fork.cpp
     util/printing.cpp
-    util/string.cpp
+    util/utf8string.cpp
+    util/cesu8string.cpp
+    util/unicode.cpp
     Property.cpp
     Random.cpp
 )

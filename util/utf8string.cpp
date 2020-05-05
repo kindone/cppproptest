@@ -1,5 +1,6 @@
 #include "../api.hpp"
-#include "string.hpp"
+#include "utf8string.hpp"
+#include "unicode.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -10,8 +11,6 @@ IosFlagSaver::~IosFlagSaver()
 {
     ios.flags(f);
 }
-
-}  // namespace util
 
 std::ostream& validChar(std::ostream& os, uint8_t c)
 {
@@ -46,23 +45,6 @@ std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, ui
     util::IosFlagSaver iosFlagSaver(os);
     os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2)
        << static_cast<int>(c3) << static_cast<int>(c4);
-    return os;
-}
-
-std::ostream& codepage(std::ostream& os, uint32_t code)
-{
-    util::IosFlagSaver iosFlagSaver(os);
-    if (code < 0x10000) {
-        os << "\\u";
-        os << std::setfill('0') << std::setw(2) << std::hex << ((code & 0xff00) >> 8);
-        os << std::setfill('0') << std::setw(2) << std::hex << (code & 0xff);
-    } else {
-        os << "\\U";
-        os << std::setfill('0') << std::setw(2) << std::hex << ((code & 0xff0000) >> 16);
-        os << std::setfill('0') << std::setw(2) << std::hex << ((code & 0xff00) >> 8);
-        os << std::setfill('0') << std::setw(2) << std::hex << (code & 0xff);
-    }
-
     return os;
 }
 
@@ -156,7 +138,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
         if (chars[i] <= 0x7f) {
             validChar(os, chars[i]);
             // os << static_cast<char>(chars[i]);
-        } else if (i + 1 >= chars.size()) {
+        } else if (i + 2 > chars.size()) {
             charAsHex(os, chars[i]);
             // U+0080..U+07FF
         } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
@@ -168,7 +150,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
             } else {
                 charAsHex(os, chars[i]);
             }
-        } else if (i + 2 >= chars.size()) {
+        } else if (i + 3 > chars.size()) {
             charAsHex(os, chars[i]);
             // U+0800..U+0FFF
         } else if (0xe0 == chars[i]) {
@@ -210,7 +192,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
                 i += 2;
             } else
                 charAsHex(os, chars[i]);
-        } else if (i + 3 >= chars.size()) {
+        } else if (i + 4 > chars.size()) {
             charAsHex(os, chars[i]);
             // U+10000..U+3FFFF
         } else if (0xf0 == chars[i]) {
@@ -261,14 +243,14 @@ bool isValidUTF8(std::vector<uint8_t>& chars)
     for (size_t i = 0; i < chars.size(); i++) {
         if (chars[i] <= 0x7f) {
             continue;
-        } else if (i + 1 >= chars.size()) {
+        } else if (i + 2 > chars.size()) {
             return false;
         } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
                 i++;
             } else
                 return false;
-        } else if (i + 2 >= chars.size()) {
+        } else if (i + 3 > chars.size()) {
             return false;
         } else if (0xe0 == chars[i]) {
             if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
@@ -290,7 +272,7 @@ bool isValidUTF8(std::vector<uint8_t>& chars)
                 i += 2;
             } else
                 return false;
-        } else if (i + 3 >= chars.size()) {
+        } else if (i + 4 > chars.size()) {
             return false;
         } else if (0xf0 == chars[i]) {
             if (0x90 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
@@ -317,5 +299,7 @@ bool isValidUTF8(std::vector<uint8_t>& chars)
     }
     return true;
 }
+
+}  // namespace util
 
 }  // namespace PropertyBasedTesting

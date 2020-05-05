@@ -100,11 +100,11 @@ void PropertyContext::tag(const char* file, int lineno, std::string key, std::st
     auto itr = tags.find(key);
     // key already exists
     if (itr != tags.end()) {
-        auto valueMap = itr->second;
+        auto& valueMap = itr->second;
         auto valueItr = valueMap.find(value);
         // value already exists
         if (valueItr != valueMap.end()) {
-            auto tag = valueItr->second;
+            auto& tag = valueItr->second;
             tag.count++;
         } else {
             std::map<std::string, Tag>& valueMap = itr->second;
