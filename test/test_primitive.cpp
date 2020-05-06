@@ -100,7 +100,7 @@ TEST(PropTest, GenUTF8String)
         UTF8String str = static_cast<UTF8String>(gen(rand).getRef());
         uint8_t c0 = str[0];
         if (str.size() == 1) {
-            if (0x0 <= c0 && c0 <= 0x7f)
+            if (c0 <= 0x7f)
                 context.tag(__FILE__, __LINE__, "code", "1 byte U+0000..U+007F");
             else
                 context.tag(__FILE__, __LINE__, "code", "1 byte error");
@@ -166,7 +166,7 @@ TEST(PropTest, GenCESU8String)
         CESU8String str = static_cast<CESU8String>(gen(rand).getRef());
         uint8_t c0 = str[0];
         if (str.size() == 1) {
-            if (0x0 <= c0 && c0 <= 0x7f)
+            if (c0 <= 0x7f)
                 context.tag(__FILE__, __LINE__, "code", "1 byte U+0000..U+007F");
             else
                 context.tag(__FILE__, __LINE__, "code", "1 byte error");

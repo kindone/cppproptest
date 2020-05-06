@@ -1,5 +1,3 @@
-#pragma once
-
 #include "misc.hpp"
 #include <iostream>
 #include <iomanip>
