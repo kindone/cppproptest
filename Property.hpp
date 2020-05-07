@@ -132,8 +132,7 @@ public:
                 std::cerr << "Discard is not supported for single run" << std::endl;
             }
         } catch (const PropertyFailedBase& e) {
-            std::cerr << "Property have failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")"
-                      << std::endl;
+            std::cerr << "Property failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
             std::cout << "  with args: ";
             show(std::cout, valueTup);
             std::cout << std::endl;
