@@ -2,8 +2,6 @@
 
 `proptest` is a property-based testing framework for C++. 
 
-&nbsp;
-
 ## Property-based testing
 
 Property-based testing originated from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) of Haskell. 
@@ -156,6 +154,7 @@ auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
 
 ## Further topics and details of the framework can be found in:
 
+* [Getting Started](doc/GettingStarted.md)
 * [Using and Defining Generators](doc/Generators.md)
 * [Counter Examples and Shrinking](doc/Shrinking.md)
 * [Stateful Testing with Property-based Testing Framework](doc/StatefulTesting.md)
