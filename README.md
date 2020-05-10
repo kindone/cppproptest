@@ -1,6 +1,6 @@
-# proptest
+# cppproptest
 
-`proptest` is a property-based testing framework for C++. 
+`cppproptest` is a property-based testing framework for C++. 
 
 ## Property-based testing
 
@@ -84,10 +84,10 @@ Here are some of the benefits of turning conventional unit tests into property b
 
 ## Further topics and details of the framework can be found in:
 
-* [Getting Started with `proptest`](doc/GettingStarted.md)
+* [Getting Started with `cppproptest`](doc/GettingStarted.md)
 * [Using and Defining Generators](doc/Generators.md)
 * [Counter Examples and Shrinking](doc/Shrinking.md)
-* [Stateful Testing with `proptest`](doc/StatefulTesting.md)
-* [Concurrency Testing with `proptest`](doc/ConcurrencyTesting.md)
-* [Advanced Mocking with `proptest`](doc/Mocking.md)
+* [Stateful Testing with `cppproptest`](doc/StatefulTesting.md)
+* [Concurrency Testing with `cppproptest`](doc/ConcurrencyTesting.md)
+* [Advanced Mocking with `cppproptest`](doc/Mocking.md)
 
