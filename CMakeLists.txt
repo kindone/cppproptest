@@ -16,12 +16,18 @@ include_directories(. googletest/googletest/include googletest/googlemock/includ
 
 ### library
 SET(proptest_sources
-    testing/generator/numeric.cpp
-    testing/generator/string.cpp
-    testing/generator/util.cpp
-    testing/Property.cpp
-    testing/Random.cpp
-    testing/printing.cpp
+    generator/numeric.cpp
+    generator/string.cpp
+    generator/util.cpp
+    util/fork.cpp
+    util/printing.cpp
+    util/utf8string.cpp
+    util/cesu8string.cpp
+    util/unicode.cpp
+    Property.cpp
+    PropertyContext.cpp
+    Random.cpp
+    assert.cpp
 )
 
 ADD_LIBRARY(proptest
@@ -40,16 +46,18 @@ TARGET_LINK_LIBRARIES(proptest
 
 ### tests
 SET(proptest_testsources
-    testbase.cpp
-    test_gen.cpp
-    test_property.cpp
-    test_primitive.cpp
-    test_combinator.cpp
-    test_shrinkable.cpp
-    test_mock.cpp
-    test_util.cpp
-    test_state.cpp
-    test_stream.cpp
+    test/testbase.cpp
+    test/test_gen.cpp
+    test/test_property.cpp
+    test/test_primitive.cpp
+    test/test_combinator.cpp
+    test/test_shrinkable.cpp
+    test/test_mock.cpp
+    test/test_util.cpp
+    test/test_state.cpp
+    test/test_concurrency.cpp
+    test/test_stream.cpp
+    test/test_fork.cpp
 )
 
 

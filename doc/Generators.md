@@ -5,11 +5,12 @@ Built-in generators are called Arbitraries. `proptest` provides a set of Arbitra
 ## Arbitraries provided by `proptest`
 
 `proptest` provides `Arbitrary<T>` for following primitive types and containers
+* `char` and `bool`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
-* String types: `std::string`, `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbitrary<UTF8String>`)
+* String types: `std::string` (defaults to generate ASCII character strings), `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbitrary<UTF8String>`)
 * Shared pointers: `std::shared_ptr<T>` where an `Arbitrary<T>` or a custom generator for `T` is available.
-* Standard containers: `std::vector`, `std::list`, `std::set`, `std::pair`, `std::tuple`
+* Standard containers: `std::vector`, `std::list`, `std::set`, `std::pair`, `std::tuple`, `std::map`
 	* Arbitraries for containers can optionally take a generator for their element types
 		```cpp
 		// You can supply a specific generator for integers
@@ -18,7 +19,15 @@ Built-in generators are called Arbitraries. `proptest` provides a set of Arbitra
 		auto vecInt = Arbitrary<std::vector<int>>();
 		```
 	
-   	* Containers provide methods for container size configuration
+	* `Arbitrary<std::Map>` provides setter methods for assigning key and value generators
+		
+		```cpp
+		auto mapGen = Arbitrary<std::map<int,int>>();
+		mapGen.setKeyGen(inRange<int>(0,100)); // key ranges from 0 to 100
+		mapGen.setElemGen(inRange<int>(-100, 100)); // value ranges from -100 to 100
+		```
+	
+   	* Containers provide methods for configuring desired sizes
 		* `setMinSize(size)`, `setMaxSize(size)` for restricting to specific range of sizes
 		* `setSize(size)` for restricting to specific size 
 		
