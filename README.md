@@ -4,9 +4,11 @@
 
 ## Property-based testing
 
-Property-based testing originated from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) of Haskell. 
-Its basic idea is to quickly prove a theorem, as the name suggests. 
-You can define an abstract property of the system under test, letting the test framework prove or disprove the property with massive input combinations.
+Many property-based testing frameworks derive from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) in Haskell. 
+Its basic idea is to quickly prove a theorem, as the name 'QuickCheck' suggests. 
+You can define an abstract property of a component, and let the test framework prove or disprove the property by feeding in massive input combinations. 
+
+This approach is often said to be somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in definitive fashion, as in static code analysis, but by actually running the code, as in dynamic code analysis.
 
 A property is in the form of function `(Input0, ... , InputN) -> bool` (or `(Input0, ... , InputN) -> void`)
 
@@ -24,7 +26,7 @@ or
 
 > Falsifiable after 12 tests, where
 >   a = 4,
->   b = -4
+>   b = -4 **(this failure is not actual and only exemplary)**
 
 Among many other benefits, property-based tests can immediately replace dull dummy-based tests, such as:
 
@@ -41,7 +43,7 @@ TEST(Suite, test) {
 }
 ```
 
-This can be turned into a property-based test, which fully tests againt arbitrary input strings:
+This can be turned into a property-based test, which fully tests the component againt arbitrary input strings:
 
 ```cpp
 // property test 
@@ -56,6 +58,27 @@ TEST(Suite, test) {
     });
 }
 ```
+
+Here are some of the benefits of turning conventional unit tests into property based tests:
+
+
+|                   | Conventional Unit Tests   | **Property-Based Tests**     |
+| ----------------- |---------------------------| ---------------------------- |
+| Paradigm          | Procedural                | Functional                   |
+| Test inputs       | Dummy values (with bias)  | Auto-generated combinations  |
+| Style             | Concrete & imperative     | Abstract & declarative       |
+| Finding bugs      | Less likely               | More likely                  |
+| Code Coverage     | Low                       | High                         |
+| Readability       | Low                       | High                         |
+| Extensibility     |                           |                              |
+| &emsp; of params  | No                        | Yes                          |
+| &emsp; of mocks   | No                        | Yes                          |
+| Encourages change | Yes                       | Yes, even more               |
+| Input generation  | Manual                    | Automatic                    |
+| Debugging failures| Manual                    | Backed by automatic shrinking|
+| Stateful tests    | Manual                    | Semi-automatic               |
+| Concurrency tests | Manual                    | Semi-automatic               |
+| Developer efforts | More                      | Less                         |
 
 &nbsp;
 
