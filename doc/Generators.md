@@ -1,10 +1,10 @@
 # Using and Defining Generators 
 
-Built-in generators are called Arbitraries. `proptest` provides a set of Arbitraries for immediate generation of popular types. 
+Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of popular types. 
 
-## Arbitraries provided by `proptest`
+## Arbitraries provided by `cppproptest`
 
-`proptest` provides `Arbitrary<T>` for following primitive types and containers
+`cppproptest` provides `Arbitrary<T>` for following primitive types and containers
 * `char` and `bool`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
