@@ -52,7 +52,7 @@ TEST(Suite, test) {
         MyDecoder decoder;    
         auto encoded = encoder.encode(original);
         auto decoded = decoder.decode(encoded);
-        return original == decoded;
+        PROP_ASSERT_EQ(original, decoded);
     });
 }
 ```
