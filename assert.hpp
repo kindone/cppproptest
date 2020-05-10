@@ -69,30 +69,12 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_TRUE(condition) PROP_ASSERT_VARGS(condition, {})
 #define PROP_ASSERT_FALSE(condition) PROP_ASSERT_VARGS(!condition, {})
 
-#define PROP_EXPECT_STREAM(condition, a, sign, b)                                                               \
-    if (!(condition)) {                                                                                         \
-        std::cerr << std::endl                                                                                  \
-                  << "Expectation '" << #condition << "' (" << __FILE__ << ":" << __LINE__ << ") failed with "; \
-        std::cerr << a << sign << b;                                                                            \
-    }                                                                                                           \
-    PropertyBasedTesting::util::errorOrEmpty(!condition)
-
 #define PROP_ASSERT_EQ(a, b) PROP_ASSERT(a == b)
 #define PROP_ASSERT_NE(a, b) PROP_ASSERT(a != b)
 #define PROP_ASSERT_LT(a, b) PROP_ASSERT(a < b)
 #define PROP_ASSERT_GT(a, b) PROP_ASSERT(a > b)
 #define PROP_ASSERT_LE(a, b) PROP_ASSERT(a <= b)
 #define PROP_ASSERT_GE(a, b) PROP_ASSERT(a >= b)
-
-#define PROP_EXPECT(cond) PROP_EXPECT_STREAM(cond, cond, "", "")
-#define PROP_EXPECT_TRUE(cond) PROP_EXPECT_STREAM(cond, cond, "", "")
-#define PROP_EXPECT_FALSE(cond) PROP_EXPECT_STREAM(cond, cond, "", "")
-#define PROP_EXPECT_EQ(a, b) PROP_EXPECT_STREAM((a == b), a, " != ", b)
-#define PROP_EXPECT_NE(a, b) PROP_EXPECT_STREAM((a != b), a, " == ", b)
-#define PROP_EXPECT_LT(a, b) PROP_EXPECT_STREAM((a < b), a, " >= ", b)
-#define PROP_EXPECT_GT(a, b) PROP_EXPECT_STREAM((a > b), a, " <= ", b)
-#define PROP_EXPECT_LE(a, b) PROP_EXPECT_STREAM((a <= b), a, " > ", b)
-#define PROP_EXPECT_GE(a, b) PROP_EXPECT_STREAM((a >= b), a, " < ", b)
 
 #define PROP_DISCARD()                                                              \
     do {                                                                            \

@@ -180,7 +180,18 @@ TEST(PropTest, TestStringCheckFail2)
 {
     check([](std::string a) {
         PROP_STAT(a.size() > 3);
-        PROP_EXPECT_TRUE(a.size() < 5);
+        PROP_EXPECT(a.size() < 5);
+    });
+
+    check([](std::string a) {
+        PROP_STAT(a.size() > 3);
+        return a.size() < 5;
+    });
+
+    check([](std::string a) {
+        PROP_STAT(a.size() > 3);
+        PROP_EXPECT(a.size() < 5);
+        PROP_EXPECT_LT(a.size(), 6);
     });
 }
 

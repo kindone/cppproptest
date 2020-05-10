@@ -25,6 +25,7 @@ SET(proptest_sources
     util/cesu8string.cpp
     util/unicode.cpp
     Property.cpp
+    PropertyContext.cpp
     Random.cpp
     assert.cpp
 )
