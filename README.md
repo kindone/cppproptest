@@ -84,10 +84,10 @@ Here are some of the benefits of turning conventional unit tests into property b
 
 ## Further topics and details of the framework can be found in:
 
-* [Getting Started](doc/GettingStarted.md)
+* [Getting Started with `proptest`](doc/GettingStarted.md)
 * [Using and Defining Generators](doc/Generators.md)
 * [Counter Examples and Shrinking](doc/Shrinking.md)
-* [Stateful Testing with Property-based Testing Framework](doc/StatefulTesting.md)
-* [Concurrency Testing with Property-based Testing Framework](doc/ConcurrencyTesting.md)
-* [Advanced Mocking with Property-based Testing Framework](doc/Mocking.md)
+* [Stateful Testing with `proptest`](doc/StatefulTesting.md)
+* [Concurrency Testing with `proptest`](doc/ConcurrencyTesting.md)
+* [Advanced Mocking with `proptest`](doc/Mocking.md)
 
