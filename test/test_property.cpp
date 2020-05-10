@@ -200,7 +200,7 @@ TEST(PropTest, TestVectorCheckFail)
             PROP_STAT(a.size() > 3);
             show(std::cout, a);
             std::cout << std::endl;
-            PROP_ASSERT(a.size() < 5);
+            PROP_EXPECT_LT(a.size(), 5);
             return true;
         },
         vecGen);

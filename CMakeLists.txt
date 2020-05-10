@@ -26,6 +26,7 @@ SET(proptest_sources
     util/unicode.cpp
     Property.cpp
     Random.cpp
+    assert.cpp
 )
 
 ADD_LIBRARY(proptest

@@ -526,3 +526,14 @@ TEST(UtilTestCase, Random64)
                   << std::endl;
     }
 }
+
+TEST(UtilTestCase, asserts) {
+    int a = 5;
+    int b = 4;
+    PROP_EXPECT_EQ(a, a);
+    PROP_EXPECT_EQ(a, a) << " should not print";
+    PROP_EXPECT_EQ(a, b);
+    PROP_EXPECT_EQ(a, b) << " should print";
+    PROP_EXPECT_LT(a, b);
+    PROP_EXPECT_GT(a, b) << " should print";
+}
