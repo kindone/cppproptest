@@ -6,7 +6,7 @@
 
 Many property-based testing frameworks derive from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) in Haskell. 
 Its basic idea is to quickly prove a theorem, as the name 'QuickCheck' suggests. 
-You can define an abstract property of a component, and let the test framework prove or disprove the property by feeding in massive input combinations. 
+You can define an abstract property of a component, and let the test framework prove or disprove that property by feeding in massive input combinations. 
 
 This approach is often said to be somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in definitive fashion, as in static code analysis, but by actually running the code, as in dynamic code analysis.
 
