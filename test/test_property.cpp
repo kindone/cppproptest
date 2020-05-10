@@ -46,12 +46,11 @@ TEST(PropTest, TestPropertyExample)
 {
     auto func = [](std::string a, int i, std::string b) -> bool {
         PROP_STAT(i > 0);
-        PROP_ASSERT(false);
-        return true;
+        return false;
     };
     auto prop = property(func);
     // with specific arguments
-    prop.example(std::string("hello"), 10, std::string("world"));
+    EXPECT_FALSE(prop.example(std::string("hello"), 10, std::string("world")));
 }
 
 TYPED_TEST(SignedNumericTest, TestCheckFail)
@@ -122,10 +121,9 @@ public:
 
 TEST(PropTest, TestCheckBit)
 {
-    check([](Bit bit) -> bool {
+    check([](Bit bit) {
         PROP_STAT(bit.v == 1);
         PROP_STAT(bit.v != 1 && bit.v != 0);
-        return true;
     });
 }
 
@@ -139,47 +137,42 @@ TEST(PropTest, TestCheckWithGen)
 
     // supply custom generator
     check(
-        [](int a, int b) -> bool {
+        [](int a, int b) {
             PROP_STAT(a > 0);
             PROP_STAT(b > 0);
-            return true;
         },
         GenSmallInt(), GenSmallInt());
 
     //
     check(
-        [](int a, int b) -> bool {
+        [](int a, int b) {
             PROP_STAT(a > 0);
             PROP_STAT(b > 0);
-            return true;
         },
         GenSmallInt());
 
     GenSmallInt genSmallInt;
 
     check(
-        [](int a, int b) -> bool {
+        [](int a, int b) {
             PROP_STAT(a > 0);
             PROP_STAT(b > 0);
-            return true;
         },
         genSmallInt, genSmallInt);
 
     check(
-        [](int a, std::string b) -> bool {
+        [](int a, std::string b)  {
             PROP_STAT(a > 0);
             PROP_STAT(b.size() > 0);
-            return true;
         },
         genSmallInt);
 }
 
 TEST(PropTest, TestStringCheckFail)
 {
-    check([](std::string a) -> bool {
+    check([](std::string a) {
         PROP_STAT(a.size() > 3);
         PROP_ASSERT(a.size() < 5);
-        return true;
     });
 }
 
@@ -196,19 +189,18 @@ TEST(PropTest, TestVectorCheckFail)
     vecGen.setMaxSize(32);
 
     check(
-        [](std::vector<int> a) -> bool {
+        [](std::vector<int> a) {
             PROP_STAT(a.size() > 3);
             show(std::cout, a);
             std::cout << std::endl;
             PROP_EXPECT_LT(a.size(), 5);
-            return true;
         },
         vecGen);
 }
 
 TEST(PropTest, TestTupleCheckFail)
 {
-    check([](std::tuple<int, std::tuple<int>> tuple) -> bool {
+    check([](std::tuple<int, std::tuple<int>> tuple) {
         // std::cout << "tuple: ";
         // show(std::cout, tuple);
         // std::cout << std::endl;
@@ -216,7 +208,6 @@ TEST(PropTest, TestTupleCheckFail)
         std::tuple<int> subtup = std::get<1>(tuple);
         int b = std::get<0>(subtup);
         PROP_ASSERT((-10 < a && a < 100) || (-20 < b && b < 200));
-        return true;
     });
 }
 
@@ -260,12 +251,11 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     animalVecGen.setMaxSize(20);
 
     check(
-        [&i](std::vector<Animal> animals) -> bool {
-            std::cout << "animal " << i++ << std::endl;
+        [&i](std::vector<Animal> animals) {
+            // std::cout << "animal " << i++ << std::endl;
             if (!animals.empty()) {
                 PROP_STAT(animals.size() > 3);
             }
-            return true;
         },
         animalVecGen);
 }
@@ -277,7 +267,6 @@ decltype(auto) dummyProperty()
     return property([modelPtr](int dummy) {
         auto model = *modelPtr;
         PROP_STAT(model() > 2);
-        return true;
     });
 }
 

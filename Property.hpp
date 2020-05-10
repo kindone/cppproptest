@@ -88,15 +88,14 @@ decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup)
 
 }  // namespace util
 
-template <typename CallableWrapper, typename GenTuple>
+template <typename Func, typename GenTuple>
 class Property final : public PropertyBase {
 public:
-    Property(CallableWrapper&& c, const GenTuple& g) : callableWrapper(std::forward<CallableWrapper>(c)), genTup(g) {}
+    Property(const Func& f, const GenTuple& g) : func(f), genTup(g) {}
 
     virtual bool invoke(Random& rand) override
     {
-        return util::invokeWithGenTuple(
-            rand, std::forward<decltype(callableWrapper.callable)>(callableWrapper.callable), genTup);
+        return util::invokeWithGenTuple(rand, func, genTup);
     }
 
     Property& setSeed(uint64_t s)
@@ -120,8 +119,7 @@ public:
         try {
             try {
                 try {
-                    return util::invokeWithArgs(std::forward<typename CallableWrapper::T>(callableWrapper.callable),
-                                                std::forward<ARGS>(args)...);
+                    return util::invokeWithArgs(func, std::forward<ARGS>(args)...);
                 } catch (const AssertFailed& e) {
                     throw PropertyFailed<decltype(valueTup)>(e, valueTupPtr);
                 }
@@ -167,9 +165,7 @@ private:
         bool result = false;
         auto values = util::transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
-            result = util::invokeWithArgTupleWithReplace<N>(
-                std::forward<typename CallableWrapper::T>(callableWrapper.callable),
-                std::forward<decltype(values)>(values), replace.get());
+            result = util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
             // std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         } catch (const AssertFailed& e) {
             // std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
@@ -263,7 +259,7 @@ private:
     }
 
 private:
-    CallableWrapper callableWrapper;
+    Func func;
     GenTuple genTup;
 };
 
@@ -281,14 +277,38 @@ auto make_CallableWrapper(Callable&& callable)
     return CallableWrapper<Callable>(std::forward<Callable>(callable));
 }
 
+template <typename RetType, typename Callable, typename std::enable_if_t<std::is_same<RetType, bool>::value, bool> = true, typename... ARGS>
+std::function<bool(ARGS...)> property_callable_of_helper(TypeList<ARGS...>, Callable&& callable)
+{
+    return std::function<RetType(ARGS...)>(callable);
+}
+
+template <typename RetType, typename Callable, typename std::enable_if_t<std::is_same<RetType, void>::value, bool> = true, typename... ARGS>
+std::function<bool(ARGS...)> property_callable_of_helper(TypeList<ARGS...>, Callable&& callable)
+{
+    return std::function<bool(ARGS...)>([callable](ARGS&&...args) {
+        callable(std::forward<ARGS>(args)...);
+        return true;
+    });
+}
+
+template <class Callable>
+decltype(auto) property_callable_of(Callable&& callable) {
+    using RetType = typename function_traits<Callable>::return_type;
+    typename function_traits<Callable>::argument_type_list argument_type_list;
+    return property_callable_of_helper<RetType>(argument_type_list, std::forward<Callable>(callable));
+}
+
+
 template <typename Callable, typename... EXPGENS>
 auto property(Callable&& callable, EXPGENS&&... gens)
 {
     // acquire full tuple of generators
     typename function_traits<Callable>::argument_type_list argument_type_list;
+    auto func = property_callable_of(callable);
     auto genTup = util::createGenTuple(argument_type_list, gens...);
-    return Property<CallableWrapper<Callable>, decltype(genTup)>(make_CallableWrapper(std::forward<Callable>(callable)),
-                                                                 genTup);
+
+    return Property<decltype(func), decltype(genTup)>(func, genTup);
 }
 
 template <typename Callable, typename... EXPGENS>
