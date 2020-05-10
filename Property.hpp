@@ -93,10 +93,7 @@ class Property final : public PropertyBase {
 public:
     Property(const Func& f, const GenTuple& g) : func(f), genTup(g) {}
 
-    virtual bool invoke(Random& rand) override
-    {
-        return util::invokeWithGenTuple(rand, func, genTup);
-    }
+    virtual bool invoke(Random& rand) override { return util::invokeWithGenTuple(rand, func, genTup); }
 
     Property& setSeed(uint64_t s)
     {
@@ -165,7 +162,8 @@ private:
         bool result = false;
         auto values = util::transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
-            result = util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
+            result =
+                util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
             // std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         } catch (const AssertFailed& e) {
             // std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
@@ -277,28 +275,30 @@ auto make_CallableWrapper(Callable&& callable)
     return CallableWrapper<Callable>(std::forward<Callable>(callable));
 }
 
-template <typename RetType, typename Callable, typename std::enable_if_t<std::is_same<RetType, bool>::value, bool> = true, typename... ARGS>
+template <typename RetType, typename Callable,
+          typename std::enable_if_t<std::is_same<RetType, bool>::value, bool> = true, typename... ARGS>
 std::function<bool(ARGS...)> property_callable_of_helper(TypeList<ARGS...>, Callable&& callable)
 {
     return std::function<RetType(ARGS...)>(callable);
 }
 
-template <typename RetType, typename Callable, typename std::enable_if_t<std::is_same<RetType, void>::value, bool> = true, typename... ARGS>
+template <typename RetType, typename Callable,
+          typename std::enable_if_t<std::is_same<RetType, void>::value, bool> = true, typename... ARGS>
 std::function<bool(ARGS...)> property_callable_of_helper(TypeList<ARGS...>, Callable&& callable)
 {
-    return std::function<bool(ARGS...)>([callable](ARGS&&...args) {
+    return std::function<bool(ARGS...)>([callable](ARGS&&... args) {
         callable(std::forward<ARGS>(args)...);
         return true;
     });
 }
 
 template <class Callable>
-decltype(auto) property_callable_of(Callable&& callable) {
+decltype(auto) property_callable_of(Callable&& callable)
+{
     using RetType = typename function_traits<Callable>::return_type;
     typename function_traits<Callable>::argument_type_list argument_type_list;
     return property_callable_of_helper<RetType>(argument_type_list, std::forward<Callable>(callable));
 }
-
 
 template <typename Callable, typename... EXPGENS>
 auto property(Callable&& callable, EXPGENS&&... gens)

@@ -161,7 +161,7 @@ TEST(PropTest, TestCheckWithGen)
         genSmallInt, genSmallInt);
 
     check(
-        [](int a, std::string b)  {
+        [](int a, std::string b) {
             PROP_STAT(a > 0);
             PROP_STAT(b.size() > 0);
         },
@@ -173,6 +173,14 @@ TEST(PropTest, TestStringCheckFail)
     check([](std::string a) {
         PROP_STAT(a.size() > 3);
         PROP_ASSERT(a.size() < 5);
+    });
+}
+
+TEST(PropTest, TestStringCheckFail2)
+{
+    check([](std::string a) {
+        PROP_STAT(a.size() > 3);
+        PROP_EXPECT_TRUE(a.size() < 5);
     });
 }
 
