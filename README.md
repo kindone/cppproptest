@@ -8,7 +8,7 @@ Property-based testing originated from [QuickCheck](https://en.wikipedia.org/wik
 Its basic idea is to quickly prove a theorem, as the name suggests. 
 You can define an abstract property of the system under test, letting the test framework prove or disprove the property with massive input combinations.
 
-A property is in the form of function `(Input0, ... , InputN) -> bool`
+A property is in the form of function `(Input0, ... , InputN) -> bool` (or `(Input0, ... , InputN) -> void`)
 
 ```cpp
 [](int a, int b) -> bool {
