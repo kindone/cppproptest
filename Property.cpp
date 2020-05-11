@@ -26,7 +26,7 @@ uint32_t PropertyBase::defaultNumRuns = 1000;
 
 PropertyBase::PropertyBase() : seed(util::getGlobalSeed()), numRuns(defaultNumRuns) {}
 
-bool PropertyBase::check()
+bool PropertyBase::forAll()
 {
     Random rand(seed);
     Random savedRand(seed);

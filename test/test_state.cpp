@@ -65,7 +65,7 @@ TEST(StateTest, States)
                               just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); }));
 
     auto prop = statefulProperty<VectorAction>(Arbitrary<std::vector<int>>(), actionsGen);
-    prop.check();
+    prop.forAll();
 }
 
 struct VectorModel
@@ -132,7 +132,7 @@ TEST(StateTest, StatesWithModel)
 
     auto prop = statefulProperty<VectorAction2>(
         Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
-    prop.check();
+    prop.forAll();
 }
 
 TEST(StateTest, StatesWithModel2)
@@ -145,5 +145,5 @@ TEST(StateTest, StatesWithModel2)
 
     auto prop = statefulProperty<VectorAction2>(
         Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
-    prop.check();
+    prop.forAll();
 }

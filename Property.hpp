@@ -69,7 +69,7 @@ class Random;
 class PROPTEST_API PropertyBase {
 public:
     PropertyBase();
-    bool check();
+    bool forAll();
     virtual ~PropertyBase() {}
     static void setDefaultNumRuns(uint32_t);
     static void tag(const char* filename, int lineno, std::string key, std::string value);
@@ -285,19 +285,7 @@ private:
     GenTuple genTup;
 };
 
-template <class Callable>
-class CallableWrapper {
-public:
-    using T = Callable;
-    Callable callable;
-    CallableWrapper(Callable&& c) : callable(std::forward<Callable>(c)) {}
-};
-
-template <class Callable>
-auto make_CallableWrapper(Callable&& callable)
-{
-    return CallableWrapper<Callable>(std::forward<Callable>(callable));
-}
+namespace util {
 
 template <typename RetType, typename Callable,
           typename std::enable_if_t<std::is_same<RetType, bool>::value, bool> = true, typename... ARGS>
@@ -324,19 +312,21 @@ decltype(auto) property_callable_of(Callable&& callable)
     return property_callable_of_helper<RetType>(argument_type_list, std::forward<Callable>(callable));
 }
 
+}  // namespace util
+
 template <typename Callable, typename... EXPGENS>
 auto property(Callable&& callable, EXPGENS&&... gens)
 {
     // acquire full tuple of generators
     typename function_traits<Callable>::argument_type_list argument_type_list;
-    auto func = property_callable_of(callable);
+    auto func = util::property_callable_of(callable);
     auto genTup = util::createGenTuple(argument_type_list, gens...);
 
     return Property<decltype(func), decltype(genTup)>(func, genTup);
 }
 
 template <typename Callable, typename... EXPGENS>
-bool check(Callable&& callable, EXPGENS&&... gens)
+bool forAll(Callable&& callable, EXPGENS&&... gens)
 {
     return property(callable, gens...).check();
 }

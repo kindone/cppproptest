@@ -11,7 +11,7 @@ TEST(PropTest, TestConstruct)
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
-    check(
+    forAll(
         [](Animal animal) -> bool {
             PROP_STAT(animal.numFeet > 3);
             return true;
@@ -29,7 +29,7 @@ TEST(PropTest, TestConstruct2)
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
-    check(
+    forAll(
         [](Animal animal) -> bool {
             PROP_STAT(animal.numFeet > 3);
             return true;
@@ -46,7 +46,7 @@ TEST(PropTest, TestConstruct3)
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
-    check(
+    forAll(
         [](Animal animal) -> bool {
             PROP_STAT(animal.numFeet > 3);
             return true;
@@ -240,7 +240,7 @@ TEST(PropTest, TestDependency2)
     // exhaustive(tableDataGen(rand), 0);
 
     // DictionaryCompression::IQTypeInfo ti;
-    check(
+    forAll(
         [](TableData td) {
             // column->set(&index[i].first, index[i].second);
             return true;

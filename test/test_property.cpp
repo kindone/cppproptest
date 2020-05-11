@@ -4,13 +4,13 @@ using namespace PropertyBasedTesting;
 
 TEST(PropTest, TestCheckAssert)
 {
-    check([](std::string a, int i, std::string b) -> bool {
+    forAll([](std::string a, int i, std::string b) -> bool {
         if (i % 2 == 0)
             PROP_DISCARD();
         return true;
     });
 
-    check([](std::string a, int i, std::string b) -> bool {
+    forAll([](std::string a, int i, std::string b) -> bool {
         if (i % 2 == 0)
             PROP_SUCCESS();
         PROP_DISCARD();
@@ -23,12 +23,12 @@ TEST(PropTest, TestPropertyBasic)
     property([](std::vector<int> a) -> bool {
         PROP_STAT(a.size() > 5);
         return true;
-    }).check();
+    }).forAll();
 
     auto func = [](std::vector<int> a) -> bool { return true; };
 
-    property(func).check();
-    check(func);
+    property(func).forAll();
+    forAll(func);
 
     auto prop = property([](std::string a, int i, std::string b) -> bool {
         PROP_STAT(i > 0);
@@ -37,7 +37,7 @@ TEST(PropTest, TestPropertyBasic)
     });
 
     // chaining
-    prop.setSeed(0).check();
+    prop.setSeed(0).forAll();
     // with specific arguments
     prop.example(std::string("hello"), 10, std::string("world"));
 }
@@ -55,7 +55,7 @@ TEST(PropTest, TestPropertyExample)
 
 TYPED_TEST(SignedNumericTest, TestCheckFail)
 {
-    check([](TypeParam a, TypeParam b /*,std::string str, std::vector<int> vec*/) -> bool {
+    forAll([](TypeParam a, TypeParam b /*,std::string str, std::vector<int> vec*/) -> bool {
         PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200);
         return true;
     });
@@ -63,18 +63,18 @@ TYPED_TEST(SignedNumericTest, TestCheckFail)
 
 TEST(PropTest, TestCheckBasic)
 {
-    check([](const int& a, const int& b) -> bool {
+    forAll([](const int& a, const int& b) -> bool {
         EXPECT_EQ(a + b, b + a);
         PROP_STAT(a + b > 0);
         return true;
     });
 
-    check([](int a) -> bool {
+    forAll([](int a) -> bool {
         PROP_STAT(a > 0);
         return true;
     });
 
-    check([](std::string a, std::string b) -> bool {
+    forAll([](std::string a, std::string b) -> bool {
         std::string c /*(allocator())*/, d /*(allocator())*/;
         c = a + b;
         d = b + a;
@@ -82,7 +82,7 @@ TEST(PropTest, TestCheckBasic)
         return true;
     });
 
-    check([=](UTF8String a, UTF8String b) -> bool {
+    forAll([=](UTF8String a, UTF8String b) -> bool {
         std::string c /*(allocator())*/, d /*(allocator())*/;
         c = a + b;
         d = b + a;
@@ -121,7 +121,7 @@ public:
 
 TEST(PropTest, TestCheckBit)
 {
-    check([](Bit bit) {
+    forAll([](Bit bit) {
         PROP_STAT(bit.v == 1);
         PROP_STAT(bit.v != 1 && bit.v != 0);
     });
@@ -136,7 +136,7 @@ TEST(PropTest, TestCheckWithGen)
     });*/
 
     // supply custom generator
-    check(
+    forAll(
         [](int a, int b) {
             PROP_STAT(a > 0);
             PROP_STAT(b > 0);
@@ -144,7 +144,7 @@ TEST(PropTest, TestCheckWithGen)
         GenSmallInt(), GenSmallInt());
 
     //
-    check(
+    forAll(
         [](int a, int b) {
             PROP_STAT(a > 0);
             PROP_STAT(b > 0);
@@ -153,14 +153,14 @@ TEST(PropTest, TestCheckWithGen)
 
     GenSmallInt genSmallInt;
 
-    check(
+    forAll(
         [](int a, int b) {
             PROP_STAT(a > 0);
             PROP_STAT(b > 0);
         },
         genSmallInt, genSmallInt);
 
-    check(
+    forAll(
         [](int a, std::string b) {
             PROP_STAT(a > 0);
             PROP_STAT(b.size() > 0);
@@ -170,7 +170,7 @@ TEST(PropTest, TestCheckWithGen)
 
 TEST(PropTest, TestStringCheckFail)
 {
-    check([](std::string a) {
+    forAll([](std::string a) {
         PROP_STAT(a.size() > 3);
         PROP_ASSERT(a.size() < 5);
     });
@@ -178,17 +178,17 @@ TEST(PropTest, TestStringCheckFail)
 
 TEST(PropTest, TestStringCheckFail2)
 {
-    check([](std::string a) {
+    forAll([](std::string a) {
         PROP_STAT(a.size() > 3);
         PROP_EXPECT(a.size() < 5);
     });
 
-    check([](std::string a) {
+    forAll([](std::string a) {
         PROP_STAT(a.size() > 3);
         return a.size() < 5;
     });
 
-    check([](std::string a) {
+    forAll([](std::string a) {
         PROP_STAT(a.size() > 3);
         PROP_EXPECT(a.size() < 5);
         PROP_EXPECT_LT(a.size(), 6);
@@ -207,7 +207,7 @@ TEST(PropTest, TestVectorCheckFail)
     auto vecGen = Arbitrary<std::vector<int>>();
     vecGen.setMaxSize(32);
 
-    check(
+    forAll(
         [](std::vector<int> a) {
             PROP_STAT(a.size() > 3);
             show(std::cout, a);
@@ -219,7 +219,7 @@ TEST(PropTest, TestVectorCheckFail)
 
 TEST(PropTest, TestTupleCheckFail)
 {
-    check([](std::tuple<int, std::tuple<int>> tuple) {
+    forAll([](std::tuple<int, std::tuple<int>> tuple) {
         // std::cout << "tuple: ";
         // show(std::cout, tuple);
         // std::cout << std::endl;
@@ -244,15 +244,15 @@ public:
 
 TEST(PropTest, TestPropertyFunctionLambdaMethod)
 {
-    property(propertyAsFunc).check();
-    check(propertyAsFunc);
+    property(propertyAsFunc).forAll();
+    forAll(propertyAsFunc);
 
     PropertyAsClass propertyAsClass;
-    property(propertyAsClass).check();
-    check(propertyAsClass);
+    property(propertyAsClass).forAll();
+    forAll(propertyAsClass);
 
-    property(PropertyAsClass::propertyAsMethod).check();
-    check(PropertyAsClass::propertyAsMethod);
+    property(PropertyAsClass::propertyAsMethod).forAll();
+    forAll(PropertyAsClass::propertyAsMethod);
 }
 
 TEST(PropTest, TestCheckArbitraryWithConstruct)
@@ -269,7 +269,7 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     auto animalVecGen = Arbitrary<std::vector<Animal>>(animal);
     animalVecGen.setMaxSize(20);
 
-    check(
+    forAll(
         [&i](std::vector<Animal> animals) {
             // std::cout << "animal " << i++ << std::endl;
             if (!animals.empty()) {
@@ -292,5 +292,5 @@ decltype(auto) dummyProperty()
 TEST(StateTest, PropertyCapture)
 {
     auto prop = dummyProperty();
-    prop.check();
+    prop.forAll();
 }
