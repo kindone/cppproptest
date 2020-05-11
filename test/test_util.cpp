@@ -527,9 +527,11 @@ TEST(UtilTestCase, Random64)
     }
 }
 
-TEST(UtilTestCase, asserts) {
+TEST(UtilTestCase, asserts)
+{
     int a = 5;
     int b = 4;
+    PropertyContext context;
     PROP_EXPECT_EQ(a, a);
     PROP_EXPECT_EQ(a, a) << " should not print";
     PROP_EXPECT_EQ(a, b);

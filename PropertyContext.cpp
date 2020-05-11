@@ -62,8 +62,9 @@ void PropertyContext::fail(const char* filename, int lineno, const char* conditi
 
 std::stringstream& PropertyContext::getLastStream()
 {
+    static std::stringstream defaultStr;
     if (failures.empty())
-        throw std::runtime_error("no failures recorded");
+        return defaultStr;
 
     return failures.back().str;
 }
