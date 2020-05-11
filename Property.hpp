@@ -328,7 +328,7 @@ auto property(Callable&& callable, EXPGENS&&... gens)
 template <typename Callable, typename... EXPGENS>
 bool forAll(Callable&& callable, EXPGENS&&... gens)
 {
-    return property(callable, gens...).check();
+    return property(callable, gens...).forAll();
 }
 
 }  // namespace PropertyBasedTesting

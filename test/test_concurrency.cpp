@@ -62,5 +62,5 @@ TEST(ConcurrencyTest, States)
     auto actionsGen = actions<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
 
     auto prop = concurrency<VectorAction3>(Arbitrary<std::vector<int>>(), actionsGen);
-    prop.forAll();
+    prop.check();
 }
