@@ -35,7 +35,7 @@ using namespace PropertyBasedTesting;
 
 TEST(AudioCodec, EncoderDecoder)
 {
-    ASSERT_TRUE(check([](SoundData soundData) {
+    ASSERT_TRUE(forAll([](SoundData soundData) {
         auto encoded = MyAudioCodec::encode(soundData);
         auto decoded = MyAudioCodec::decode(encoded);
         PROP_ASSERT_EQ(decoded, soundData);
@@ -43,13 +43,13 @@ TEST(AudioCodec, EncoderDecoder)
 }
 ```
 
-## `property` and `check`
+## `property` and `forAll`
 
-`property` defines a property with optional configuration and `check` is the shorthand for `Property::check`.
-`Property::check` performs property-based test using supplied callable (function, functor, or lambda).
+`property` defines a property with optional configuration and `forAll` is the shorthand for `Property::forAll`.
+`Property::forAll` performs property-based test using supplied callable (function, functor, or lambda).
 
 ```cpp
-check([](int a, int b) -> bool {
+forAll([](int a, int b) -> bool {
     return a + b == b + a;
 });
 ```
@@ -59,7 +59,7 @@ is equivalent to
 ```cpp
 property([](int a, int b) -> bool {
     return a + b == b + a;
-}).check();
+}).forAll();
 ```
 
 ### Defining a property
