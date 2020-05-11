@@ -1,5 +1,47 @@
-# Getting Started
+# Getting Started with `cppproptest`
 
+## Your first property-based test
+
+`cppproptest` requires [CMake](https://cmake.org) for build tool and a C++14-compliant compiler.
+You can examine the requirements with: 
+
+```Shell
+# at cppproptest root directory
+$ cmake . -BBUILD
+$ cd BUILD && make && ./test_proptest
+```
+
+You can edit your project's CMakeLists.txt to include the library `proptest`:
+
+```CMake
+ADD_SUBDIRECTORY(<path_to_cppproptest_root>)
+
+...
+
+TARGET_LINK_LIBRARIES( ...
+    ...
+    proptest
+    ...
+)
+```
+
+Here's an example test based on [Googletest](https://github.com/google/googletest):
+
+```cpp
+// ...
+#include "proptest/proptest.hpp"
+
+using namespace PropertyBasedTesting;
+
+TEST(AudioCodec, EncoderDecoder)
+{
+    ASSERT_TRUE(check([](SoundData soundData) {
+        auto encoded = MyAudioCodec::encode(soundData);
+        auto decoded = MyAudioCodec::decode(encoded);
+        PROP_ASSERT_EQ(decoded, soundData);
+    }));
+}
+```
 
 ## `property` and `check`
 
@@ -100,5 +142,3 @@ auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
     return num % 2 == 0;
 });
 ```
-
-&nbsp;
