@@ -3,9 +3,9 @@
 
 Compared to [generators](Generators.md), shrinking is a relatively optional feature of property-based testing. But it plays very important role in terms of usability and debugging. 
 
-> Shrinking is the process of finding a failing combination of arguments with simpler representation.
+> Shrinking is the process of finding another failing combination of arguments with simpler representation.
 
-Shrinking shines when a property fails and you want to find out why - starting with whether it was the component that has a bug or the test that was badly designed. 
+Shrinking shines when a property fails and you want to find out why - starting with whether it was the component that had a bug or the test that was badly designed. 
 
 ```cpp
 forAll([](int a, int b, bool c, std::vector<int> d) -> bool {
