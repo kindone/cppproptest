@@ -19,7 +19,7 @@ auto myIntGen = [](Random& rand) {
 
 ## Arbitraries
 
-An `Arbitrary` refers to default generators for a type. You can additionaly define an `Arbitrary<T>` for your type `T`. By defining an `Arbitrary`, you can omit the custom generator argument that was needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `PropertyBasedTesting` namespace in order to be accessible in the framework.
+An `Arbitrary` refers to default generator for a type. You can additionaly define an `Arbitrary<T>` for your type `T`, if it isn't already defined. By defining an `Arbitrary`, you can omit the custom generator argument that is needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `PropertyBasedTesting` namespace in order to be accessible in the framework.
 
 ```cpp
 namespace PropertyBasedTesting {
@@ -34,7 +34,7 @@ struct Arbitrary<Car> : Gen<Car> {
 }
 ```
 
-There are useful helpers for creating new generators from existing ones. You can find the full list in below section.
+There are useful helpers for creating new generators from existing ones. 
 
 `suchThat` is such a helper. It selectively generates values that satisfies a criteria function. Following is an even number generator from the integer `Arbitrary`.
 
@@ -45,6 +45,8 @@ auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
     return num % 2 == 0;
 });
 ```
+
+You can find the full list of such helpers in section **Generator Combinators** below.
 
 &nbsp;
 
