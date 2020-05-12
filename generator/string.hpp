@@ -17,7 +17,6 @@ public:
     Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen);
 
     Shrinkable<std::string> operator()(Random& rand) override;
-    static std::string boundaryValues[1];
 
     Arbitrary setMinSize(size_t size);
     Arbitrary setMaxSize(size_t size);
@@ -38,7 +37,6 @@ public:
     Arbitrary() : minSize(defaultMinSize), maxSize(defaultMaxSize) {}
 
     Shrinkable<UTF8String> operator()(Random& rand) override;
-    static std::string boundaryValues[1];
 
     Arbitrary setMinSize(size_t size)
     {
@@ -72,7 +70,6 @@ public:
     Arbitrary() : minSize(defaultMinSize), maxSize(defaultMaxSize) {}
 
     Shrinkable<CESU8String> operator()(Random& rand) override;
-    static std::string boundaryValues[1];
 
     Arbitrary setMinSize(size_t size)
     {

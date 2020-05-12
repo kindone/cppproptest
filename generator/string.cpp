@@ -12,7 +12,6 @@
 
 namespace PropertyBasedTesting {
 
-std::string Arbitrary<std::string>::boundaryValues[1] = {""};
 size_t Arbitrary<std::string>::defaultMinSize = 0;
 size_t Arbitrary<std::string>::defaultMaxSize = 200;
 
@@ -54,14 +53,6 @@ Arbitrary<std::string> Arbitrary<std::string>::setSize(size_t size)
 
 Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
 {
-    // if (minSize == 0 && rand.getRandomBool(0.05)) {
-    //     size_t i = rand.getRandomSize(0, sizeof(boundaryValues) / sizeof(boundaryValues[0]));
-    //     std::string str = std::string(boundaryValues[i]);
-    //     int len = str.size();
-    //     return binarySearchShrinkable<int>(len).transform<std::string>(
-    //         [str](const int& len) { return str.substr(0, len); });
-    // }
-
     size_t size = rand.getRandomSize(minSize, maxSize + 1);
     std::string str(size, ' ' /*, allocator()*/);
     for (size_t i = 0; i < size; i++)
@@ -80,8 +71,6 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
 
 size_t Arbitrary<UTF8String>::defaultMinSize = 0;
 size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
-
-std::string Arbitrary<UTF8String>::boundaryValues[1] = {""};
 
 /*
  * legal utf-8 byte sequence
@@ -236,8 +225,6 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
 
 size_t Arbitrary<CESU8String>::defaultMinSize = 0;
 size_t Arbitrary<CESU8String>::defaultMaxSize = 200;
-
-std::string Arbitrary<CESU8String>::boundaryValues[1] = {""};
 
 /*
  * legal CESU-8 byte sequence
