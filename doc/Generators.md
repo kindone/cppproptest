@@ -1,10 +1,57 @@
 # Using and Defining Generators 
 
-Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of popular types. 
+You can use generators to generate randomized arguments for properties.
+
+A generator is a callable (function, functor, or lambda) with following signature:
+
+```cpp
+(Random&) -> Shrinkable<T>
+```
+
+You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but you can basically treat it as a wrapper for a value of type `T` here. So a generator generates a value of type `T` from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
+
+```cpp
+auto myIntGen = [](Random& rand) {
+    int smallInt = rand.getRandomInt8();
+    return make_shrinkable<int>(smallInt);
+};
+```
+
+## Arbitraries
+
+An `Arbitrary` refers to default generators for a type. You can additionaly define an `Arbitrary<T>` for your type `T`. By defining an `Arbitrary`, you can omit the custom generator argument that was needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `PropertyBasedTesting` namespace in order to be accessible in the framework.
+
+```cpp
+namespace PropertyBasedTesting {
+
+struct Arbitrary<Car> : Gen<Car> {
+  Shrinkable<Car> operator()(Random& rand) {
+    bool isAutomatic = rand.getRandomBool();
+    return make_shrinkable<Car>(isAutomatic);
+  }
+};
+
+}
+```
+
+There are useful helpers for creating new generators from existing ones. You can find the full list in below section.
+
+`suchThat` is such a helper. It selectively generates values that satisfies a criteria function. Following is an even number generator from the integer `Arbitrary`.
+
+```cpp
+auto anyIntGen = Arbitrary<int>();
+// generates even numbers
+auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
+    return num % 2 == 0;
+});
+```
+
+&nbsp;
 
 ## Arbitraries provided by `cppproptest`
 
-`cppproptest` provides `Arbitrary<T>` for following primitive types and containers
+Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used.
+
 * `char` and `bool`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
