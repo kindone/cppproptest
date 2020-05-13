@@ -19,7 +19,7 @@ forAll([](int a, double b, bool c) -> bool {
 If above property fails, you would immediately want to know which combination of the arguments `a`, `b`, and `c` is responsible for the failure. In some cases, a boolean flag such as `c` in this example could have triggered the failure. If `c` is the only responsible for the failure, we can keep other arguments `a` and `b` as simple as possible. Finding such relationship of arguments is what we would do to indentify the root cause of the failure.
 
 *Shrinking* can perform this process automatically. When a failure is encountered, `forAll` performs *shrinking* of the failing arguments. In other words, it tries to find another input combination that still fails the property, but with simpler representation.
-If an integer is big, it tries with a smaller number. If a boolean is `true`, then tries with `false`. If a vector has many elements, it tries with removing some of the elements, and so on. If possible, it will come up with much more meaningful set of arguments that led to the failure. In this specific example, `a`, `b`, and `c` tuple can be shrunk from the complicated `(-13680124, 7524.68454e-14, true)` to `(0, 0, true)`.
+If an integer is big, it tries with a smaller number. If a boolean is `true`, then tries with `false`. If a vector has many elements, it tries with removing some of the elements, and so on. If possible, it will come up with much more meaningful set of arguments that led to the failure. In this specific example, `a`, `b`, and `c` tuple can be shrunk from the complicated `(-13680124, 7524.68454e-14, true)` to much simpler `(0, 0, true)`.
 
 In short,
 
