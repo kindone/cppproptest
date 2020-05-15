@@ -294,3 +294,12 @@ TEST(StateTest, PropertyCapture)
     auto prop = dummyProperty();
     prop.forAll();
 }
+
+TEST(PropTest, TestExpectDeath)
+{
+    forAll([](std::vector<int> vec, uint64_t n) {
+        auto dangerous = [&vec, n]() { vec[vec.size() - 1 + n] = 100; };
+        dangerous();
+        // EXPECT_DEATH(, ".*") << "vector: " << vec.size() << ", n: " << n;
+    });
+}

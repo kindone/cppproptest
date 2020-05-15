@@ -28,10 +28,6 @@ struct Action
     virtual bool run(SYSTEM& system, MODEL&) { return run(system); }
 
     virtual bool run(SYSTEM&) { throw std::runtime_error("attempt to call undefined run"); };
-
-    virtual bool postcondition(const SYSTEM& system, const MODEL&) { return postcondition(system); }
-
-    virtual bool postcondition(const SYSTEM&) { return true; }
 };
 
 template <typename SYSTEM>
@@ -85,8 +81,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen
         [](SystemType obj, std::vector<std::shared_ptr<ActionType>> actions) {
             for (auto action : actions) {
                 if (action->precondition(obj))
-                    action->run(obj);
-                PROP_ASSERT(action->postcondition(obj));
+                    PROP_ASSERT(action->run(obj));
             }
             return true;
         },
@@ -107,8 +102,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
                 if (action->precondition(obj, model))
-                    action->run(obj, model);
-                PROP_ASSERT(action->postcondition(obj, model));
+                    PROP_ASSERT(action->run(obj, model));
             }
             return true;
         },

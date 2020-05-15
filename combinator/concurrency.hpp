@@ -119,44 +119,68 @@ bool Concurrency<ActionType>::invoke(Random& rand)
     // front
     for (auto action : front) {
         if (action->precondition(obj))
-            action->run(obj);
-        PROP_ASSERT(action->postcondition(obj));
+            PROP_ASSERT(action->run(obj));
     }
 
-    std::mutex mtx;
-    std::condition_variable cv;
-    bool ready = false;
+    std::thread rearRunner1([&obj, rear1, rear2]() mutable {
+        sched_param sch;
+        sch.sched_priority = -20;
+        int policy = SCHED_RR;
 
-    std::thread rearRunner([obj, rear2, &ready, &mtx, &cv]() mutable {
+        pthread_getschedparam(pthread_self(), &policy, &sch);
+        pthread_setschedparam(pthread_self(), policy, &sch);
+
+        std::mutex mtx;
+        std::condition_variable cv;
+        bool ready = false;
+
+        std::atomic<int> counter{0};
+        std::vector<int> log;
+        log.resize(50000);
+
+        std::thread rearRunner2([obj, rear2, &ready, &mtx, &cv, &log, &counter]() mutable {
+            sched_param sch;
+            sch.sched_priority = -20;
+            int policy = SCHED_RR;
+
+            pthread_getschedparam(pthread_self(), &policy, &sch);
+            pthread_setschedparam(pthread_self(), policy, &sch);
+            std::unique_lock<std::mutex> lck(mtx);
+            ready = true;
+            cv.notify_all();
+
+            for (auto action : rear2) {
+                if (!action->precondition(obj))
+                    continue;
+                PROP_ASSERT(action->run(obj));
+                // std::cout << "rear2" << std::endl;
+                log[counter++] = 2;
+                std::this_thread::yield();
+            }
+        });
+
         std::unique_lock<std::mutex> lck(mtx);
-        ready = true;
-        cv.notify_all();
+        while (!ready)
+            cv.wait(lck);
+        // std::this_thread::yield();
 
-        for (auto action : rear2) {
+        for (auto action : rear1) {
             if (!action->precondition(obj))
                 continue;
-            action->run(obj);
-            std::cout << "rear2" << std::endl;
+            PROP_ASSERT(action->run(obj));
+            // std::cout << "rear1" << std::endl;
+            log[counter++] = 1;
             std::this_thread::yield();
-            PROP_ASSERT(action->postcondition(obj));
+        }
+
+        rearRunner2.join();
+
+        for (int i = 0; i < counter; i++) {
+            std::cout << i << ": rear" << log[i] << std::endl;
         }
     });
 
-    std::unique_lock<std::mutex> lck(mtx);
-    while (!ready)
-        cv.wait(lck);
-    // std::this_thread::yield();
-
-    for (auto action : rear1) {
-        if (!action->precondition(obj))
-            continue;
-        action->run(obj);
-        std::cout << "rear1" << std::endl;
-        std::this_thread::yield();
-        PROP_ASSERT(action->postcondition(obj));
-    }
-
-    rearRunner.join();
+    rearRunner1.join();
 
     return true;
 }
