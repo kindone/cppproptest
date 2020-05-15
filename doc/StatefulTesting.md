@@ -108,7 +108,7 @@ struct Clear : public ActionWithoutModel<MyVector> {
 ```
 
 
-### Generating `Action` sequence
+## Generating `Action` sequence
 
 With our `Action`s properly defined, we can generate the sequence of `Action`s.
 `actions` function is a useful shorthand for `oneOf` generator combinator that is specialized for generating `Action` Sequences.
