@@ -1,10 +1,59 @@
 # Using and Defining Generators 
 
-Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of popular types. 
+You can use generators to generate randomized arguments for properties.
+
+A generator is a callable (function, functor, or lambda) with following signature:
+
+```cpp
+(Random&) -> Shrinkable<T>
+```
+
+You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but you can basically treat it as a wrapper for a value of type `T` here. So a generator generates a value of type `T` from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
+
+```cpp
+auto myIntGen = [](Random& rand) {
+    int smallInt = rand.getRandomInt8();
+    return make_shrinkable<int>(smallInt);
+};
+```
+
+## Arbitraries
+
+An `Arbitrary` refers to default generator for a type. You can additionaly define an `Arbitrary<T>` for your type `T`, if it isn't already defined. By defining an `Arbitrary`, you can omit the custom generator argument that is needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `PropertyBasedTesting` namespace in order to be accessible in the framework.
+
+```cpp
+namespace PropertyBasedTesting {
+
+struct Arbitrary<Car> : Gen<Car> {
+  Shrinkable<Car> operator()(Random& rand) {
+    bool isAutomatic = rand.getRandomBool();
+    return make_shrinkable<Car>(isAutomatic);
+  }
+};
+
+}
+```
+
+There are useful helpers for creating new generators from existing ones. 
+
+`suchThat` is such a helper. It selectively generates values that satisfies a criteria function. Following is an even number generator from the integer `Arbitrary`.
+
+```cpp
+auto anyIntGen = Arbitrary<int>();
+// generates even numbers
+auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
+    return num % 2 == 0;
+});
+```
+
+You can find the full list of such helpers in section **Generator Combinators** below.
+
+&nbsp;
 
 ## Arbitraries provided by `cppproptest`
 
-`cppproptest` provides `Arbitrary<T>` for following primitive types and containers
+Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used.
+
 * `char` and `bool`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
@@ -44,6 +93,8 @@ Generator combinators are provided for building a new generator based on existin
 
 * `just<T>(T*)` or `just<T>(function<T()>)`: always generates specific value
 
+### Pair and Tuples
+
 * `pair<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
 
 	```cpp
@@ -55,6 +106,8 @@ Generator combinators are provided for building a new generator based on existin
 	```cpp
 	auto tupleGen = tuple<int, std::string, double>(Arbitrary<int>(), Arbitrary<std::string>(), Arbitrary<double>());
 	```
+
+### Constructing an object
 
 * `construct<T, ARG1, ..., ARGN>([gen1, ..., genM])`: generates an object of type `T` by calling its constructor that matches the signature `(ARG1, ..., ARGN)`. Custom generators `gen1`,..., `genM` can be supplied for generating arguments. If `M < N`, then rest of the arguments are generated with `Arbitrary`s.
 
@@ -69,6 +122,8 @@ Generator combinators are provided for building a new generator based on existin
 	auto coordinateGen2 = construct<Coordinate, int, int>(inRange(-10, 10)); // y is generated with Arbitrary<int>
 	```
 
+### Applying constraints
+
 * `suchThat<T>` or `filter<T>(gen, condition_predicate)`:  generates a type `T` that satisfies condition predicate (`condition_predicate` returns `true`)
 
 	```cpp
@@ -78,6 +133,8 @@ Generator combinators are provided for building a new generator based on existin
 	});
 	```
 
+### Transformation or mapping
+
 * `transform<T,U>(gen, transformer)`: generates type `U` based on generator for type `T`, using `transformer` that transforms a value of type `T` to type `U`
 
 	```cpp
@@ -86,6 +143,8 @@ Generator combinators are provided for building a new generator based on existin
 	    return std::string(num);
 	});
 	```
+
+### Selecting from generators
 
 * `oneOf<T>(gen1, ..., genN)`: generates a type `T` from multiple generators for type `T`, by choosing one of the generators randomly
 
@@ -100,6 +159,8 @@ Generator combinators are provided for building a new generator based on existin
 	// generates a numeric within ranges (0,10), (100, 1000), (10000, 100000)
 	auto evenGen = oneOf<int>(weighted(inRange<int>(0, 10), 0.8), weighted(inRange<int>(100, 1000), 0.15), inRange<int>(10000, 100000)/* weight automatically becomes 1.0 - (0.8 + 0.15) == 0.05 */);
 	```
+
+### Generating with dependencies
 
 * `dependency<T,U>(gen1, gen2generator)`: generates a `std::pair<T,U>` with a generator `gen1` for type `T` and `gen2generator`. `gen2generator` receives a type `T` and returns a generator for type `U`.
 
