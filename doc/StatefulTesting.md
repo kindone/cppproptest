@@ -30,8 +30,6 @@ struct ActionWithoutModel
     virtual bool precondition(const SYSTEM&) { ... }
 
     virtual bool run(SYSTEM&) { ... }
-
-    virtual bool postcondition(const SYSTEM&) { ... }
 };
 ```
 
@@ -39,9 +37,9 @@ struct ActionWithoutModel
 
 You would prefer `ActionWithoutModel` if you don't need a model structure and `Action` if you need one.
 
-* `precondition` is called to check if an action in the sequence is appicable for current system's state. 
+* `precondition` is called to check if an action in the sequence is applicable to current state. If it's not the action is skipped.
     * Overriding `precondition` is optional and returns `true` by default
-* `run` is called to actually apply the state change and perform validations to your model after the state change
+* `run` is called to actually apply the state change and perform validations against your model after the state change
     
 ```cpp
 template <typename SYSTEM, typename MODEL>
