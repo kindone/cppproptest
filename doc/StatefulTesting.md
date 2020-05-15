@@ -6,7 +6,7 @@ While property-based testing suits well with functions and stateless objects, it
 * Define a generator for `action` type that can build a seqeunce of actions and provide arguments to the selected actions
 * Run the action sequences generated as in usual property tests
 
-### Understanding `Action`
+## Understanding `Action`
 
 Say, you are to write stateful test for your `MyVector`, which is a linear container for integers with random-access support.
 
@@ -51,7 +51,7 @@ struct Action
 };
 ```
 
-### Defining `Action`s
+## Defining Actions
 
 For the listed methods that might change the state of a `MyVector`, we would write `Action`s for each.
 
@@ -133,7 +133,7 @@ auto actionSeqGen = actions<ActionWithoutModel<MyVector>>(
 
 This defines a generator for action sequences that randomly chooses `push_back`, `pop_back`, `at`, and `clear` methods for `MyVector` with arguments.
 
-### Running stateful tests
+## Running stateful tests
 
 Finally, we will call `statefulProperty::forAll` to perform generation of action sequences and run the tests.
 You should supply generator for initial state of `MyVector` to start with.
