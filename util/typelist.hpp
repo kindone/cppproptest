@@ -1,5 +1,4 @@
-#ifndef TESTING_TYPELIST_HPP
-#define TESTING_TYPELIST_HPP
+#pragma once
 
 #include <tuple>
 
@@ -54,5 +53,3 @@ struct At<List<Ts...>, Index>
 
 template <class List, size_t Index>
 using itemAt = typename TypeListItemAt::At<List, Index>::type;
-
-#endif
