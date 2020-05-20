@@ -270,7 +270,7 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     animalVecGen.setMaxSize(20);
 
     forAll(
-        [&i](std::vector<Animal> animals) {
+        [](std::vector<Animal> animals) {
             // std::cout << "animal " << i++ << std::endl;
             if (!animals.empty()) {
                 PROP_STAT(animals.size() > 3);
@@ -303,3 +303,4 @@ TEST(PropTest, TestExpectDeath)
         // EXPECT_DEATH(, ".*") << "vector: " << vec.size() << ", n: " << n;
     });
 }
+

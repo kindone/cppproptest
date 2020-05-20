@@ -219,7 +219,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
             if (positions.empty())
                 return UTF8String();
             else
-                return UTF8String(std::move(str.substr(0, positions[size + minSizeCopy])));
+                return UTF8String(str.substr(0, positions[size + minSizeCopy]));
         });
 }
 
@@ -357,7 +357,7 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
             if (positions.empty())
                 return CESU8String();
             else
-                return CESU8String(std::move(str.substr(0, positions[size + minSizeCopy])));
+                return CESU8String(str.substr(0, positions[size + minSizeCopy]));
         });
 }
 
