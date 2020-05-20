@@ -1,5 +1,5 @@
 #include "PropertyContext.hpp"
-#include "Property.hpp"
+#include "PropertyBase.hpp"
 #include <string>
 #include <sstream>
 #include <map>

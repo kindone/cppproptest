@@ -8,6 +8,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 SET(CMAKE_CXX_FLAGS_RELEASE "")
 SET(CMAKE_CXX_STANDARD 14)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -stdlib=libc++ -std=c++14")
+#SET(CMAKE_CXX_FLAGS "-Werror -Weverything -Wno-thread-safety-analysis -Wunreachable-code-loop-increment -Wno-error=deprecated -Wno-c++98-compat -Wno-shadow-uncaptured-local -Wno-shadow -Wno-c++98-compat-pedantic")
 #SET(CMAKE_CXX_LDFLAGS "${CMAKE_CXX_LDFLAGS} -lc++")
 
 add_subdirectory("googletest")

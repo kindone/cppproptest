@@ -2,6 +2,7 @@
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <functional>
 #include "typelist.hpp"
 
 namespace PropertyBasedTesting {
@@ -77,18 +78,5 @@ template <class F>
 struct function_traits<F&&> : public function_traits<F>
 {
 };
-
-template <typename RetType, typename Callable, typename... ARGS>
-std::function<RetType(ARGS...)> std_function_of_helper(TypeList<ARGS...>, Callable&& callable)
-{
-    return std::function<RetType(ARGS...)>(callable);
-}
-
-template <class Callable>
-decltype(auto) std_function_of(Callable&& callable) {
-    using RetType = typename function_traits<Callable>::return_type;
-    typename function_traits<Callable>::argument_type_list argument_type_list;
-    return std_function_of_helper<RetType>(argument_type_list, std::forward<Callable>(callable));
-}
 
 }  // namespace PropertyBasedTesting

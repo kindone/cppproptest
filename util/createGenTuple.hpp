@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <utility>
 #include <functional>
+#include "typelist.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -30,12 +31,6 @@ decltype(auto) createGenHelperListed(std::index_sequence<index...>)
     return std::make_tuple(genToFunc(Arbitrary<itemAt<Tuple, index>>())...);
 }
 
-template <typename... ARGS, std::size_t... index>
-decltype(auto) createGenHelperPacked(std::index_sequence<index...>)
-{
-    return std::make_tuple(ARGS()...);
-}
-
 // returns a std::Tuple<Arbitrary<ARGS...>>
 template <typename... ARGS>
 decltype(auto) createGenTuple(TypeList<ARGS...> /*argument_list*/)
@@ -45,20 +40,20 @@ decltype(auto) createGenTuple(TypeList<ARGS...> /*argument_list*/)
     return createGenHelperListed<ArgsAsTuple>(std::make_index_sequence<Size>{});
 }
 
-template <typename... ARGS, typename... EXPARGS,
-          typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) == sizeof...(ARGS)), bool>::type = true>
-decltype(auto) createGenTuple(TypeList<ARGS...>, EXPARGS&&... gens)
+template <typename... ARGS, typename... EXPGENS,
+          typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGS)), bool>::type = true>
+decltype(auto) createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
-    // constexpr auto ExplicitSize = sizeof...(EXPARGS);
+    // constexpr auto ExplicitSize = sizeof...(EXPGENS);
     auto explicits = std::make_tuple(gens...);
     return explicits;
 }
 
-template <typename... ARGS, typename... EXPARGS,
-          typename std::enable_if<(sizeof...(EXPARGS) > 0 && sizeof...(EXPARGS) < sizeof...(ARGS)), bool>::type = true>
-decltype(auto) createGenTuple(TypeList<ARGS...>, EXPARGS&&... gens)
+template <typename... ARGS, typename... EXPGENS,
+          typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGS)), bool>::type = true>
+decltype(auto) createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
-    constexpr auto ExplicitSize = sizeof...(EXPARGS);
+    constexpr auto ExplicitSize = sizeof...(EXPGENS);
     constexpr auto ImplicitSize = sizeof...(ARGS) - ExplicitSize;
     auto explicits = std::make_tuple(gens...);
     using ArgsAsTuple = std::tuple<std::decay_t<ARGS>...>;

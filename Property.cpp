@@ -1,4 +1,4 @@
-#include "Property.hpp"
+#include "PropertyBase.hpp"
 #include "assert.hpp"
 #include "util/tuple.hpp"
 #include <exception>

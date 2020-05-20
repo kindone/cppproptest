@@ -39,13 +39,7 @@ struct At;
 template <template <class...> class List, class... Ts, size_t Index>
 struct At<List<Ts...>, Index>
 {
-    static_assert(Index < sizeof...(Ts),
-                  "List "
-                  "has "
-                  "less "
-                  "than N "
-                  "elems"
-                  ".");
+    static_assert(Index < sizeof...(Ts), "List has less than N elems.");
     using type = typename AtHelper<List<Ts...>, Index>::type;
 };
 
