@@ -280,3 +280,18 @@ TEST(PropTest, GenList)
     //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
     // }
 }
+
+TEST(PropTest, GenNullable)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<std::list<int>> gen(inRange<int>(0, 100));
+    gen.setMaxSize(8);
+    Arbitrary<Nullable<std::list<int>>> nullableGen(gen);
+    auto shr = nullableGen(rand);
+    // exhaustive(shr, 0);
+
+    for (int i = 0; i < 100; i++) {
+        std::cout << "int: " << nullableGen(rand).getRef() << std::endl;
+    }
+}

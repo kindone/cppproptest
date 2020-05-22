@@ -6,9 +6,11 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <memory>
 #include "../Shrinkable.hpp"
 #include "utf8string.hpp"
 #include "cesu8string.hpp"
+#include "nullable.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -41,6 +43,10 @@ template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::list<T, Allocator>& list);
 template <typename T, typename Compare, typename Allocator>
 std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input);
+// template <typename T>
+// std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr);
+template <typename T>
+std::ostream& show(std::ostream& os, const Nullable<T>& nullable);
 
 namespace util {
 
@@ -59,7 +65,7 @@ struct HasShow
 };
 
 // default printer
-template <typename T, bool = !HasShow<T>::value>
+template <typename T, bool = !util::HasShow<T>::value>
 struct ShowDefault
 {
     static std::ostream& show(std::ostream& os, const T&)
@@ -85,7 +91,6 @@ template <typename T>
 static std::ostream& show(std::ostream& os, const T& obj)
 {
     util::ShowDefault<T>::show(os, obj);
-    ;
     return os;
 }
 
@@ -207,5 +212,26 @@ std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& inpu
     return os;
 }
 
-}  // namespace PropertyBasedTesting
+// template <typename T>
+// std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr)
+// {
+//     if (static_cast<bool>(ptr))
+//         show(os, *ptr);
+//     else
+//         os << "(null)";
+//     return os;
+// }
 
+template <typename T>
+std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
+{
+    if (!nullable.isNull())
+        show(os, *nullable.ptr);
+    else
+        os << "(null)";
+    return os;
+    // show(os, nullable.ptr);
+    return os;
+}
+
+}  // namespace PropertyBasedTesting

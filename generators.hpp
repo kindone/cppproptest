@@ -11,6 +11,7 @@
 #include "generator/map.hpp"
 #include "generator/util.hpp"
 #include "generator/shared_ptr.hpp"
+#include "generator/nullable.hpp"
 #include "combinator/filter.hpp"
 #include "combinator/transform.hpp"
 #include "combinator/construct.hpp"

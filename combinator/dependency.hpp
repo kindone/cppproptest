@@ -11,14 +11,16 @@ template <typename T, typename U>
 std::function<Shrinkable<std::pair<T, U>>(Random&)> dependency(
     std::function<Shrinkable<T>(Random&)> gen1, std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gen2gen)
 {
-    auto genPair = [gen1, gen2gen](Random& rand) -> Shrinkable<std::pair<T, U>> {
-        Shrinkable<T> shrinkableT = gen1(rand);
+    auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
+    auto gen2genPtr = std::make_shared<decltype(gen2gen)>(gen2gen);
+    auto genPair = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<std::pair<T, U>> {
+        Shrinkable<T> shrinkableT = (*gen1Ptr)(rand);
         using Intermediate = std::pair<T, Shrinkable<U>>;
 
         // expand Shrinkable<T>
         Shrinkable<std::pair<T, Shrinkable<U>>> intermediate =
-            shrinkableT.template transform<std::pair<T, Shrinkable<U>>>([&rand, gen2gen](const T& t) {
-                auto gen2 = gen2gen(t);
+            shrinkableT.template transform<std::pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
+                auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
                 return make_shrinkable<std::pair<T, Shrinkable<U>>>(std::make_pair(t, shrinkableU));
             });

@@ -138,8 +138,28 @@ std::ostream& operator<<(std::ostream& os, const std::map<int, int>& input);
 std::ostream& operator<<(std::ostream& os, const std::list<int>& input);
 
 template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<T>& ptr)
+{
+    if (static_cast<bool>(ptr))
+        os << *ptr;
+    else
+        os << "(null)";
+    return os;
+    // return PropertyBasedTesting::show(os, ptr);
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::Nullable<T>& nullable)
+{
+    os << nullable.ptr;
+    return os;
+    // return PropertyBasedTesting::show(os, nullable);
+}
+
+template <typename T>
 void exhaustive(const PropertyBasedTesting::Shrinkable<T>& shrinkable, int level, bool print = true)
 {
+    // using namespace PropertyBasedTesting;
     if (print) {
         for (int i = 0; i < level; i++)
             std::cout << "  ";
