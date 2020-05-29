@@ -1,8 +1,18 @@
 #include "../api.hpp"
 #include "utf8string.hpp"
 #include "unicode.hpp"
+#include <stdexcept>
 
 namespace PropertyBasedTesting {
+
+size_t UTF8String::charsize() const
+{
+    int size = util::UTF8CharSize(*this);
+    if (size < 0)
+        throw std::runtime_error("Not a valid UTF-8 string");
+
+    return static_cast<size_t>(size);
+}
 
 namespace util {
 
@@ -238,9 +248,30 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
+int UTF8CharSize(const std::string& str)
+{
+    std::vector<uint8_t> chars;
+    chars.reserve(str.size());
+    for (size_t i = 0; i < str.size(); i++) {
+        chars[i] = str[i];
+    }
+    int numChars = 0;
+    if (isValidUTF8(chars, numChars)) {
+        return numChars;
+    } else
+        return -1;
+}
+
 bool isValidUTF8(std::vector<uint8_t>& chars)
 {
-    for (size_t i = 0; i < chars.size(); i++) {
+    int numChars = 0;
+    return isValidUTF8(chars, numChars);
+}
+
+bool isValidUTF8(std::vector<uint8_t>& chars, int& numChars)
+{
+    numChars = 0;
+    for (size_t i = 0; i < chars.size(); i++, numChars++) {
         if (chars[i] <= 0x7f) {
             continue;
         } else if (i + 2 > chars.size()) {

@@ -1,8 +1,18 @@
 #include "../api.hpp"
 #include "cesu8string.hpp"
 #include "unicode.hpp"
+#include <stdexcept>
 
 namespace PropertyBasedTesting {
+
+size_t CESU8String::charsize() const
+{
+    int size = util::CESU8CharSize(*this);
+    if (size < 0)
+        throw std::runtime_error("Not a valid CESU-8 string");
+
+    return static_cast<size_t>(size);
+}
 
 namespace util {
 
@@ -206,9 +216,29 @@ std::ostream& decodeCESU8(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
+int CESU8CharSize(const std::string& str)
+{
+    std::vector<uint8_t> chars;
+    chars.reserve(str.size());
+    for (size_t i = 0; i < str.size(); i++) {
+        chars[i] = str[i];
+    }
+    int numChars = 0;
+    if (isValidCESU8(chars, numChars)) {
+        return numChars;
+    } else
+        return -1;
+}
+
 bool isValidCESU8(std::vector<uint8_t>& chars)
 {
-    for (size_t i = 0; i < chars.size(); i++) {
+    int numChars = 0;
+    return isValidCESU8(chars, numChars);
+}
+
+bool isValidCESU8(std::vector<uint8_t>& chars, int& numChars)
+{
+    for (size_t i = 0; i < chars.size(); i++, numChars++) {
         if (chars[i] <= 0x7f) {
             continue;
         } else if (i + 2 > chars.size()) {

@@ -531,9 +531,10 @@ TEST(UtilTestCase, asserts)
 {
     int a = 5;
     int b = 4;
+    int c = 5;
     PropertyContext context;
-    PROP_EXPECT_EQ(a, a);
-    PROP_EXPECT_EQ(a, a) << " should not print";
+    PROP_EXPECT_EQ(a, c);
+    PROP_EXPECT_EQ(a, c) << " should not print";
     PROP_EXPECT_EQ(a, b);
     PROP_EXPECT_EQ(a, b) << " should print";
     PROP_EXPECT_LT(a, b);
