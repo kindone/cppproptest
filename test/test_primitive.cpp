@@ -99,6 +99,7 @@ TEST(PropTest, GenUTF8String)
     for (int i = 0; i < 10000; i++) {
         UTF8String str = static_cast<UTF8String>(gen(rand).getRef());
         uint8_t c0 = str[0];
+        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
         if (str.size() == 1) {
             if (c0 <= 0x7f)
                 context.tag(__FILE__, __LINE__, "code", "1 byte U+0000..U+007F");
@@ -165,6 +166,9 @@ TEST(PropTest, GenCESU8String)
     for (int i = 0; i < 10000; i++) {
         CESU8String str = static_cast<CESU8String>(gen(rand).getRef());
         uint8_t c0 = str[0];
+
+        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+
         if (str.size() == 1) {
             if (c0 <= 0x7f)
                 context.tag(__FILE__, __LINE__, "code", "1 byte U+0000..U+007F");

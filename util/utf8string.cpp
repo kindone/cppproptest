@@ -250,8 +250,7 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
 
 int UTF8CharSize(const std::string& str)
 {
-    std::vector<uint8_t> chars;
-    chars.reserve(str.size());
+    std::vector<uint8_t> chars(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars[i] = str[i];
     }

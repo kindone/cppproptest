@@ -260,8 +260,6 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    int i = 0;
-
     auto vecGen = Arbitrary<std::vector<int>>();
     vecGen.setMaxSize(20);
     auto animal =
@@ -303,4 +301,3 @@ TEST(PropTest, TestExpectDeath)
         // EXPECT_DEATH(, ".*") << "vector: " << vec.size() << ", n: " << n;
     });
 }
-

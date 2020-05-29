@@ -218,8 +218,7 @@ std::ostream& decodeCESU8(std::ostream& os, std::vector<uint8_t>& chars)
 
 int CESU8CharSize(const std::string& str)
 {
-    std::vector<uint8_t> chars;
-    chars.reserve(str.size());
+    std::vector<uint8_t> chars(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars[i] = str[i];
     }
@@ -238,6 +237,7 @@ bool isValidCESU8(std::vector<uint8_t>& chars)
 
 bool isValidCESU8(std::vector<uint8_t>& chars, int& numChars)
 {
+    numChars = 0;
     for (size_t i = 0; i < chars.size(); i++, numChars++) {
         if (chars[i] <= 0x7f) {
             continue;
