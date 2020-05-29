@@ -84,9 +84,6 @@ bool PropertyBase::forAll()
 
 void PropertyBase::setContext(PropertyContext* ctx)
 {
-    if ((context && ctx) || (!context && !ctx))
-        throw std::runtime_error("invalid argument or property context state");
-
     context = ctx;
 }
 

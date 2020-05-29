@@ -18,14 +18,14 @@ std::ostream& operator<<(std::ostream& os, const Failure& f)
     return os;
 }
 
-PropertyContext::PropertyContext()
+PropertyContext::PropertyContext() : oldContext(PropertyBase::getContext())
 {
     PropertyBase::setContext(this);
 }
 
 PropertyContext::~PropertyContext()
 {
-    PropertyBase::setContext(nullptr);
+    PropertyBase::setContext(oldContext);
 }
 
 void PropertyContext::tag(const char* file, int lineno, std::string key, std::string value)

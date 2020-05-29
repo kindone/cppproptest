@@ -65,16 +65,25 @@ std::ostream& errorOrEmpty(bool condition);
         }                                                                                                              \
     } while (false)
 
+#define PROP_ASSERT_STREAM(condition, a, sign, b)           \
+    do {                                                    \
+        if (!(condition)) {                                 \
+            std::stringstream str;                          \
+            str << condition << " with " << a << sign << b; \
+            PROP_ASSERT_VARGS(str, {})                      \
+        }                                                   \
+    } while (false)
+
 #define PROP_ASSERT(condition) PROP_ASSERT_VARGS(condition, {})
 #define PROP_ASSERT_TRUE(condition) PROP_ASSERT_VARGS(condition, {})
 #define PROP_ASSERT_FALSE(condition) PROP_ASSERT_VARGS(!condition, {})
 
-#define PROP_ASSERT_EQ(a, b) PROP_ASSERT(a == b)
-#define PROP_ASSERT_NE(a, b) PROP_ASSERT(a != b)
-#define PROP_ASSERT_LT(a, b) PROP_ASSERT(a < b)
-#define PROP_ASSERT_GT(a, b) PROP_ASSERT(a > b)
-#define PROP_ASSERT_LE(a, b) PROP_ASSERT(a <= b)
-#define PROP_ASSERT_GE(a, b) PROP_ASSERT(a >= b)
+#define PROP_ASSERT_EQ(a, b) PROP_ASSERT_STREAM(a == b, a, " != ", b)
+#define PROP_ASSERT_NE(a, b) PROP_ASSERT_STREAM(a != b, a, " == ", b)
+#define PROP_ASSERT_LT(a, b) PROP_ASSERT_STREAM(a < b, a, " >= ", b)
+#define PROP_ASSERT_GT(a, b) PROP_ASSERT_STREAM(a > b, a, " <= ", b)
+#define PROP_ASSERT_LE(a, b) PROP_ASSERT_STREAM(a <= b, a, " > ", b)
+#define PROP_ASSERT_GE(a, b) PROP_ASSERT_STREAM(a >= b, a, " < ", b)
 
 #define PROP_DISCARD()                                                              \
     do {                                                                            \

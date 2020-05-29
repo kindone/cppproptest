@@ -43,11 +43,14 @@ struct PROPTEST_API PropertyContext
     std::stringstream& getLastStream();
     std::stringstream flushFailures();
     void printSummary();
+    bool hasFailures() const { return !failures.empty(); }
 
 private:
     // key -> (value -> Tag(count, detail))
     std::map<std::string, std::map<std::string, Tag> > tags;
     std::list<Failure> failures;
+
+    PropertyContext* oldContext;
 };
 
 }  // namespace PropertyBasedTesting

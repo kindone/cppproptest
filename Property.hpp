@@ -107,7 +107,7 @@ private:
         // std::cout << " replaced with arg " << N << ": ";
         // show(std::cout, replace);
         // std::cout << std::endl;
-
+        PropertyContext context;
         bool result = false;
         auto values = util::transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
@@ -121,7 +121,7 @@ private:
             // std::cout << "    test failed with std::exception: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
-        return result;
+        return result && !context.hasFailures();
     }
 
     template <typename Shrinks>
