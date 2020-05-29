@@ -64,7 +64,7 @@ bool PropertyBase::forAll()
     } catch (const PropertyFailedBase& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
                   << ")" << std::endl;
-        std::cerr << context.flushFailures().str();
+        // std::cerr << context.flushFailures(2).str();
         // shrink
         handleShrink(savedRand /*, e*/);
         return false;
@@ -72,7 +72,7 @@ bool PropertyBase::forAll()
         // skip shrinking?
         std::cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
                   << std::endl;
-        std::cerr << context.flushFailures().str();
+        // std::cerr << context.flushFailures(2).str();
         handleShrink(savedRand /*, e*/);
         return false;
     }

@@ -69,11 +69,23 @@ std::stringstream& PropertyContext::getLastStream()
     return failures.back().str;
 }
 
-std::stringstream PropertyContext::flushFailures()
+std::stringstream PropertyContext::flushFailures(int indent)
 {
+    const auto doIndent = [](std::stringstream& str, int indent) {
+        for (int i = 0; i < indent; i++)
+            str << " ";
+    };
+
     std::stringstream allFailures;
-    for (auto itr = failures.begin(); itr != failures.end(); ++itr) {
-        allFailures << *itr << std::endl;
+    auto itr = failures.begin();
+    if (itr != failures.end()) {
+        // doIndent(allFailures, indent);
+        allFailures << *itr++;
+    }
+    for (; itr != failures.end(); ++itr) {
+        allFailures << "," << std::endl;
+        doIndent(allFailures, indent);
+        allFailures << *itr;
     }
     failures.clear();
     return allFailures;

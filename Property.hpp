@@ -107,7 +107,6 @@ private:
         // std::cout << " replaced with arg " << N << ": ";
         // show(std::cout, replace);
         // std::cout << std::endl;
-        PropertyContext context;
         bool result = false;
         auto values = util::transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
@@ -115,13 +114,14 @@ private:
                 util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
             // std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
         } catch (const AssertFailed& e) {
+            std::cerr << "    assertion failed: " << e.what() << std::endl;
             // std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         } catch (const std::exception& e) {
             // std::cout << "    test failed with std::exception: result=" << (result ? "true" : "false") << std::endl;
             // TODO: trace
         }
-        return result && !context.hasFailures();
+        return result;
     }
 
     template <typename Shrinks>
@@ -148,11 +148,12 @@ private:
             // printShrinks(shrinks);
             auto iter = shrinks.iterator();
             bool shrinkFound = false;
+            PropertyContext context;
             // keep trying until failure is reproduced
             while (iter.hasNext()) {
                 // get shrinkable
                 auto next = iter.next();
-                if (!test<N>(std::forward<ValueTuple>(valueTup), next)) {
+                if (!test<N>(std::forward<ValueTuple>(valueTup), next) || context.hasFailures()) {
                     shrinks = next.shrinks();
                     std::get<N>(valueTup) = next;
                     shrinkFound = true;
@@ -167,6 +168,8 @@ private:
                 std::cout << "  shrinking found simpler failing arg " << N << ": ";
                 show(std::cout, valueTup);
                 std::cout << std::endl;
+                if (context.hasFailures())
+                    std::cout << "    by failed expectation: " << context.flushFailures(4).str() << std::endl;
             } else {
                 break;
             }

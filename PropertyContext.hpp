@@ -41,7 +41,7 @@ struct PROPTEST_API PropertyContext
     void fail(const char* filename, int lineno, const char* condition, const std::stringstream& str);
     void tag(std::string key, std::string value) { tag("?", -1, key, value); }
     std::stringstream& getLastStream();
-    std::stringstream flushFailures();
+    std::stringstream flushFailures(int indent = 0);
     void printSummary();
     bool hasFailures() const { return !failures.empty(); }
 
