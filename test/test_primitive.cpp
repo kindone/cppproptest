@@ -172,6 +172,7 @@ void testUTF16BE(PropertyContext& context, Random rand)
 
     for (int i = 0; i < 100000; i++) {
         UTF16BEString str = static_cast<UTF16BEString>(gen(rand).getRef());
+        str.charsize();
         uint8_t c0 = str[0];
         context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
         if (str.size() == 1) {
@@ -211,6 +212,7 @@ void testUTF16LE(PropertyContext& context, Random rand)
 
     for (int i = 0; i < 100000; i++) {
         UTF16LEString str = static_cast<UTF16LEString>(gen(rand).getRef());
+        str.charsize();
         uint8_t c0 = str[1];
         context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
         if (str.size() == 1) {

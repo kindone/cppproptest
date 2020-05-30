@@ -2,14 +2,21 @@
 #include "utf16string.hpp"
 #include "unicode.hpp"
 #include <stdexcept>
+#include <sstream>
 
 namespace PropertyBasedTesting {
 
 size_t UTF16BEString::charsize() const
 {
     int size = util::UTF16BECharSize(*this);
-    if (size < 0)
-        throw std::runtime_error("Not a valid UTF-16 BE string");
+    if (size < 0) {
+        std::stringstream str;
+        str << "Not a valid UTF-16 BE string: ";
+        for (size_t i = 0; i < this->size(); i++) {
+            str << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>((*this)[i]) << " ";
+        }
+        throw std::runtime_error(str.str());
+    }
 
     return static_cast<size_t>(size);
 }
@@ -17,8 +24,14 @@ size_t UTF16BEString::charsize() const
 size_t UTF16LEString::charsize() const
 {
     int size = util::UTF16LECharSize(*this);
-    if (size < 0)
-        throw std::runtime_error("Not a valid UTF-16 LE string");
+    if (size < 0) {
+        std::stringstream str;
+        str << "Not a valid UTF-16 LE string: ";
+        for (size_t i = 0; i < this->size(); i++) {
+            str << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>((*this)[i]) << " ";
+        }
+        throw std::runtime_error(str.str());
+    }
 
     return static_cast<size_t>(size);
 }
@@ -181,9 +194,10 @@ bool isValidUTF16BE(std::vector<uint8_t>& chars, int& numChars)
             return false;
         }
         // D800~DBFF + DC00~DF00
-        else if (chars[i] <= 0xDB && 0xDC <= chars[i + 2] && chars[i + 2] <= 0xDF) {
+        else if (0xD8 <= chars[i] && chars[i] <= 0xDB && 0xDC <= chars[i + 2] && chars[i + 2] <= 0xDF) {
             i += 3;
-        }
+        } else
+            return false;
     }
     return true;
 }
@@ -206,9 +220,10 @@ bool isValidUTF16LE(std::vector<uint8_t>& chars, int& numChars)
             return false;
         }
         // D800~DBFF + DC00~DF00
-        else if (chars[i + 1] <= 0xDB && 0xDC <= chars[i + 3] && chars[i + 3] <= 0xDF) {
+        else if (0xD8 <= chars[i + 1] && chars[i + 1] <= 0xDB && 0xDC <= chars[i + 3] && chars[i + 3] <= 0xDF) {
             i += 3;
-        }
+        } else
+            return false;
     }
     return true;
 }

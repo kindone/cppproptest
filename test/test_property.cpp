@@ -176,6 +176,29 @@ TEST(PropTest, TestStringCheckFail)
     });
 }
 
+TEST(PropTest, TestUnicodeStringCheckFail)
+{
+    forAll([](UTF8String a) {
+        PROP_STAT(a.size() > 3);
+        PROP_ASSERT(a.size() < 100);
+    });
+
+    forAll([](CESU8String a) {
+        PROP_STAT(a.size() > 3);
+        PROP_ASSERT(a.size() < 100);
+    });
+
+    forAll([](UTF16BEString a) {
+        PROP_STAT(a.size() > 3);
+        PROP_ASSERT(a.size() < 100);
+    });
+
+    forAll([](UTF16LEString a) {
+        PROP_STAT(a.size() > 3);
+        PROP_ASSERT(a.size() < 100);
+    });
+}
+
 TEST(PropTest, TestStringCheckFail2)
 {
     forAll([](std::string a) {
