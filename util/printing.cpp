@@ -3,6 +3,7 @@
 #include "utf8string.hpp"
 #include "utf16string.hpp"
 #include "cesu8string.hpp"
+#include "unicode.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -36,6 +37,9 @@ PROPTEST_API std::ostream& show(std::ostream& os, const UTF16LEString& str)
     os << "\"";
     util::decodeUTF16LE(os, str);
     os << "\"";
+    os << " (";
+    util::charAsHex(os, str);
+    os << ")";
     return os;
 }
 

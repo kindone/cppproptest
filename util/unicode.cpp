@@ -71,6 +71,19 @@ std::ostream& charAsHex(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
+std::ostream& charAsHex(std::ostream& os, const std::string& chars)
+{
+    util::IosFlagSaver iosFlagSaver(os);
+
+    if (chars.size() > 0)
+        os << /*"\\x" <<*/ std::setfill('0') << std::setw(2) << std::hex
+           << static_cast<int>(static_cast<uint8_t>(chars[0]));
+    for (size_t i = 1; i < chars.size(); i++) {
+        os << " " << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(static_cast<uint8_t>(chars[i]));
+    }
+    return os;
+}
+
 std::ostream& validChar(std::ostream& os, uint8_t c)
 {
     if (static_cast<char>(c) == '\\')
