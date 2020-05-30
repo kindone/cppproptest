@@ -294,21 +294,11 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
     if (!util::isValidUTF16BE(chars)) {
         std::stringstream os;
         os << "not a valid UTF-16 BE string: ";
-        printf("not a valid UTF-16 BE string: ");
         for (size_t i = 0; i < chars.size(); i++) {
             os << static_cast<int>(chars[i]) << " ";
-            printf("%x ", chars[i]);
         }
-        printf("\n");
-
         throw std::runtime_error(os.str());
     }
-
-    // std::cout << "hex = {";
-    // util::UTF16BEToHex(std::cout, chars);
-    // std::cout << "}, decoded = \"";
-    // util::decodeUTF16BE(std::cout, chars);
-    // std::cout << "\"" << std::endl;
 
     UTF16BEString str(chars.size(), ' ' /*, allocator()*/);
     for (size_t i = 0; i < chars.size(); i++) {

@@ -84,6 +84,9 @@ public:
         } catch (const std::exception& e) {
             // skip shrinking?
             std::cerr << "std::exception occurred: " << e.what() << std::endl;
+            std::cout << "  with args: ";
+            show(std::cout, valueTup);
+            std::cout << std::endl;
             return false;
         }
         return false;
