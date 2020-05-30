@@ -127,7 +127,7 @@ TEST(PropTest, GenUTF8String)
         } else if (str.size() == 4) {
             uint8_t c1 = str[1];
             uint8_t c2 = str[2];
-            uint8_t c3 = str[2];
+            uint8_t c3 = str[3];
             if (0xf0 == c0 && 0x90 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 && c3 <= 0xbf)
                 context.tag(__FILE__, __LINE__, "code", "4 bytes U+10000..U+3FFFF");
             else if (0xf1 <= c0 && c0 <= 0xf3 && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 &&
@@ -149,6 +149,141 @@ TEST(PropTest, GenUTF8String2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbitrary<UTF8String> gen;
+    gen.setMaxSize(8);
+    for (int i = 0; i < 3; i++)
+        exhaustive(gen(rand), 0);
+}
+
+TEST(PropTest, GenUTF32String)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    PropertyContext context;
+    uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
+
+    for (int i = 0; i < 100000; i++) {
+        uint32_t code = rand.getRandomSize(1, 0x10FFFF - (0xDFFF - 0xD800 + 1) + 1);
+        if (0xd800 <= code && code <= 0xdfff) {
+            code = code + (0xdfff - 0xd800 + 1);
+        }
+        if (code <= 0xD7FF)
+            context.tag(
+                __FILE__, __LINE__, "code",
+                "U+0001..U+D7FF (" + std::to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
+        else if (0xE000 <= code && code <= 0xFFFF)
+            context.tag(
+                __FILE__, __LINE__, "code",
+                "U+E000..U+FFFF (" + std::to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
+        else
+            context.tag(__FILE__, __LINE__, "code",
+                        "U+10000..U+10FFFF(" +
+                            std::to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
+    }
+    context.printSummary();
+}
+
+TEST(PropTest, GenUTF16BEString)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<UTF16BEString> gen;
+    gen.setSize(1);
+
+    PropertyContext context;
+    uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
+
+    for (int i = 0; i < 100000; i++) {
+        UTF16BEString str = static_cast<UTF16BEString>(gen(rand).getRef());
+        uint8_t c0 = str[0];
+        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+        if (str.size() == 1) {
+            context.tag(__FILE__, __LINE__, "code", "1 byte error");
+        } else if (str.size() == 2) {
+            if (c0 <= 0xD7)
+                context.tag(__FILE__, __LINE__, "code",
+                            "2 bytes U+0001..U+D7FF (" +
+                                std::to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
+            else if (0xE0 <= c0)
+                context.tag(__FILE__, __LINE__, "code",
+                            "2 bytes U+E000..U+FFFF (" +
+                                std::to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
+            else
+                context.tag(__FILE__, __LINE__, "code", "2 byte error");
+        } else if (str.size() == 3) {
+            context.tag(__FILE__, __LINE__, "code", "3 bytes error");
+        } else if (str.size() == 4) {
+            uint8_t c2 = str[2];
+            if (0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)
+                context.tag(__FILE__, __LINE__, "code",
+                            "4 bytes U+10000..U+10FFFF(" +
+                                std::to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
+            else
+                context.tag(__FILE__, __LINE__, "code", "4 bytes error");
+        } else
+            context.tag(__FILE__, __LINE__, "code", "error");
+    }
+    context.printSummary();
+}
+
+TEST(PropTest, GenUTF16BEString2)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<UTF16BEString> gen;
+    gen.setMaxSize(8);
+    for (int i = 0; i < 3; i++)
+        exhaustive(gen(rand), 0);
+}
+
+TEST(PropTest, GenUTF16LEString)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<UTF16LEString> gen;
+    gen.setSize(1);
+
+    PropertyContext context;
+    uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
+
+    for (int i = 0; i < 100000; i++) {
+        UTF16LEString str = static_cast<UTF16LEString>(gen(rand).getRef());
+        uint8_t c0 = str[1];
+        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+        if (str.size() == 1) {
+            context.tag(__FILE__, __LINE__, "code", "1 byte error");
+        } else if (str.size() == 2) {
+            if (c0 <= 0xD7)
+                context.tag(__FILE__, __LINE__, "code",
+                            "2 bytes U+0001..U+D7FF (" +
+                                std::to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
+            else if (0xE0 <= c0)
+                context.tag(__FILE__, __LINE__, "code",
+                            "2 bytes U+E000..U+FFFF (" +
+                                std::to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
+            else
+                context.tag(__FILE__, __LINE__, "code", "2 byte error: " + std::to_string(static_cast<int>(c0)));
+        } else if (str.size() == 3) {
+            context.tag(__FILE__, __LINE__, "code", "3 bytes error");
+        } else if (str.size() == 4) {
+            uint8_t c2 = str[3];
+            if (0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)
+                context.tag(__FILE__, __LINE__, "code",
+                            "4 bytes U+10000..U+10FFFF(" +
+                                std::to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
+            else
+                context.tag(__FILE__, __LINE__, "code", "4 bytes error");
+        } else
+            context.tag(__FILE__, __LINE__, "code", "error");
+    }
+    context.printSummary();
+}
+
+TEST(PropTest, GenUTF16LEString2)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbitrary<UTF16LEString> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);

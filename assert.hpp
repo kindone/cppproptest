@@ -65,13 +65,13 @@ std::ostream& errorOrEmpty(bool condition);
         }                                                                                                              \
     } while (false)
 
-#define PROP_ASSERT_STREAM(condition, a, sign, b)           \
-    do {                                                    \
-        if (!(condition)) {                                 \
-            std::stringstream str;                          \
-            str << condition << " with " << a << sign << b; \
-            PROP_ASSERT_VARGS(str, {})                      \
-        }                                                   \
+#define PROP_ASSERT_STREAM(condition, a, sign, b)            \
+    do {                                                     \
+        if (!(condition)) {                                  \
+            std::stringstream str;                           \
+            str << #condition << " with " << a << sign << b; \
+            PROP_ASSERT_VARGS(str, {})                       \
+        }                                                    \
     } while (false)
 
 #define PROP_ASSERT(condition) PROP_ASSERT_VARGS(condition, {})

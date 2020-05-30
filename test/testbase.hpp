@@ -4,6 +4,7 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 #include "util/utf8string.hpp"
+#include "util/utf16string.hpp"
 #include "util/cesu8string.hpp"
 
 #include <chrono>
@@ -126,6 +127,8 @@ class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector
 }  // namespace PropertyBasedTesting
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String&);
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16BEString&);
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16LEString&);
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::CESU8String&);
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& vec);
 std::ostream& operator<<(std::ostream& os, const TableData& td);

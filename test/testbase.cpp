@@ -1,6 +1,8 @@
 #include "testbase.hpp"
 #include "util/utf8string.hpp"
+#include "util/utf16string.hpp"
 #include "util/cesu8string.hpp"
+#include "util/unicode.hpp"
 
 constexpr int32_t GenSmallInt::boundaryValues[13];
 
@@ -31,6 +33,50 @@ std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8Strin
     std::cout << "}, decoded = \"";
 
     PropertyBasedTesting::util::decodeUTF8(os, chars);
+    os << "\"";
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16BEString& str)
+{
+    // os << "\"";
+    // os << static_cast<std::string>(str) << "\" (";
+    // PropertyBasedTesting::decodeUTF8(os, str);
+    // os << ")\"";
+
+    os << "hex = {";
+    std::vector<uint8_t> chars;
+    chars.reserve(str.size());
+    for (size_t i = 0; i < str.size(); i++)
+        chars.push_back(str[i]);
+
+    PropertyBasedTesting::util::charAsHex(os, chars);
+    std::cout << "}, decoded = \"";
+
+    PropertyBasedTesting::util::decodeUTF16BE(os, chars);
+    os << "\"";
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16LEString& str)
+{
+    // os << "\"";
+    // os << static_cast<std::string>(str) << "\" (";
+    // PropertyBasedTesting::decodeUTF8(os, str);
+    // os << ")\"";
+
+    os << "hex = {";
+    std::vector<uint8_t> chars;
+    chars.reserve(str.size());
+    for (size_t i = 0; i < str.size(); i++)
+        chars.push_back(str[i]);
+
+    PropertyBasedTesting::util::charAsHex(os, chars);
+    std::cout << "}, decoded = \"";
+
+    PropertyBasedTesting::util::decodeUTF16LE(os, chars);
     os << "\"";
 
     return os;

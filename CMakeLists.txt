@@ -23,6 +23,7 @@ SET(proptest_sources
     util/fork.cpp
     util/printing.cpp
     util/utf8string.cpp
+    util/utf16string.cpp
     util/cesu8string.cpp
     util/unicode.cpp
     Property.cpp

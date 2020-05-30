@@ -19,11 +19,6 @@ public:
 };
 
 namespace util {
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c);
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c1, uint8_t c2);
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3);
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4);
-std::ostream& cesu8AsHex(std::ostream& os, uint8_t c);
 PROPTEST_API std::ostream& CESU8ToHex(std::ostream& os, std::vector<uint8_t>& chars);
 PROPTEST_API std::ostream& decodeCESU8(std::ostream& os, std::vector<uint8_t>& chars);
 PROPTEST_API std::ostream& decodeCESU8(std::ostream& os, const std::string& str);

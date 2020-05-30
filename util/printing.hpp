@@ -9,6 +9,7 @@
 #include <memory>
 #include "../Shrinkable.hpp"
 #include "utf8string.hpp"
+#include "utf16string.hpp"
 #include "cesu8string.hpp"
 #include "nullable.hpp"
 
@@ -17,6 +18,8 @@ namespace PropertyBasedTesting {
 std::ostream& show(std::ostream& os, const std::string&);
 std::ostream& show(std::ostream& os, const UTF8String&);
 std::ostream& show(std::ostream& os, const CESU8String&);
+std::ostream& show(std::ostream& os, const UTF16BEString&);
+std::ostream& show(std::ostream& os, const UTF16LEString&);
 std::ostream& show(std::ostream& os, const bool&);
 std::ostream& show(std::ostream& os, const char&);
 std::ostream& show(std::ostream& os, const int8_t&);

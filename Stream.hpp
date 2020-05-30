@@ -115,6 +115,7 @@ struct NonEmptyStream final : public StreamImpl<T>
 
     Stream<T> concat(const Stream<T>& other) const
     {
+        
         return Stream<T>(head(), [tailGen = this->tailGen, other]() { return Stream<T>((*tailGen)()).concat(other); });
     }
 

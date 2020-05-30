@@ -1,6 +1,7 @@
 #include "printing.hpp"
 #include "../api.hpp"
 #include "utf8string.hpp"
+#include "utf16string.hpp"
 #include "cesu8string.hpp"
 
 namespace PropertyBasedTesting {
@@ -18,6 +19,22 @@ PROPTEST_API std::ostream& show(std::ostream& os, const UTF8String& str)
 {
     os << "\"";
     util::decodeUTF8(os, str);
+    os << "\"";
+    return os;
+}
+
+PROPTEST_API std::ostream& show(std::ostream& os, const UTF16BEString& str)
+{
+    os << "\"";
+    util::decodeUTF16BE(os, str);
+    os << "\"";
+    return os;
+}
+
+PROPTEST_API std::ostream& show(std::ostream& os, const UTF16LEString& str)
+{
+    os << "\"";
+    util::decodeUTF16LE(os, str);
     os << "\"";
     return os;
 }
