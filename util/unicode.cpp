@@ -1,4 +1,5 @@
 #include "misc.hpp"
+#include "unicode.hpp"
 #include <iostream>
 #include <iomanip>
 #include <ios>
