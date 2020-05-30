@@ -78,17 +78,29 @@ std::ostream& decodeUTF16LE(std::ostream& os, const UTF16LEString& str)
 std::ostream& decodeUTF16BE(std::ostream& os, std::vector<uint8_t>& chars)
 {
     for (size_t i = 0; i < chars.size(); i++) {
-        // U+0000..U+007F
         if (i + 2 > chars.size()) {
             charAsHex(os, chars[i]);
-            // U+0000..U+D7FF or U+E000..U+FFFF
-        } else if (chars[i] <= 0xD7 || 0xE0 <= chars[i]) {
+        }
+        // ASCII: U+0000..U+007F
+        if (chars[i] == 0 && chars[i + 1] <= 0x7f) {
+            validChar2(os, chars[i + 1]);
+            i++;
+        }
+        // U+0000..U+D7FF or U+E000..U+FFFF
+        else if (chars[i] <= 0xD7 || 0xE0 <= chars[i]) {
             codepage(os, (chars[i] << 8) + chars[i + 1]);
+            i++;
+        } else if (i + 4 > chars.size()) {
+            charAsHex(os, chars[i], chars[i + 1], chars[i + 2], chars[i + 3]);
+            break;
         }
         // U+10000.. use surrogate pairs
-        // chars[i] in D8..DF
+        // U+0000..U+D7FF or U+E000..U+FFFF
         else {
-            codepage(os, 0x10000 + ((chars[i] - 0xD8) << 8) + chars[i + 1]);
+            uint16_t c0 = ((chars[i] - 0xD8) << 8) + chars[i + 1];
+            uint16_t c1 = ((chars[i + 2] - 0xDC) << 8) + chars[i + 3];
+            codepage(os, 0x10000 + (c0 << 16) + c1);
+            i += 3;
         }
     }
     return os;
@@ -97,17 +109,29 @@ std::ostream& decodeUTF16BE(std::ostream& os, std::vector<uint8_t>& chars)
 std::ostream& decodeUTF16LE(std::ostream& os, std::vector<uint8_t>& chars)
 {
     for (size_t i = 0; i < chars.size(); i++) {
-        // U+0000..U+007F
         if (i + 2 > chars.size()) {
-            charAsHex(os, chars[i], chars[i + 1]);
-            // U+0000..U+D7FF or U+E000..U+FFFF
-        } else if (chars[i + 1] <= 0xD7 || 0xE0 <= chars[i + 1]) {
+            charAsHex(os, chars[i]);
+        }
+        // ASCII: U+0000..U+007F
+        if (chars[i + 1] == 0 && chars[i] <= 0x7f) {
+            validChar2(os, chars[i]);
+            i++;
+        }
+        // U+0000..U+D7FF or U+E000..U+FFFF
+        else if (chars[i + 1] <= 0xD7 || 0xE0 <= chars[i + 1]) {
             codepage(os, (chars[i + 1] << 8) + chars[i]);
+            i++;
+        } else if (i + 4 > chars.size()) {
+            charAsHex(os, chars[i], chars[i + 1], chars[i + 2], chars[i + 3]);
+            break;
         }
         // U+10000.. use surrogate pairs
-        // chars[i] in D8..DF
+        // U+0000..U+D7FF or U+E000..U+FFFF
         else {
-            codepage(os, 0x10000 + ((chars[i + 1] - 0xD8) << 8) + chars[i]);
+            uint16_t c0 = ((chars[i + 1] - 0xD8) << 8) + chars[i];
+            uint16_t c1 = ((chars[i + 3] - 0xDC) << 8) + chars[i + 2];
+            codepage(os, 0x10000 + (c0 << 16) + c1);
+            i += 3;
         }
     }
     return os;

@@ -106,7 +106,8 @@ void PropertyContext::printSummary()
         for (auto valueKV : valueMap) {
             auto value = valueKV.first;
             auto tag = valueKV.second;
-            std::cout << "    " << value << ": " << static_cast<double>(tag.count) / total * 100 << "%" << std::endl;
+            std::cout << "    " << value << ": " << tag.count << "/" << total << " ("
+                      << static_cast<double>(tag.count) / total * 100 << "%)" << std::endl;
         }
     }
 }

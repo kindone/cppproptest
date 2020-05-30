@@ -83,28 +83,41 @@ std::ostream& validChar(std::ostream& os, uint8_t c)
     return os;
 }
 
-std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2)
+std::ostream& validChar2(std::ostream& os, uint8_t c)
 {
-    util::IosFlagSaver iosFlagSaver(os);
-    os << "\\u" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2);
+    if (static_cast<char>(c) == '\\')
+        os << "\\\\";
+    else if (c < 0x20) {
+        util::IosFlagSaver iosFlagSaver(os);
+        os << "\\u" << std::setfill('0') << std::setw(4) << std::hex << static_cast<int>(c);
+    } else
+        os << static_cast<char>(c);
+
     return os;
 }
 
-std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3)
-{
-    util::IosFlagSaver iosFlagSaver(os);
-    os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(0) << static_cast<int>(c1)
-       << static_cast<int>(c2) << static_cast<int>(c3);
-    return os;
-}
+// std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2)
+// {
+//     util::IosFlagSaver iosFlagSaver(os);
+//     os << "\\u" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2);
+//     return os;
+// }
 
-std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
-{
-    util::IosFlagSaver iosFlagSaver(os);
-    os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2)
-       << static_cast<int>(c3) << static_cast<int>(c4);
-    return os;
-}
+// std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3)
+// {
+//     util::IosFlagSaver iosFlagSaver(os);
+//     os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(0) << static_cast<int>(c1)
+//        << static_cast<int>(c2) << static_cast<int>(c3);
+//     return os;
+// }
+
+// std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
+// {
+//     util::IosFlagSaver iosFlagSaver(os);
+//     os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2)
+//        << static_cast<int>(c3) << static_cast<int>(c4);
+//     return os;
+// }
 
 }  // namespace util
 }  // namespace PropertyBasedTesting
