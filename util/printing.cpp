@@ -29,6 +29,9 @@ PROPTEST_API std::ostream& show(std::ostream& os, const UTF16BEString& str)
     os << "\"";
     util::decodeUTF16BE(os, str);
     os << "\"";
+    os << " (";
+    util::charAsHex(os, str);
+    os << ")";
     return os;
 }
 
