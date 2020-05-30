@@ -2,6 +2,7 @@
 
 #include "../api.hpp"
 #include <iostream>
+#include <vector>
 
 namespace PropertyBasedTesting {
 namespace util {
