@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& os, const Failure& f)
     return os;
 }
 
-PropertyContext::PropertyContext() : oldContext(PropertyBase::getContext()), lastStreamExists(false)
+PropertyContext::PropertyContext() : lastStreamExists(false), oldContext(PropertyBase::getContext())
 {
     PropertyBase::setContext(this);
 }
