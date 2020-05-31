@@ -243,7 +243,7 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
     std::vector<int> positions /*, allocator()*/;
     std::vector<uint32_t> codes;
 
-    chars.reserve(len * 4);
+    chars.reserve(len * 4 + 2);
     codes.reserve(len);
     positions.reserve(len);
 
@@ -290,6 +290,8 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
         }
     }
     positions.push_back(chars.size());
+    chars.push_back(0);
+    chars.push_back(0);
 
     if (!util::isValidUTF16BE(chars)) {
         std::stringstream os;
@@ -383,6 +385,8 @@ Shrinkable<UTF16LEString> Arbitrary<UTF16LEString>::operator()(Random& rand)
         }
     }
     positions.push_back(chars.size());
+    chars.push_back(0);
+    chars.push_back(0);
 
     if (!util::isValidUTF16LE(chars)) {
         std::stringstream os;
