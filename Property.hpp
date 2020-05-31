@@ -76,14 +76,14 @@ public:
                 std::cerr << "Discard is not supported for single run" << std::endl;
             }
         } catch (const PropertyFailedBase& e) {
-            std::cerr << "Property failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
+            std::cerr << "example failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
             std::cout << "  with args: ";
             show(std::cout, valueTup);
             std::cout << std::endl;
             return false;
         } catch (const std::exception& e) {
             // skip shrinking?
-            std::cerr << "std::exception occurred: " << e.what() << std::endl;
+            std::cerr << "example failed by std::exception: " << e.what() << std::endl;
             std::cout << "  with args: ";
             show(std::cout, valueTup);
             std::cout << std::endl;
@@ -205,7 +205,7 @@ private:
             util::transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
                                  std::forward<decltype(shrinksTuple)>(shrinksTuple), std::make_index_sequence<Size>{});
-        std::cout << "  found shrunk args: ";
+        std::cout << "  simplest args found by shrinking: ";
         show(std::cout, shrunk);
         std::cout << std::endl;
     }

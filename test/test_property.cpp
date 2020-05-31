@@ -235,7 +235,8 @@ TEST(PropTest, TestVectorCheckFail)
             PROP_STAT(a.size() > 3);
             show(std::cout, a);
             std::cout << std::endl;
-            PROP_EXPECT_LT(a.size(), 5);
+            PROP_EXPECT_LT(a.size(), 5) << "synthesized failure1";
+            PROP_EXPECT_LT(a.size(), 4) << "synthesized failure2";
         },
         vecGen);
 }
