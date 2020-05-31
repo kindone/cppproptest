@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& os, const Failure& f)
     return os;
 }
 
-PropertyContext::PropertyContext() : oldContext(PropertyBase::getContext())
+PropertyContext::PropertyContext() : oldContext(PropertyBase::getContext()), lastStreamExists(false)
 {
     PropertyBase::setContext(this);
 }
@@ -53,17 +53,19 @@ void PropertyContext::tag(const char* file, int lineno, std::string key, std::st
 void PropertyContext::succeed(const char* filename, int lineno, const char* condition, const std::stringstream& str)
 {
     // DO NOTHING
+    lastStreamExists = false;
 }
 
 void PropertyContext::fail(const char* filename, int lineno, const char* condition, const std::stringstream& str)
 {
     failures.push_back(Failure(filename, lineno, condition, str));
+    lastStreamExists = true;
 }
 
 std::stringstream& PropertyContext::getLastStream()
 {
     static std::stringstream defaultStr;
-    if (failures.empty())
+    if (failures.empty() || !lastStreamExists)
         return defaultStr;
 
     return failures.back().str;

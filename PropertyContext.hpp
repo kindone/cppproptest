@@ -49,6 +49,7 @@ private:
     // key -> (value -> Tag(count, detail))
     std::map<std::string, std::map<std::string, Tag> > tags;
     std::list<Failure> failures;
+    bool lastStreamExists;
 
     PropertyContext* oldContext;
 };

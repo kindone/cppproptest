@@ -77,14 +77,14 @@ public:
             }
         } catch (const PropertyFailedBase& e) {
             std::cerr << "example failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
-            std::cout << "  with args: ";
+            std::cerr << "  with args: ";
             show(std::cout, valueTup);
             std::cout << std::endl;
             return false;
         } catch (const std::exception& e) {
             // skip shrinking?
             std::cerr << "example failed by std::exception: " << e.what() << std::endl;
-            std::cout << "  with args: ";
+            std::cerr << "  with args: ";
             show(std::cout, valueTup);
             std::cout << std::endl;
             return false;
