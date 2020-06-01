@@ -19,13 +19,16 @@ include_directories(. googletest/googletest/include googletest/googlemock/includ
 SET(proptest_sources
     generator/numeric.cpp
     generator/string.cpp
+    generator/utf8string.cpp
+    generator/utf16string.cpp
+    generator/cesu8string.cpp
     generator/util.cpp
     util/fork.cpp
-    util/printing.cpp
     util/utf8string.cpp
     util/utf16string.cpp
     util/cesu8string.cpp
     util/unicode.cpp
+    util/printing.cpp
     Property.cpp
     PropertyContext.cpp
     Random.cpp
