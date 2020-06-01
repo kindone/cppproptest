@@ -53,21 +53,21 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int8_t>& input);
 template <typename ARG1, typename ARG2>
 std::ostream& operator<<(std::ostream& os, const std::tuple<ARG1, ARG2>& tuple)
 {
-    os << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+    os << PropertyBasedTesting::Show<std::tuple<ARG1, ARG2>>(tuple);
     return os;
 }
 
 template <typename ARG1, typename ARG2, typename ARG3>
 std::ostream& operator<<(std::ostream& os, const std::tuple<ARG1, ARG2, ARG3>& tuple)
 {
-    os << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ", " << std::get<2>(tuple) << ")";
+    os << PropertyBasedTesting::Show<std::tuple<ARG1, ARG2, ARG3>>(tuple);
     return os;
 }
 
 template <typename ARG1, typename ARG2>
 std::ostream& operator<<(std::ostream& os, const std::pair<ARG1, ARG2>& pair)
 {
-    os << "(" << pair.first << ", " << pair.second << ")";
+    os << PropertyBasedTesting::Show<std::pair<ARG1, ARG2>>(pair);
     return os;
 }
 
@@ -167,7 +167,7 @@ void exhaustive(const PropertyBasedTesting::Shrinkable<T>& shrinkable, int level
         for (int i = 0; i < level; i++)
             std::cout << "  ";
 
-        std::cout << "shrinkable: " << shrinkable.get() << std::endl;
+        std::cout << "shrinkable: " << PropertyBasedTesting::Show<T>(shrinkable.get()) << std::endl;
     }
 
     auto shrinks = shrinkable.shrinks();

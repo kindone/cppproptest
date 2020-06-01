@@ -104,6 +104,18 @@ std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
     return os;
 }
 
+template <typename T>
+struct Show
+{
+    Show(const T& value) : value(value) {}
+    friend std::ostream& operator<<(std::ostream& os, const Show<T>& sh)
+    {
+        show(os, sh.value);
+        return os;
+    }
+    const T& value;
+};
+
 namespace util {
 
 template <typename T>
@@ -116,8 +128,7 @@ bool toStreamLast(std::ostream& os, const T& t)
 template <typename T>
 bool toStreamFrontHelper(std::ostream& os, const T& t)
 {
-    show(os, t);
-    os << ", ";
+    os << Show<T>(t) << ", ";
     return true;
 }
 
@@ -144,11 +155,7 @@ struct ToStreamEach<0, Tuple>
 template <typename ARG1, typename ARG2>
 std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair)
 {
-    os << "( ";
-    show(os, pair.first);
-    os << ", ";
-    show(os, pair.second);
-    os << " )";
+    os << "( " << Show<ARG1>(pair.first) << ", " << Show<ARG2>(pair.second) << " )";
     return os;
 }
 
@@ -170,10 +177,9 @@ std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& seq)
     os << "[ ";
     auto begin = seq.begin();
     if (begin != seq.end()) {
-        show(os, *begin);
+        os << Show<T>(*begin);
         for (auto itr = ++begin; itr != seq.end(); itr++) {
-            os << ", ";
-            show(os, *itr);
+            os << ", " << Show<T>(*itr);
         }
     }
     os << " ]";
@@ -186,10 +192,9 @@ std::ostream& show(std::ostream& os, const std::list<T, Allocator>& seq)
     os << "[ ";
     auto begin = seq.begin();
     if (begin != seq.end()) {
-        show(os, *begin);
+        os << Show<T>(*begin);
         for (auto itr = ++begin; itr != seq.end(); itr++) {
-            os << ", ";
-            show(os, *itr);
+            os << ", " << Show<T>(*itr);
         }
     }
     os << " ]";
@@ -229,7 +234,7 @@ template <typename T>
 std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
 {
     if (!nullable.isNull())
-        show(os, *nullable.ptr);
+        os << Show<T>(*nullable.ptr);
     else
         os << "(null)";
     return os;

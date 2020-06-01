@@ -317,7 +317,7 @@ TEST(StateTest, PropertyCapture)
     prop.forAll();
 }
 
-TEST(PropTest, TestExpectDeath)
+TEST(PropTest, DISABLED_TestExpectDeath)
 {
     forAll([](std::vector<int> vec, uint64_t n) {
         auto dangerous = [&vec, n]() { vec[vec.size() - 1 + n] = 100; };

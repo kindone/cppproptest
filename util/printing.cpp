@@ -9,57 +9,31 @@ namespace PropertyBasedTesting {
 
 PROPTEST_API std::ostream& show(std::ostream& os, const std::string& str)
 {
-    os << "\"";
-    util::decodeUTF8(os, str);
-    os << "\"";
-    os << " (";
-    util::charAsHex(os, str);
-    os << ")";
-    // os << "\"" << str << "\"";
+    os << "\"" << util::DecodeUTF8(str) << "\" (" << util::StringAsHex(str) << ")";
     return os;
 }
 
 PROPTEST_API std::ostream& show(std::ostream& os, const UTF8String& str)
 {
-    os << "\"";
-    util::decodeUTF8(os, str);
-    os << "\"";
-    os << " (";
-    util::charAsHex(os, str);
-    os << ")";
+    os << "\"" << util::DecodeUTF8(str) << "\" (" << util::StringAsHex(str) << ")";
     return os;
 }
 
 PROPTEST_API std::ostream& show(std::ostream& os, const UTF16BEString& str)
 {
-    os << "\"";
-    util::decodeUTF16BE(os, str);
-    os << "\"";
-    os << " (";
-    util::charAsHex(os, str);
-    os << ")";
+    os << "\"" << util::DecodeUTF16BE(str) << "\" (" << util::StringAsHex(str) << ")";
     return os;
 }
 
 PROPTEST_API std::ostream& show(std::ostream& os, const UTF16LEString& str)
 {
-    os << "\"";
-    util::decodeUTF16LE(os, str);
-    os << "\"";
-    os << " (";
-    util::charAsHex(os, str);
-    os << ")";
+    os << "\"" << util::DecodeUTF16LE(str) << "\" (" << util::StringAsHex(str) << ")";
     return os;
 }
 
 PROPTEST_API std::ostream& show(std::ostream& os, const CESU8String& str)
 {
-    os << "\"";
-    util::decodeCESU8(os, str);
-    os << "\"";
-    os << " (";
-    util::charAsHex(os, str);
-    os << ")";
+    os << "\"" << util::DecodeCESU8(str) << "\" (" << util::StringAsHex(str) << ")";
     return os;
 }
 

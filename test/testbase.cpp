@@ -18,119 +18,61 @@ double getTime()
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String& str)
 {
-    // os << "\"";
-    // os << static_cast<std::string>(str) << "\" (";
-    // PropertyBasedTesting::decodeUTF8(os, str);
-    // os << ")\"";
-
-    os << "hex = {";
-    std::vector<uint8_t> chars;
-    chars.reserve(str.size());
-    for (size_t i = 0; i < str.size(); i++)
-        chars.push_back(str[i]);
-
-    PropertyBasedTesting::util::UTF8ToHex(os, chars);
-    std::cout << "}, decoded = \"";
-
-    PropertyBasedTesting::util::decodeUTF8(os, chars);
-    os << "\"";
-
+    os << PropertyBasedTesting::Show<PropertyBasedTesting::UTF8String>(str);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16BEString& str)
 {
-    // os << "\"";
-    // os << static_cast<std::string>(str) << "\" (";
-    // PropertyBasedTesting::decodeUTF8(os, str);
-    // os << ")\"";
-
-    os << "hex = {";
-    std::vector<uint8_t> chars;
-    chars.reserve(str.size());
-    for (size_t i = 0; i < str.size(); i++)
-        chars.push_back(str[i]);
-
-    PropertyBasedTesting::util::charAsHex(os, chars);
-    std::cout << "}, decoded = \"";
-
-    PropertyBasedTesting::util::decodeUTF16BE(os, chars);
-    os << "\"";
-
+    os << PropertyBasedTesting::Show<PropertyBasedTesting::UTF16BEString>(str);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16LEString& str)
 {
-    // os << "\"";
-    // os << static_cast<std::string>(str) << "\" (";
-    // PropertyBasedTesting::decodeUTF8(os, str);
-    // os << ")\"";
-
-    os << "hex = {";
-    std::vector<uint8_t> chars;
-    chars.reserve(str.size());
-    for (size_t i = 0; i < str.size(); i++)
-        chars.push_back(str[i]);
-
-    PropertyBasedTesting::util::charAsHex(os, chars);
-    std::cout << "}, decoded = \"";
-
-    PropertyBasedTesting::util::decodeUTF16LE(os, chars);
-    os << "\"";
-
+    os << PropertyBasedTesting::Show<PropertyBasedTesting::UTF16LEString>(str);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::CESU8String& str)
 {
-    // os << "\"";
-    // os << static_cast<std::string>(str) << "\" (";
-    // PropertyBasedTesting::decodeUTF8(os, str);
-    // os << ")\"";
-
-    os << "hex = {";
-    std::vector<uint8_t> chars;
-    chars.reserve(str.size());
-    for (size_t i = 0; i < str.size(); i++)
-        chars.push_back(str[i]);
-
-    PropertyBasedTesting::util::CESU8ToHex(os, chars);
-    std::cout << "}, decoded = \"";
-
-    PropertyBasedTesting::util::decodeCESU8(os, chars);
-    os << "\"";
-
+    os << PropertyBasedTesting::Show<PropertyBasedTesting::CESU8String>(str);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& input)
 {
-    os << "[ ";
-    for (auto const& i : input) {
-        os << i.a << " ";
-    }
-    os << "]";
+    os << PropertyBasedTesting::Show<std::vector<Foo>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int>& input)
 {
-    os << "[ ";
-    for (auto const& i : input) {
-        os << i << " ";
-    }
-    os << "]";
+    os << PropertyBasedTesting::Show<std::vector<int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int8_t>& input)
 {
-    os << "[ ";
-    for (auto const& i : input) {
-        os << static_cast<int>(i) << " ";
-    }
-    os << "]";
+    os << PropertyBasedTesting::Show<std::vector<int8_t>>(input);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
+{
+    os << PropertyBasedTesting::Show<std::set<int>>(input);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::map<int, int>& input)
+{
+    os << PropertyBasedTesting::Show<std::map<int, int>>(input);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
+{
+    os << PropertyBasedTesting::Show<std::list<int>>(input);
     return os;
 }
 
@@ -172,54 +114,5 @@ std::ostream& operator<<(std::ostream& os, const Animal& input)
     os << ", name: " << input.name;
     os << ", measures: " << input.measures;
     os << " }";
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
-{
-    os << "{ ";
-    if (input.size() == 1) {
-        os << *input.begin();
-    } else if (input.size() > 0) {
-        os << *input.begin();
-        auto second = input.begin();
-        second++;
-        for (auto itr = second; itr != input.end(); ++itr) {
-            os << ", " << *itr;
-        }
-    }
-
-    os << " }";
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::map<int, int>& input)
-{
-    os << "Map { ";
-    if (input.size() == 1) {
-        auto& pair = *input.begin();
-        os << "{" << pair.first << " -> " << pair.second << "}";
-    } else if (input.size() > 0) {
-        auto& firstPair = *input.begin();
-        os << "{" << firstPair.first << " -> " << firstPair.second << "}";
-        auto second = input.begin();
-        second++;
-        for (auto itr = second; itr != input.end(); ++itr) {
-            auto& pair = *itr;
-            os << ", {" << pair.first << " -> " << pair.second << "}";
-        }
-    }
-
-    os << " }";
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
-{
-    os << "[ ";
-    for (auto const& i : input) {
-        os << i << " ";
-    }
-    os << "]";
     return os;
 }
