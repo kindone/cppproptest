@@ -84,6 +84,12 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_GT(a, b) PROP_ASSERT_STREAM(a > b, a, " <= ", b)
 #define PROP_ASSERT_LE(a, b) PROP_ASSERT_STREAM(a <= b, a, " > ", b)
 #define PROP_ASSERT_GE(a, b) PROP_ASSERT_STREAM(a >= b, a, " < ", b)
+#define PROP_ASSERT_STREQ(a, b)                                                                       \
+    PROP_ASSERT_STREAM(strcmp(a, b) == 0, PropertyBasedTesting::Show<const char*>(a), " not equals ", \
+                       PropertyBasedTesting::Show<const char*>(b))
+#define PROP_ASSERT_STRNE(a, b)                                                                   \
+    PROP_ASSERT_STREAM(strcmp(a, b) != 0, PropertyBasedTesting::Show<const char*>(a), " equals ", \
+                       PropertyBasedTesting::Show<const char*>(b))
 
 #define PROP_DISCARD()                                                              \
     do {                                                                            \

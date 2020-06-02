@@ -7,6 +7,20 @@
 
 namespace PropertyBasedTesting {
 
+PROPTEST_API std::ostream& show(std::ostream& os, const char* c_str, size_t len)
+{
+    std::string str(c_str, len);
+    os << "(" << util::StringAsHex(str) << ")";
+    return os;
+}
+
+PROPTEST_API std::ostream& show(std::ostream& os, const char* c_str)
+{
+    std::string str(c_str);
+    os << "(" << util::StringAsHex(str) << ")";
+    return os;
+}
+
 PROPTEST_API std::ostream& show(std::ostream& os, const std::string& str)
 {
     os << "\"" << util::DecodeUTF8(str) << "\" (" << util::StringAsHex(str) << ")";

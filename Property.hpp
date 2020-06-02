@@ -77,16 +77,12 @@ public:
             }
         } catch (const PropertyFailedBase& e) {
             std::cerr << "example failed: " << e.what() << " (" << e.filename << ":" << e.lineno << ")" << std::endl;
-            std::cerr << "  with args: ";
-            show(std::cout, valueTup);
-            std::cout << std::endl;
+            std::cerr << "  with args: " << Show<std::tuple<ARGS...>>(valueTup) << std::endl;
             return false;
         } catch (const std::exception& e) {
             // skip shrinking?
             std::cerr << "example failed by std::exception: " << e.what() << std::endl;
-            std::cerr << "  with args: ";
-            show(std::cout, valueTup);
-            std::cout << std::endl;
+            std::cerr << "  with args: " << Show<std::tuple<ARGS...>>(valueTup) << std::endl;
             return false;
         }
         return false;
@@ -133,9 +129,8 @@ private:
         auto itr = shrinks.iterator();
         // std::cout << "    shrinks: " << std::endl;
         for (int i = 0; i < 4 && itr.hasNext(); i++) {
-            std::cout << "    ";
-            show(std::cout, itr.next());
-            std::cout << std::endl;
+            auto& value = itr.next();
+            std::cout << "    " << Show<std::decay_t<decltype(value)>>(value) << std::endl;
         }
     }
 
@@ -168,9 +163,8 @@ private:
                 }
             }
             if (shrinkFound) {
-                std::cout << "  shrinking found simpler failing arg " << N << ": ";
-                show(std::cout, valueTup);
-                std::cout << std::endl;
+                std::cout << "  shrinking found simpler failing arg " << N << ": " << Show<ValueTuple>(valueTup)
+                          << std::endl;
                 if (context.hasFailures())
                     std::cout << "    by failed expectation: " << context.flushFailures(4).str() << std::endl;
             } else {
@@ -196,18 +190,14 @@ private:
 
         auto generatedValueTup = util::transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
 
-        std::cout << "  with args: ";
-        show(std::cout, generatedValueTup);
-        std::cout << std::endl;
+        std::cout << "  with args: " << Show<decltype(generatedValueTup)>(generatedValueTup) << std::endl;
         // std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<GenTuple>::value;
         auto shrinksTuple =
             util::transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
                                  std::forward<decltype(shrinksTuple)>(shrinksTuple), std::make_index_sequence<Size>{});
-        std::cout << "  simplest args found by shrinking: ";
-        show(std::cout, shrunk);
-        std::cout << std::endl;
+        std::cout << "  simplest args found by shrinking: " << Show<decltype(shrunk)>(shrunk) << std::endl;
     }
 
 private:
