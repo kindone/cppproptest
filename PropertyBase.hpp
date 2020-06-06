@@ -5,16 +5,18 @@
 #include "PropertyContext.hpp"
 #include <sstream>
 
-#define PROP_EXPECT_STREAM(condition, a, sign, b)                   \
-    if (!(condition)) {                                             \
-        std::stringstream str;                                      \
-        str << a << sign << b;                                      \
-        PropertyBase::fail(__FILE__, __LINE__, #condition, str);    \
-    } else {                                                        \
-        std::stringstream str;                                      \
-        PropertyBase::succeed(__FILE__, __LINE__, #condition, str); \
-    }                                                               \
-    PropertyBase::getLastStream()
+#define PROP_EXPECT_STREAM(condition, a, sign, b)                       \
+    ([&]() -> std::stringstream& {                                      \
+        if (!(condition)) {                                             \
+            std::stringstream str;                                      \
+            str << a << sign << b;                                      \
+            PropertyBase::fail(__FILE__, __LINE__, #condition, str);    \
+        } else {                                                        \
+            std::stringstream str;                                      \
+            PropertyBase::succeed(__FILE__, __LINE__, #condition, str); \
+        }                                                               \
+        return PropertyBase::getLastStream();                           \
+    })()
 
 #define PROP_EXPECT(cond) PROP_EXPECT_STREAM(cond, "", "", "")
 #define PROP_EXPECT_TRUE(cond) PROP_EXPECT_STREAM(cond, "", "", "")
@@ -25,6 +27,12 @@
 #define PROP_EXPECT_GT(a, b) PROP_EXPECT_STREAM(a > b, a, " <= ", b)
 #define PROP_EXPECT_LE(a, b) PROP_EXPECT_STREAM(a <= b, a, " > ", b)
 #define PROP_EXPECT_GE(a, b) PROP_EXPECT_STREAM(a >= b, a, " < ", b)
+#define PROP_EXPECT_STREQ(a, b, n)                                                                    \
+    PROP_EXPECT_STREAM(memcmp(a, b, n) == 0, PropertyBasedTesting::Show<char*>(a, n), " not equals ", \
+                       PropertyBasedTesting::Show<char*>(b, n))
+#define PROP_EXPECT_STRNE(a, b, n)                                                                \
+    PROP_EXPECT_STREAM(memcmp(a, b, n) != 0, PropertyBasedTesting::Show<char*>(a, n), " equals ", \
+                       PropertyBasedTesting::Show<char*>(b, n))
 
 #define PROP_STAT(VALUE)                                               \
     do {                                                               \

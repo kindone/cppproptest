@@ -118,6 +118,19 @@ struct Show
     const T& value;
 };
 
+template <>
+struct Show<char*>
+{
+    Show(const char* value, size_t n) : value(value), n(n) {}
+    friend std::ostream& operator<<(std::ostream& os, const Show<char*>& sh)
+    {
+        show(os, sh.value, sh.n);
+        return os;
+    }
+    const char* value;
+    size_t n;
+};
+
 namespace util {
 
 template <typename T>

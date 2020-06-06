@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <mutex>
 
 using namespace PropertyBasedTesting;
 
@@ -16,6 +17,11 @@ struct VectorAction3 : public ActionWithoutModel<std::vector<int>>
 {
 };
 
+std::mutex& getMutex() {
+    static std::mutex mtx;
+    return mtx;
+}
+
 struct PushBack3 : public VectorAction3
 {
     PushBack3(int value) : value(value) {}
@@ -23,6 +29,7 @@ struct PushBack3 : public VectorAction3
     virtual bool run(std::vector<int>& system)
     {
         // std::cout << "PushBack(" << value << ")" << std::endl;
+        std::lock_guard<std::mutex> guard(getMutex());
         system.push_back(value);
         return true;
     }
@@ -35,6 +42,7 @@ struct Clear3 : public VectorAction3
     virtual bool run(std::vector<int>& system)
     {
         // std::cout << "Clear" << std::endl;
+        std::lock_guard<std::mutex> guard(getMutex());
         system.clear();
         return true;
     }
@@ -45,8 +53,10 @@ struct PopBack3 : public VectorAction3
     virtual bool run(std::vector<int>& system)
     {
         // std::cout << "PopBack" << std::endl;
+        std::lock_guard<std::mutex> guard(getMutex());
         if (system.empty())
             return true;
+
         system.pop_back();
         return true;
     }

@@ -7,6 +7,7 @@ TEST(PropTest, TestCheckAssert)
     forAll([](std::string a, int i, std::string b) -> bool {
         if (i % 2 == 0)
             PROP_DISCARD();
+        PROP_EXPECT_STREQ(a.c_str(), b.c_str(), a.size());
         return true;
     });
 
@@ -14,6 +15,8 @@ TEST(PropTest, TestCheckAssert)
         if (i % 2 == 0)
             PROP_SUCCESS();
         PROP_DISCARD();
+
+        PROP_ASSERT_STREQ(a.c_str(), b.c_str(), a.size());
         return true;
     });
 }

@@ -105,6 +105,47 @@ bool Concurrency<ActionType>::check()
 }
 
 template <typename ActionType>
+struct RearRunner
+{
+    using SystemType = typename ActionType::SystemType;
+    using Actions = std::vector<std::shared_ptr<ActionType>>;
+
+    RearRunner(int n, SystemType& obj, Actions& actions, std::atomic_bool& thread_ready, std::atomic_bool& sync_ready,
+               std::vector<int>& log, std::atomic_int& counter)
+        : n(n),
+          obj(obj),
+          actions(actions),
+          thread_ready(thread_ready),
+          sync_ready(sync_ready),
+          log(log),
+          counter(counter)
+    {
+    }
+
+    void operator()()
+    {
+        thread_ready = true;
+        while (!sync_ready) {}
+
+        for (auto action : actions) {
+            if (!action->precondition(obj))
+                continue;
+            PROP_ASSERT(action->run(obj));
+            // std::cout << "rear2" << std::endl;
+            log[counter++] = n;
+        }
+    }
+
+    int n;
+    SystemType& obj;
+    Actions& actions;
+    std::atomic_bool& thread_ready;
+    std::atomic_bool& sync_ready;
+    std::vector<int>& log;
+    std::atomic_int& counter;
+};
+
+template <typename ActionType>
 bool Concurrency<ActionType>::invoke(Random& rand)
 {
     Shrinkable<SystemType> initialShr = (*initialGenPtr)(rand);
@@ -122,65 +163,32 @@ bool Concurrency<ActionType>::invoke(Random& rand)
             PROP_ASSERT(action->run(obj));
     }
 
-    std::thread rearRunner1([&obj, rear1, rear2]() mutable {
-        sched_param sch;
-        sch.sched_priority = -20;
-        int policy = SCHED_RR;
-
-        pthread_getschedparam(pthread_self(), &policy, &sch);
-        pthread_setschedparam(pthread_self(), policy, &sch);
-
-        std::mutex mtx;
-        std::condition_variable cv;
-        bool ready = false;
-
+    // rear
+    std::thread spawner([&]() {
+        std::atomic_bool thread1_ready(false);
+        std::atomic_bool thread2_ready(false);
+        std::atomic_bool sync_ready(false);
         std::atomic<int> counter{0};
         std::vector<int> log;
-        log.resize(50000);
+        log.resize(5000);
 
-        std::thread rearRunner2([obj, rear2, &ready, &mtx, &cv, &log, &counter]() mutable {
-            sched_param sch;
-            sch.sched_priority = -20;
-            int policy = SCHED_RR;
+        std::thread rearRunner1(RearRunner<ActionType>(1, obj, rear1, thread1_ready, sync_ready, log, counter));
+        std::thread rearRunner2(RearRunner<ActionType>(2, obj, rear2, thread2_ready, sync_ready, log, counter));
+        while (!thread1_ready) {}
+        while (!thread2_ready) {}
 
-            pthread_getschedparam(pthread_self(), &policy, &sch);
-            pthread_setschedparam(pthread_self(), policy, &sch);
-            std::unique_lock<std::mutex> lck(mtx);
-            ready = true;
-            cv.notify_all();
+        sync_ready = true;
 
-            for (auto action : rear2) {
-                if (!action->precondition(obj))
-                    continue;
-                PROP_ASSERT(action->run(obj));
-                // std::cout << "rear2" << std::endl;
-                log[counter++] = 2;
-                std::this_thread::yield();
-            }
-        });
-
-        std::unique_lock<std::mutex> lck(mtx);
-        while (!ready)
-            cv.wait(lck);
-        // std::this_thread::yield();
-
-        for (auto action : rear1) {
-            if (!action->precondition(obj))
-                continue;
-            PROP_ASSERT(action->run(obj));
-            // std::cout << "rear1" << std::endl;
-            log[counter++] = 1;
-            std::this_thread::yield();
-        }
-
+        rearRunner1.join();
         rearRunner2.join();
 
+        std::cout << "count: " << counter << std::endl;
         for (int i = 0; i < counter; i++) {
             std::cout << i << ": rear" << log[i] << std::endl;
         }
     });
 
-    rearRunner1.join();
+    spawner.join();
 
     return true;
 }

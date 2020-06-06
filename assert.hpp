@@ -70,7 +70,7 @@ std::ostream& errorOrEmpty(bool condition);
         if (!(condition)) {                                  \
             std::stringstream str;                           \
             str << #condition << " with " << a << sign << b; \
-            PROP_ASSERT_VARGS(str, {})                       \
+            PROP_ASSERT_VARGS(str, {});                      \
         }                                                    \
     } while (false)
 
@@ -84,12 +84,14 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_GT(a, b) PROP_ASSERT_STREAM(a > b, a, " <= ", b)
 #define PROP_ASSERT_LE(a, b) PROP_ASSERT_STREAM(a <= b, a, " > ", b)
 #define PROP_ASSERT_GE(a, b) PROP_ASSERT_STREAM(a >= b, a, " < ", b)
-#define PROP_ASSERT_STREQ(a, b)                                                                       \
-    PROP_ASSERT_STREAM(strcmp(a, b) == 0, PropertyBasedTesting::Show<const char*>(a), " not equals ", \
-                       PropertyBasedTesting::Show<const char*>(b))
-#define PROP_ASSERT_STRNE(a, b)                                                                   \
-    PROP_ASSERT_STREAM(strcmp(a, b) != 0, PropertyBasedTesting::Show<const char*>(a), " equals ", \
-                       PropertyBasedTesting::Show<const char*>(b))
+
+#define PROP_ASSERT_STREQ(a, b, n)                                                                    \
+    PROP_ASSERT_STREAM(memcmp(a, b, n) == 0, PropertyBasedTesting::Show<char*>(a, n), " not equals ", \
+                       PropertyBasedTesting::Show<char*>(b, n))
+
+#define PROP_ASSERT_STRNE(a, b, n)                                                                \
+    PROP_ASSERT_STREAM(memcmp(a, b, n) != 0, PropertyBasedTesting::Show<char*>(a, n), " equals ", \
+                       PropertyBasedTesting::Show<char*>(b, n))
 
 #define PROP_DISCARD()                                                              \
     do {                                                                            \
