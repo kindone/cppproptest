@@ -13,7 +13,7 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class PROPTEST_API Arbitrary<std::list<T>> final : public Gen<std::list<T>> {
+class PROPTEST_API Arbitrary<std::list<T>> final : public ArbitraryBase<std::list<T>> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;

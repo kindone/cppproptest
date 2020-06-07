@@ -6,7 +6,7 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<UTF16BEString> final : public Gen<UTF16BEString> {
+class PROPTEST_API Arbitrary<UTF16BEString> final : public ArbitraryBase<UTF16BEString> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;

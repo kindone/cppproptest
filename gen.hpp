@@ -20,40 +20,78 @@ template <typename T>
 struct Gen
 {
     using type = T;
-    Gen() {
-        auto caller = [this](Random& rand) {
-            return this->operator()(rand);
-        };
-        genPtr = std::make_shared<std::function<Shrinkable<T>(Random&)>>(caller);
-    }
 
-    Gen(std::function<Shrinkable<T>(Random&)> gen) : genPtr(std::make_shared<std::function<Shrinkable<T>(Random&)>>(gen)) {}
     virtual ~Gen() {}
 
     virtual Shrinkable<T> operator()(Random& rand) {
-        if(!genPtr)
-            throw std::runtime_error("operator() should be defined for Gen");
-        else
-            return (*genPtr)(rand);
+        throw std::runtime_error("operator() should be defined for Gen");
+    }
+};
+
+template <typename T>
+struct CustomGen : public Gen<T> {
+
+    CustomGen(std::function<Shrinkable<T>(Random&)> gen) : genPtr(std::make_shared<std::function<Shrinkable<T>(Random&)>>(gen)) {}
+
+    virtual Shrinkable<T> operator()(Random& rand) {
+        return (*genPtr)(rand);
     }
 
     template <typename U>
     decltype(auto) transform(std::function<U(const T&)> transformer)
     {
-        return PropertyBasedTesting::transform<T, U>(static_cast<std::function<Shrinkable<T>(Random&)>>(*this), transformer);
+        auto thisPtr = clone();
+        return CustomGen<U>(PropertyBasedTesting::transform<T, U>([thisPtr](Random& rand) {
+            return (*thisPtr->genPtr)(rand);
+        }, transformer));
     }
 
     template <typename Criteria>
     decltype(auto) filter(Criteria&& criteria)
     {
-        return PropertyBasedTesting::filter<T>(static_cast<std::function<Shrinkable<T>(Random&)>>(*this), std::forward<Criteria>(criteria));
+        auto thisPtr = clone();
+        return CustomGen<T>(PropertyBasedTesting::filter<T>([thisPtr](Random& rand) {
+            return (*thisPtr->genPtr)(rand);
+        }, std::forward<Criteria>(criteria)));
+    }
+
+    std::shared_ptr<CustomGen<T>> clone() {
+        return std::make_shared<CustomGen<T>>(*dynamic_cast<CustomGen<T>*>(this));
     }
 
     std::shared_ptr<std::function<Shrinkable<T>(Random&)>> genPtr;
 };
 
+template <typename T> struct Arbitrary;
+
 template <typename T>
-struct Arbitrary : public Gen<T>
+struct ArbitraryBase : public Gen<T> {
+
+    template <typename U>
+    decltype(auto) transform(std::function<U(const T&)> transformer)
+    {
+        auto thisPtr = clone();
+        return CustomGen<U>(PropertyBasedTesting::transform<T, U>([thisPtr](Random& rand) {
+            return thisPtr->operator()(rand);
+        }, transformer));
+    }
+
+    template <typename Criteria>
+    decltype(auto) filter(Criteria&& criteria)
+    {
+        auto thisPtr = clone();
+        return CustomGen<T>(PropertyBasedTesting::filter<T>([thisPtr](Random& rand) {
+            return thisPtr->operator()(rand);
+        }, std::forward<Criteria>(criteria)));
+    }
+
+    std::shared_ptr<Arbitrary<T>> clone() {
+        return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this));
+    }
+};
+
+template <typename T>
+struct Arbitrary : public ArbitraryBase<T>
 {
 };
 

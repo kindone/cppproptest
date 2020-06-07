@@ -22,7 +22,7 @@ public:
 namespace PropertyBasedTesting {
 
 template <typename T>
-class Arbitrary<std::set<T>> final : public Gen<std::set<T>> {
+class Arbitrary<std::set<T>> final : public ArbitraryBase<std::set<T>> {
     using Set = typename std::set<T>;
 
 public:

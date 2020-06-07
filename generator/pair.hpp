@@ -86,7 +86,7 @@ decltype(auto) pair(GEN1&& gen1, GEN2&& gen2)
 }
 
 template <typename ARG1, typename ARG2>
-class PROPTEST_API Arbitrary<std::pair<ARG1, ARG2>> final : public Gen<std::pair<ARG1, ARG2>> {
+class PROPTEST_API Arbitrary<std::pair<ARG1, ARG2>> final : public ArbitraryBase<std::pair<ARG1, ARG2>> {
 public:
     Shrinkable<std::pair<ARG1, ARG2>> operator()(Random& rand) override
     {

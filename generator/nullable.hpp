@@ -9,7 +9,7 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class Arbitrary<Nullable<T>> final : public Gen<Nullable<T>> {
+class Arbitrary<Nullable<T>> final : public ArbitraryBase<Nullable<T>> {
 public:
     Arbitrary() : elemGen(Arbitrary<T>()) {}
 

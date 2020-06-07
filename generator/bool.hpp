@@ -5,7 +5,7 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<bool> final : public Gen<bool> {
+class PROPTEST_API Arbitrary<bool> final : public ArbitraryBase<bool> {
 public:
     Shrinkable<bool> operator()(Random& rand) override
     {

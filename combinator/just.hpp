@@ -3,6 +3,7 @@
 #include <type_traits>
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
+#include "../gen.hpp"
 
 namespace PropertyBasedTesting {
 
@@ -10,7 +11,7 @@ template <typename T, typename LazyEval>
 std::function<Shrinkable<T>(Random&)> just(LazyEval&& lazyEval)
 {
     auto lazyEvalPtr = std::make_shared<std::function<T()>>(std::forward<LazyEval>(lazyEval));
-    return [lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); };
+    return CustomGen<T>([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
 }
 
 // template <typename T, typename...ARGS>
@@ -25,7 +26,7 @@ template <typename T, typename U = T>
 std::function<Shrinkable<T>(Random&)> just(U* valuePtr)
 {
     std::shared_ptr<T> sharedPtr(valuePtr);
-    return [sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); };
+    return CustomGen<T>([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });
 }
 
 }  // namespace PropertyBasedTesting

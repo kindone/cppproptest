@@ -6,7 +6,6 @@
 
 namespace PropertyBasedTesting {
 
-// FIXME: doesn't honor shrinking
 template <typename T, typename U>
 decltype(auto) transform(std::function<Shrinkable<T>(Random&)> gen, std::function<U(const T&)> transformer)
 {

@@ -8,7 +8,7 @@
 
 namespace PropertyBasedTesting {
 template <typename Key, typename T>
-class Arbitrary<std::map<Key, T>> final : public Gen<std::map<Key, T>> {
+class Arbitrary<std::map<Key, T>> final : public ArbitraryBase<std::map<Key, T>> {
     using Map = typename std::map<Key, T>;
 
 public:

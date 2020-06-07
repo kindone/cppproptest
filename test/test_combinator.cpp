@@ -107,7 +107,7 @@ TEST(PropTest, TestFilter3)
     }
 
     {
-        auto evenGen = intGen.filter([](const int& val) -> bool { return val % 2 == 0; });
+        auto evenGen = Arbitrary<int>().filter([](const int& val) -> bool { return val % 2 == 0; });
 
         auto shrinkable = evenGen(savedRand);
         std::cout << "GenShrinks2: " << shrinkable.get() << std::endl;
@@ -118,37 +118,71 @@ TEST(PropTest, TestFilter3)
     }
 }
 
+
 TEST(PropTest, TestTransform)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
+    Random savedRand = rand;
 
     Arbitrary<int> gen;
-    auto stringGen =
-        transform<int, std::string>(gen, [](const int& value) { return "(" + std::to_string(value) + ")"; });
 
-    for (int i = 0; i < 10; i++) {
-        auto shrinkable = stringGen(rand);
-        std::cout << "string: " << shrinkable.get() << std::endl;
-        int j = 0;
-        for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
-            auto shrinkable2 = itr.next();
-            std::cout << "  shrink: " << shrinkable2.get() << std::endl;
-            int k = 0;
-            for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
-                std::cout << "    shrink: " << itr2.next().get() << std::endl;
+    {
+        auto stringGen =
+            transform<int, std::string>(gen, [](const int& value) { return "(" + std::to_string(value) + ")"; });
+
+        for (int i = 0; i < 10; i++) {
+            auto shrinkable = stringGen(rand);
+            std::cout << "string: " << shrinkable.get() << std::endl;
+            int j = 0;
+            for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
+                auto shrinkable2 = itr.next();
+                std::cout << "  shrink: " << shrinkable2.get() << std::endl;
+                int k = 0;
+                for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
+                    std::cout << "    shrink: " << itr2.next().get() << std::endl;
+                }
             }
+        }
+
+        auto vectorGen = transform<std::string, std::vector<std::string>>(stringGen, [](const std::string& value) {
+            std::vector<std::string> vec;
+            vec.push_back(value);
+            return vec;
+        });
+
+        for (int i = 0; i < 10; i++) {
+            std::cout << "vector " << vectorGen(rand).get()[0] << std::endl;
         }
     }
 
-    auto vectorGen = transform<std::string, std::vector<std::string>>(stringGen, [](const std::string& value) {
-        std::vector<std::string> vec;
-        vec.push_back(value);
-        return vec;
-    });
+    {
+        auto stringGen =
+            Arbitrary<int>().transform<std::string>([](const int& value) { return "(" + std::to_string(value) + ")"; });
 
-    for (int i = 0; i < 10; i++) {
-        std::cout << "vector " << vectorGen(rand).get()[0] << std::endl;
+        for (int i = 0; i < 10; i++) {
+            auto shrinkable = stringGen(savedRand);
+            std::cout << "string2: " << shrinkable.get() << std::endl;
+            int j = 0;
+            for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
+                auto shrinkable2 = itr.next();
+                std::cout << "  shrink2: " << shrinkable2.get() << std::endl;
+                int k = 0;
+                for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
+                    std::cout << "    shrink2: " << itr2.next().get() << std::endl;
+                }
+            }
+        }
+
+        auto vectorGen = stringGen.transform<std::vector<std::string>>([](const std::string& value) {
+            std::vector<std::string> vec;
+            vec.push_back(value);
+            return vec;
+        });
+
+        for (int i = 0; i < 10; i++) {
+            std::cout << "vector2 " << vectorGen(savedRand).get()[0] << std::endl;
+        }
     }
 }
 

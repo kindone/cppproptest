@@ -8,7 +8,7 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class Arbitrary<std::shared_ptr<T>> final : public Gen<std::shared_ptr<T>> {
+class Arbitrary<std::shared_ptr<T>> final : public ArbitraryBase<std::shared_ptr<T>> {
 public:
     Arbitrary() : elemGen(Arbitrary<T>()) {}
 

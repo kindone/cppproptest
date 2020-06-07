@@ -6,7 +6,7 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<CESU8String> final : public Gen<CESU8String> {
+class PROPTEST_API Arbitrary<CESU8String> final : public ArbitraryBase<CESU8String> {
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;

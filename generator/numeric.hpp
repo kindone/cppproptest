@@ -35,7 +35,7 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
 }
 
 template <>
-class PROPTEST_API Arbitrary<int8_t> final : public Gen<int8_t> {
+class PROPTEST_API Arbitrary<int8_t> final : public ArbitraryBase<int8_t> {
 public:
     Shrinkable<int8_t> operator()(Random& rand) override;
     static constexpr int8_t boundaryValues[] = {INT8_MIN,     0,   INT8_MAX, -1,   1,    -2,   2,   INT8_MIN + 1,
@@ -43,7 +43,7 @@ public:
 };
 
 template <>
-class PROPTEST_API Arbitrary<int16_t> final : public Gen<int16_t> {
+class PROPTEST_API Arbitrary<int16_t> final : public ArbitraryBase<int16_t> {
 public:
     Shrinkable<int16_t> operator()(Random& rand) override;
     static constexpr int16_t boundaryValues[] = {0,
@@ -67,7 +67,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<int32_t> final : public Gen<int32_t>
+struct PROPTEST_API Arbitrary<int32_t> final : public ArbitraryBase<int32_t>
 {
 public:
     Shrinkable<int32_t> operator()(Random& rand) override;
@@ -101,7 +101,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<int64_t> final : public Gen<int64_t>
+struct PROPTEST_API Arbitrary<int64_t> final : public ArbitraryBase<int64_t>
 {
 public:
     Shrinkable<int64_t> operator()(Random& rand) override;
@@ -144,14 +144,14 @@ public:
 };
 
 template <>
-class PROPTEST_API Arbitrary<char> final : public Gen<char> {
+class PROPTEST_API Arbitrary<char> final : public ArbitraryBase<char> {
 public:
     Shrinkable<char> operator()(Random& rand) override;
     static constexpr char boundaryValues[] = {0};
 };
 
 template <>
-class PROPTEST_API Arbitrary<uint8_t> final : public Gen<uint8_t> {
+class PROPTEST_API Arbitrary<uint8_t> final : public ArbitraryBase<uint8_t> {
 public:
     Shrinkable<uint8_t> operator()(Random& rand) override;
     static constexpr uint8_t boundaryValues[] = {
@@ -159,7 +159,7 @@ public:
 };
 
 template <>
-class PROPTEST_API Arbitrary<uint16_t> final : public Gen<uint16_t> {
+class PROPTEST_API Arbitrary<uint16_t> final : public ArbitraryBase<uint16_t> {
 public:
     Shrinkable<uint16_t> operator()(Random& rand) override;
     static constexpr uint16_t boundaryValues[] = {0,
@@ -179,7 +179,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<uint32_t> final : public Gen<uint32_t>
+struct PROPTEST_API Arbitrary<uint32_t> final : public ArbitraryBase<uint32_t>
 {
 public:
     Shrinkable<uint32_t> operator()(Random& rand) override;
@@ -206,7 +206,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<uint64_t> : public Gen<uint64_t>
+struct PROPTEST_API Arbitrary<uint64_t> : public ArbitraryBase<uint64_t>
 {
 public:
     Shrinkable<uint64_t> operator()(Random& rand) override;
@@ -238,20 +238,20 @@ public:
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> nonZero(T max = std::numeric_limits<T>::max())
 {
-    return [max](Random& rand) { return generateInteger<T>(rand, 1, max); };
+    return CustomGen<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
 }
 
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> nonNegative(T max = std::numeric_limits<T>::max())
 {
-    return [max](Random& rand) { return generateInteger<T>(rand, 0, max); };
+    return CustomGen<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
 }
 
 // generates numeric in [a, b]
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> fromTo(T min, T max)
 {
-    return [min, max](Random& rand) { return generateInteger<T>(rand, min, max); };
+    return CustomGen<T>([min, max](Random& rand) { return generateInteger<T>(rand, min, max); });
 }
 
 // generates numeric in [a, b)
@@ -259,11 +259,11 @@ template <typename T>
 std::function<Shrinkable<T>(Random& rand)> inRange(T fromInclusive, T toExclusive)
 {
     return
-        [fromInclusive, toExclusive](Random& rand) { return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1)); };
+        CustomGen<T>([fromInclusive, toExclusive](Random& rand) { return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1)); });
 }
 
 template <>
-struct PROPTEST_API Arbitrary<float> : public Gen<float>
+struct PROPTEST_API Arbitrary<float> : public ArbitraryBase<float>
 {
 public:
     Shrinkable<float> operator()(Random& rand) override;
@@ -271,7 +271,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<double> : public Gen<double>
+struct PROPTEST_API Arbitrary<double> : public ArbitraryBase<double>
 {
 public:
     Shrinkable<double> operator()(Random& rand) override;
