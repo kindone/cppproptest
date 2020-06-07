@@ -115,7 +115,7 @@ public:
     Shrinkable<Bit> operator()(Random& rand)
     {
         static auto gen_v =
-            transform<uint8_t, uint8_t>(Arbitrary<uint8_t>(), [](const uint8_t& vbit) { return (1 << 0) & vbit; });
+            PropertyBasedTesting::transform<uint8_t, uint8_t>(Arbitrary<uint8_t>(), [](const uint8_t& vbit) { return (1 << 0) & vbit; });
         static auto gen_bit = construct<Bit, uint8_t, bool>(gen_v, Arbitrary<bool>());
         return gen_bit(rand);
     }

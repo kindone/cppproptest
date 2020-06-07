@@ -17,14 +17,6 @@
 namespace PropertyBasedTesting {
 
 template <typename ActionType>
-struct ConcurrentActions
-{
-    std::list<std::shared_ptr<ActionType>> front;
-    std::list<std::shared_ptr<ActionType>> rear1;
-    std::list<std::shared_ptr<ActionType>> rear2;
-};
-
-template <typename ActionType>
 class PROPTEST_API Concurrency {
 public:
     using SystemType = typename ActionType::SystemType;
@@ -183,9 +175,11 @@ bool Concurrency<ActionType>::invoke(Random& rand)
         rearRunner2.join();
 
         std::cout << "count: " << counter << std::endl;
+        std::cout << "threads: ";
         for (int i = 0; i < counter; i++) {
-            std::cout << i << ": rear" << log[i] << std::endl;
+            std::cout << log[i];
         }
+        std::cout << std::endl;
     });
 
     spawner.join();

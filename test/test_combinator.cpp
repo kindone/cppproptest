@@ -92,14 +92,29 @@ TEST(PropTest, TestFilter3)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<int> intGen;
-    auto evenGen = filter<int>(intGen, [](const int& val) -> bool { return val % 2 == 0; });
+    Random savedRand = rand;
 
-    auto shrinkable = evenGen(rand);
-    std::cout << "GenShrinks: " << shrinkable.get() << std::endl;
-    auto shrinks = shrinkable.shrinks();
-    for (auto itr = shrinks.iterator(); itr.hasNext();) {
-        std::cout << "  shrinks: " << itr.next().get() << std::endl;
+    Arbitrary<int> intGen;
+    {
+        auto evenGen = filter<int>(intGen, [](const int& val) -> bool { return val % 2 == 0; });
+
+        auto shrinkable = evenGen(rand);
+        std::cout << "GenShrinks: " << shrinkable.get() << std::endl;
+        auto shrinks = shrinkable.shrinks();
+        for (auto itr = shrinks.iterator(); itr.hasNext();) {
+            std::cout << "  shrinks: " << itr.next().get() << std::endl;
+        }
+    }
+
+    {
+        auto evenGen = intGen.filter([](const int& val) -> bool { return val % 2 == 0; });
+
+        auto shrinkable = evenGen(savedRand);
+        std::cout << "GenShrinks2: " << shrinkable.get() << std::endl;
+        auto shrinks = shrinkable.shrinks();
+        for (auto itr = shrinks.iterator(); itr.hasNext();) {
+            std::cout << "  shrinks2: " << itr.next().get() << std::endl;
+        }
     }
 }
 
