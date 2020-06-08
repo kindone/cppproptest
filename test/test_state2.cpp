@@ -9,9 +9,12 @@
 using namespace PropertyBasedTesting;
 
 template <typename SystemType>
-decltype(auto) action(std::function<bool(SystemType& system)> func) {
+using ActionFor = std::function<bool(SystemType&)>;
+
+template <typename SystemType>
+decltype(auto) actionFor(ActionFor<SystemType> func) {
     auto funcPtr = std::make_shared<decltype(func)>(func);
-    return just<std::function<bool(SystemType&)>>([funcPtr]() {
+    return just<ActionFor<SystemType>>([funcPtr]() {
         return *funcPtr;
     });
 }
@@ -43,8 +46,7 @@ TEST(StateTest, States2)
 {
     using SystemType = std::vector<int>;
 
-    auto intGen = Arbitrary<int>();
-    auto pushBackGen = Arbitrary<int>().transform<std::function<bool(SystemType&)>>([](const int value) {
+    auto pushBackGen = Arbitrary<int>().transform<ActionFor<SystemType>>([](const int value) {
         return [value](SystemType& system)
         {
             std::cout << "PushBack(" << value << ")" << std::endl;
@@ -55,7 +57,7 @@ TEST(StateTest, States2)
         };
     });
 
-    auto popBackGen = action<SystemType>([](SystemType& system) {
+    auto popBackGen = actionFor<SystemType>([](SystemType& system) {
         std::cout << "PopBack" << std::endl;
         auto size = system.size();
         if (system.empty())
@@ -65,7 +67,7 @@ TEST(StateTest, States2)
         return true;
     });
 
-    auto clearGen = action<SystemType>([](SystemType& system) {
+    auto clearGen = actionFor<SystemType>([](SystemType& system) {
         std::cout << "Clear" << std::endl;
         system.clear();
         PROP_ASSERT(system.size() == 0);

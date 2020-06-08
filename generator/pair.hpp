@@ -76,10 +76,10 @@ Shrinkable<std::pair<ARG1, ARG2>> generatePairStream(
 template <typename GEN1, typename GEN2>
 decltype(auto) pair(GEN1&& gen1, GEN2&& gen2)
 {
-    auto genPair = std::make_pair(gen1, gen2);
+    auto genPairPtr = std::make_shared<std::pair<GEN1,GEN2>>(std::forward<GEN1>(gen1), std::forward<GEN2>(gen2));
     // generator
-    return [genPair](Random& rand) mutable {
-        auto elemPair = std::make_pair(genPair.first(rand), genPair.second(rand));
+    return [genPairPtr](Random& rand) mutable {
+        auto elemPair = std::make_pair(genPairPtr->first(rand), genPairPtr->second(rand));
         auto shrinkable = make_shrinkable<decltype(elemPair)>(elemPair);
         return util::generatePairStream(shrinkable);
     };

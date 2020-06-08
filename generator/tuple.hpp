@@ -85,7 +85,6 @@ template <typename... GENS, std::enable_if_t<0 < sizeof...(GENS), bool> = true>
 decltype(auto) tuple(GENS&&... gens)
 {
     // constexpr auto Size = sizeof...(GENS);
-
     auto genTup = std::make_tuple(gens...);
     // generator
     return [genTup](Random& rand) mutable {

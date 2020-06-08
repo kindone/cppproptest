@@ -38,7 +38,7 @@ struct CustomGen : public Gen<T> {
     }
 
     template <typename U>
-    decltype(auto) transform(std::function<U(const T&)> transformer)
+    CustomGen<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
         return CustomGen<U>(PropertyBasedTesting::transform<T, U>([thisPtr](Random& rand) {
@@ -47,7 +47,7 @@ struct CustomGen : public Gen<T> {
     }
 
     template <typename Criteria>
-    decltype(auto) filter(Criteria&& criteria)
+    CustomGen<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
         return CustomGen<T>(PropertyBasedTesting::filter<T>([thisPtr](Random& rand) {
@@ -68,7 +68,7 @@ template <typename T>
 struct ArbitraryBase : public Gen<T> {
 
     template <typename U>
-    decltype(auto) transform(std::function<U(const T&)> transformer)
+    CustomGen<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
         return CustomGen<U>(PropertyBasedTesting::transform<T, U>([thisPtr](Random& rand) {
@@ -77,7 +77,7 @@ struct ArbitraryBase : public Gen<T> {
     }
 
     template <typename Criteria>
-    decltype(auto) filter(Criteria&& criteria)
+    CustomGen<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
         return CustomGen<T>(PropertyBasedTesting::filter<T>([thisPtr](Random& rand) {

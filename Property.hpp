@@ -88,13 +88,9 @@ public:
         return false;
     }
 
-    virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/) override
+    virtual void handleShrink(Random& savedRand) override
     {
-        // auto retTypeTup = util::ReturnTypeTupleFromGenTup(genTup);
-        // using ValueTuple = typename decltype(retTypeTup)::type_tuple;
-
-        // auto failed = dynamic_cast<const PropertyFailed<ValueTuple>&>(e);
-        shrink(savedRand /*, *failed.valueTupPtr*/);
+        shrink(savedRand);
     }
 
 private:
