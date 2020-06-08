@@ -8,14 +8,16 @@
 
 namespace PropertyBasedTesting {
 template <typename Key, typename T>
-class Arbitrary<std::map<Key, T>> final : public ArbitraryBase<std::map<Key, T>> {
+class Arbitrary<std::map<Key, T>> final : public ArbitraryContainer<std::map<Key, T>> {
     using Map = typename std::map<Key, T>;
+    using ArbitraryContainer<Map>::minSize;
+    using ArbitraryContainer<Map>::maxSize;
 
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : keyGen(Arbitrary<Key>()), elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+    Arbitrary() : ArbitraryContainer<Map>(defaultMinSize, defaultMaxSize), keyGen(Arbitrary<Key>()), elemGen(Arbitrary<T>()) {}
 
     Shrinkable<Map> operator()(Random& rand) override
     {
@@ -87,29 +89,8 @@ public:
         return *this;
     }
 
-    Arbitrary<Map> setMinSize(size_t size)
-    {
-        minSize = size;
-        return *this;
-    }
-
-    Arbitrary<Map> setMaxSize(size_t size)
-    {
-        maxSize = size;
-        return *this;
-    }
-
-    Arbitrary<Map> setSize(size_t size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
     std::function<Shrinkable<Key>(Random&)> keyGen;
     std::function<Shrinkable<T>(Random&)> elemGen;
-    size_t minSize;
-    size_t maxSize;
 };
 
 template <typename Key, typename T>

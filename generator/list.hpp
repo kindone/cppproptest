@@ -13,22 +13,23 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class PROPTEST_API Arbitrary<std::list<T>> final : public ArbitraryBase<std::list<T>> {
+class PROPTEST_API Arbitrary<std::list<T>> final : public ArbitraryContainer<std::list<T>> {
 public:
+    using List = std::list<T>;
+    using ArbitraryContainer<List>::minSize;
+    using ArbitraryContainer<List>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+    Arbitrary() : ArbitraryContainer<List>(defaultMinSize, defaultMaxSize), elemGen(Arbitrary<T>()) {}
 
     Arbitrary(const Arbitrary<T>& _elemGen)
-        : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); }),
-          minSize(defaultMinSize),
-          maxSize(defaultMaxSize)
+        : ArbitraryContainer<List>(defaultMinSize, defaultMaxSize),elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
     Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen)
-        : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
+        : ArbitraryContainer<List>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
     {
     }
 
@@ -177,30 +178,8 @@ public:
 
         return listShrinkable;
     }
-
-    Arbitrary<std::list<T>> setMinSize(size_t size)
-    {
-        minSize = size;
-        return *this;
-    }
-
-    Arbitrary<std::list<T>> setMaxSize(size_t size)
-    {
-        maxSize = size;
-        return *this;
-    }
-
-    Arbitrary<std::list<T>> setSize(size_t size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
     // FIXME: turn to shared_ptr
     std::function<Shrinkable<T>(Random&)> elemGen;
-    size_t minSize;
-    size_t maxSize;
 };
 
 template <typename T>

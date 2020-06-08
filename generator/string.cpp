@@ -14,39 +14,18 @@ size_t Arbitrary<std::string>::defaultMinSize = 0;
 size_t Arbitrary<std::string>::defaultMaxSize = 200;
 
 // defaults to ascii characters
-Arbitrary<std::string>::Arbitrary() : elemGen(fromTo<char>(0x1, 0x7f)), minSize(defaultMinSize), maxSize(defaultMaxSize)
+Arbitrary<std::string>::Arbitrary() : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(fromTo<char>(0x1, 0x7f))
 {
 }
 
 Arbitrary<std::string>::Arbitrary(Arbitrary<char>& _elemGen)
-    : elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); }),
-      minSize(defaultMinSize),
-      maxSize(defaultMaxSize)
+    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
 Arbitrary<std::string>::Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen)
-    : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
+    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
-}
-
-Arbitrary<std::string> Arbitrary<std::string>::setMinSize(size_t size)
-{
-    minSize = size;
-    return *this;
-}
-
-Arbitrary<std::string> Arbitrary<std::string>::setMaxSize(size_t size)
-{
-    maxSize = size;
-    return *this;
-}
-
-Arbitrary<std::string> Arbitrary<std::string>::setSize(size_t size)
-{
-    minSize = size;
-    maxSize = size;
-    return *this;
 }
 
 Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)

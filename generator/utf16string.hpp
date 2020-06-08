@@ -6,69 +6,29 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<UTF16BEString> final : public ArbitraryBase<UTF16BEString> {
+class PROPTEST_API Arbitrary<UTF16BEString> final : public ArbitraryContainer<UTF16BEString> {
 public:
+    using ArbitraryContainer<UTF16BEString>::minSize;
+    using ArbitraryContainer<UTF16BEString>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+    Arbitrary() : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize) {}
 
     Shrinkable<UTF16BEString> operator()(Random& rand) override;
-
-    Arbitrary setMinSize(size_t size)
-    {
-        minSize = size;
-        return *this;
-    }
-
-    Arbitrary setMaxSize(size_t size)
-    {
-        maxSize = size;
-        return *this;
-    }
-
-    Arbitrary setSize(size_t size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
-    size_t minSize;
-    size_t maxSize;
 };
 
 template <>
-class PROPTEST_API Arbitrary<UTF16LEString> final : public Gen<UTF16LEString> {
+class PROPTEST_API Arbitrary<UTF16LEString> final : public ArbitraryContainer<UTF16LEString> {
 public:
+    using ArbitraryContainer<UTF16LEString>::minSize;
+    using ArbitraryContainer<UTF16LEString>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+    Arbitrary() : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize) {}
 
     Shrinkable<UTF16LEString> operator()(Random& rand) override;
-
-    Arbitrary setMinSize(size_t size)
-    {
-        minSize = size;
-        return *this;
-    }
-
-    Arbitrary setMaxSize(size_t size)
-    {
-        maxSize = size;
-        return *this;
-    }
-
-    Arbitrary setSize(size_t size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
-    size_t minSize;
-    size_t maxSize;
 };
 
 }  // namespace PropertyBasedTesting

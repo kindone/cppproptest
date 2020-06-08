@@ -22,24 +22,24 @@ public:
 namespace PropertyBasedTesting {
 
 template <typename T>
-class Arbitrary<std::set<T>> final : public ArbitraryBase<std::set<T>> {
+class Arbitrary<std::set<T>> final : public ArbitraryContainer<std::set<T>> {
     using Set = typename std::set<T>;
+    using ArbitraryContainer<Set>::minSize;
+    using ArbitraryContainer<Set>::maxSize;
 
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+    Arbitrary() : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(Arbitrary<T>()) {}
 
     Arbitrary(const Arbitrary<T>& _elemGen)
-        : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); }),
-          minSize(defaultMinSize),
-          maxSize(defaultMaxSize)
+        : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
     Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen)
-        : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
+        : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
     {
     }
 
@@ -84,28 +84,7 @@ public:
         });
     }
 
-    Arbitrary<std::set<T>> setMinSize(size_t size)
-    {
-        minSize = size;
-        return *this;
-    }
-
-    Arbitrary<std::set<T>> setMaxSize(size_t size)
-    {
-        maxSize = size;
-        return *this;
-    }
-
-    Arbitrary<std::set<T>> setSize(size_t size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
     std::function<Shrinkable<T>(Random&)> elemGen;
-    size_t minSize;
-    size_t maxSize;
 };
 
 template <typename T>

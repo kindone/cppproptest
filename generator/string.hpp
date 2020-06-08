@@ -8,7 +8,9 @@
 namespace PropertyBasedTesting {
 
 template <>
-class PROPTEST_API Arbitrary<std::string> final : public ArbitraryBase<std::string> {
+class PROPTEST_API Arbitrary<std::string> final : public ArbitraryContainer<std::string> {
+    using ArbitraryContainer<std::string>::minSize;
+    using ArbitraryContainer<std::string>::maxSize;
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
@@ -18,15 +20,8 @@ public:
     Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen);
 
     Shrinkable<std::string> operator()(Random& rand) override;
-
-    Arbitrary setMinSize(size_t size);
-    Arbitrary setMaxSize(size_t size);
-    Arbitrary setSize(size_t size);
-
     // FIXME: turn to shared_ptr
     std::function<Shrinkable<char>(Random&)> elemGen;
-    size_t minSize;
-    size_t maxSize;
 };
 
 }  // namespace PropertyBasedTesting

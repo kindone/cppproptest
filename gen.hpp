@@ -91,6 +91,31 @@ struct ArbitraryBase : public Gen<T> {
 };
 
 template <typename T>
+struct ArbitraryContainer : public ArbitraryBase<T>
+{
+    ArbitraryContainer(size_t minSize, size_t maxSize) : minSize(minSize), maxSize(maxSize) {}
+
+    void setMinSize(size_t size)
+    {
+        minSize = size;
+    }
+
+    void setMaxSize(size_t size)
+    {
+        maxSize = size;
+    }
+
+    void setSize(size_t size)
+    {
+        minSize = size;
+        maxSize = size;
+    }
+
+    size_t minSize;
+    size_t maxSize;
+};
+
+template <typename T>
 struct Arbitrary : public ArbitraryBase<T>
 {
 };

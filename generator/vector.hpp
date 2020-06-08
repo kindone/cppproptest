@@ -12,22 +12,23 @@
 namespace PropertyBasedTesting {
 
 template <typename T>
-class PROPTEST_API Arbitrary<std::vector<T>> final : public ArbitraryBase<std::vector<T>> {
+class PROPTEST_API Arbitrary<std::vector<T>> final : public ArbitraryContainer<std::vector<T>> {
 public:
+    using Vector = std::vector<T>;
+    using ArbitraryContainer<std::vector<T>>::minSize;
+    using ArbitraryContainer<std::vector<T>>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : elemGen(Arbitrary<T>()), minSize(defaultMinSize), maxSize(defaultMaxSize) {}
+    Arbitrary() : ArbitraryContainer<std::vector<T>>(defaultMinSize, defaultMaxSize), elemGen(Arbitrary<T>()) {}
 
     Arbitrary(const Arbitrary<T>& _elemGen)
-        : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); }),
-          minSize(defaultMinSize),
-          maxSize(defaultMaxSize)
+        : ArbitraryContainer<std::vector<T>>(defaultMinSize, defaultMaxSize), elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
     Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen)
-        : elemGen(_elemGen), minSize(defaultMinSize), maxSize(defaultMaxSize)
+        : ArbitraryContainer<std::vector<T>>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
     {
     }
 
@@ -177,29 +178,8 @@ public:
         return vecShrinkable;
     }
 
-    Arbitrary<std::vector<T>> setMinSize(size_t size)
-    {
-        minSize = size;
-        return *this;
-    }
-
-    Arbitrary<std::vector<T>> setMaxSize(size_t size)
-    {
-        maxSize = size;
-        return *this;
-    }
-
-    Arbitrary<std::vector<T>> setSize(size_t size)
-    {
-        minSize = size;
-        maxSize = size;
-        return *this;
-    }
-
     // FIXME: turn to shared_ptr
     std::function<Shrinkable<T>(Random&)> elemGen;
-    size_t minSize;
-    size_t maxSize;
 };
 
 template <typename T>
