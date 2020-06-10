@@ -87,3 +87,28 @@ TARGET_LINK_LIBRARIES(test_proptest
 )
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
+
+
+### compile
+SET(compile_sources
+    test/compile/numeric.cpp
+    test/compile/vector.cpp
+    test/compile/map.cpp
+    test/compile/string.cpp
+    test/compile/pair.cpp
+    test/compile/tuple.cpp
+    test/compile/shrinkable.cpp
+    test/compile/stream.cpp
+)
+
+ADD_EXECUTABLE(compile_proptest
+    ${compile_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+ADD_TEST(NAME compile_proptest_gtest COMMAND compile_proptest)
