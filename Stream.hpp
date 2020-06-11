@@ -32,65 +32,42 @@ template <typename T>
 struct StreamImpl
 {
     using type = T;
-    virtual ~StreamImpl() {}
-    virtual bool isEmpty() const = 0;
-    virtual T head() const = 0;
-    virtual std::shared_ptr<StreamImpl<T>> tail() const = 0;
-    virtual Iterator<T> iterator() const = 0;
-};
 
-template <typename T>
-struct EmptyStream final : public StreamImpl<T>
-{
-    using type = T;
+    StreamImpl() {}
 
-    virtual ~EmptyStream() {}
-
-    virtual bool isEmpty() const override { return true; }
-    virtual T head() const override { throw std::invalid_argument("attempt to take head from empty stream"); }
-    virtual std::shared_ptr<StreamImpl<T>> tail() const override { return std::make_shared<EmptyStream>(); }
-
-    virtual Iterator<T> iterator() const override { return Iterator<T>{Stream<T>(*this)}; }
-};
-
-template <typename T>
-struct NonEmptyStream final : public StreamImpl<T>
-{
-    using type = T;
-
-    NonEmptyStream(const T& h, const std::function<Stream<T>()>& gen)
-        : _head(h), tailGen(std::make_shared<std::function<Stream<T>()>>(gen))
+    StreamImpl(const T& h, const std::function<Stream<T>()>& gen)
+        : headPtr(std::make_shared<T>(h)), tailGen(std::make_shared<std::function<Stream<T>()>>(gen))
     {
     }
 
-    virtual ~NonEmptyStream() {}
+    virtual ~StreamImpl() {}
 
-    virtual bool isEmpty() const override { return false; }
+    bool isEmpty() const { return !static_cast<bool>(headPtr); }
 
-    virtual T head() const override { return _head; }
+    T head() const { return *headPtr; }
 
-    virtual std::shared_ptr<StreamImpl<T>> tail() const override
+    std::shared_ptr<StreamImpl<T>> tail() const
     {
         if (isEmpty())
-            return std::make_shared<EmptyStream<T>>();
+            return std::make_shared<StreamImpl>();
 
         return (*tailGen)().impl;
     }
 
-    virtual Iterator<T> iterator() const override { return Iterator<T>{Stream<T>{*this}}; }
+    Iterator<T> iterator() const { return Iterator<T>{Stream<T>{*this}}; }
 
     template <typename U = T>
-    NonEmptyStream<U> transform(std::function<U(const T&)> transformer)
+    StreamImpl<U> transform(std::function<U(const T&)> transformer)
     {
         auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
         return transform<U>(transformerPtr);
     }
 
     template <typename U = T>
-    NonEmptyStream<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr)
+    StreamImpl<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr)
     {
         auto tailGen = this->tailGen;
-        return NonEmptyStream<U>((*transformerPtr)(_head), [transformerPtr, tailGen]() -> Stream<U> {
+        return StreamImpl<U>((*transformerPtr)(head()), [transformerPtr, tailGen]() -> Stream<U> {
             return (*tailGen)().transform(transformerPtr);
         });
     }
@@ -127,7 +104,7 @@ struct NonEmptyStream final : public StreamImpl<T>
         return Stream<T>(head(), [self, n]() { return Stream<T>(self.tail()).take(n - 1); });
     }
 
-    T _head;
+    std::shared_ptr<T> headPtr;
     std::shared_ptr<std::function<Stream<T>()>> tailGen;
 };
 
@@ -141,13 +118,9 @@ struct Stream
 
     Stream(const StreamImpl<T>& otherImpl) : impl(std::make_shared<StreamImpl<T>>(otherImpl)) {}
 
-    Stream(const EmptyStream<T>& otherImpl) : impl(std::make_shared<EmptyStream<T>>(otherImpl)) {}
+    Stream(const T& h, std::function<Stream<T>()> gen) : impl(std::make_shared<StreamImpl<T>>(h, gen)) {}
 
-    Stream(const NonEmptyStream<T>& otherImpl) : impl(std::make_shared<NonEmptyStream<T>>(otherImpl)) {}
-
-    Stream(const T& h, std::function<Stream<T>()> gen) : impl(std::make_shared<NonEmptyStream<T>>(h, gen)) {}
-
-    Stream(const T& h) : impl(std::make_shared<NonEmptyStream<T>>(h, done())) {}
+    Stream(const T& h) : impl(std::make_shared<StreamImpl<T>>(h, done())) {}
 
     bool isEmpty() const { return impl->isEmpty(); }
 
@@ -170,7 +143,7 @@ struct Stream
         if (isEmpty()) {
             return Stream<U>::empty();
         } else {
-            return Stream<U>(std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->transform(transformerPtr));
+            return Stream<U>(impl->transform(transformerPtr));
         }
     }
 
@@ -185,7 +158,7 @@ struct Stream
         if (isEmpty()) {
             return Stream::empty();
         } else {
-            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->filter(criteriaPtr);
+            return impl->filter(criteriaPtr);
         }
     }
 
@@ -194,7 +167,7 @@ struct Stream
         if (isEmpty())
             return other;
         else {
-            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->concat(other);
+            return impl->concat(other);
         }
     }
 
@@ -203,12 +176,12 @@ struct Stream
         if (isEmpty())
             return empty();
         else
-            return std::dynamic_pointer_cast<NonEmptyStream<T>>(impl)->take(n);
+            return impl->take(n);
     }
 
     std::shared_ptr<StreamImpl<T>> impl;
 
-    static Stream<T> empty() { return Stream(std::make_shared<EmptyStream<T>>()); }
+    static Stream<T> empty() { return Stream(std::make_shared<StreamImpl<T>>()); }
 
     static std::function<Stream<T>()> done()
     {
