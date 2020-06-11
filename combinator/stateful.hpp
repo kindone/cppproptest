@@ -45,9 +45,10 @@ struct ActionWithoutModel : public Action<SYSTEM, EmptyModel>
 
 namespace util {
 
-template <typename ActionType, typename GEN,
-          std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value, bool> = true>
-decltype(auto) toSharedPtrGen(GEN&& gen)
+template <typename ActionType, typename GEN>
+std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value,
+                 std::function<Shrinkable<std::shared_ptr<ActionType>>(Random&)>>
+toSharedPtrGen(GEN&& gen)
 {
     return transform<ActionType*, std::shared_ptr<ActionType>>(gen, [](const ActionType* actionType) {
         std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
@@ -55,9 +56,9 @@ decltype(auto) toSharedPtrGen(GEN&& gen)
     });
 }
 
-template <typename ActionType, typename GEN,
-          std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::type>::value, bool> = true>
-decltype(auto) toSharedPtrGen(GEN&& gen)
+template <typename ActionType, typename GEN>
+std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::type>::value, GEN&&> toSharedPtrGen(
+    GEN&& gen)
 {
     return std::forward<GEN>(gen);
 }

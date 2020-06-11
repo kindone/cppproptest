@@ -7,7 +7,7 @@ using namespace PropertyBasedTesting;
 
 TEST(Compile, string)
 {
-    Random rand(0);
+    Random rand(1);
     auto gen = Arbitrary<std::string>();
     gen(rand);
 }

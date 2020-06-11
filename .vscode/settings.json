@@ -80,7 +80,11 @@
         "__memory": "cpp",
         "memory_resource": "cpp",
         "thread": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "strstream": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
     },
     "editor.formatOnSave": true
 }

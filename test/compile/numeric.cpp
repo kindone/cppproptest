@@ -7,7 +7,7 @@ using namespace PropertyBasedTesting;
 
 TEST(Compile, numeric)
 {
-    Random rand(0);
+    Random rand(1);
     auto gen = Arbitrary<int32_t>();
     gen(rand);
 }

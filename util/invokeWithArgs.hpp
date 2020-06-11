@@ -20,14 +20,14 @@ decltype(auto) invokeWithArgTuple(Function&& f, ArgTuple&& argTup)
     return invokeHelper(std::forward<Function>(f), std::forward<ArgTuple>(argTup), std::make_index_sequence<Size>{});
 }
 
-template <size_t N, size_t M, typename Tuple, typename Replace, std::enable_if_t<N == M, bool> = true>
-decltype(auto) ReplaceHelper(Tuple&&, Replace&& replace)
+template <size_t N, size_t M, typename Tuple, typename Replace>
+std::enable_if_t<N == M, Replace&&> ReplaceHelper(Tuple&&, Replace&& replace)
 {
     return std::forward<Replace>(replace);
 }
 
-template <size_t N, size_t M, typename Tuple, typename Replace, std::enable_if_t<N != M, bool> = false>
-decltype(auto) ReplaceHelper(Tuple&& valueTup, Replace&&)
+template <size_t N, size_t M, typename Tuple, typename Replace>
+std::enable_if_t<N != M, std::tuple_element_t<M, Tuple>> ReplaceHelper(Tuple&& valueTup, Replace&&)
 {
     return std::get<M>(std::forward<Tuple>(valueTup));
 }

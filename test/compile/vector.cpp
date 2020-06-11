@@ -7,7 +7,7 @@ using namespace PropertyBasedTesting;
 
 TEST(Compile, vector)
 {
-    Random rand(2);
+    Random rand(1);
     auto gen = Arbitrary<std::vector<int64_t>>();
     gen(rand);
 }

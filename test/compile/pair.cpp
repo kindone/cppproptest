@@ -7,7 +7,7 @@ using namespace PropertyBasedTesting;
 
 TEST(Compile, pair)
 {
-    Random rand(0);
+    Random rand(1);
     auto gen = Arbitrary<std::pair<int8_t, uint8_t>>();
     gen(rand);
 }

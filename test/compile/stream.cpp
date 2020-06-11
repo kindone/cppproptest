@@ -7,7 +7,7 @@ using namespace PropertyBasedTesting;
 
 TEST(Compile, Stream)
 {
-    auto str1 = Stream<int>::one(0);
+    auto str1 = Stream<int>::one(1);
     auto str2 = Stream<std::string>::one("hello");
     auto str3 = Stream<std::vector<int>>::one(std::vector<int>());
     auto str4 = Stream<std::function<int(int)>>::one([](int a) {

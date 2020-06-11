@@ -28,8 +28,8 @@ struct Weighted
     float weight;
 };
 
-template <typename T, typename GEN, std::enable_if_t<!std::is_same<GEN, Weighted<T>>::value, bool> = true>
-Weighted<T> GenToWeighted(GEN&& gen)
+template <typename T, typename GEN>
+std::enable_if_t<!std::is_same<GEN, Weighted<T>>::value, Weighted<T>> GenToWeighted(GEN&& gen)
 {
     return weighted<T>(std::forward<GEN>(gen), 0.0);
 }

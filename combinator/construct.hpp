@@ -8,20 +8,20 @@ class Random;
 
 namespace util {
 
-template <typename TO, typename SHRINKABLE, std::enable_if_t<!std::is_lvalue_reference<TO>::value, bool> = false>
-decltype(auto) autoCast(SHRINKABLE&& shr)
+template <typename TO, typename SHRINKABLE>
+std::enable_if_t<!std::is_lvalue_reference<TO>::value, TO> autoCast(SHRINKABLE&& shr)
 {
     return shr.get();
 }
 
-template <typename TO, typename SHRINKABLE, std::enable_if_t<std::is_pointer<TO>::value, bool> = false>
-decltype(auto) autoCast(SHRINKABLE&& shr)
+template <typename TO, typename SHRINKABLE>
+std::enable_if_t<std::is_pointer<TO>::value, TO> autoCast(SHRINKABLE&& shr)
 {
     return shr.getPtr();
 }
 
-template <typename TO, typename SHRINKABLE, std::enable_if_t<std::is_lvalue_reference<TO>::value, bool> = true>
-decltype(auto) autoCast(SHRINKABLE&& shr)
+template <typename TO, typename SHRINKABLE>
+std::enable_if_t<std::is_lvalue_reference<TO>::value, TO> autoCast(SHRINKABLE&& shr)
 {
     return shr.getRef();
 }
@@ -87,10 +87,9 @@ decltype(auto) construct()
 }
 
 // all explicits
-template <
-    typename CLASS, typename... ARGTYPES, typename... EXPGENS,
-    typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGTYPES)), bool>::type = true>
-decltype(auto) construct(EXPGENS&&... gens)
+template <typename CLASS, typename... ARGTYPES, typename... EXPGENS>
+std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGTYPES)), Construct<CLASS, ARGTYPES...>>
+construct(EXPGENS&&... gens)
 {
     // constexpr auto ExplicitSize = sizeof...(EXPGENS);
     auto explicits = std::make_tuple(gens...);
@@ -98,10 +97,9 @@ decltype(auto) construct(EXPGENS&&... gens)
 }
 
 // some explicits
-template <
-    typename CLASS, typename... ARGTYPES, typename... EXPGENS,
-    typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGTYPES)), bool>::type = true>
-decltype(auto) construct(EXPGENS&&... gens)
+template <typename CLASS, typename... ARGTYPES, typename... EXPGENS>
+std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGTYPES)), Construct<CLASS, ARGTYPES...>>
+construct(EXPGENS&&... gens)
 {
     constexpr auto ExplicitSize = sizeof...(EXPGENS);
     constexpr auto ImplicitSize = sizeof...(ARGTYPES) - ExplicitSize;

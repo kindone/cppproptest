@@ -203,16 +203,14 @@ private:
 
 namespace util {
 
-template <typename RetType, typename Callable,
-          typename std::enable_if_t<std::is_same<RetType, bool>::value, bool> = true, typename... ARGS>
-std::function<bool(ARGS...)> functionWithBoolResultHelper(TypeList<ARGS...>, Callable&& callable)
+template <typename RetType, typename Callable, typename... ARGS>
+std::enable_if_t<std::is_same<RetType, bool>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<std::function<RetType(ARGS...)>>(callable);
 }
 
-template <typename RetType, typename Callable,
-          typename std::enable_if_t<std::is_same<RetType, void>::value, bool> = true, typename... ARGS>
-std::function<bool(ARGS...)> functionWithBoolResultHelper(TypeList<ARGS...>, Callable&& callable)
+template <typename RetType, typename Callable, typename... ARGS>
+std::enable_if_t<std::is_same<RetType, void>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(TypeList<ARGS...>, Callable&& callable)
 {
     return std::function<bool(ARGS...)>([callable](ARGS&&... args) {
         callable(std::forward<ARGS>(args)...);

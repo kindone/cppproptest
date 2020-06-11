@@ -28,30 +28,33 @@ decltype(auto) genToFunc(GEN&& gen)
 template <typename Tuple, std::size_t... index>
 decltype(auto) createGenHelperListed(std::index_sequence<index...>)
 {
-    return std::make_tuple(genToFunc(Arbitrary<itemAt<Tuple, index>>())...);
+    return std::make_tuple(genToFunc(Arbitrary<std::tuple_element_t<index, Tuple>>())...);
 }
 
 // returns a std::Tuple<Arbitrary<ARGS...>>
 template <typename... ARGS>
-decltype(auto) createGenTuple(TypeList<ARGS...> /*argument_list*/)
+std::tuple<std::function<Shrinkable<std::decay_t<ARGS>>(Random&)>...> createGenTuple(
+    TypeList<ARGS...> /*argument_list*/)
 {
     using ArgsAsTuple = std::tuple<std::decay_t<ARGS>...>;
     constexpr auto Size = std::tuple_size<ArgsAsTuple>::value;
     return createGenHelperListed<ArgsAsTuple>(std::make_index_sequence<Size>{});
 }
 
-template <typename... ARGS, typename... EXPGENS,
-          typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGS)), bool>::type = true>
-decltype(auto) createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
+template <typename... ARGS, typename... EXPGENS>
+std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGS)),
+                 std::tuple<std::decay_t<EXPGENS>...>>
+createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     // constexpr auto ExplicitSize = sizeof...(EXPGENS);
-    auto explicits = std::make_tuple(gens...);
+    std::tuple<std::decay_t<EXPGENS>...> explicits = std::make_tuple(gens...);
     return explicits;
 }
 
-template <typename... ARGS, typename... EXPGENS,
-          typename std::enable_if<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGS)), bool>::type = true>
-decltype(auto) createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
+template <typename... ARGS, typename... EXPGENS>
+std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGS)),
+                 std::tuple<std::function<Shrinkable<std::decay_t<ARGS>>(Random&)>...>>
+createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     constexpr auto ExplicitSize = sizeof...(EXPGENS);
     constexpr auto ImplicitSize = sizeof...(ARGS) - ExplicitSize;

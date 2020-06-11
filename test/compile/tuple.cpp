@@ -7,7 +7,7 @@ using namespace PropertyBasedTesting;
 
 TEST(Compile, tuple)
 {
-    Random rand(0);
+    Random rand(1);
     auto gen = Arbitrary<std::tuple<int8_t, uint8_t, float>>();
     gen(rand);
 }

@@ -21,14 +21,14 @@ class TupleGenUtility {
     static constexpr auto Size = sizeof...(ARGS);
 
 private:
-    template <size_t N, std::enable_if_t<N<sizeof...(ARGS), bool> = true> static shrinkable_t ConcatHelper(
-                            const shrinkable_t& aggr)
+    template <size_t N>
+        static std::enable_if_t < N<sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
     {
         return ConcatHelper<N + 1>(aggr.concat(genStream<N>()));
     }
 
-    template <size_t N, std::enable_if_t<N >= sizeof...(ARGS), bool> = false>
-    static shrinkable_t ConcatHelper(const shrinkable_t& aggr)
+    template <size_t N>
+    static std::enable_if_t<N >= sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
     {
         return aggr;
     }
@@ -81,11 +81,11 @@ Shrinkable<std::tuple<ARGS...>> generateTupleStream(const Shrinkable<std::tuple<
 
 // generates e.g. (int, int)
 // and shrinks one parameter by one and then continues to the next
-template <typename... GENS, std::enable_if_t<0 < sizeof...(GENS), bool> = true>
-decltype(auto) tuple(GENS&&... gens)
+template <typename GEN0, typename... GENS>
+decltype(auto) tuple(GEN0&& gen0, GENS&&... gens)
 {
     // constexpr auto Size = sizeof...(GENS);
-    auto genTup = std::make_tuple(gens...);
+    std::tuple<std::decay_t<GEN0>, std::decay_t<GENS>...> genTup = std::make_tuple(gen0, gens...);
     // generator
     return [genTup](Random& rand) mutable {
         auto elemTup = util::transformHeteroTupleWithArg<Generate>(std::forward<decltype(genTup)>(genTup), rand);
