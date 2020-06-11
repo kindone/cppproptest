@@ -29,121 +29,58 @@ struct Iterator
 };
 
 template <typename T>
-struct StreamImpl
+struct Stream
 {
     using type = T;
+    Stream() {}
+    Stream(const Stream& other) : headPtr(other.headPtr), tailGen(other.tailGen) {}
+    Stream(const std::shared_ptr<Stream<T>>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
 
-    StreamImpl() {}
-
-    StreamImpl(const T& h, const std::function<Stream<T>()>& gen)
+    Stream(const T& h, std::function<Stream<T>()> gen)
         : headPtr(std::make_shared<T>(h)), tailGen(std::make_shared<std::function<Stream<T>()>>(gen))
     {
     }
 
-    virtual ~StreamImpl() {}
+    Stream(const std::shared_ptr<T>& h, std::function<Stream<T>()> gen)
+        : headPtr(h), tailGen(std::make_shared<std::function<Stream<T>()>>(gen))
+    {
+    }
+
+    Stream(const T& h) : headPtr(std::make_shared<T>(h)), tailGen(std::make_shared<std::function<Stream<T>()>>(done()))
+    {
+    }
 
     bool isEmpty() const { return !static_cast<bool>(headPtr); }
 
     T head() const { return *headPtr; }
 
-    std::shared_ptr<StreamImpl<T>> tail() const
+    Stream<T> tail() const
     {
         if (isEmpty())
-            return std::make_shared<StreamImpl>();
+            return Stream();
 
-        return (*tailGen)().impl;
+        return Stream((*tailGen)());
     }
 
     Iterator<T> iterator() const { return Iterator<T>{Stream<T>{*this}}; }
 
     template <typename U = T>
-    StreamImpl<U> transform(std::function<U(const T&)> transformer)
+    Stream<U> transform(std::function<U(const T&)> transformer)
     {
         auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
         return transform<U>(transformerPtr);
     }
 
     template <typename U = T>
-    StreamImpl<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr)
-    {
-        auto tailGen = this->tailGen;
-        return StreamImpl<U>((*transformerPtr)(head()), [transformerPtr, tailGen]() -> Stream<U> {
-            return (*tailGen)().transform(transformerPtr);
-        });
-    }
-
-    Stream<T> filter(std::function<bool(const T&)> criteria) const
-    {
-        auto criteriaPtr = std::make_shared<decltype(criteria)>(criteria);
-        return filter(criteriaPtr);
-    }
-
-    Stream<T> filter(std::shared_ptr<std::function<bool(const T&)>> criteriaPtr) const
-    {
-        for (auto itr = iterator(); itr.hasNext();) {
-            auto value = itr.next();
-            if ((*criteriaPtr)(value)) {
-                auto tail = itr.stream;
-                return Stream<T>{value, [criteriaPtr, tail]() { return tail.filter(criteriaPtr); }};
-            }
-        }
-        return Stream<T>::empty();
-    }
-
-    Stream<T> concat(const Stream<T>& other) const
-    {
-        return Stream<T>(head(), [tailGen = this->tailGen, other]() { return Stream<T>((*tailGen)()).concat(other); });
-    }
-
-    Stream<T> take(int n) const
-    {
-        auto self = *this;
-        if (n == 0)
-            return Stream<T>::empty();
-
-        return Stream<T>(head(), [self, n]() { return Stream<T>(self.tail()).take(n - 1); });
-    }
-
-    std::shared_ptr<T> headPtr;
-    std::shared_ptr<std::function<Stream<T>()>> tailGen;
-};
-
-template <typename T>
-struct Stream
-{
-    using type = T;
-    Stream(const Stream& other) : impl(other.impl) {}
-
-    Stream(const std::shared_ptr<StreamImpl<T>>& otherImpl) : impl(otherImpl) {}
-
-    Stream(const StreamImpl<T>& otherImpl) : impl(std::make_shared<StreamImpl<T>>(otherImpl)) {}
-
-    Stream(const T& h, std::function<Stream<T>()> gen) : impl(std::make_shared<StreamImpl<T>>(h, gen)) {}
-
-    Stream(const T& h) : impl(std::make_shared<StreamImpl<T>>(h, done())) {}
-
-    bool isEmpty() const { return impl->isEmpty(); }
-
-    T head() const { return impl->head(); }
-
-    Stream<T> tail() const { return impl->tail(); }
-
-    Iterator<T> iterator() const { return impl->iterator(); }
-
-    template <typename U>
-    Stream<U> transform(std::function<U(const T&)> transformer) const
-    {
-        auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
-        return transform<U>(transformerPtr);
-    }
-
-    template <typename U>
-    Stream<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr) const
+    Stream<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr)
     {
         if (isEmpty()) {
             return Stream<U>::empty();
         } else {
-            return Stream<U>(impl->transform(transformerPtr));
+            auto tailGen = this->tailGen;
+            return Stream<U>((*transformerPtr)(head()), [transformerPtr, tailGen]() -> Stream<U> {
+                return (*tailGen)().transform(transformerPtr);
+            });
         }
     }
 
@@ -158,7 +95,14 @@ struct Stream
         if (isEmpty()) {
             return Stream::empty();
         } else {
-            return impl->filter(criteriaPtr);
+            for (auto itr = iterator(); itr.hasNext();) {
+                auto value = itr.next();
+                if ((*criteriaPtr)(value)) {
+                    auto tail = itr.stream;
+                    return Stream<T>{value, [criteriaPtr, tail]() { return tail.filter(criteriaPtr); }};
+                }
+            }
+            return Stream<T>::empty();
         }
     }
 
@@ -167,7 +111,8 @@ struct Stream
         if (isEmpty())
             return other;
         else {
-            return impl->concat(other);
+            return Stream<T>(headPtr,
+                             [tailGen = this->tailGen, other]() { return Stream((*tailGen)()).concat(other); });
         }
     }
 
@@ -175,13 +120,19 @@ struct Stream
     {
         if (isEmpty())
             return empty();
-        else
-            return impl->take(n);
+        else {
+            auto self = *this;
+            if (n == 0)
+                return Stream::empty();
+
+            return Stream(headPtr, [self, n]() { return Stream<T>(self.tail()).take(n - 1); });
+        }
     }
 
-    std::shared_ptr<StreamImpl<T>> impl;
+    std::shared_ptr<T> headPtr;
+    std::shared_ptr<std::function<Stream<T>()>> tailGen;
 
-    static Stream<T> empty() { return Stream(std::make_shared<StreamImpl<T>>()); }
+    static Stream<T> empty() { return Stream(); }
 
     static std::function<Stream<T>()> done()
     {
