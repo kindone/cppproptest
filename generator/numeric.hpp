@@ -258,8 +258,9 @@ std::function<Shrinkable<T>(Random& rand)> fromTo(T min, T max)
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> inRange(T fromInclusive, T toExclusive)
 {
-    return
-        CustomGen<T>([fromInclusive, toExclusive](Random& rand) { return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1)); });
+    return CustomGen<T>([fromInclusive, toExclusive](Random& rand) {
+        return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1));
+    });
 }
 
 template <>

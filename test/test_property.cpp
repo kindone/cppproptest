@@ -114,8 +114,8 @@ class Arbitrary<Bit> : public Gen<Bit> {
 public:
     Shrinkable<Bit> operator()(Random& rand)
     {
-        static auto gen_v =
-            PropertyBasedTesting::transform<uint8_t, uint8_t>(Arbitrary<uint8_t>(), [](const uint8_t& vbit) { return (1 << 0) & vbit; });
+        static auto gen_v = PropertyBasedTesting::transform<uint8_t, uint8_t>(
+            Arbitrary<uint8_t>(), [](const uint8_t& vbit) { return (1 << 0) & vbit; });
         static auto gen_bit = construct<Bit, uint8_t, bool>(gen_v, Arbitrary<bool>());
         return gen_bit(rand);
     }
@@ -282,6 +282,29 @@ TEST(PropTest, TestPropertyFunctionLambdaMethod)
     forAll(PropertyAsClass::propertyAsMethod);
 }
 
+namespace PropertyBasedTesting {
+namespace util {
+
+template <>
+struct ShowDefault<Animal>
+{
+    static std::ostream& show(std::ostream& os, const Animal& a)
+    {
+        os << "numFeet: " << a.numFeet << ", name: " << a.name << ", measures: ";
+        if (!a.measures.empty()) {
+            os << a.measures[0];
+            for (auto measure = a.measures.begin() + 1; measure != a.measures.end(); ++measure) {
+                os << ", " << *measure;
+            }
+        }
+        return os;
+    }
+};
+
+}  // namespace util
+
+}  // namespace PropertyBasedTesting
+
 TEST(PropTest, TestCheckArbitraryWithConstruct)
 {
     int64_t seed = getCurrentTime();
@@ -298,6 +321,10 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
         [](std::vector<Animal> animals) {
             // std::cout << "animal " << i++ << std::endl;
             if (!animals.empty()) {
+                for (auto animal : animals) {
+                    if (animal.name.size() < 5 && animal.measures.size() < 5)
+                        show(std::cout, animal);
+                }
                 PROP_STAT(animals.size() > 3);
             }
         },
