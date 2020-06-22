@@ -97,57 +97,57 @@ TEST(PropTest, FloatShrinkable)
 TEST(PropTest, ShrinkableBinary)
 {
     {
-        auto shrinkable = binarySearchShrinkable<int>(0);
+        auto shrinkable = binarySearchShrinkable(0);
         std::cout << "# binary of 0" << std::endl;
         exhaustive(shrinkable, 0);
     }
     {
-        auto shrinkable = binarySearchShrinkable<int>(1);
+        auto shrinkable = binarySearchShrinkable(1);
         std::cout << "# binary of 1" << std::endl;
         exhaustive(shrinkable, 0);
     }
     {
-        auto shrinkable = binarySearchShrinkable<int>(8);
+        auto shrinkable = binarySearchShrinkable(8);
         std::cout << "# binary of 8" << std::endl;
         exhaustive(shrinkable, 0);
     }
 
     {
-        auto shrinkable = binarySearchShrinkable<int>(7);
+        auto shrinkable = binarySearchShrinkable(7);
         std::cout << "# binary of 7" << std::endl;
         exhaustive(shrinkable, 0);
     }
 
     {
-        auto shrinkable = binarySearchShrinkable<int>(9);
+        auto shrinkable = binarySearchShrinkable(9);
         std::cout << "# binary of 9" << std::endl;
         exhaustive(shrinkable, 0);
     }
 
     {
-        auto shrinkable = binarySearchShrinkable<int>(-1);
+        auto shrinkable = binarySearchShrinkable(-1);
         std::cout << "# binary of -1" << std::endl;
         exhaustive(shrinkable, 0);
     }
     {
-        auto shrinkable = binarySearchShrinkable<int>(-3);
+        auto shrinkable = binarySearchShrinkable(-3);
         std::cout << "# binary of -3" << std::endl;
         exhaustive(shrinkable, 0);
     }
     {
-        auto shrinkable = binarySearchShrinkable<int>(-8);
+        auto shrinkable = binarySearchShrinkable(-8);
         std::cout << "# binary of -8" << std::endl;
         exhaustive(shrinkable, 0);
     }
 
     {
-        auto shrinkable = binarySearchShrinkable<int>(-7);
+        auto shrinkable = binarySearchShrinkable(-7);
         std::cout << "# binary of -7" << std::endl;
         exhaustive(shrinkable, 0);
     }
 
     {
-        auto shrinkable = binarySearchShrinkable<int>(-9);
+        auto shrinkable = binarySearchShrinkable(-9);
         std::cout << "# binary of -9" << std::endl;
         exhaustive(shrinkable, 0);
     }
@@ -155,7 +155,7 @@ TEST(PropTest, ShrinkableBinary)
 
 TEST(PropTest, ShrinkableConcat)
 {
-    auto shrinkable = binarySearchShrinkable<int>(8);
+    auto shrinkable = binarySearchShrinkable(8);
 
     auto concat = shrinkable.concat([shrinkable]() { return shrinkable.shrinks(); });
 
@@ -175,14 +175,13 @@ TEST(PropTest, ShrinkVector)
 
     // return make_shrinkable<std::vector<T>>(std::move(vec));
 
-    auto shrinkableVector = binarySearchShrinkable<int>(len).template transform<std::vector<T>>([vec](const int& len) {
+    auto shrinkableVector = binarySearchShrinkable(len).template transform<std::vector<T>>([vec](const int64_t& len) {
         if (len <= 0)
             return std::vector<T>();
 
         auto begin = vec.begin();
         auto last = vec.begin() + len;
         return std::vector<T>(begin, last);
-        ;
     });
 
     auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<std::vector<T>>& shr) {

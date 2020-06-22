@@ -34,7 +34,8 @@ public:
     Arbitrary() : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(Arbitrary<T>()) {}
 
     Arbitrary(const Arbitrary<T>& _elemGen)
-        : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
+        : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize),
+          elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
@@ -56,9 +57,8 @@ public:
         // shrink set size with subset using binary numeric shrink of sizes
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable<size_t>(size - minSizeCopy).template transform<size_t>([minSizeCopy](const size_t& size) {
-                return size + minSizeCopy;
-            });
+            binarySearchShrinkableU(size - minSizeCopy)
+                .template transform<uint64_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
         // this make sure shrinking is possible towards minSize
         Shrinkable<std::set<Shrinkable<T>>> shrinkable =
             rangeShrinkable.template transform<std::set<Shrinkable<T>>>([shrinkSet](const size_t& size) {

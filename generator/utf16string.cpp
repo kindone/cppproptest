@@ -97,8 +97,8 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return binarySearchShrinkable<size_t>(len - minSizeCopy)
-        .template transform<UTF16BEString>([str, minSizeCopy, positions](const size_t& size) -> UTF16BEString {
+    return binarySearchShrinkableU(len - minSizeCopy)
+        .template transform<UTF16BEString>([str, minSizeCopy, positions](const uint64_t& size) -> UTF16BEString {
             if (positions.empty())
                 return UTF16BEString();
             else
@@ -202,8 +202,8 @@ Shrinkable<UTF16LEString> Arbitrary<UTF16LEString>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return binarySearchShrinkable<size_t>(len - minSizeCopy)
-        .template transform<UTF16LEString>([str, minSizeCopy, positions](const size_t& size) -> UTF16LEString {
+    return binarySearchShrinkable(len - minSizeCopy)
+        .template transform<UTF16LEString>([str, minSizeCopy, positions](const uint64_t& size) -> UTF16LEString {
             if (positions.empty())
                 return UTF16LEString();
             else

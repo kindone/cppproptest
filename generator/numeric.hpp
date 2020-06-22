@@ -23,15 +23,16 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
         throw std::runtime_error("invalid range");
 
     if (min >= 0)  // [3,5] -> [0,2] -> [3,5]
-        return binarySearchShrinkable<T>(static_cast<T>(value - min)).template transform<T>([min](const T& value) {
-            return value + min;
+        return binarySearchShrinkableU(static_cast<T>(value - min)).template transform<T>([min](const uint64_t& value) {
+            return static_cast<T>(value + min);
         });
     else if (max <= 0)  // [-5,-3] -> [-2,0] -> [-5,-3]
-        return binarySearchShrinkable<T>(static_cast<T>(value - max)).template transform<T>([max](const T& value) {
-            return value + max;
+        return binarySearchShrinkable(static_cast<T>(value - max)).template transform<T>([max](const int64_t& value) {
+            return static_cast<T>(value + max);
         });
     else  // [-2, 2]
-        return binarySearchShrinkable<T>(value);
+        return binarySearchShrinkable(value).template transform<T>(
+            [](const int64_t value) { return static_cast<T>(value); });
 }
 
 template <>

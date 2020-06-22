@@ -140,8 +140,8 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return binarySearchShrinkable<size_t>(len - minSizeCopy)
-        .template transform<CESU8String>([str, minSizeCopy, positions](const size_t& size) -> CESU8String {
+    return binarySearchShrinkable(len - minSizeCopy)
+        .template transform<CESU8String>([str, minSizeCopy, positions](const uint64_t& size) -> CESU8String {
             if (positions.empty())
                 return CESU8String();
             else

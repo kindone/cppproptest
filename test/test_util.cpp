@@ -224,7 +224,7 @@ TEST(UtilTestCase, ShrinkableNumeric)
     int values[] = {8, -8};
     for (size_t i = 0; i < 2; i++) {
         int value = values[i];
-        auto shrinkable = binarySearchShrinkable<int>(value);
+        auto shrinkable = binarySearchShrinkable(value);
 
         for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
             auto shrinkable = itr.next();
@@ -249,8 +249,8 @@ TEST(UtilTestCase, ShrinkableString)
 {
     auto str = std::string("hello world");
     int len = str.size();
-    auto shrinkable =
-        binarySearchShrinkable<int>(len).transform<std::string>([str](const int& len) { return str.substr(0, len); });
+    auto shrinkable = binarySearchShrinkable(len).template transform<std::string>(
+        [str](const int64_t& len) { return str.substr(0, len); });
 
     for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
         auto shrinkable = itr.next();
@@ -260,40 +260,6 @@ TEST(UtilTestCase, ShrinkableString)
         }
     }
 }
-
-/*
-TEST(UtilTestCase, ShrinkableVector) {
-
-    int len = 8;
-    std::vector<int> vec;
-    for(int i = 0; i < len; i++)
-        vec.push_back(i);
-
-    auto shrinkable =  binarySearchShrinkable<int>(value).transform<std::vector<int>>([vec](const int& len) {
-        auto begin = vec.begin();
-        auto last = vec.begin() + len;
-        return std::vector<T>(begin, last);;
-    });
-
-    for(auto itr = shrinkable.shrinks().iterator(); itr.hasNext(); ) {
-        auto shrinkable = itr.next();
-        std::cout << "vecstreamshrink:" << shrinkable.get() << std::endl;
-        for(auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext(); ) {
-            auto shrinkable2 = itr2.next();
-            std::cout << "  shrink: " << shrinkable2.get() << std::endl;
-            for(auto itr3 = shrinkable2.shrinks().iterator(); itr3.hasNext();) {
-                auto shrinkable3 = itr3.next();
-                std::cout << "    shrink: " << shrinkable3.get() << std::endl;
-                for(auto itr4 = shrinkable3.shrinks().iterator(); itr4.hasNext();) {
-                    auto shrinkable4 = itr4.next();
-                    std::cout << "      shrink: " << shrinkable4.get() << std::endl;
-                }
-
-            }
-        }
-    }
-}
-*/
 
 struct NoBlank
 {
