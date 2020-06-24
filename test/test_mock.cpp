@@ -55,7 +55,7 @@ TEST(PropTest, MockOnCall)
     ON_CALL(cat, meow(5)).WillByDefault(Return(5));
 
     int count = 0;
-    ON_CALL(cat, meow(0)).WillByDefault(Invoke([&count](int loudness) { return count++; }));
+    ON_CALL(cat, meow(0)).WillByDefault(Invoke([&count](int) { return count++; }));
 
     EXPECT_EQ(cat.meow(5), 5);
     EXPECT_EQ(cat.meow(4), 0);

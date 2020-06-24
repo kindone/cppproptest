@@ -111,7 +111,7 @@ TEST(UtilTestCase, stdbind)
 }
 
 template <typename... ARGS>
-decltype(auto) doTuple(std::tuple<ARGS...>& tup)
+decltype(auto) doTuple(std::tuple<ARGS...>&)
 {
     TypeList<typename std::remove_reference<ARGS>::type...> typeList;
     return typeList;
@@ -122,6 +122,8 @@ TEST(UtilTestCase, TypeList)
     auto tup = std::make_tuple(1, 2.3, "abc");
     auto res = doTuple(tup);
     using type_tuple = typename decltype(res)::type_tuple;
+    auto tup2 = static_cast<type_tuple>(tup);
+    EXPECT_EQ(tup, tup2);
 }
 
 TEST(UtilTestCase, StreamShrink)
@@ -227,9 +229,9 @@ TEST(UtilTestCase, ShrinkableNumeric)
         auto shrinkable = binarySearchShrinkable(value);
 
         for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
-            auto shrinkable = itr.next();
-            std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
-            for (auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext();) {
+            auto shrinkable1 = itr.next();
+            std::cout << "strstreamshrink:" << shrinkable1.get() << std::endl;
+            for (auto itr2 = shrinkable1.shrinks().iterator(); itr2.hasNext();) {
                 auto shrinkable2 = itr2.next();
                 std::cout << "  shrink: " << shrinkable2.get() << std::endl;
                 for (auto itr3 = shrinkable2.shrinks().iterator(); itr3.hasNext();) {
@@ -253,9 +255,9 @@ TEST(UtilTestCase, ShrinkableString)
         [str](const int64_t& len) { return str.substr(0, len); });
 
     for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
-        auto shrinkable = itr.next();
-        std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
-        for (auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext();) {
+        auto shrinkable1 = itr.next();
+        std::cout << "strstreamshrink:" << shrinkable1.get() << std::endl;
+        for (auto itr2 = shrinkable1.shrinks().iterator(); itr2.hasNext();) {
             std::cout << "  shrink: " << itr2.next().get() << std::endl;
         }
     }
@@ -264,15 +266,15 @@ TEST(UtilTestCase, ShrinkableString)
 struct NoBlank
 {
     NoBlank() = delete;
-    NoBlank(int a) {}
+    NoBlank(int) {}
 };
 
 struct NoCopy
 {
-    NoCopy(int a) : id(nextId()) { std::cout << "nocopy create" << id << std::endl; }
+    NoCopy(int) : id(nextId()) { std::cout << "nocopy create" << id << std::endl; }
     NoCopy(const NoCopy&) = delete;
     NoCopy& operator=(const NoCopy&) = delete;
-    NoCopy(NoCopy&& a)
+    NoCopy(NoCopy&&)
     {
         id = nextId();
         std::cout << "nocopy move" << id << std::endl;
@@ -288,12 +290,12 @@ int NoCopy::maxId = 1;
 
 struct NoMove
 {
-    NoMove(int a) : id(nextId()) { std::cout << "nomove create" << id << std::endl; }
-    NoMove(const NoMove& other)
+    NoMove(int) : id(nextId()) { std::cout << "nomove create" << id << std::endl; }
+    NoMove(const NoMove&)
     {
         id = nextId();
         std::cout << "nomove copy" << id << std::endl;
-    };
+    }
     NoMove(NoMove&& a) = delete;
     ~NoMove() { std::cout << "~nomove destroy" << id << std::endl; }
 
@@ -349,7 +351,7 @@ TEST(UtilTestCase, RandomBasic)
         auto r2 = rand2.getRandomInt32();
         auto r3 = rand3.getRandomInt32();
         EXPECT_EQ(r1, r2);
-        EXPECT_EQ(r2, r2);
+        EXPECT_EQ(r2, r3);
     }
 
     for (int i = 0; i < 10; i++) {

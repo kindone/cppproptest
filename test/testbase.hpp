@@ -105,7 +105,7 @@ struct Foo
 struct GenSmallInt : public PropertyBasedTesting::Gen<int32_t>
 {
     GenSmallInt() : step(0ULL) {}
-    PropertyBasedTesting::Shrinkable<int32_t> operator()(PropertyBasedTesting::Random& rand)
+    PropertyBasedTesting::Shrinkable<int32_t> operator()(PropertyBasedTesting::Random&)
     {
         constexpr size_t num = sizeof(boundaryValues) / sizeof(boundaryValues[0]);
         return PropertyBasedTesting::make_shrinkable<int32_t>(boundaryValues[step++ % num]);

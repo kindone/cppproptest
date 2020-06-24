@@ -96,11 +96,11 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
             code -= 0x10000;
             uint16_t surrogates[2] = {static_cast<uint16_t>(0xD800 + (code >> 10)),
                                       static_cast<uint16_t>(0xDC00 + (code & 0x3FF))};
-            for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
                 code = surrogates[i];
-                code -= (i == 0 ? 0xd800 : 0xdc00);
+                code -= (j == 0 ? 0xd800 : 0xdc00);
                 uint8_t c0 = 0xed;
-                uint8_t c1 = ((code >> 6) & 0x3f) + (i == 0 ? 0xa0 : 0xb0);
+                uint8_t c1 = ((code >> 6) & 0x3f) + (j == 0 ? 0xa0 : 0xb0);
                 uint8_t c2 = (code & 0x3f) + 0x80;
                 chars.push_back(c0);
                 chars.push_back(c1);

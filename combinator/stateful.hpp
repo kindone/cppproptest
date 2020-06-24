@@ -27,7 +27,7 @@ struct Action
 
     virtual bool run(SYSTEM& system, MODEL&) { return run(system); }
 
-    virtual bool run(SYSTEM&) { throw std::runtime_error("attempt to call undefined run"); };
+    virtual bool run(SYSTEM&) { throw std::runtime_error("attempt to call undefined run"); }
 };
 
 template <typename SYSTEM>

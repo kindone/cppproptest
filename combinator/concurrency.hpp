@@ -189,7 +189,7 @@ bool Concurrency<ActionType>::invoke(Random& rand)
 }
 
 template <typename ActionType>
-void Concurrency<ActionType>::handleShrink(Random& savedRand, const PropertyFailedBase& e)
+void Concurrency<ActionType>::handleShrink(Random&, const PropertyFailedBase&)
 {
 }
 

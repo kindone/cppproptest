@@ -77,9 +77,9 @@ struct Stream
         if (isEmpty()) {
             return Stream<U>::empty();
         } else {
-            auto tailGen = this->tailGen;
-            return Stream<U>((*transformerPtr)(head()), [transformerPtr, tailGen]() -> Stream<U> {
-                return (*tailGen)().transform(transformerPtr);
+            auto thisTailGen = tailGen;
+            return Stream<U>((*transformerPtr)(head()), [transformerPtr, thisTailGen]() -> Stream<U> {
+                return (*thisTailGen)().transform(transformerPtr);
             });
         }
     }

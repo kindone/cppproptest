@@ -31,7 +31,7 @@ bool PropertyBase::forAll()
     Random rand(seed);
     Random savedRand(seed);
     std::cout << "random seed: " << seed << std::endl;
-    PropertyContext context;
+    PropertyContext ctx;
     int i = 0;
     try {
         for (; i < numRuns; i++) {
@@ -41,7 +41,7 @@ bool PropertyBase::forAll()
                 try {
                     savedRand = rand;
                     bool result = invoke(rand);
-                    std::stringstream failures = context.flushFailures();
+                    std::stringstream failures = ctx.flushFailures();
                     if (failures.rdbuf()->in_avail()) {
                         std::cerr << "Falsifiable, after " << (i + 1) << " tests: ";
                         std::cerr << failures.str();
@@ -64,7 +64,7 @@ bool PropertyBase::forAll()
     } catch (const PropertyFailedBase& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
                   << ")" << std::endl;
-        // std::cerr << context.flushFailures(2).str();
+        // std::cerr << ctx.flushFailures(2).str();
         // shrink
         handleShrink(savedRand /*, e*/);
         return false;
@@ -72,13 +72,13 @@ bool PropertyBase::forAll()
         // skip shrinking?
         std::cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
                   << std::endl;
-        // std::cerr << context.flushFailures(2).str();
+        // std::cerr << ctx.flushFailures(2).str();
         handleShrink(savedRand /*, e*/);
         return false;
     }
 
     std::cout << "OK, passed " << numRuns << " tests" << std::endl;
-    context.printSummary();
+    ctx.printSummary();
     return true;
 }
 

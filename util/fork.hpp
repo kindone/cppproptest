@@ -121,7 +121,7 @@ RET safeCall(std::function<RET()> func)
     else {
         int state = 0;
         pid_t got_pid = waitpid(forked.getPid(), &state, 0);
-        RET result;
+        // RET result;
         std::cout << "got pid: " << got_pid << ", exited: " << WIFEXITED(state)
                   << ", exitstatus: " << WEXITSTATUS(state) << ", signaled: " << WIFSIGNALED(state)
                   << ", stopped: " << WIFSTOPPED(state) << ", termsig: " << WTERMSIG(state) << std::endl;

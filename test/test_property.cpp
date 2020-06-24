@@ -17,6 +17,7 @@ TEST(PropTest, TestCheckAssert)
         PROP_DISCARD();
 
         PROP_ASSERT_STREQ(a.c_str(), b.c_str(), a.size());
+        PROP_STAT(i < 0);
         return true;
     });
 }
@@ -28,12 +29,12 @@ TEST(PropTest, TestPropertyBasic)
         return true;
     }).forAll();
 
-    auto func = [](std::vector<int> a) -> bool { return true; };
+    auto func = [](std::vector<int>) -> bool { return true; };
 
     property(func).forAll();
     forAll(func);
 
-    auto prop = property([](std::string a, int i, std::string b) -> bool {
+    auto prop = property([](std::string, int i, std::string) -> bool {
         PROP_STAT(i > 0);
         PROP_ASSERT(false);
         return true;
@@ -47,7 +48,7 @@ TEST(PropTest, TestPropertyBasic)
 
 TEST(PropTest, TestPropertyExample)
 {
-    auto func = [](std::string a, int i, std::string b) -> bool {
+    auto func = [](std::string, int i, std::string) -> bool {
         PROP_STAT(i > 0);
         return false;
     };
@@ -257,16 +258,16 @@ TEST(PropTest, TestTupleCheckFail)
     });
 }
 
-bool propertyAsFunc(std::string a, int i, std::vector<int> v)
+bool propertyAsFunc(std::string, int, std::vector<int>)
 {
     return true;
 }
 
 class PropertyAsClass {
 public:
-    bool operator()(std::string a, int i, std::vector<int> v) { return true; }
+    bool operator()(std::string, int, std::vector<int>) { return true; }
 
-    static bool propertyAsMethod(std::string a, int i, std::vector<int> v) { return true; }
+    static bool propertyAsMethod(std::string, int, std::vector<int>) { return true; }
 };
 
 TEST(PropTest, TestPropertyFunctionLambdaMethod)
@@ -335,7 +336,7 @@ decltype(auto) dummyProperty()
 {
     using Type = std::function<int()>;
     std::shared_ptr<Type> modelPtr = std::make_shared<Type>([]() { return 0; });
-    return property([modelPtr](int dummy) {
+    return property([modelPtr](int) {
         auto model = *modelPtr;
         PROP_STAT(model() > 2);
     });

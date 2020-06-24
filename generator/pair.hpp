@@ -33,7 +33,7 @@ private:
             });
             return pairWithElems.shrinks();
         };
-    };
+    }
 
     static std::function<stream_t(const shrinkable_t&)> genStream2()
     {
@@ -50,7 +50,7 @@ private:
             });
             return pairWithElems.shrinks();
         };
-    };
+    }
 
 public:
     static Shrinkable<out_pair_t> generateStream(const shrinkable_t& shrinkable)
@@ -76,7 +76,7 @@ Shrinkable<std::pair<ARG1, ARG2>> generatePairStream(
 template <typename GEN1, typename GEN2>
 decltype(auto) pair(GEN1&& gen1, GEN2&& gen2)
 {
-    auto genPairPtr = std::make_shared<std::pair<GEN1,GEN2>>(std::forward<GEN1>(gen1), std::forward<GEN2>(gen2));
+    auto genPairPtr = std::make_shared<std::pair<GEN1, GEN2>>(std::forward<GEN1>(gen1), std::forward<GEN2>(gen2));
     // generator
     return [genPairPtr](Random& rand) mutable {
         auto elemPair = std::make_pair(genPairPtr->first(rand), genPairPtr->second(rand));

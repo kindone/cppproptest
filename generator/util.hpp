@@ -7,8 +7,8 @@ namespace PropertyBasedTesting {
 
 class Random;
 
-Shrinkable<int64_t> binarySearchShrinkable(int64_t value);
-Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value);
+PROPTEST_API Shrinkable<int64_t> binarySearchShrinkable(int64_t value);
+PROPTEST_API Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value);
 
 template <typename T>
 decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr)

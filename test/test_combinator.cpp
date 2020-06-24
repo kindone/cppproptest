@@ -293,7 +293,7 @@ TEST(PropTest, TestDependency2)
 
     // DictionaryCompression::IQTypeInfo ti;
     forAll(
-        [](TableData td) {
+        [](TableData) {
             // column->set(&index[i].first, index[i].second);
             return true;
         },

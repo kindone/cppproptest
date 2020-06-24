@@ -23,7 +23,7 @@ struct Gen
 
     virtual ~Gen() {}
 
-    virtual Shrinkable<T> operator()(Random& rand) { throw std::runtime_error("operator() should be defined for Gen"); }
+    virtual Shrinkable<T> operator()(Random&) { throw std::runtime_error("operator() should be defined for Gen"); }
 };
 
 template <typename T>
@@ -97,10 +97,10 @@ struct ArbitraryContainer : public ArbitraryBase<T>
         maxSize = size;
     }
 
-    void setSize(size_t minSize, size_t maxSize)
+    void setSize(size_t min, size_t max)
     {
-        this->minSize = minSize;
-        this->maxSize = maxSize;
+        minSize = min;
+        maxSize = max;
     }
 
     size_t minSize;

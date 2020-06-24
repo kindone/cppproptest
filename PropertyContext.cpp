@@ -40,7 +40,6 @@ void PropertyContext::tag(const char* file, int lineno, std::string key, std::st
             auto& tag = valueItr->second;
             tag.count++;
         } else {
-            std::map<std::string, Tag>& valueMap = itr->second;
             valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
         }
     } else {
@@ -50,7 +49,7 @@ void PropertyContext::tag(const char* file, int lineno, std::string key, std::st
     }
 }
 
-void PropertyContext::succeed(const char* filename, int lineno, const char* condition, const std::stringstream& str)
+void PropertyContext::succeed(const char*, int, const char*, const std::stringstream&)
 {
     // DO NOTHING
     lastStreamExists = false;

@@ -78,7 +78,7 @@ public:
 
 protected:
     static void setContext(PropertyContext* context);
-    static PropertyContext* getContext() { return context; };
+    static PropertyContext* getContext() { return context; }
     static PropertyContext* context;
 
 protected:

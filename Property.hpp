@@ -24,12 +24,12 @@ decltype(auto) ReturnTypeOf()
     return typeHolder;
 }
 
-template <typename... ARGS>
-decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>& tup)
-{
-    TypeList<typename decltype(ReturnTypeOf<ARGS>())::type...> typeList;
-    return typeList;
-}
+// template <typename... ARGS>
+// decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>&)
+// {
+//     TypeList<typename decltype(ReturnTypeOf<ARGS>())::type...> typeList;
+//     return typeList;
+// }
 
 }  // namespace util
 
@@ -88,10 +88,7 @@ public:
         return false;
     }
 
-    virtual void handleShrink(Random& savedRand) override
-    {
-        shrink(savedRand);
-    }
+    virtual void handleShrink(Random& savedRand) override { shrink(savedRand); }
 
 private:
     template <size_t N, typename Replace>
@@ -204,13 +201,15 @@ private:
 namespace util {
 
 template <typename RetType, typename Callable, typename... ARGS>
-std::enable_if_t<std::is_same<RetType, bool>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(TypeList<ARGS...>, Callable&& callable)
+std::enable_if_t<std::is_same<RetType, bool>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(
+    TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<std::function<RetType(ARGS...)>>(callable);
 }
 
 template <typename RetType, typename Callable, typename... ARGS>
-std::enable_if_t<std::is_same<RetType, void>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(TypeList<ARGS...>, Callable&& callable)
+std::enable_if_t<std::is_same<RetType, void>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(
+    TypeList<ARGS...>, Callable&& callable)
 {
     return std::function<bool(ARGS...)>([callable](ARGS&&... args) {
         callable(std::forward<ARGS>(args)...);

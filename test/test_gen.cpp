@@ -269,15 +269,15 @@ TEST(PropTest, GenVectorPerf)
             std::cout << "construct" << std::endl;
             breaker();
         }
-        Log(const Log& other)
+        Log(const Log&)
         {
             std::cout << "copy construct" << std::endl;
             breaker();
         }
 
-        Log(Log&& other) { std::cout << "move construct" << std::endl; }
+        Log(Log&&) { std::cout << "move construct" << std::endl; }
 
-        Log& operator=(const Log& other)
+        Log& operator=(const Log&)
         {
             std::cout << "operator=()" << std::endl;
             return *this;

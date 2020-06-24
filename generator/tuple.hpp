@@ -54,7 +54,7 @@ private:
             });
             return tupWithElems.shrinks();
         };
-    };
+    }
 
 public:
     template <typename T>
