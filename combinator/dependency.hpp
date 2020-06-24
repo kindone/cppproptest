@@ -9,23 +9,26 @@ namespace PropertyBasedTesting {
 // returns a shrinkable pair of <T,U> where U depends on T
 template <typename T, typename U>
 std::function<Shrinkable<std::pair<T, U>>(Random&)> dependency(
-    std::function<Shrinkable<T>(Random&)> gen1, std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gen2gen)
+    std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gen2gen, std::function<Shrinkable<T>(Random&)> gen1)
 {
     auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
     auto gen2genPtr = std::make_shared<decltype(gen2gen)>(gen2gen);
-    auto genPair = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<std::pair<T, U>> {
+
+    static auto genPair = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<std::pair<T, U>> {
+        // generate T
         Shrinkable<T> shrinkableT = (*gen1Ptr)(rand);
         using Intermediate = std::pair<T, Shrinkable<U>>;
 
-        // expand Shrinkable<T>
+        // shrink strategy 1: expand Shrinkable<T>
         Shrinkable<std::pair<T, Shrinkable<U>>> intermediate =
             shrinkableT.template transform<std::pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
+                // generate U
                 auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
                 return make_shrinkable<std::pair<T, Shrinkable<U>>>(std::make_pair(t, shrinkableU));
             });
 
-        // expand Shrinkable<U>
+        // shrink strategy 2: expand Shrinkable<U>
         intermediate =
             intermediate.andThen([](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
                 // assume interShr has no shrinks

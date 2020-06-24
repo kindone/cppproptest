@@ -118,7 +118,6 @@ TEST(PropTest, TestFilter3)
     }
 }
 
-
 TEST(PropTest, TestTransform)
 {
     int64_t seed = getCurrentTime();
@@ -213,13 +212,15 @@ TEST(PropTest, TestOneOfWeighted)
 TEST(PropTest, TestDependency)
 {
     auto intGen = fromTo(0, 2);
-    auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
-        auto intGen = fromTo<int>(0, 8);
-        auto vecGen = Arbitrary<std::vector<int>>(intGen);
-        vecGen.maxSize = in;
-        vecGen.minSize = in;
-        return vecGen;
-    });
+    auto pairGen = dependency<int, std::vector<int>>(
+        [](const int& in) {
+            auto intGen = fromTo<int>(0, 8);
+            auto vecGen = Arbitrary<std::vector<int>>(intGen);
+            vecGen.maxSize = in;
+            vecGen.minSize = in;
+            return vecGen;
+        },
+        intGen);
 
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -249,17 +250,19 @@ TEST(PropTest, TestDependency2)
     // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = tuple(numRowsGen, numElementsGen);
 
-    auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](const Dimension& dimension) {
-        int numRows = std::get<0>(dimension);
-        uint16_t numElements = std::get<1>(dimension);
-        auto firstGen = fromTo<uint16_t>(0, numElements);
-        auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
-        auto indexGen = tuple(firstGen, secondGen);
-        auto indexVecGen = Arbitrary<IndexVector>(indexGen);
-        indexVecGen.minSize = numRows;
-        indexVecGen.maxSize = numRows;
-        return indexVecGen;
-    });
+    auto rawGen = dependency<Dimension, IndexVector>(
+        [](const Dimension& dimension) {
+            int numRows = std::get<0>(dimension);
+            uint16_t numElements = std::get<1>(dimension);
+            auto firstGen = fromTo<uint16_t>(0, numElements);
+            auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
+            auto indexGen = tuple(firstGen, secondGen);
+            auto indexVecGen = Arbitrary<IndexVector>(indexGen);
+            indexVecGen.minSize = numRows;
+            indexVecGen.maxSize = numRows;
+            return indexVecGen;
+        },
+        dimGen);
 
     std::cout << "raw." << std::endl;
     double t0 = getTime();
@@ -295,4 +298,24 @@ TEST(PropTest, TestDependency2)
             return true;
         },
         tableDataGen);
+}
+
+TEST(PropTest, TestDependency3)
+{
+    auto nullableIntegers = dependency<bool, int>(
+        [](const bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
+            if (isNull)
+                return just<int>([]() { return 0; });
+            else
+                return fromTo<int>(10, 20);
+        },
+        Arbitrary<bool>());
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    for (int i = 0; i < 3; i++) {
+        auto pairShr = nullableIntegers(rand);
+        exhaustive(pairShr, 0);
+    }
 }

@@ -67,19 +67,19 @@ Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbi
 		// otherwise, Arbitrary<int> is used
 		auto vecInt = Arbitrary<std::vector<int>>();
 		```
-	
+
 	* `Arbitrary<std::Map>` provides setter methods for assigning key and value generators
-		
+
 		```cpp
 		auto mapGen = Arbitrary<std::map<int,int>>();
 		mapGen.setKeyGen(inRange<int>(0,100)); // key ranges from 0 to 100
 		mapGen.setElemGen(inRange<int>(-100, 100)); // value ranges from -100 to 100
 		```
-	
+
    	* Containers provide methods for configuring desired sizes
 		* `setMinSize(size)`, `setMaxSize(size)` for restricting to specific range of sizes
-		* `setSize(size)` for restricting to specific size 
-		
+		* `setSize(size)` for restricting to specific size
+
 		```cpp
 		auto vecInt = Arbitrary<std::vector<int>>();
 		vecInt.setSize(10); // generated vector will always have size 10
@@ -152,9 +152,9 @@ Generator combinators are provided for building a new generator based on existin
 	// generates a numeric within ranges (0,10), (100, 1000), (10000, 100000)
 	auto evenGen = oneOf<int>(inRange<int>(0, 10), inRange<int>(100, 1000), inRange<int>(10000, 100000));
 	```
-	
+
 	* `oneOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
-	
+
 	```cpp
 	// generates a numeric within ranges (0,10), (100, 1000), (10000, 100000)
 	auto evenGen = oneOf<int>(weighted(inRange<int>(0, 10), 0.8), weighted(inRange<int>(100, 1000), 0.15), inRange<int>(10000, 100000)/* weight automatically becomes 1.0 - (0.8 + 0.15) == 0.05 */);
@@ -162,14 +162,21 @@ Generator combinators are provided for building a new generator based on existin
 
 ### Generating with dependencies
 
-* `dependency<T,U>(gen1, gen2generator)`: generates a `std::pair<T,U>` with a generator `gen1` for type `T` and `gen2generator`. `gen2generator` receives a type `T` and returns a generator for type `U`.
+* `dependency<T,U>(genUgen, genT)`: generates a `std::pair<T,U>` with a generator `genT` for type `T` and `genUgen`. `genUgen` receives a type `T` and returns a generator for type `U`. This can effectively create a pair of two independne
 
 	```cpp
-	auto sizeAndVectorGen = dependency<int, std::vector<bool>>(Arbitrary<int>(),[](const int& num) {
+	auto sizeAndVectorGen = dependency<int, std::vector<bool>>([](const int& num) {
 	    auto vectorGen = Arbitrary<std::vector<int>>();
 	    vectorGen.maxLen = num;
 	    // generates a vector with maximum size of num
 	    return vectorGen;
-	});
+	}, Arbitrary<int>());
+
+	auto nullableIntegers = dependency<bool, int>([](const bool& isNull) {
+		if(isNull)
+			return just<int>([]() { return 0; });
+	    else
+			return fromTo<int>(10, 20);
+	}, Arbitrary<bool>());
 	```
 
