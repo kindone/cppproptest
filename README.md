@@ -65,20 +65,15 @@ Here are some of the benefits of turning conventional unit tests into property b
 |                   | Conventional Unit Tests   | **Property-Based Tests**     |
 | ----------------- |---------------------------| ---------------------------- |
 | Paradigm          | Procedural                | Functional                   |
-| Test inputs       | Dummy values (with bias)  | Auto-generated combinations  |
-| Style             | Concrete, imperative      | Abstract, declarative        |
-| Finding bugs      | Less likely               | More likely                  |
-| Code Coverage     | Low                       | High                         |
-| Readability       | Low                       | High                         |
-| Extensibility     |                           |                              |
-| &emsp; of params  | No                        | Yes                          |
-| &emsp; of mocks   | No                        | Yes                          |
-| Encourages change | Yes                       | Yes, even more               |
-| Input generation  | Manual                    | Automatic                    |
-| Debugging failures| Manual                    | Backed by automatic shrinking|
-| Stateful tests    | Manual                    | Semi-automatic               |
-| Concurrency tests | Manual                    | Semi-automatic               |
-| Developer efforts | More                      | Less                         |
+| Test inputs       | Example values            | Auto-generated combinations  |
+| Style             | Concrete                  | Abstract                     |
+| Finding bugs      | -                         | More likely                  |
+| Code Coverage     | -                         | Higher                       |
+| Readability       | -                         | Higher                       |
+| Debugging failures| -                         | Supported (shrinking)        |
+| Stateful tests    | -                         | Supported                    |
+| Concurrency tests | -                         | Supported                    |
+
 
 &nbsp;
 
