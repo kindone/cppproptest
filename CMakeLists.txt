@@ -34,6 +34,7 @@ SET(proptest_sources
     util/cesu8string.cpp
     util/unicode.cpp
     util/printing.cpp
+    util/bitmap.cpp
     Property.cpp
     PropertyContext.cpp
     Random.cpp
@@ -74,6 +75,7 @@ SET(proptest_testsources
     test/test_concurrency.cpp
     test/test_stream.cpp
     test/test_fork.cpp
+    test/test_concurrency2.cpp
 )
 
 
