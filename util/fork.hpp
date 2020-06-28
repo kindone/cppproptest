@@ -25,7 +25,7 @@ struct PipeResult
         if (success)
             return &ret;
         else
-            return msg.c_str();
+            return msg.data();
     }
 
     size_t dataLength() { return size; }
