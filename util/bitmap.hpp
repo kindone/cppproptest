@@ -1,10 +1,12 @@
+#pragma once
+#include "../api.hpp"
 #include <memory>
 #include <atomic>
 #include <exception>
 
 namespace PropertyBasedTesting {
 
-struct Bitmap
+struct PROPTEST_API Bitmap
 {
     static constexpr int size = 1000;
 
