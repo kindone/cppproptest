@@ -12,6 +12,13 @@ Bitmap::Bitmap()
     }
 }
 
+Bitmap::Bitmap(const Bitmap& other)
+{
+    for (int i = 0; i < size; i++) {
+        states[i].store(other.states[i].load());
+    }
+}
+
 void Bitmap::setChanging(int n)
 {
     State AvailableState = Available;

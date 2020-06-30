@@ -4,6 +4,10 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include "../util/function_traits.hpp"
+#include "../combinator/transform.hpp"
+#include "../combinator/oneof.hpp"
+#include "../gen.hpp"
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 
@@ -13,6 +17,8 @@ struct EmptyModel
 {
     static EmptyModel value;
 };
+
+Shrinkable<EmptyModel> EmptyModelGen(Random&);
 
 template <typename SYSTEM, typename MODEL>
 struct Action

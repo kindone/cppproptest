@@ -18,6 +18,7 @@ struct PROPTEST_API Bitmap
     } State;
 
     Bitmap();
+    Bitmap(const Bitmap&);
     void setChanging(int n);
     void take(int n);
     void put(int n);

@@ -16,6 +16,7 @@ struct Shrinkable
 {
     using type = T;
 
+    Shrinkable(std::shared_ptr<T> p) : ptr(p) { shrinksPtr = emptyPtr(); }
     Shrinkable(const Shrinkable& other) : ptr(other.ptr), shrinksPtr(other.shrinksPtr) {}
 
     Shrinkable& operator=(const Shrinkable& other)
@@ -205,7 +206,6 @@ struct Shrinkable
 
 private:
     Shrinkable() { shrinksPtr = emptyPtr(); }
-    Shrinkable(std::shared_ptr<T> p) : ptr(p) { shrinksPtr = emptyPtr(); }
 
     Shrinkable(std::shared_ptr<T> p, std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> s) : ptr(p), shrinksPtr(s)
     {

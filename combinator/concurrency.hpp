@@ -22,6 +22,8 @@ class PROPTEST_API Concurrency {
 public:
     using SystemType = typename ActionType::SystemType;
     using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using ModelType = typename ActionType::ModelType;
+    using ModelTypeGen = typename std::function<ModelType(SystemType&)>;
     using Actions = std::vector<std::shared_ptr<ActionType>>;
     using ActionsGen = std::function<Shrinkable<Actions>(Random&)>;
 
@@ -29,6 +31,16 @@ public:
 
     Concurrency(std::shared_ptr<SystemTypeGen> initialGenPtr, std::shared_ptr<ActionsGen> actionsGenPtr)
         : initialGenPtr(initialGenPtr), actionsGenPtr(actionsGenPtr), seed(getCurrentTime()), numRuns(defaultNumRuns)
+    {
+    }
+
+    Concurrency(std::shared_ptr<SystemTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
+                std::shared_ptr<ActionsGen> actionsGenPtr)
+        : initialGenPtr(initialGenPtr),
+          modelFactoryPtr(modelFactoryPtr),
+          actionsGenPtr(actionsGenPtr),
+          seed(getCurrentTime()),
+          numRuns(defaultNumRuns)
     {
     }
 
@@ -50,6 +62,7 @@ public:
 
 private:
     std::shared_ptr<SystemTypeGen> initialGenPtr;
+    std::shared_ptr<ModelTypeGen> modelFactoryPtr;
     std::shared_ptr<ActionsGen> actionsGenPtr;
     uint64_t seed;
     int numRuns;
@@ -101,12 +114,14 @@ template <typename ActionType>
 struct RearRunner
 {
     using SystemType = typename ActionType::SystemType;
+    using ModelType = typename ActionType::ModelType;
     using Actions = std::vector<std::shared_ptr<ActionType>>;
 
-    RearRunner(int n, SystemType& obj, Actions& actions, std::atomic_bool& thread_ready, std::atomic_bool& sync_ready,
-               std::vector<int>& log, std::atomic_int& counter)
+    RearRunner(int n, SystemType& obj, ModelType& model, Actions& actions, std::atomic_bool& thread_ready,
+               std::atomic_bool& sync_ready, std::vector<int>& log, std::atomic_int& counter)
         : n(n),
           obj(obj),
+          model(model),
           actions(actions),
           thread_ready(thread_ready),
           sync_ready(sync_ready),
@@ -121,9 +136,9 @@ struct RearRunner
         while (!sync_ready) {}
 
         for (auto action : actions) {
-            if (!action->precondition(obj))
+            if (!action->precondition(obj, model))
                 continue;
-            PROP_ASSERT(action->run(obj));
+            PROP_ASSERT(action->run(obj, model));
             // std::cout << "rear2" << std::endl;
             log[counter++] = n;
         }
@@ -131,6 +146,7 @@ struct RearRunner
 
     int n;
     SystemType& obj;
+    ModelType& model;
     Actions& actions;
     std::atomic_bool& thread_ready;
     std::atomic_bool& sync_ready;
@@ -143,6 +159,7 @@ bool Concurrency<ActionType>::invoke(Random& rand)
 {
     Shrinkable<SystemType> initialShr = (*initialGenPtr)(rand);
     SystemType& obj = initialShr.getRef();
+    ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
     Shrinkable<Actions> frontShr = (*actionsGenPtr)(rand);
     Shrinkable<Actions> rear1Shr = (*actionsGenPtr)(rand);
     Shrinkable<Actions> rear2Shr = (*actionsGenPtr)(rand);
@@ -152,8 +169,8 @@ bool Concurrency<ActionType>::invoke(Random& rand)
 
     // front
     for (auto action : front) {
-        if (action->precondition(obj))
-            PROP_ASSERT(action->run(obj));
+        if (action->precondition(obj, model))
+            PROP_ASSERT(action->run(obj, model));
     }
 
     // rear
@@ -165,8 +182,8 @@ bool Concurrency<ActionType>::invoke(Random& rand)
         std::vector<int> log;
         log.resize(5000);
 
-        std::thread rearRunner1(RearRunner<ActionType>(1, obj, rear1, thread1_ready, sync_ready, log, counter));
-        std::thread rearRunner2(RearRunner<ActionType>(2, obj, rear2, thread2_ready, sync_ready, log, counter));
+        std::thread rearRunner1(RearRunner<ActionType>(1, obj, model, rear1, thread1_ready, sync_ready, log, counter));
+        std::thread rearRunner2(RearRunner<ActionType>(2, obj, model, rear2, thread2_ready, sync_ready, log, counter));
         while (!thread1_ready) {}
         while (!thread2_ready) {}
 
@@ -203,6 +220,24 @@ decltype(auto) concurrency(InitialGen&& initialGen, ActionsGen&& actionsGen)
     auto actionsGenPtr =
         std::make_shared<std::function<Shrinkable<Actions>(Random&)>>(std::forward<ActionsGen>(actionsGen));
     return Concurrency<ActionType>(initialGenPtr, actionsGenPtr);
+}
+
+template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
+decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
+{
+    using SystemType = typename ActionType::SystemType;
+    using ModelType = typename ActionType::ModelType;
+    using ModelFactoryFunction = std::function<ModelType(SystemType&)>;
+    std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
+        std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
+
+    using SystemType = typename ActionType::SystemType;
+    using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using Actions = std::vector<std::shared_ptr<ActionType>>;
+    auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
+    auto actionsGenPtr =
+        std::make_shared<std::function<Shrinkable<Actions>(Random&)>>(std::forward<ActionsGen>(actionsGen));
+    return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
 }
 
 }  // namespace PropertyBasedTesting

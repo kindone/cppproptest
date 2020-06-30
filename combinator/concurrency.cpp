@@ -1,5 +1,3 @@
-#pragma once
-
 #include "concurrency.hpp"
 #include <memory>
 #include <list>
