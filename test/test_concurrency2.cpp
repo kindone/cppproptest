@@ -15,6 +15,14 @@ class ConcurrencyTest2 : public ::testing::Test {
 TEST(ConcurrencyTest2, bitmap)
 {
     Bitmap bitmap;
+    for (int i = 0; i < Bitmap::size; i++) {
+        EXPECT_NE(bitmap.occupyAvailable(0), -1);
+    }
+    bitmap.reset();
+    Bitmap copy = bitmap;
+    for (int i = 0; i < Bitmap::size; i++) {
+        EXPECT_NE(copy.occupyAvailable(0), -1);
+    }
     std::cout << bitmap.occupyAvailable(0) << std::endl;
     std::cout << bitmap.states[0] << ", " << bitmap.states[1] << std::endl;
     std::cout << bitmap.occupyAvailable(0) << std::endl;

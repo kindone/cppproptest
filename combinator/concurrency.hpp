@@ -45,7 +45,9 @@ public:
     }
 
     bool check();
-    bool invoke(Random& rand);
+    bool check(std::function<void(SystemType&, ModelType&)> postCheck);
+    bool check(std::function<void(SystemType&)> postCheck);
+    bool invoke(Random& rand, std::function<void(SystemType&, ModelType&)> postCheck);
     void handleShrink(Random& savedRand, const PropertyFailedBase& e);
 
     Concurrency& setSeed(uint64_t s)
@@ -71,6 +73,20 @@ private:
 template <typename ActionType>
 bool Concurrency<ActionType>::check()
 {
+    static auto emptyPostCheck = [](SystemType&, ModelType&) {};
+    return check(emptyPostCheck);
+}
+
+template <typename ActionType>
+bool Concurrency<ActionType>::check(std::function<void(SystemType&)> postCheck)
+{
+    static auto fullPostCheck = [postCheck](SystemType& sys, ModelType&) { postCheck(sys); };
+    return check(fullPostCheck);
+}
+
+template <typename ActionType>
+bool Concurrency<ActionType>::check(std::function<void(SystemType&, ModelType&)> postCheck)
+{
     Random rand(seed);
     Random savedRand(seed);
     std::cout << "random seed: " << seed << std::endl;
@@ -82,7 +98,7 @@ bool Concurrency<ActionType>::check()
                 pass = true;
                 try {
                     savedRand = rand;
-                    invoke(rand);
+                    invoke(rand, postCheck);
                     pass = true;
                 } catch (const Success&) {
                     pass = true;
@@ -93,14 +109,14 @@ bool Concurrency<ActionType>::check()
             } while (!pass);
         }
     } catch (const PropertyFailedBase& e) {
-        std::cerr << "Falsifiable, after " << i << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
+        std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
                   << ")" << std::endl;
 
         // shrink
         handleShrink(savedRand, e);
         return false;
     } catch (const std::exception& e) {
-        std::cerr << "Falsifiable, after " << i << " tests - std::exception occurred: " << e.what() << std::endl;
+        std::cerr << "Falsifiable, after " << (i + 1) << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
         return false;
     }
@@ -155,7 +171,7 @@ struct RearRunner
 };
 
 template <typename ActionType>
-bool Concurrency<ActionType>::invoke(Random& rand)
+bool Concurrency<ActionType>::invoke(Random& rand, std::function<void(SystemType&, ModelType&)> postCheck)
 {
     Shrinkable<SystemType> initialShr = (*initialGenPtr)(rand);
     SystemType& obj = initialShr.getRef();
@@ -201,6 +217,7 @@ bool Concurrency<ActionType>::invoke(Random& rand)
     });
 
     spawner.join();
+    postCheck(obj, model);
 
     return true;
 }

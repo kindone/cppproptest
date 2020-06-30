@@ -22,6 +22,7 @@ struct PROPTEST_API Bitmap
     void setChanging(int n);
     void take(int n);
     void put(int n);
+    void reset();
 
     int occupyAvailable(int n);
     int occupyUnavailable(int n);

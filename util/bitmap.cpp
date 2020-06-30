@@ -8,7 +8,7 @@ namespace PropertyBasedTesting {
 Bitmap::Bitmap()
 {
     for (int i = 0; i < size; i++) {
-        states[i] = Available;
+        states[i].store(Available);
     }
 }
 
@@ -41,6 +41,13 @@ void Bitmap::put(int n)
     if (states[n] != Changing)
         throw std::runtime_error("invalid state");
     states[n] = Available;
+}
+
+void Bitmap::reset()
+{
+    for (int i = 0; i < size; i++) {
+        states[i] = Available;
+    }
 }
 
 int Bitmap::occupyAvailable(int n)
