@@ -27,7 +27,7 @@ public:
     using Actions = std::vector<std::shared_ptr<ActionType>>;
     using ActionsGen = std::function<Shrinkable<Actions>(Random&)>;
 
-    static constexpr uint32_t defaultNumRuns = 100;
+    static constexpr uint32_t defaultNumRuns = 200;
 
     Concurrency(std::shared_ptr<SystemTypeGen> initialGenPtr, std::shared_ptr<ActionsGen> actionsGenPtr)
         : initialGenPtr(initialGenPtr), actionsGenPtr(actionsGenPtr), seed(getCurrentTime()), numRuns(defaultNumRuns)
@@ -208,8 +208,7 @@ bool Concurrency<ActionType>::invoke(Random& rand, std::function<void(SystemType
         rearRunner1.join();
         rearRunner2.join();
 
-        std::cout << "count: " << counter << std::endl;
-        std::cout << "threads: ";
+        std::cout << "count: " << counter << ", order: ";
         for (int i = 0; i < counter; i++) {
             std::cout << log[i];
         }
