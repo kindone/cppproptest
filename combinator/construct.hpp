@@ -86,25 +86,15 @@ decltype(auto) construct()
     return Construct<CLASS, ARGTYPES...>(implicits);
 }
 
-// all explicits
-template <typename CLASS, typename... ARGTYPES, typename... EXPGENS>
-std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGTYPES)), Construct<CLASS, ARGTYPES...>>
-construct(EXPGENS&&... gens)
-{
-    // constexpr auto ExplicitSize = sizeof...(EXPGENS);
-    auto explicits = std::make_tuple(gens...);
-    return Construct<CLASS, ARGTYPES...>(explicits);
-}
-
 // some explicits
-template <typename CLASS, typename... ARGTYPES, typename... EXPGENS>
-std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGTYPES)), Construct<CLASS, ARGTYPES...>>
-construct(EXPGENS&&... gens)
+template <typename CLASS, typename... ARGTYPES, typename EXPGEN0, typename... EXPGENS>
+Construct<CLASS, ARGTYPES...> construct(EXPGEN0&& gen0, EXPGENS&&... gens)
 {
-    constexpr auto ExplicitSize = sizeof...(EXPGENS);
+    constexpr auto ExplicitSize = sizeof...(EXPGENS) + 1;
     constexpr auto ImplicitSize = sizeof...(ARGTYPES) - ExplicitSize;
-    auto explicits = std::make_tuple(util::genToFunc(gens)...);
     using ArgsAsTuple = std::tuple<std::decay_t<ARGTYPES>...>;
+
+    auto explicits = std::make_tuple(util::genToFunc(gen0), util::genToFunc(gens)...);
     auto implicits = util::createGenHelperListed<ArgsAsTuple>(
         util::addOffset<ExplicitSize>(std::make_index_sequence<ImplicitSize>{}));
 

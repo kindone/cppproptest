@@ -54,6 +54,23 @@ TEST(PropTest, TestConstruct3)
         gen);
 }
 
+TEST(PropTest, TestConstruct4)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(fromTo<int>(0, 10), Arbitrary<std::string>());
+    Animal animal = gen(rand).get();
+    std::cout << "Gen animal: " << animal << std::endl;
+
+    forAll(
+        [](Animal animal) -> bool {
+            PROP_STAT(animal.numFeet > 3);
+            return true;
+        },
+        gen);
+}
+
 TEST(PropTest, TestFilter)
 {
     int64_t seed = getCurrentTime();
