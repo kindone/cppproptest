@@ -13,9 +13,13 @@ public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize) {}
+    Arbitrary();
+    Arbitrary(Arbitrary<uint32_t>& _elemGen);
+    Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen);
 
     Shrinkable<CESU8String> operator()(Random& rand) override;
+
+    std::function<Shrinkable<uint32_t>(Random&)> elemGen;
 };
 
 }  // namespace PropertyBasedTesting

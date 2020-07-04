@@ -1,6 +1,7 @@
 #include "../gen.hpp"
 #include "../util/cesu8string.hpp"
 #include "cesu8string.hpp"
+#include "unicode.hpp"
 #include "util.hpp"
 #include "numeric.hpp"
 #include <vector>
@@ -13,6 +14,22 @@ namespace PropertyBasedTesting {
 
 size_t Arbitrary<CESU8String>::defaultMinSize = 0;
 size_t Arbitrary<CESU8String>::defaultMaxSize = 200;
+
+Arbitrary<CESU8String>::Arbitrary()
+    : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
+{
+}
+
+Arbitrary<CESU8String>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
+    : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize),
+      elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
+{
+}
+
+Arbitrary<CESU8String>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+    : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+{
+}
 
 /*
  * legal CESU-8 byte sequence
@@ -43,10 +60,9 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
 
     for (size_t i = 0; i < len; i++) {
         // U+D800..U+DFFF is forbidden for surrogate use
-        uint32_t code = rand.getRandomSize(1, 0x10FFFF - (0xDFFF - 0xD800 + 1) + 1);
-        if (0xd800 <= code && code <= 0xdfff) {
-            code = code + (0xdfff - 0xd800 + 1);
-        }
+        Shrinkable<uint32_t> codeShr = elemGen(rand);
+        uint32_t code = codeShr.get();
+
         positions.push_back(chars.size());
         codes.push_back(code);
 
@@ -97,7 +113,7 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
             uint16_t surrogates[2] = {static_cast<uint16_t>(0xD800 + (code >> 10)),
                                       static_cast<uint16_t>(0xDC00 + (code & 0x3FF))};
             for (int j = 0; j < 2; j++) {
-                code = surrogates[i];
+                code = surrogates[j];
                 code -= (j == 0 ? 0xd800 : 0xdc00);
                 uint8_t c0 = 0xed;
                 uint8_t c1 = ((code >> 6) & 0x3f) + (j == 0 ? 0xa0 : 0xb0);

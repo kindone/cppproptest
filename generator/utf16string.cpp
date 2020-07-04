@@ -3,6 +3,7 @@
 #include "utf16string.hpp"
 #include "util.hpp"
 #include "numeric.hpp"
+#include "unicode.hpp"
 #include <vector>
 #include <iostream>
 #include <ios>
@@ -13,6 +14,22 @@ namespace PropertyBasedTesting {
 
 size_t Arbitrary<UTF16BEString>::defaultMinSize = 0;
 size_t Arbitrary<UTF16BEString>::defaultMaxSize = 200;
+
+Arbitrary<UTF16BEString>::Arbitrary()
+    : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
+{
+}
+
+Arbitrary<UTF16BEString>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
+    : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize),
+      elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
+{
+}
+
+Arbitrary<UTF16BEString>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+    : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+{
+}
 
 /*
  * legal UTF-16 byte sequence
@@ -39,10 +56,9 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
 
     for (size_t i = 0; i < len; i++) {
         // U+D800..U+DFFF is forbidden for surrogate use
-        uint32_t code = rand.getRandomSize(1, 0x10FFFF - (0xDFFF - 0xD800 + 1) + 1);
-        if (0xd800 <= code && code <= 0xdfff) {
-            code = code + (0xDFFF - 0xD800 + 1);
-        }
+        Shrinkable<uint32_t> codeShr = elemGen(rand);
+        uint32_t code = codeShr.get();
+
         positions.push_back(chars.size());
         codes.push_back(code);
 
@@ -109,6 +125,22 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
 size_t Arbitrary<UTF16LEString>::defaultMinSize = 0;
 size_t Arbitrary<UTF16LEString>::defaultMaxSize = 200;
 
+Arbitrary<UTF16LEString>::Arbitrary()
+    : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
+{
+}
+
+Arbitrary<UTF16LEString>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
+    : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize),
+      elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
+{
+}
+
+Arbitrary<UTF16LEString>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+    : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+{
+}
+
 /*
  * legal UTF-16 byte sequence
  *
@@ -134,10 +166,9 @@ Shrinkable<UTF16LEString> Arbitrary<UTF16LEString>::operator()(Random& rand)
 
     for (size_t i = 0; i < len; i++) {
         // U+D800..U+DFFF is forbidden for surrogate use
-        uint32_t code = rand.getRandomSize(1, 0x10FFFF - (0xDFFF - 0xD800 + 1) + 1);
-        if (0xd800 <= code && code <= 0xdfff) {
-            code = code + (0xdfff - 0xd800 + 1);
-        }
+        Shrinkable<uint32_t> codeShr = elemGen(rand);
+        uint32_t code = codeShr.get();
+
         positions.push_back(chars.size());
         codes.push_back(code);
 

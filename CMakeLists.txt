@@ -28,6 +28,7 @@ SET(proptest_sources
     generator/utf16string.cpp
     generator/cesu8string.cpp
     generator/util.cpp
+    generator/unicode.cpp
     combinator/stateful.cpp
     combinator/concurrency.cpp
     util/fork.cpp

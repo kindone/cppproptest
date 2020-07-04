@@ -13,9 +13,13 @@ public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize) {}
+    Arbitrary();
+    Arbitrary(Arbitrary<uint32_t>& _elemGen);
+    Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen);
 
     Shrinkable<UTF16BEString> operator()(Random& rand) override;
+
+    std::function<Shrinkable<uint32_t>(Random&)> elemGen;
 };
 
 template <>
@@ -26,9 +30,12 @@ public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize) {}
+    Arbitrary();
+    Arbitrary(Arbitrary<uint32_t>& _elemGen);
+    Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen);
 
     Shrinkable<UTF16LEString> operator()(Random& rand) override;
+    std::function<Shrinkable<uint32_t>(Random&)> elemGen;
 };
 
 }  // namespace PropertyBasedTesting

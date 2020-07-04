@@ -41,12 +41,6 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     return binarySearchShrinkableU(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const uint64_t& size) {
         return str.substr(0, size + minSizeCopy);
     });
-
-    /*
-    return make_shrinkable<std::string>(str).with([str]() -> stream_t {
-        return stream_t::empty();
-    });
-    */
 }
 
 }  // namespace PropertyBasedTesting

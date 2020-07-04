@@ -1,4 +1,5 @@
 #include "testbase.hpp"
+#include "generator/unicode.hpp"
 
 using namespace PropertyBasedTesting;
 
@@ -101,38 +102,45 @@ void testUTF8(PropertyContext& context, Random rand)
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "1 byte U+0001..U+007F");
             else
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "1 byte error");
+            context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+0001..U+D7FF");
         } else if (str.size() == 2) {
             uint8_t c1 = str[1];
             if (0xc2 <= c0 && c0 <= 0xdf && 0x80 <= c1 && c1 <= 0xbf)
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "2 bytes U+0080..U+07FF");
             else
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "2 byte error");
+            context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+0001..U+D7FF");
         } else if (str.size() == 3) {
             uint8_t c1 = str[1];
             uint8_t c2 = str[2];
-            if (0xe0 == c0 && 0xa0 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf)
+            if (0xe0 == c0 && 0xa0 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "3 bytes U+0800..U+0FFF");
-            else if (0xe1 <= c0 && c0 <= 0xec && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf)
+                context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+0001..U+D7FF");
+            } else if (0xe1 <= c0 && c0 <= 0xec && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "3 bytes U+1000..U+CFFF");
-            else if (0xed == c0 && 0x80 <= c1 && c1 <= 0x9f && 0x80 <= c2 && c2 <= 0xbf)
+                context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+0001..U+D7FF");
+            } else if (0xed == c0 && 0x80 <= c1 && c1 <= 0x9f && 0x80 <= c2 && c2 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "3 bytes U+D000..U+D7FF");
-            else if (0xee <= c0 && c0 <= 0xef && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf)
+                context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+0001..U+D7FF");
+            } else if (0xee <= c0 && c0 <= 0xef && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "3 bytes U+E000..U+FFFF");
-            else
+                context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+E000..U+FFFF");
+            } else
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "3 bytes error");
         } else if (str.size() == 4) {
             uint8_t c1 = str[1];
             uint8_t c2 = str[2];
             uint8_t c3 = str[3];
-            if (0xf0 == c0 && 0x90 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 && c3 <= 0xbf)
+            if (0xf0 == c0 && 0x90 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 && c3 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "4 bytes U+10000..U+3FFFF");
-            else if (0xf1 <= c0 && c0 <= 0xf3 && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 &&
-                     c3 <= 0xbf)
+            } else if (0xf1 <= c0 && c0 <= 0xf3 && 0x80 <= c1 && c1 <= 0xbf && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 &&
+                       c3 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "4 bytes U+40000..U+FFFFF");
-            else if (0xf4 == c0 && 0x80 <= c1 && c1 <= 0x8f && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 && c3 <= 0xbf)
+            } else if (0xf4 == c0 && 0x80 <= c1 && c1 <= 0x8f && 0x80 <= c2 && c2 <= 0xbf && 0x80 <= c3 && c3 <= 0xbf) {
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "4 bytes U+100000..U+10FFFF");
-            else
+            } else
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "4 bytes error");
+            context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+10000..U+10FFFF");
         } else
             context.tag(__FILE__, __LINE__, "UTF-8 code", "error");
         // std::cout << "str: " << static_cast<CESU8String>(gen(rand).getRef()) << std::endl;
@@ -144,10 +152,8 @@ void testUTF32(PropertyContext& context, Random rand)
     uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
     for (int i = 0; i < 100000; i++) {
         rand.getRandomSize(0, 1);  // dummy call to align with string generators
-        uint32_t code = rand.getRandomSize(1, 0x10FFFF - (0xDFFF - 0xD800 + 1) + 1);
-        if (0xd800 <= code && code <= 0xdfff) {
-            code = code + (0xdfff - 0xd800 + 1);
-        }
+        uint32_t code = unicodeGen(rand).get();
+
         if (code <= 0xD7FF)
             context.tag(
                 __FILE__, __LINE__, "code",
