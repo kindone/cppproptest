@@ -4,7 +4,7 @@
 #include <utility>
 #include <tuple>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
 {
@@ -88,4 +88,4 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
     });
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

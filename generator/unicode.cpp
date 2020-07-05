@@ -2,7 +2,7 @@
 #include "../combinator/oneof.hpp"
 #include "../generator/numeric.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 Shrinkable<uint32_t> unicodeGen(Random& rand)
 {
@@ -15,4 +15,4 @@ Shrinkable<uint32_t> unicodeGen(Random& rand)
     return gen(rand);
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

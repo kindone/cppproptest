@@ -3,7 +3,7 @@
 #include "../Shrinkable.hpp"
 #include "../Stream.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 class Random;
 
@@ -40,4 +40,4 @@ struct ShrinkableGetRef
     static decltype(auto) transform(T&& shrinkable) { return shrinkable.getRef(); }
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

@@ -4,7 +4,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 namespace util {
 
 template <typename Function, typename Tuple, std::size_t... index>
@@ -58,4 +58,4 @@ decltype(auto) invokeWithArgs(Function&& f, Args&&... args)
 }
 
 }  // namespace util
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

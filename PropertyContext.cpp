@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 std::ostream& operator<<(std::ostream& os, const Failure& f)
 {
@@ -113,4 +113,4 @@ void PropertyContext::printSummary()
     }
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

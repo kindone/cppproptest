@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T>
 struct Stream;
@@ -148,4 +148,4 @@ struct Stream
     }
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

@@ -19,10 +19,10 @@ auto myIntGen = [](Random& rand) {
 
 ## Arbitraries
 
-An `Arbitrary` refers to default generator for a type. You can additionaly define an `Arbitrary<T>` for your type `T`, if it isn't already defined. By defining an `Arbitrary`, you can omit the custom generator argument that is needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `PropertyBasedTesting` namespace in order to be accessible in the framework.
+An `Arbitrary` refers to default generator for a type. You can additionaly define an `Arbitrary<T>` for your type `T`, if it isn't already defined. By defining an `Arbitrary`, you can omit the custom generator argument that is needed to be passed everytime you defined a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `pbt` namespace in order to be accessible in the framework.
 
 ```cpp
-namespace PropertyBasedTesting {
+namespace pbt {
 
 struct Arbitrary<Car> : Gen<Car> {
   Shrinkable<Car> operator()(Random& rand) {

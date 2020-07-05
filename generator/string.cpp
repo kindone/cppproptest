@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 size_t Arbitrary<std::string>::defaultMinSize = 0;
 size_t Arbitrary<std::string>::defaultMaxSize = 200;
@@ -43,4 +43,4 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
     });
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

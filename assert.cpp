@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 namespace util {
 
 std::ostream& errorOrEmpty(bool error) {
@@ -15,4 +15,4 @@ std::ostream& errorOrEmpty(bool error) {
 }
 
 }  // namespace util
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

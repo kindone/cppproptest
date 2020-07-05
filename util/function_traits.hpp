@@ -5,7 +5,7 @@
 #include <functional>
 #include "typelist.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <class F>
 struct function_traits;
@@ -79,4 +79,4 @@ struct function_traits<F&&> : public function_traits<F>
 {
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

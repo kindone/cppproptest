@@ -5,7 +5,7 @@
 #include "../Random.hpp"
 #include "../assert.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 namespace util {
 template <typename T>
@@ -103,4 +103,4 @@ decltype(auto) oneOf(GENS&&... gens)
     };
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

@@ -11,7 +11,7 @@ struct A
     int b;
 };
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 TEST(ForkTestCase, SafeCall1)
 {

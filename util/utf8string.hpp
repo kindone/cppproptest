@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <vector>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 class PROPTEST_API UTF8String : public std::string {
 public:
@@ -40,4 +40,4 @@ PROPTEST_API int UTF8CharSize(const std::string& str);
 
 }  // namespace util
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

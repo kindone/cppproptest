@@ -2,7 +2,7 @@
 #include <functional>
 #include "../Shrinkable.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename GenT>
 class Filter : public GenT {
@@ -48,4 +48,4 @@ decltype(auto) suchThat(GEN&& gen, Criteria&& criteria)
     return filter<T, GEN, Criteria>(std::forward<GEN>(gen), std::forward<Criteria>(criteria));
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

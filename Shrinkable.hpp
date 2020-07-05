@@ -4,7 +4,7 @@
 #include <memory>
 #include "Stream.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T>
 struct Shrinkable;
@@ -236,4 +236,4 @@ Shrinkable<T> make_shrinkable(Args&&... args)
     return shrinkable;
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

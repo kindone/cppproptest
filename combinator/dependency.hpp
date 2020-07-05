@@ -4,7 +4,7 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 // returns a shrinkable pair of <T,U> where U depends on T
 template <typename T, typename U>
@@ -52,4 +52,4 @@ std::function<Shrinkable<std::pair<T, U>>(Random&)> dependency(
     return genPair;
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

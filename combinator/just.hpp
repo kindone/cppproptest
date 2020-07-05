@@ -5,7 +5,7 @@
 #include "../Random.hpp"
 #include "../gen.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T, typename LazyEval>
 std::function<Shrinkable<T>(Random&)> just(LazyEval&& lazyEval)
@@ -29,4 +29,4 @@ std::function<Shrinkable<T>(Random&)> just(U* valuePtr)
     return CustomGen<T>([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

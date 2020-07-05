@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 size_t Arbitrary<CESU8String>::defaultMinSize = 0;
 size_t Arbitrary<CESU8String>::defaultMaxSize = 200;
@@ -165,4 +165,4 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
         });
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

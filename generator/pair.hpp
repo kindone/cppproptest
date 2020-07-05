@@ -6,7 +6,7 @@
 #include <utility>
 #include <memory>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 namespace util {
 
@@ -94,4 +94,4 @@ public:
     }
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

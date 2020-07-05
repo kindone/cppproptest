@@ -10,7 +10,7 @@
 
 #include "../api.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 namespace util {
 
 template <typename RET>
@@ -140,4 +140,4 @@ RET safeCall(std::function<RET()> func)
 }
 
 }  // namespace util
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

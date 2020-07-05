@@ -21,7 +21,7 @@ struct MockCat : public Cat
     MOCK_METHOD1(meow, int(int));
 };
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 using ::testing::_;
 using ::testing::AssertionResult;

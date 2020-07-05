@@ -1,6 +1,6 @@
 #include "fork.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 namespace util {
 
 Pipe::Pipe()
@@ -58,4 +58,4 @@ void Fork::exitAbnormal()
 }
 
 }  // namespace util
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

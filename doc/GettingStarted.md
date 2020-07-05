@@ -31,7 +31,7 @@ Here's an example test based on [Googletest](https://github.com/google/googletes
 // ...
 #include "proptest/proptest.hpp"
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 TEST(AudioCodec, EncoderDecoder)
 {

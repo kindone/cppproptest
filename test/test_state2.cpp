@@ -6,7 +6,7 @@
 #include <iostream>
 #include <memory>
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 template <typename SystemType>
 using ActionFor = std::function<bool(SystemType&)>;

@@ -3,7 +3,7 @@
 #include "unicode.hpp"
 #include <stdexcept>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 size_t UTF8String::charsize() const
 {
@@ -262,4 +262,4 @@ bool isValidUTF8(std::vector<uint8_t>& chars, int& numChars)
 
 }  // namespace util
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

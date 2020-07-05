@@ -3,7 +3,7 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 TEST(Compile, tuple)
 {

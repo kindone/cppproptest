@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T>
 struct Nullable
@@ -15,4 +15,4 @@ struct Nullable
     std::shared_ptr<T> ptr;
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

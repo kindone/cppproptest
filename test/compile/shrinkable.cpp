@@ -3,7 +3,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 TEST(Compile, Shrinkable)
 {

@@ -16,63 +16,63 @@ double getTime()
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String& str)
+std::ostream& operator<<(std::ostream& os, const pbt::UTF8String& str)
 {
-    os << PropertyBasedTesting::Show<PropertyBasedTesting::UTF8String>(str);
+    os << pbt::Show<pbt::UTF8String>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16BEString& str)
+std::ostream& operator<<(std::ostream& os, const pbt::UTF16BEString& str)
 {
-    os << PropertyBasedTesting::Show<PropertyBasedTesting::UTF16BEString>(str);
+    os << pbt::Show<pbt::UTF16BEString>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16LEString& str)
+std::ostream& operator<<(std::ostream& os, const pbt::UTF16LEString& str)
 {
-    os << PropertyBasedTesting::Show<PropertyBasedTesting::UTF16LEString>(str);
+    os << pbt::Show<pbt::UTF16LEString>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::CESU8String& str)
+std::ostream& operator<<(std::ostream& os, const pbt::CESU8String& str)
 {
-    os << PropertyBasedTesting::Show<PropertyBasedTesting::CESU8String>(str);
+    os << pbt::Show<pbt::CESU8String>(str);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& input)
 {
-    os << PropertyBasedTesting::Show<std::vector<Foo>>(input);
+    os << pbt::Show<std::vector<Foo>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int>& input)
 {
-    os << PropertyBasedTesting::Show<std::vector<int>>(input);
+    os << pbt::Show<std::vector<int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int8_t>& input)
 {
-    os << PropertyBasedTesting::Show<std::vector<int8_t>>(input);
+    os << pbt::Show<std::vector<int8_t>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
 {
-    os << PropertyBasedTesting::Show<std::set<int>>(input);
+    os << pbt::Show<std::set<int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::map<int, int>& input)
 {
-    os << PropertyBasedTesting::Show<std::map<int, int>>(input);
+    os << pbt::Show<std::map<int, int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
 {
-    os << PropertyBasedTesting::Show<std::list<int>>(input);
+    os << pbt::Show<std::list<int>>(input);
     return os;
 }
 

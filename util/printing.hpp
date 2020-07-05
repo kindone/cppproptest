@@ -13,7 +13,7 @@
 #include "cesu8string.hpp"
 #include "nullable.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 std::ostream& show(std::ostream& os, const char*);
 std::ostream& show(std::ostream& os, const char*, size_t len);
@@ -257,4 +257,4 @@ std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
     return os;
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

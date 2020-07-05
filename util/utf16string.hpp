@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 class PROPTEST_API UTF16BEString : public std::string {
 public:
@@ -68,4 +68,4 @@ PROPTEST_API bool isValidUTF16LE(std::vector<uint8_t>& chars, int& numChars);
 PROPTEST_API int UTF16LECharSize(const std::string& str);
 }  // namespace util
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

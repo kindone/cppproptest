@@ -6,7 +6,7 @@
 #include <memory>
 #include <map>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 template <typename Key, typename T>
 class Arbitrary<std::map<Key, T>> final : public ArbitraryContainer<std::map<Key, T>> {
     using Map = typename std::map<Key, T>;
@@ -107,4 +107,4 @@ size_t Arbitrary<std::map<Key, T>>::defaultMinSize = 0;
 template <typename Key, typename T>
 size_t Arbitrary<std::map<Key, T>>::defaultMaxSize = 200;
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

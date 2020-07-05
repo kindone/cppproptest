@@ -1,6 +1,6 @@
 #include "testbase.hpp"
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 TEST(PropTest, TestConstruct)
 {

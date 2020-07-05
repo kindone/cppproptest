@@ -2,7 +2,7 @@
 #include "../gen.hpp"
 #include "../Stream.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <>
 class PROPTEST_API Arbitrary<bool> final : public ArbitraryBase<bool> {
@@ -21,4 +21,4 @@ public:
 
 // template struct Arbitrary<bool>;
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

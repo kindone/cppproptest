@@ -8,7 +8,7 @@
 #include <memory>
 #include <mutex>
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 class ConcurrencyTest : public ::testing::Test {
 };

@@ -12,7 +12,7 @@
 #include "combinator/transform.hpp"
 #include "combinator/filter.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 class Random;
 
@@ -40,7 +40,7 @@ struct CustomGen : public Gen<T>
     CustomGen<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
-        return CustomGen<U>(PropertyBasedTesting::transform<T, U>(
+        return CustomGen<U>(pbt::transform<T, U>(
             [thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, transformer));
     }
 
@@ -48,7 +48,7 @@ struct CustomGen : public Gen<T>
     CustomGen<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return CustomGen<T>(PropertyBasedTesting::filter<T>(
+        return CustomGen<T>(pbt::filter<T>(
             [thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, std::forward<Criteria>(criteria)));
     }
 
@@ -67,7 +67,7 @@ struct ArbitraryBase : public Gen<T>
     CustomGen<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
-        return CustomGen<U>(PropertyBasedTesting::transform<T, U>(
+        return CustomGen<U>(pbt::transform<T, U>(
             [thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
     }
 
@@ -75,7 +75,7 @@ struct ArbitraryBase : public Gen<T>
     CustomGen<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return CustomGen<T>(PropertyBasedTesting::filter<T>(
+        return CustomGen<T>(pbt::filter<T>(
             [thisPtr](Random& rand) { return thisPtr->operator()(rand); }, std::forward<Criteria>(criteria)));
     }
 
@@ -112,7 +112,7 @@ struct Arbitrary : public ArbitraryBase<T>
 {
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt
 
 #include "util/invokeWithArgs.hpp"
 #include "util/invokeWithGenTuple.hpp"

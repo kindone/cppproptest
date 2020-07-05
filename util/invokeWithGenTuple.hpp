@@ -4,7 +4,7 @@
 #include "tuple.hpp"
 #include "../generator/util.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 namespace util {
 
 template <typename Function, typename GenTuple, std::size_t... index>
@@ -31,4 +31,4 @@ decltype(auto) invokeWithGenTuple(Random& rand, Function&& f, Tuple&& genTup)
 }
 
 }  // namespace util
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

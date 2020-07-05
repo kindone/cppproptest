@@ -10,7 +10,7 @@
 #include <cmath>
 #include <memory>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T>
 class PROPTEST_API Arbitrary<std::list<T>> final : public ArbitraryContainer<std::list<T>> {
@@ -187,4 +187,4 @@ size_t Arbitrary<std::list<T>>::defaultMinSize = 0;
 template <typename T>
 size_t Arbitrary<std::list<T>>::defaultMaxSize = 200;
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

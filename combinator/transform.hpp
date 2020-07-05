@@ -4,7 +4,7 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T, typename U>
 std::function<Shrinkable<U>(Random&)> transform(std::function<Shrinkable<T>(Random&)> gen, std::function<U(const T&)> transformer)
@@ -17,4 +17,4 @@ std::function<Shrinkable<U>(Random&)> transform(std::function<Shrinkable<T>(Rand
     };
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

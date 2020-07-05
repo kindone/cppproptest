@@ -4,7 +4,7 @@
 #include <exception>
 #include <utility>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 namespace util {
 
@@ -119,4 +119,4 @@ std::stringstream& PropertyBase::getLastStream()
     return context->getLastStream();
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

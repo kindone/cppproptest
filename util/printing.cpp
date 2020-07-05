@@ -5,7 +5,7 @@
 #include "cesu8string.hpp"
 #include "unicode.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 PROPTEST_API std::ostream& show(std::ostream& os, const char* c_str, size_t len)
 {
@@ -123,4 +123,4 @@ PROPTEST_API std::ostream& show(std::ostream& os, const double& val)
     return os;
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

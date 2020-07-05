@@ -3,7 +3,7 @@
 #include <ios>
 #include <iomanip>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 namespace util {
 
 class IosFlagSaver {

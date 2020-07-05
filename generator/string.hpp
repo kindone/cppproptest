@@ -5,7 +5,7 @@
 #include "../util/cesu8string.hpp"
 #include <string>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <>
 class PROPTEST_API Arbitrary<std::string> final : public ArbitraryContainer<std::string> {
@@ -24,4 +24,4 @@ public:
     std::function<Shrinkable<char>(Random&)> elemGen;
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

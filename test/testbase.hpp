@@ -53,21 +53,21 @@ std::ostream& operator<<(std::ostream& os, const std::vector<int8_t>& input);
 template <typename ARG1, typename ARG2>
 std::ostream& operator<<(std::ostream& os, const std::tuple<ARG1, ARG2>& tuple)
 {
-    os << PropertyBasedTesting::Show<std::tuple<ARG1, ARG2>>(tuple);
+    os << pbt::Show<std::tuple<ARG1, ARG2>>(tuple);
     return os;
 }
 
 template <typename ARG1, typename ARG2, typename ARG3>
 std::ostream& operator<<(std::ostream& os, const std::tuple<ARG1, ARG2, ARG3>& tuple)
 {
-    os << PropertyBasedTesting::Show<std::tuple<ARG1, ARG2, ARG3>>(tuple);
+    os << pbt::Show<std::tuple<ARG1, ARG2, ARG3>>(tuple);
     return os;
 }
 
 template <typename ARG1, typename ARG2>
 std::ostream& operator<<(std::ostream& os, const std::pair<ARG1, ARG2>& pair)
 {
-    os << PropertyBasedTesting::Show<std::pair<ARG1, ARG2>>(pair);
+    os << pbt::Show<std::pair<ARG1, ARG2>>(pair);
     return os;
 }
 
@@ -102,13 +102,13 @@ struct Foo
     int a;
 };
 
-struct GenSmallInt : public PropertyBasedTesting::Gen<int32_t>
+struct GenSmallInt : public pbt::Gen<int32_t>
 {
     GenSmallInt() : step(0ULL) {}
-    PropertyBasedTesting::Shrinkable<int32_t> operator()(PropertyBasedTesting::Random&)
+    pbt::Shrinkable<int32_t> operator()(pbt::Random&)
     {
         constexpr size_t num = sizeof(boundaryValues) / sizeof(boundaryValues[0]);
-        return PropertyBasedTesting::make_shrinkable<int32_t>(boundaryValues[step++ % num]);
+        return pbt::make_shrinkable<int32_t>(boundaryValues[step++ % num]);
     }
 
     size_t step;
@@ -117,19 +117,19 @@ struct GenSmallInt : public PropertyBasedTesting::Gen<int32_t>
         INT16_MIN, INT16_MAX, INT16_MIN + 1, INT16_MAX - 1};
 };
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 // define arbitrary of Animal using Construct
 template <>
 class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector<int>&> {
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt
 
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF8String&);
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16BEString&);
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::UTF16LEString&);
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::CESU8String&);
+std::ostream& operator<<(std::ostream& os, const pbt::UTF8String&);
+std::ostream& operator<<(std::ostream& os, const pbt::UTF16BEString&);
+std::ostream& operator<<(std::ostream& os, const pbt::UTF16LEString&);
+std::ostream& operator<<(std::ostream& os, const pbt::CESU8String&);
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& vec);
 std::ostream& operator<<(std::ostream& os, const TableData& td);
 std::ostream& operator<<(std::ostream& os, const std::vector<std::tuple<uint16_t, bool>>& indexVec);
@@ -148,26 +148,26 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<T>& ptr)
     else
         os << "(null)";
     return os;
-    // return PropertyBasedTesting::show(os, ptr);
+    // return pbt::show(os, ptr);
 }
 
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const PropertyBasedTesting::Nullable<T>& nullable)
+std::ostream& operator<<(std::ostream& os, const pbt::Nullable<T>& nullable)
 {
     os << nullable.ptr;
     return os;
-    // return PropertyBasedTesting::show(os, nullable);
+    // return pbt::show(os, nullable);
 }
 
 template <typename T>
-void exhaustive(const PropertyBasedTesting::Shrinkable<T>& shrinkable, int level, bool print = true)
+void exhaustive(const pbt::Shrinkable<T>& shrinkable, int level, bool print = true)
 {
-    // using namespace PropertyBasedTesting;
+    // using namespace pbt;
     if (print) {
         for (int i = 0; i < level; i++)
             std::cout << "  ";
 
-        std::cout << "shrinkable: " << PropertyBasedTesting::Show<T>(shrinkable.get()) << std::endl;
+        std::cout << "shrinkable: " << pbt::Show<T>(shrinkable.get()) << std::endl;
     }
 
     auto shrinks = shrinkable.shrinks();

@@ -5,7 +5,7 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <typename T>
 class Arbitrary<std::shared_ptr<T>> final : public ArbitraryBase<std::shared_ptr<T>> {
@@ -30,4 +30,4 @@ public:
     std::function<Shrinkable<T>(Random&)> elemGen;
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

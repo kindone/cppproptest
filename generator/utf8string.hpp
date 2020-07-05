@@ -3,7 +3,7 @@
 #include "../util/utf8string.hpp"
 #include <string>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 template <>
 class PROPTEST_API Arbitrary<UTF8String> final : public ArbitraryContainer<UTF8String> {
@@ -22,4 +22,4 @@ public:
     std::function<Shrinkable<uint32_t>(Random&)> elemGen;
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

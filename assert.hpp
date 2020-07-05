@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 struct AssertFailed : public std::logic_error
 {
@@ -55,12 +55,12 @@ namespace util {
 std::ostream& errorOrEmpty(bool condition);
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt
 
 #define PROP_ASSERT_VARGS(condition, code)                                                                             \
     do {                                                                                                               \
         if (!(condition)) {                                                                                            \
-            ::PropertyBasedTesting::AssertFailed __proptest_except_obj(__FILE__, __LINE__, code, #condition, nullptr); \
+            ::pbt::AssertFailed __proptest_except_obj(__FILE__, __LINE__, code, #condition, nullptr); \
             throw __proptest_except_obj;                                                                               \
         }                                                                                                              \
     } while (false)
@@ -86,19 +86,19 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_GE(a, b) PROP_ASSERT_STREAM(a >= b, a, " < ", b)
 
 #define PROP_ASSERT_STREQ(a, b, n)                                                                    \
-    PROP_ASSERT_STREAM(memcmp(a, b, n) == 0, PropertyBasedTesting::Show<char*>(a, n), " not equals ", \
-                       PropertyBasedTesting::Show<char*>(b, n))
+    PROP_ASSERT_STREAM(memcmp(a, b, n) == 0, pbt::Show<char*>(a, n), " not equals ", \
+                       pbt::Show<char*>(b, n))
 
 #define PROP_ASSERT_STRNE(a, b, n)                                                                \
-    PROP_ASSERT_STREAM(memcmp(a, b, n) != 0, PropertyBasedTesting::Show<char*>(a, n), " equals ", \
-                       PropertyBasedTesting::Show<char*>(b, n))
+    PROP_ASSERT_STREAM(memcmp(a, b, n) != 0, pbt::Show<char*>(a, n), " equals ", \
+                       pbt::Show<char*>(b, n))
 
 #define PROP_DISCARD()                                                              \
     do {                                                                            \
-        throw ::PropertyBasedTesting::Discard(__FILE__, __LINE__, {}, "", nullptr); \
+        throw ::pbt::Discard(__FILE__, __LINE__, {}, "", nullptr); \
     } while (false)
 
 #define PROP_SUCCESS()                                                              \
     do {                                                                            \
-        throw ::PropertyBasedTesting::Success(__FILE__, __LINE__, {}, "", nullptr); \
+        throw ::pbt::Success(__FILE__, __LINE__, {}, "", nullptr); \
     } while (false)

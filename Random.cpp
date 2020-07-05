@@ -4,7 +4,7 @@
 #include <iostream>
 #include <chrono>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 Random::Random(uint64_t seed) : engine(seed) {}
 
@@ -165,4 +165,4 @@ uint64_t Random::getRandomU<uint64_t>(uint64_t min, uint64_t max)
 {
     return getRandomUInt64(min, max);
 }
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

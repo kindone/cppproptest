@@ -28,11 +28,11 @@
 #define PROP_EXPECT_LE(a, b) PROP_EXPECT_STREAM(a <= b, a, " > ", b)
 #define PROP_EXPECT_GE(a, b) PROP_EXPECT_STREAM(a >= b, a, " < ", b)
 #define PROP_EXPECT_STREQ(a, b, n)                                                                    \
-    PROP_EXPECT_STREAM(memcmp(a, b, n) == 0, PropertyBasedTesting::Show<char*>(a, n), " not equals ", \
-                       PropertyBasedTesting::Show<char*>(b, n))
+    PROP_EXPECT_STREAM(memcmp(a, b, n) == 0, pbt::Show<char*>(a, n), " not equals ", \
+                       pbt::Show<char*>(b, n))
 #define PROP_EXPECT_STRNE(a, b, n)                                                                \
-    PROP_EXPECT_STREAM(memcmp(a, b, n) != 0, PropertyBasedTesting::Show<char*>(a, n), " equals ", \
-                       PropertyBasedTesting::Show<char*>(b, n))
+    PROP_EXPECT_STREAM(memcmp(a, b, n) != 0, pbt::Show<char*>(a, n), " equals ", \
+                       pbt::Show<char*>(b, n))
 
 #define PROP_STAT(VALUE)                                               \
     do {                                                               \
@@ -61,7 +61,7 @@
         }                                                      \
     } while (false);
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 class Random;
 
@@ -94,4 +94,4 @@ protected:
     friend struct PropertyContext;
 };
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

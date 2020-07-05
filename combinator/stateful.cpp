@@ -2,11 +2,11 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 Shrinkable<EmptyModel> EmptyModelGen(Random&)
 {
     return make_shrinkable<EmptyModel>();
 }
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

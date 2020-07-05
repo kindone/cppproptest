@@ -7,7 +7,7 @@
 #include <chrono>
 #include <iostream>
 
-using namespace PropertyBasedTesting;
+using namespace pbt;
 
 class ConcurrencyTest2 : public ::testing::Test {
 };

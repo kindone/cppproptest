@@ -5,6 +5,6 @@
 #include <iostream>
 #include <thread>
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt

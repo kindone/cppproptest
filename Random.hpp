@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include "api.hpp"
 
-namespace PropertyBasedTesting {
+namespace pbt {
 
 PROPTEST_API int64_t getCurrentTime();
 
@@ -74,4 +74,4 @@ uint32_t Random::getRandomU<uint32_t>(uint64_t min, uint64_t max);
 template <>
 uint64_t Random::getRandomU<uint64_t>(uint64_t min, uint64_t max);
 
-}  // namespace PropertyBasedTesting
+}  // namespace pbt
