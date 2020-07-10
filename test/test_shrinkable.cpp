@@ -1,5 +1,5 @@
 #include "testbase.hpp"
 
-using namespace pbt;
+using namespace proptest;
 
 // TODO

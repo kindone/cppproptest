@@ -2,11 +2,11 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 
-namespace pbt {
+namespace proptest {
 
 Shrinkable<EmptyModel> EmptyModelGen(Random&)
 {
     return make_shrinkable<EmptyModel>();
 }
 
-}  // namespace pbt
+}  // namespace proptest

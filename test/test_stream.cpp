@@ -8,7 +8,7 @@
 class StreamTestCase : public ::testing::Test {
 };
 
-using namespace pbt;
+using namespace proptest;
 
 TEST(StreamTestCase, Stream)
 {

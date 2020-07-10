@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <sstream>
 
-namespace pbt {
+namespace proptest {
 
 size_t UTF16BEString::charsize() const
 {
@@ -229,4 +229,4 @@ bool isValidUTF16LE(std::vector<uint8_t>& chars, int& numChars)
 }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

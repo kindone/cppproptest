@@ -8,10 +8,9 @@
 namespace std {
 
 template <typename T>
-class less<pbt::Shrinkable<T>> {
+class less<proptest::Shrinkable<T>> {
 public:
-    constexpr bool operator()(const pbt::Shrinkable<T>& lhs,
-                              const pbt::Shrinkable<T>& rhs) const
+    constexpr bool operator()(const proptest::Shrinkable<T>& lhs, const proptest::Shrinkable<T>& rhs) const
     {
         return lhs.getRef() < rhs.getRef();
     }
@@ -19,7 +18,7 @@ public:
 
 }  // namespace std
 
-namespace pbt {
+namespace proptest {
 
 template <typename T>
 class Arbitrary<std::set<T>> final : public ArbitraryContainer<std::set<T>> {
@@ -92,4 +91,4 @@ size_t Arbitrary<std::set<T>>::defaultMinSize = 0;
 template <typename T>
 size_t Arbitrary<std::set<T>>::defaultMaxSize = 200;
 
-}  // namespace pbt
+}  // namespace proptest

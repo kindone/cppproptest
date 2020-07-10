@@ -3,7 +3,7 @@
 #include <exception>
 #include "bitmap.hpp"
 
-namespace pbt {
+namespace proptest {
 
 Bitmap::Bitmap()
 {
@@ -82,4 +82,4 @@ int Bitmap::occupyUnavailable(int n)
     return -1;
 }
 
-}  // namespace pbt
+}  // namespace proptest

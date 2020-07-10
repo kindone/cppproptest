@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
 template <size_t N, typename Tuple>
@@ -70,4 +70,4 @@ decltype(auto) transformHeteroTupleWithArg(Tuple&& tup, Arg&& arg)
 }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

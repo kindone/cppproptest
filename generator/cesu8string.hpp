@@ -3,7 +3,7 @@
 #include "../util/cesu8string.hpp"
 #include <string>
 
-namespace pbt {
+namespace proptest {
 
 template <>
 class PROPTEST_API Arbitrary<CESU8String> final : public ArbitraryContainer<CESU8String> {
@@ -22,4 +22,4 @@ public:
     std::function<Shrinkable<uint32_t>(Random&)> elemGen;
 };
 
-}  // namespace pbt
+}  // namespace proptest

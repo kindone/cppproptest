@@ -3,7 +3,7 @@
 #include "util/utf8string.hpp"
 #include "util/cesu8string.hpp"
 
-namespace pbt {
+namespace proptest {
 
 // explicit instantiation
 // INSTANTIATE_FOR_ALL_BASIC_TYPES(template class PROPTEST_API PROPTEST_SHRINKABLE);
@@ -12,4 +12,4 @@ namespace pbt {
 // INSTANTIATE_FOR_ALL_BASIC_TYPES(template class PROPTEST_API PROPTEST_SHRINKABLE_SET);
 // INSTANTIATE_FOR_ALL_BASIC_TYPES(template class PROPTEST_API PROPTEST_SHRINKABLE_SHARED_PTR);
 
-}  // namespace pbt
+}  // namespace proptest

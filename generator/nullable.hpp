@@ -6,7 +6,7 @@
 #include "../Random.hpp"
 #include "../util/nullable.hpp"
 
-namespace pbt {
+namespace proptest {
 
 template <typename T>
 class Arbitrary<Nullable<T>> final : public ArbitraryBase<Nullable<T>> {
@@ -37,4 +37,4 @@ public:
     std::function<Shrinkable<T>(Random&)> elemGen;
 };
 
-}  // namespace pbt
+}  // namespace proptest

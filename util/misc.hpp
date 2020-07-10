@@ -3,7 +3,7 @@
 #include <ios>
 #include <iomanip>
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
 class IosFlagSaver {
@@ -21,5 +21,4 @@ private:
 };
 
 }  // namespace util
-}
-
+}  // namespace proptest

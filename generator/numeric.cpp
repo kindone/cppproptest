@@ -7,7 +7,7 @@
 #include <functional>
 #include <cmath>
 
-namespace pbt {
+namespace proptest {
 
 Shrinkable<char> Arbitrary<char>::operator()(Random& rand)
 {
@@ -196,4 +196,4 @@ template struct Arbitrary<uint64_t>;
 template struct Arbitrary<float>;
 template struct Arbitrary<double>;
 */
-}  // namespace pbt
+}  // namespace proptest

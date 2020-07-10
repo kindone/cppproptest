@@ -11,7 +11,7 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 
-namespace pbt {
+namespace proptest {
 
 struct EmptyModel
 {
@@ -116,4 +116,4 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
         std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionsGen));
 }
 
-}  // namespace pbt
+}  // namespace proptest

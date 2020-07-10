@@ -2,7 +2,7 @@
 #include "../gen.hpp"
 #include <type_traits>
 
-namespace pbt {
+namespace proptest {
 
 class Random;
 
@@ -101,4 +101,4 @@ Construct<CLASS, ARGTYPES...> construct(EXPGEN0&& gen0, EXPGENS&&... gens)
     return Construct<CLASS, ARGTYPES...>(std::tuple_cat(explicits, implicits));
 }
 
-}  // namespace pbt
+}  // namespace proptest

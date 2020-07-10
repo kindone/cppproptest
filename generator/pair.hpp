@@ -6,7 +6,7 @@
 #include <utility>
 #include <memory>
 
-namespace pbt {
+namespace proptest {
 
 namespace util {
 
@@ -94,4 +94,4 @@ public:
     }
 };
 
-}  // namespace pbt
+}  // namespace proptest

@@ -1,6 +1,6 @@
 #include "fork.hpp"
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
 Pipe::Pipe()
@@ -58,4 +58,4 @@ void Fork::exitAbnormal()
 }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

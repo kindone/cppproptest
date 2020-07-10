@@ -14,7 +14,7 @@
 #include <iomanip>
 #include <map>
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
 template <typename T>
@@ -264,4 +264,4 @@ bool forAll(Callable&& callable, EXPGENS&&... gens)
     return property(callable, gens...).forAll();
 }
 
-}  // namespace pbt
+}  // namespace proptest

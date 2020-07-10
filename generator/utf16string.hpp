@@ -3,7 +3,7 @@
 #include "../util/utf16string.hpp"
 #include <string>
 
-namespace pbt {
+namespace proptest {
 
 template <>
 class PROPTEST_API Arbitrary<UTF16BEString> final : public ArbitraryContainer<UTF16BEString> {
@@ -38,4 +38,4 @@ public:
     std::function<Shrinkable<uint32_t>(Random&)> elemGen;
 };
 
-}  // namespace pbt
+}  // namespace proptest

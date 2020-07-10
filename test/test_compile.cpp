@@ -1,6 +1,6 @@
 #include "testbase.hpp"
 
-using namespace pbt;
+using namespace proptest;
 
 TEST(PropTest, CompilePropInts)
 {

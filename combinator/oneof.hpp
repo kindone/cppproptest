@@ -5,7 +5,7 @@
 #include "../Random.hpp"
 #include "../assert.hpp"
 
-namespace pbt {
+namespace proptest {
 
 namespace util {
 template <typename T>
@@ -103,4 +103,4 @@ decltype(auto) oneOf(GENS&&... gens)
     };
 }
 
-}  // namespace pbt
+}  // namespace proptest

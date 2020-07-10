@@ -4,12 +4,11 @@
 #include "tuple.hpp"
 #include "../generator/util.hpp"
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
 template <typename Function, typename GenTuple, std::size_t... index>
-decltype(auto) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup,
-                                   std::index_sequence<index...>)
+decltype(auto) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...>)
 {
     auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...);
     // FIXME: more efficient way than copying in to shared?
@@ -31,4 +30,4 @@ decltype(auto) invokeWithGenTuple(Random& rand, Function&& f, Tuple&& genTup)
 }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

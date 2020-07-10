@@ -20,7 +20,7 @@ class MyVector {
 };
 ```
 
-You first need to define actions for each state change. This can be done by extending `pbt::Action` or `pbt::ActionWithoutModel` abstract class with following signature:
+You first need to define actions for each state change. This can be done by extending `proptest::Action` or `proptest::ActionWithoutModel` abstract class with following signature:
 
 
 ```cpp

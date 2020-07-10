@@ -12,7 +12,7 @@
 #include "combinator/transform.hpp"
 #include "combinator/filter.hpp"
 
-namespace pbt {
+namespace proptest {
 
 class Random;
 
@@ -40,16 +40,16 @@ struct CustomGen : public Gen<T>
     CustomGen<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
-        return CustomGen<U>(pbt::transform<T, U>(
-            [thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, transformer));
+        return CustomGen<U>(
+            proptest::transform<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, transformer));
     }
 
     template <typename Criteria>
     CustomGen<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return CustomGen<T>(pbt::filter<T>(
-            [thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, std::forward<Criteria>(criteria)));
+        return CustomGen<T>(proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
+                                                std::forward<Criteria>(criteria)));
     }
 
     std::shared_ptr<CustomGen<T>> clone() { return std::make_shared<CustomGen<T>>(*dynamic_cast<CustomGen<T>*>(this)); }
@@ -67,16 +67,16 @@ struct ArbitraryBase : public Gen<T>
     CustomGen<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
-        return CustomGen<U>(pbt::transform<T, U>(
-            [thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
+        return CustomGen<U>(
+            proptest::transform<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
     }
 
     template <typename Criteria>
     CustomGen<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return CustomGen<T>(pbt::filter<T>(
-            [thisPtr](Random& rand) { return thisPtr->operator()(rand); }, std::forward<Criteria>(criteria)));
+        return CustomGen<T>(proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+                                                std::forward<Criteria>(criteria)));
     }
 
     std::shared_ptr<Arbitrary<T>> clone() { return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this)); }
@@ -112,7 +112,7 @@ struct Arbitrary : public ArbitraryBase<T>
 {
 };
 
-}  // namespace pbt
+}  // namespace proptest
 
 #include "util/invokeWithArgs.hpp"
 #include "util/invokeWithGenTuple.hpp"

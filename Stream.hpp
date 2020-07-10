@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-namespace pbt {
+namespace proptest {
 
 template <typename T>
 struct Stream;
@@ -148,4 +148,4 @@ struct Stream
     }
 };
 
-}  // namespace pbt
+}  // namespace proptest

@@ -3,7 +3,7 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 
-using namespace pbt;
+using namespace proptest;
 
 TEST(Compile, numeric)
 {

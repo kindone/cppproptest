@@ -6,7 +6,7 @@
 #include <functional>
 #include "typelist.hpp"
 
-namespace pbt {
+namespace proptest {
 
 class Random;
 
@@ -68,4 +68,4 @@ createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 
 }  // namespace util
 
-}  // namespace pbt
+}  // namespace proptest

@@ -3,7 +3,7 @@
 #include "unicode.hpp"
 #include <stdexcept>
 
-namespace pbt {
+namespace proptest {
 
 size_t CESU8String::charsize() const
 {
@@ -286,4 +286,4 @@ bool isValidCESU8(std::vector<uint8_t>& chars, int& numChars)
 }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

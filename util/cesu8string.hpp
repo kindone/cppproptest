@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-namespace pbt {
+namespace proptest {
 
 class PROPTEST_API CESU8String : public std::string {
 public:
@@ -38,4 +38,4 @@ PROPTEST_API bool isValidCESU8(std::vector<uint8_t>& chars, int& numChars);
 PROPTEST_API int CESU8CharSize(const std::string& str);
 }  // namespace util
 
-}  // namespace pbt
+}  // namespace proptest

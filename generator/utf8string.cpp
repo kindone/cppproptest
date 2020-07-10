@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace pbt {
+namespace proptest {
 
 size_t Arbitrary<UTF8String>::defaultMinSize = 0;
 size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
@@ -180,4 +180,4 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
         });
 }
 
-}  // namespace pbt
+}  // namespace proptest

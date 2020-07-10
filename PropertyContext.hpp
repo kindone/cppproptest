@@ -6,7 +6,7 @@
 #include <sstream>
 #include <list>
 
-namespace pbt {
+namespace proptest {
 
 struct Tag
 {
@@ -54,4 +54,4 @@ private:
     PropertyContext* oldContext;
 };
 
-}  // namespace pbt
+}  // namespace proptest

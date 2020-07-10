@@ -9,7 +9,7 @@
 #include <cmath>
 #include <memory>
 
-namespace pbt {
+namespace proptest {
 
 template <typename T>
 class PROPTEST_API Arbitrary<std::vector<T>> final : public ArbitraryContainer<std::vector<T>> {
@@ -193,4 +193,4 @@ size_t Arbitrary<std::vector<T>>::defaultMinSize = 0;
 template <typename T>
 size_t Arbitrary<std::vector<T>>::defaultMaxSize = 200;
 
-}  // namespace pbt
+}  // namespace proptest

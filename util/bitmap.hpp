@@ -4,7 +4,7 @@
 #include <atomic>
 #include <exception>
 
-namespace pbt {
+namespace proptest {
 
 struct PROPTEST_API Bitmap
 {
@@ -30,4 +30,4 @@ struct PROPTEST_API Bitmap
     std::atomic<State> states[size];
 };
 
-}  // namespace pbt
+}  // namespace proptest

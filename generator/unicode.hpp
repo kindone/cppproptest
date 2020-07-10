@@ -4,7 +4,7 @@
 #include "../api.hpp"
 #include <functional>
 
-namespace pbt {
+namespace proptest {
 
 PROPTEST_API Shrinkable<uint32_t> unicodeGen(Random& rand);
 

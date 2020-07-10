@@ -4,10 +4,11 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 
-namespace pbt {
+namespace proptest {
 
 template <typename T, typename U>
-std::function<Shrinkable<U>(Random&)> transform(std::function<Shrinkable<T>(Random&)> gen, std::function<U(const T&)> transformer)
+std::function<Shrinkable<U>(Random&)> transform(std::function<Shrinkable<T>(Random&)> gen,
+                                                std::function<U(const T&)> transformer)
 {
     auto genPtr = std::make_shared<decltype(gen)>(gen);
     auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
@@ -17,4 +18,4 @@ std::function<Shrinkable<U>(Random&)> transform(std::function<Shrinkable<T>(Rand
     };
 }
 
-}  // namespace pbt
+}  // namespace proptest

@@ -7,8 +7,8 @@
 class UtilTestCase : public ::testing::Test {
 };
 
-using namespace pbt;
-using namespace pbt::util;
+using namespace proptest;
+using namespace proptest::util;
 
 extern std::ostream& operator<<(std::ostream& os, const std::vector<int>& input);
 

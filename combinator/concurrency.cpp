@@ -5,6 +5,6 @@
 #include <iostream>
 #include <thread>
 
-namespace pbt {
+namespace proptest {
 
-}  // namespace pbt
+}  // namespace proptest

@@ -5,12 +5,13 @@
 #include "../util/cesu8string.hpp"
 #include <string>
 
-namespace pbt {
+namespace proptest {
 
 template <>
 class PROPTEST_API Arbitrary<std::string> final : public ArbitraryContainer<std::string> {
     using ArbitraryContainer<std::string>::minSize;
     using ArbitraryContainer<std::string>::maxSize;
+
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
@@ -24,4 +25,4 @@ public:
     std::function<Shrinkable<char>(Random&)> elemGen;
 };
 
-}  // namespace pbt
+}  // namespace proptest

@@ -8,7 +8,7 @@
 #include <memory>
 #include <mutex>
 
-using namespace pbt;
+using namespace proptest;
 
 class ConcurrencyTest : public ::testing::Test {
 };
@@ -17,7 +17,8 @@ struct VectorAction3 : public ActionWithoutModel<std::vector<int>>
 {
 };
 
-std::mutex& getMutex() {
+std::mutex& getMutex()
+{
     static std::mutex mtx;
     return mtx;
 }

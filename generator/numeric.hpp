@@ -3,7 +3,7 @@
 #include "../Stream.hpp"
 #include "util.hpp"
 
-namespace pbt {
+namespace proptest {
 
 template <typename T>
 Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(),
@@ -280,4 +280,4 @@ public:
     static constexpr double boundaryValues[] = {0.0, 1.0, -1.0};
 };
 
-}  // namespace pbt
+}  // namespace proptest

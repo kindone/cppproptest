@@ -6,7 +6,7 @@
 #include <iostream>
 #include <memory>
 
-using namespace pbt;
+using namespace proptest;
 
 class StateTestCase : public ::testing::Test {
 };

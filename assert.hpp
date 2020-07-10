@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace pbt {
+namespace proptest {
 
 struct AssertFailed : public std::logic_error
 {
@@ -55,14 +55,14 @@ namespace util {
 std::ostream& errorOrEmpty(bool condition);
 }
 
-}  // namespace pbt
+}  // namespace proptest
 
-#define PROP_ASSERT_VARGS(condition, code)                                                                             \
-    do {                                                                                                               \
-        if (!(condition)) {                                                                                            \
-            ::pbt::AssertFailed __proptest_except_obj(__FILE__, __LINE__, code, #condition, nullptr); \
-            throw __proptest_except_obj;                                                                               \
-        }                                                                                                              \
+#define PROP_ASSERT_VARGS(condition, code)                                                                 \
+    do {                                                                                                   \
+        if (!(condition)) {                                                                                \
+            ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, code, #condition, nullptr); \
+            throw __proptest_except_obj;                                                                   \
+        }                                                                                                  \
     } while (false)
 
 #define PROP_ASSERT_STREAM(condition, a, sign, b)            \
@@ -85,20 +85,18 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_LE(a, b) PROP_ASSERT_STREAM(a <= b, a, " > ", b)
 #define PROP_ASSERT_GE(a, b) PROP_ASSERT_STREAM(a >= b, a, " < ", b)
 
-#define PROP_ASSERT_STREQ(a, b, n)                                                                    \
-    PROP_ASSERT_STREAM(memcmp(a, b, n) == 0, pbt::Show<char*>(a, n), " not equals ", \
-                       pbt::Show<char*>(b, n))
+#define PROP_ASSERT_STREQ(a, b, n) \
+    PROP_ASSERT_STREAM(memcmp(a, b, n) == 0, proptest::Show<char*>(a, n), " not equals ", proptest::Show<char*>(b, n))
 
-#define PROP_ASSERT_STRNE(a, b, n)                                                                \
-    PROP_ASSERT_STREAM(memcmp(a, b, n) != 0, pbt::Show<char*>(a, n), " equals ", \
-                       pbt::Show<char*>(b, n))
+#define PROP_ASSERT_STRNE(a, b, n) \
+    PROP_ASSERT_STREAM(memcmp(a, b, n) != 0, proptest::Show<char*>(a, n), " equals ", proptest::Show<char*>(b, n))
 
-#define PROP_DISCARD()                                                              \
-    do {                                                                            \
-        throw ::pbt::Discard(__FILE__, __LINE__, {}, "", nullptr); \
+#define PROP_DISCARD()                                                  \
+    do {                                                                \
+        throw ::proptest::Discard(__FILE__, __LINE__, {}, "", nullptr); \
     } while (false)
 
-#define PROP_SUCCESS()                                                              \
-    do {                                                                            \
-        throw ::pbt::Success(__FILE__, __LINE__, {}, "", nullptr); \
+#define PROP_SUCCESS()                                                  \
+    do {                                                                \
+        throw ::proptest::Success(__FILE__, __LINE__, {}, "", nullptr); \
     } while (false)

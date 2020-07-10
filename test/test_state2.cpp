@@ -6,17 +6,16 @@
 #include <iostream>
 #include <memory>
 
-using namespace pbt;
+using namespace proptest;
 
 template <typename SystemType>
 using ActionFor = std::function<bool(SystemType&)>;
 
 template <typename SystemType>
-decltype(auto) actionFor(ActionFor<SystemType> func) {
+decltype(auto) actionFor(ActionFor<SystemType> func)
+{
     auto funcPtr = std::make_shared<decltype(func)>(func);
-    return just<ActionFor<SystemType>>([funcPtr]() {
-        return *funcPtr;
-    });
+    return just<ActionFor<SystemType>>([funcPtr]() { return *funcPtr; });
 }
 
 template <typename SystemType, typename... GENS>
@@ -47,8 +46,7 @@ TEST(StateTest, States2)
     using SystemType = std::vector<int>;
 
     auto pushBackGen = Arbitrary<int>().transform<ActionFor<SystemType>>([](const int value) {
-        return [value](SystemType& system)
-        {
+        return [value](SystemType& system) {
             std::cout << "PushBack(" << value << ")" << std::endl;
             auto size = system.size();
             system.push_back(value);

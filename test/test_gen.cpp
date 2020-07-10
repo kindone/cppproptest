@@ -1,7 +1,7 @@
 #include "testbase.hpp"
 #include <iostream>
 
-using namespace pbt;
+using namespace proptest;
 
 TEST(PropTest, GenVectorOfInt)
 {

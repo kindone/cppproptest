@@ -5,7 +5,7 @@
 #include <ios>
 #include <vector>
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
 std::ostream& codepage(std::ostream& os, uint32_t code)
@@ -134,4 +134,4 @@ std::ostream& validChar2(std::ostream& os, uint8_t c)
 // }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

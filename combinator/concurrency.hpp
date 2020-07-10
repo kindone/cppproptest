@@ -15,7 +15,7 @@
 #include <atomic>
 #include <condition_variable>
 
-namespace pbt {
+namespace proptest {
 
 template <typename ActionType>
 class PROPTEST_API Concurrency {
@@ -256,4 +256,4 @@ decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory,
     return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
 }
 
-}  // namespace pbt
+}  // namespace proptest

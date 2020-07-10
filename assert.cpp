@@ -2,17 +2,18 @@
 #include <iostream>
 #include <sstream>
 
-namespace pbt {
+namespace proptest {
 namespace util {
 
-std::ostream& errorOrEmpty(bool error) {
+std::ostream& errorOrEmpty(bool error)
+{
     static std::stringstream str;
     static std::ostream& empty = str;
-    if(error)
+    if (error)
         return std::cerr;
     else
         return empty;
 }
 
 }  // namespace util
-}  // namespace pbt
+}  // namespace proptest

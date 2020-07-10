@@ -1,7 +1,7 @@
 #include "testbase.hpp"
 #include "generator/unicode.hpp"
 
-using namespace pbt;
+using namespace proptest;
 
 template <typename T>
 T abs(T t)

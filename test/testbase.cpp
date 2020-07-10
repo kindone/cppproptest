@@ -16,63 +16,63 @@ double getTime()
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-std::ostream& operator<<(std::ostream& os, const pbt::UTF8String& str)
+std::ostream& operator<<(std::ostream& os, const proptest::UTF8String& str)
 {
-    os << pbt::Show<pbt::UTF8String>(str);
+    os << proptest::Show<proptest::UTF8String>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const pbt::UTF16BEString& str)
+std::ostream& operator<<(std::ostream& os, const proptest::UTF16BEString& str)
 {
-    os << pbt::Show<pbt::UTF16BEString>(str);
+    os << proptest::Show<proptest::UTF16BEString>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const pbt::UTF16LEString& str)
+std::ostream& operator<<(std::ostream& os, const proptest::UTF16LEString& str)
 {
-    os << pbt::Show<pbt::UTF16LEString>(str);
+    os << proptest::Show<proptest::UTF16LEString>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const pbt::CESU8String& str)
+std::ostream& operator<<(std::ostream& os, const proptest::CESU8String& str)
 {
-    os << pbt::Show<pbt::CESU8String>(str);
+    os << proptest::Show<proptest::CESU8String>(str);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& input)
 {
-    os << pbt::Show<std::vector<Foo>>(input);
+    os << proptest::Show<std::vector<Foo>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int>& input)
 {
-    os << pbt::Show<std::vector<int>>(input);
+    os << proptest::Show<std::vector<int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<int8_t>& input)
 {
-    os << pbt::Show<std::vector<int8_t>>(input);
+    os << proptest::Show<std::vector<int8_t>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
 {
-    os << pbt::Show<std::set<int>>(input);
+    os << proptest::Show<std::set<int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::map<int, int>& input)
 {
-    os << pbt::Show<std::map<int, int>>(input);
+    os << proptest::Show<std::map<int, int>>(input);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
 {
-    os << pbt::Show<std::list<int>>(input);
+    os << proptest::Show<std::list<int>>(input);
     return os;
 }
 

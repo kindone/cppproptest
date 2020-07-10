@@ -7,7 +7,7 @@
 #include <tuple>
 #include <memory>
 
-namespace pbt {
+namespace proptest {
 
 namespace util {
 
@@ -100,4 +100,4 @@ public:
     Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) override { return tuple(Arbitrary<ARGS>()...)(rand); }
 };
 
-}  // namespace pbt
+}  // namespace proptest
