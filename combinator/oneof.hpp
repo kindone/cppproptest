@@ -4,6 +4,7 @@
 
 #include "../Random.hpp"
 #include "../assert.hpp"
+#include "../gen.hpp"
 
 namespace proptest {
 
@@ -85,7 +86,7 @@ decltype(auto) oneOf(GENS&&... gens)
                 weight = (1.0 - sum) / static_cast<double>(numUnassigned);
         }
 
-    return [genVecPtr](Random& rand) {
+    return CustomGen<T>([genVecPtr](Random& rand) {
         while (true) {
             auto dice = rand.getRandomSize(0, genVecPtr->size());
             const util::Weighted<T>& weighted = (*genVecPtr)[dice];
@@ -100,7 +101,7 @@ decltype(auto) oneOf(GENS&&... gens)
                 }
             }
         };
-    };
+    });
 }
 
 }  // namespace proptest

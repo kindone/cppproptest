@@ -40,7 +40,7 @@
         value << std::boolalpha;                                       \
         value << (VALUE);                                              \
         PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str()); \
-    } while (false);
+    } while (false)
 
 #define PROP_TAG(KEY, VALUE)                                           \
     do {                                                               \
@@ -50,14 +50,14 @@
         value << std::boolalpha;                                       \
         value << (VALUE);                                              \
         PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str()); \
-    } while (false);
+    } while (false)
 
 #define PROP_CLASSIFY(condition, KEY, VALUE)                   \
     do {                                                       \
         if (condition) {                                       \
             PropertyBase::tag(__FILE__, __LINE__, KEY, VALUE); \
         }                                                      \
-    } while (false);
+    } while (false)
 
 namespace proptest {
 
