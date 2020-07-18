@@ -153,7 +153,7 @@ public:
         // shrink vector size with subvector using binary numeric shrink of sizes
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable(size - minSizeCopy)
+            util::binarySearchShrinkable(size - minSizeCopy)
                 .template transform<uint64_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
         // this make sure shrinking is possible towards minSize
         shrinkable_t shrinkable =

@@ -1,5 +1,6 @@
 #pragma once
 #include "../gen.hpp"
+#include "../api.hpp"
 #include "../Stream.hpp"
 #include "util.hpp"
 
@@ -23,15 +24,15 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
         throw std::runtime_error("invalid range");
 
     if (min >= 0)  // [3,5] -> [0,2] -> [3,5]
-        return binarySearchShrinkableU(static_cast<T>(value - min)).template transform<T>([min](const uint64_t& value) {
+        return util::binarySearchShrinkableU(static_cast<T>(value - min)).template transform<T>([min](const uint64_t& value) {
             return static_cast<T>(value + min);
         });
     else if (max <= 0)  // [-5,-3] -> [-2,0] -> [-5,-3]
-        return binarySearchShrinkable(static_cast<T>(value - max)).template transform<T>([max](const int64_t& value) {
+        return util::binarySearchShrinkable(static_cast<T>(value - max)).template transform<T>([max](const int64_t& value) {
             return static_cast<T>(value + max);
         });
     else  // [-2, 2]
-        return binarySearchShrinkable(value).template transform<T>(
+        return util::binarySearchShrinkable(value).template transform<T>(
             [](const int64_t value) { return static_cast<T>(value); });
 }
 
@@ -263,21 +264,5 @@ std::function<Shrinkable<T>(Random& rand)> inRange(T fromInclusive, T toExclusiv
         return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1));
     });
 }
-
-template <>
-struct PROPTEST_API Arbitrary<float> : public ArbitraryBase<float>
-{
-public:
-    Shrinkable<float> operator()(Random& rand) override;
-    static constexpr float boundaryValues[] = {0.0, 1.0, -1.0};
-};
-
-template <>
-struct PROPTEST_API Arbitrary<double> : public ArbitraryBase<double>
-{
-public:
-    Shrinkable<double> operator()(Random& rand) override;
-    static constexpr double boundaryValues[] = {0.0, 1.0, -1.0};
-};
 
 }  // namespace proptest

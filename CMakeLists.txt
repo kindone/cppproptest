@@ -22,7 +22,8 @@ include_directories(. googletest/googletest/include googletest/googlemock/includ
 
 ### library
 SET(proptest_sources
-    generator/numeric.cpp
+    generator/integral.cpp
+    generator/floating.cpp
     generator/string.cpp
     generator/utf8string.cpp
     generator/utf16string.cpp
@@ -98,7 +99,8 @@ ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
 ### compile
 SET(compile_sources
-    test/compile/numeric.cpp
+    test/compile/integral.cpp
+    test/compile/floating.cpp
     test/compile/vector.cpp
     test/compile/map.cpp
     test/compile/string.cpp
@@ -106,6 +108,7 @@ SET(compile_sources
     test/compile/tuple.cpp
     test/compile/shrinkable.cpp
     test/compile/stream.cpp
+    test/compile/property.cpp
 )
 
 ADD_EXECUTABLE(compile_proptest

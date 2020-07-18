@@ -113,7 +113,7 @@ TEST(UtilTestCase, stdbind)
 template <typename... ARGS>
 decltype(auto) doTuple(std::tuple<ARGS...>&)
 {
-    TypeList<typename std::remove_reference<ARGS>::type...> typeList;
+    util::TypeList<typename std::remove_reference<ARGS>::type...> typeList;
     return typeList;
 }
 
@@ -226,7 +226,7 @@ TEST(UtilTestCase, ShrinkableNumeric)
     int values[] = {8, -8};
     for (size_t i = 0; i < 2; i++) {
         int value = values[i];
-        auto shrinkable = binarySearchShrinkable(value);
+        auto shrinkable = util::binarySearchShrinkable(value);
 
         for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
             auto shrinkable1 = itr.next();
@@ -251,7 +251,7 @@ TEST(UtilTestCase, ShrinkableString)
 {
     auto str = std::string("hello world");
     int len = str.size();
-    auto shrinkable = binarySearchShrinkable(len).template transform<std::string>(
+    auto shrinkable = util::binarySearchShrinkable(len).template transform<std::string>(
         [str](const int64_t& len) { return str.substr(0, len); });
 
     for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {

@@ -3,7 +3,7 @@
 #include "cesu8string.hpp"
 #include "unicode.hpp"
 #include "util.hpp"
-#include "numeric.hpp"
+#include "integral.hpp"
 #include <vector>
 #include <iostream>
 #include <ios>
@@ -156,7 +156,7 @@ Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return binarySearchShrinkable(len - minSizeCopy)
+    return util::binarySearchShrinkable(len - minSizeCopy)
         .template transform<CESU8String>([str, minSizeCopy, positions](const uint64_t& size) -> CESU8String {
             if (positions.empty())
                 return CESU8String();

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "generator/numeric.hpp"
+#include "generator/integral.hpp"
+#include "generator/floating.hpp"
 #include "generator/bool.hpp"
 #include "generator/string.hpp"
 #include "generator/utf8string.hpp"

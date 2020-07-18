@@ -1,6 +1,7 @@
 #include "../Shrinkable.hpp"
 #include "../combinator/oneof.hpp"
-#include "../generator/numeric.hpp"
+#include "../generator/integral.hpp"
+#include "unicode.hpp"
 
 namespace proptest {
 

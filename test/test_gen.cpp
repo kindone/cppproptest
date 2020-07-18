@@ -96,6 +96,7 @@ TEST(PropTest, FloatShrinkable)
 
 TEST(PropTest, ShrinkableBinary)
 {
+    using namespace util;
     {
         auto shrinkable = binarySearchShrinkable(0);
         std::cout << "# binary of 0" << std::endl;
@@ -155,7 +156,7 @@ TEST(PropTest, ShrinkableBinary)
 
 TEST(PropTest, ShrinkableConcat)
 {
-    auto shrinkable = binarySearchShrinkable(8);
+    auto shrinkable = util::binarySearchShrinkable(8);
 
     auto concat = shrinkable.concat([shrinkable]() { return shrinkable.shrinks(); });
 
@@ -175,14 +176,15 @@ TEST(PropTest, ShrinkVector)
 
     // return make_shrinkable<std::vector<T>>(std::move(vec));
 
-    auto shrinkableVector = binarySearchShrinkable(len).template transform<std::vector<T>>([vec](const int64_t& len) {
-        if (len <= 0)
-            return std::vector<T>();
+    auto shrinkableVector =
+        util::binarySearchShrinkable(len).template transform<std::vector<T>>([vec](const int64_t& len) {
+            if (len <= 0)
+                return std::vector<T>();
 
-        auto begin = vec.begin();
-        auto last = vec.begin() + len;
-        return std::vector<T>(begin, last);
-    });
+            auto begin = vec.begin();
+            auto last = vec.begin() + len;
+            return std::vector<T>(begin, last);
+        });
 
     auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<std::vector<T>>& shr) {
         std::vector<T> copy = shr.get();

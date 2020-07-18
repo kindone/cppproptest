@@ -5,9 +5,9 @@
 
 using namespace proptest;
 
-TEST(Compile, numeric)
+TEST(Compile, floating)
 {
     Random rand(1);
-    auto gen = Arbitrary<int32_t>();
+    auto gen = Arbitrary<float>();
     gen(rand);
 }

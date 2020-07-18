@@ -4,6 +4,7 @@
 #include "bitmap.hpp"
 
 namespace proptest {
+namespace util {
 
 Bitmap::Bitmap()
 {
@@ -82,4 +83,5 @@ int Bitmap::occupyUnavailable(int n)
     return -1;
 }
 
+}  // namespace util
 }  // namespace proptest

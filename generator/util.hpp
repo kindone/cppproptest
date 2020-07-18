@@ -7,6 +7,8 @@ namespace proptest {
 
 class Random;
 
+namespace util {
+
 PROPTEST_API Shrinkable<int64_t> binarySearchShrinkable(int64_t value);
 PROPTEST_API Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value);
 
@@ -40,4 +42,5 @@ struct ShrinkableGetRef
     static decltype(auto) transform(T&& shrinkable) { return shrinkable.getRef(); }
 };
 
+}  // namespace util
 }  // namespace proptest

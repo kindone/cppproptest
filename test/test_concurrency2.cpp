@@ -14,13 +14,13 @@ class ConcurrencyTest2 : public ::testing::Test {
 
 TEST(ConcurrencyTest2, bitmap)
 {
-    Bitmap bitmap;
-    for (int i = 0; i < Bitmap::size; i++) {
+    util::Bitmap bitmap;
+    for (int i = 0; i < util::Bitmap::size; i++) {
         EXPECT_NE(bitmap.occupyAvailable(0), -1);
     }
     bitmap.reset();
-    Bitmap copy = bitmap;
-    for (int i = 0; i < Bitmap::size; i++) {
+    util::Bitmap copy = bitmap;
+    for (int i = 0; i < util::Bitmap::size; i++) {
         EXPECT_NE(copy.occupyAvailable(0), -1);
     }
     std::cout << bitmap.occupyAvailable(0) << std::endl;
@@ -32,7 +32,7 @@ TEST(ConcurrencyTest2, bitmap)
 
 TEST(ConcurrencyTest2, Container) {}
 
-struct VectorAction4 : public Action<std::vector<int>, Bitmap>
+struct VectorAction4 : public Action<std::vector<int>, util::Bitmap>
 {
 };
 
@@ -42,7 +42,7 @@ struct PushBack4 : public VectorAction4
 {
     PushBack4(int value) : value(value) {}
 
-    virtual bool run(std::vector<int>& system, Bitmap&)
+    virtual bool run(std::vector<int>& system, util::Bitmap&)
     {
         // std::cout << "PushBack(" << value << ")" << std::endl;
         std::lock_guard<std::mutex> guard(getMutex());
@@ -55,7 +55,7 @@ struct PushBack4 : public VectorAction4
 
 struct Clear4 : public VectorAction4
 {
-    virtual bool run(std::vector<int>& system, Bitmap&)
+    virtual bool run(std::vector<int>& system, util::Bitmap&)
     {
         // std::cout << "Clear" << std::endl;
         std::lock_guard<std::mutex> guard(getMutex());
@@ -66,7 +66,7 @@ struct Clear4 : public VectorAction4
 
 struct PopBack4 : public VectorAction4
 {
-    virtual bool run(std::vector<int>& system, Bitmap&)
+    virtual bool run(std::vector<int>& system, util::Bitmap&)
     {
         // std::cout << "PopBack" << std::endl;
         std::lock_guard<std::mutex> guard(getMutex());

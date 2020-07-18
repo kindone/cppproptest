@@ -2,6 +2,9 @@
 
 #include <tuple>
 
+namespace proptest {
+namespace util {
+
 template <typename T>
 struct TypeHolder
 {
@@ -47,3 +50,6 @@ struct At<List<Ts...>, Index>
 
 template <class List, size_t Index>
 using itemAt = typename TypeListItemAt::At<List, Index>::type;
+
+}  // namespace util
+}  // namespace proptest

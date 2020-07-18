@@ -5,6 +5,7 @@
 #include <exception>
 
 namespace proptest {
+namespace util {
 
 struct PROPTEST_API Bitmap
 {
@@ -30,4 +31,5 @@ struct PROPTEST_API Bitmap
     std::atomic<State> states[size];
 };
 
+}  // namespace util
 }  // namespace proptest

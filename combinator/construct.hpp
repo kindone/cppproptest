@@ -37,7 +37,7 @@ decltype(auto) autoCastTuple(FromTuple&& tuple)
 template <class CLASS, typename... ARGTYPES>
 class Construct : public Gen<CLASS> {
 public:
-    using ArgumentList = TypeList<ARGTYPES...>;
+    using ArgumentList = util::TypeList<ARGTYPES...>;
     using GenTuple = std::tuple<std::function<Shrinkable<std::remove_reference_t<ARGTYPES>>(Random&)>...>;
 
     static constexpr auto Size = sizeof...(ARGTYPES);

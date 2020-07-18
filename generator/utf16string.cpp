@@ -2,7 +2,7 @@
 #include "../util/utf16string.hpp"
 #include "utf16string.hpp"
 #include "util.hpp"
-#include "numeric.hpp"
+#include "integral.hpp"
 #include "unicode.hpp"
 #include <vector>
 #include <iostream>
@@ -113,7 +113,7 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return binarySearchShrinkableU(len - minSizeCopy)
+    return util::binarySearchShrinkableU(len - minSizeCopy)
         .template transform<UTF16BEString>([str, minSizeCopy, positions](const uint64_t& size) -> UTF16BEString {
             if (positions.empty())
                 return UTF16BEString();
@@ -233,7 +233,7 @@ Shrinkable<UTF16LEString> Arbitrary<UTF16LEString>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return binarySearchShrinkable(len - minSizeCopy)
+    return util::binarySearchShrinkable(len - minSizeCopy)
         .template transform<UTF16LEString>([str, minSizeCopy, positions](const uint64_t& size) -> UTF16LEString {
             if (positions.empty())
                 return UTF16LEString();

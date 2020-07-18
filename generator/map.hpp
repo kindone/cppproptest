@@ -43,7 +43,7 @@ public:
         // shrink map size with submap using binary numeric shrink of sizes
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            binarySearchShrinkable(size - minSizeCopy).template transform<size_t>([minSizeCopy](const uint64_t& size) {
+            util::binarySearchShrinkable(size - minSizeCopy).template transform<size_t>([minSizeCopy](const uint64_t& size) {
                 return size + minSizeCopy;
             });
 

@@ -15,23 +15,6 @@
 #include <map>
 
 namespace proptest {
-namespace util {
-
-template <typename T>
-decltype(auto) ReturnTypeOf()
-{
-    TypeHolder<typename std::result_of<decltype (&T::operator())(T, Random&)>::type> typeHolder;
-    return typeHolder;
-}
-
-// template <typename... ARGS>
-// decltype(auto) ReturnTypeTupleFromGenTup(std::tuple<ARGS...>&)
-// {
-//     TypeList<typename decltype(ReturnTypeOf<ARGS>())::type...> typeList;
-//     return typeList;
-// }
-
-}  // namespace util
 
 template <typename... ARGS>
 class Property final : public PropertyBase {
@@ -100,7 +83,7 @@ private:
         // show(std::cout, replace);
         // std::cout << std::endl;
         bool result = false;
-        auto values = util::transformHeteroTuple<ShrinkableGet>(std::forward<ValueTuple>(valueTup));
+        auto values = util::transformHeteroTuple<util::ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
             result =
                 util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
@@ -181,13 +164,14 @@ private:
         // show(std::cout, valueTup);
         // std::cout << std::endl;
 
-        auto generatedValueTup = util::transformHeteroTupleWithArg<Generate>(std::forward<GenTuple>(genTup), savedRand);
+        auto generatedValueTup =
+            util::transformHeteroTupleWithArg<util::Generate>(std::forward<GenTuple>(genTup), savedRand);
 
         std::cout << "  with args: " << Show<decltype(generatedValueTup)>(generatedValueTup) << std::endl;
         // std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
         static constexpr auto Size = std::tuple_size<GenTuple>::value;
         auto shrinksTuple =
-            util::transformHeteroTuple<GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
+            util::transformHeteroTuple<util::GetShrinks>(std::forward<decltype(generatedValueTup)>(generatedValueTup));
         auto shrunk = shrinkEach(std::forward<decltype(generatedValueTup)>(generatedValueTup),
                                  std::forward<decltype(shrinksTuple)>(shrinksTuple), std::make_index_sequence<Size>{});
         std::cout << "  simplest args found by shrinking: " << Show<decltype(shrunk)>(shrunk) << std::endl;
@@ -202,14 +186,14 @@ namespace util {
 
 template <typename RetType, typename Callable, typename... ARGS>
 std::enable_if_t<std::is_same<RetType, bool>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(
-    TypeList<ARGS...>, Callable&& callable)
+    util::TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<std::function<RetType(ARGS...)>>(callable);
 }
 
 template <typename RetType, typename Callable, typename... ARGS>
 std::enable_if_t<std::is_same<RetType, void>::value, std::function<bool(ARGS...)>> functionWithBoolResultHelper(
-    TypeList<ARGS...>, Callable&& callable)
+    util::TypeList<ARGS...>, Callable&& callable)
 {
     return std::function<bool(ARGS...)>([callable](ARGS&&... args) {
         callable(std::forward<ARGS>(args)...);
@@ -226,7 +210,7 @@ decltype(auto) functionWithBoolResult(Callable&& callable)
 }
 
 template <typename RetType, typename Callable, typename... ARGS>
-std::function<RetType(ARGS...)> asFunctionHelper(TypeList<ARGS...>, Callable&& callable)
+std::function<RetType(ARGS...)> asFunctionHelper(util::TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<std::function<RetType(ARGS...)>>(callable);
 }

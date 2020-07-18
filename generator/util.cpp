@@ -5,6 +5,7 @@
 #include <tuple>
 
 namespace proptest {
+namespace util {
 
 Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
 {
@@ -88,4 +89,5 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
     });
 }
 
+}  // namespace util
 }  // namespace proptest

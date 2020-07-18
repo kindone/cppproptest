@@ -20,7 +20,7 @@ struct function_traits<R(Args...)>
 {
     using return_type = R;
     static constexpr std::size_t arity = sizeof...(Args);
-    using argument_type_list = TypeList<Args...>;
+    using argument_type_list = util::TypeList<Args...>;
 
     template <std::size_t N>
     struct argument
