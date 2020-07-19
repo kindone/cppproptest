@@ -226,6 +226,18 @@ TEST(PropTest, TestOneOfWeighted)
         std::cout << gen(rand).get() << std::endl;
 }
 
+TEST(PropTest, TestRanges)
+{
+    auto intGen = intervals({Interval(-1, 0), Interval(0, 1)});
+    auto uintGen = uintervals({UInterval(0, 0), UInterval(10, 10)});
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for (int i = 0; i < 10; i++)
+        std::cout << intGen(rand).get() << std::endl;
+    for (int i = 0; i < 10; i++)
+        std::cout << uintGen(rand).get() << std::endl;
+}
+
 TEST(PropTest, TestDependency)
 {
     auto intGen = fromTo(0, 2);

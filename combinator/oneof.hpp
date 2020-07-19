@@ -47,23 +47,9 @@ Weighted<T>& GenToWeighted(Weighted<T>& weighted)
     return weighted;
 }
 
-}  // namespace util
-
-template <typename T, typename GEN>
-util::Weighted<T> weighted(GEN&& gen, double weight)
+template <typename T>
+decltype(auto) oneOfHelper(const std::shared_ptr<std::vector<util::Weighted<T>>>& genVecPtr)
 {
-    using FuncType = std::function<Shrinkable<T>(Random&)>;
-    std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
-    return util::Weighted<T>(funcPtr, weight);
-}
-
-// a GEN can be a generator or a weighted(GEN, weight)
-template <typename T, typename... GENS>
-decltype(auto) oneOf(GENS&&... gens)
-{
-    using WeightedVec = std::vector<util::Weighted<T>>;
-    std::shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(std::forward<GENS>(gens))...});
-
     // calculate and assign unassigned weights
     double sum = 0.0;
     int numUnassigned = 0;
@@ -102,6 +88,26 @@ decltype(auto) oneOf(GENS&&... gens)
             }
         };
     });
+}
+
+}  // namespace util
+
+template <typename T, typename GEN>
+util::Weighted<T> weighted(GEN&& gen, double weight)
+{
+    using FuncType = std::function<Shrinkable<T>(Random&)>;
+    std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
+    return util::Weighted<T>(funcPtr, weight);
+}
+
+// a GEN can be a generator or a weighted(GEN, weight)
+template <typename T, typename... GENS>
+decltype(auto) oneOf(GENS&&... gens)
+{
+    using WeightedVec = std::vector<util::Weighted<T>>;
+    std::shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(std::forward<GENS>(gens))...});
+
+    return util::oneOfHelper<T>(genVecPtr);
 }
 
 }  // namespace proptest

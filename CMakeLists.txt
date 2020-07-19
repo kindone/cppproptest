@@ -31,6 +31,7 @@ SET(proptest_sources
     generator/util.cpp
     generator/unicode.cpp
     combinator/stateful.cpp
+    combinator/intervals.cpp
     combinator/concurrency.cpp
     util/fork.cpp
     util/utf8string.cpp
@@ -96,7 +97,7 @@ TARGET_LINK_LIBRARIES(test_proptest
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
-
+if(profile_compile)
 ### compile
 SET(compile_sources
     test/compile/integral.cpp
@@ -122,3 +123,4 @@ TARGET_LINK_LIBRARIES(compile_proptest
 )
 
 ADD_TEST(NAME compile_proptest_gtest COMMAND compile_proptest)
+endif()
