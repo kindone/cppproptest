@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Shrinkable.hpp"
+#include "../Random.hpp"
 #include "../api.hpp"
 #include <functional>
 

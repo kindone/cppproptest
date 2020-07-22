@@ -2,6 +2,16 @@
 
 using namespace proptest;
 
+TEST(PropTest, TestJust)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen = just<int>([]() { return 0; });
+
+    std::cout << "just: " << gen(rand).get() << std::endl;
+}
+
 TEST(PropTest, TestConstruct)
 {
     int64_t seed = getCurrentTime();
@@ -267,8 +277,8 @@ TEST(PropTest, TestDependency)
 
 TEST(PropTest, TestDependency2)
 {
-    using Dimension = std::tuple<int, uint16_t>;
-    using IndexVector = std::vector<std::tuple<uint16_t, bool>>;
+    using Dimension = std::pair<int, uint16_t>;
+    using IndexVector = std::vector<std::pair<uint16_t, bool>>;
     using RawData = std::pair<Dimension, IndexVector>;
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -277,18 +287,17 @@ TEST(PropTest, TestDependency2)
     auto numRowsGen = fromTo<int>(10000, 10000);
     auto numElementsGen = Arbitrary<uint16_t>();
     // auto numElementsGen = inRange<uint16_t>(60000, 60000);
-    auto dimGen = tuple(numRowsGen, numElementsGen);
+    auto dimGen = pair(numRowsGen, numElementsGen);
 
     auto rawGen = dependency<Dimension, IndexVector>(
         [](const Dimension& dimension) {
-            int numRows = std::get<0>(dimension);
-            uint16_t numElements = std::get<1>(dimension);
+            int numRows = dimension.first;
+            uint16_t numElements = dimension.second;
             auto firstGen = fromTo<uint16_t>(0, numElements);
             auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
-            auto indexGen = tuple(firstGen, secondGen);
+            auto indexGen = pair(firstGen, secondGen);
             auto indexVecGen = Arbitrary<IndexVector>(indexGen);
-            indexVecGen.minSize = numRows;
-            indexVecGen.maxSize = numRows;
+            indexVecGen.setSize(numRows);
             return indexVecGen;
         },
         dimGen);
@@ -308,8 +317,8 @@ TEST(PropTest, TestDependency2)
     auto tableDataGen = transform<RawData, TableData>(rawGen, [](const RawData& raw) {
         TableData tableData;
         auto dimension = raw.first;
-        tableData.num_rows = std::get<0>(dimension);
-        tableData.num_elements = std::get<1>(dimension);
+        tableData.num_rows = dimension.first;
+        tableData.num_elements = dimension.second;
         tableData.indexes = raw.second;
         return tableData;
     });
@@ -318,15 +327,25 @@ TEST(PropTest, TestDependency2)
     for (int i = 0; i < 10; i++) {
         std::cout << "table: " << tableDataGen(rand).get() << " / table " << i << std::endl;
     }
+
+    auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(
+        [](const TableData& td) {
+            std::vector<bool> values;
+            auto vectorGen = Arbitrary<std::vector<bool>>();
+            vectorGen.setSize(td.num_elements);
+            return vectorGen;
+        },
+        tableDataGen);
+
     // exhaustive(tableDataGen(rand), 0);
 
     // DictionaryCompression::IQTypeInfo ti;
     forAll(
-        [](TableData) {
+        [](std::pair<TableData, std::vector<bool>>) {
             // column->set(&index[i].first, index[i].second);
             return true;
         },
-        tableDataGen);
+        tableDataWithValueGen);
 }
 
 TEST(PropTest, TestDependency3)

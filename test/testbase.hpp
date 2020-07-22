@@ -75,7 +75,7 @@ struct TableData
 {
     int num_rows;
     uint16_t num_elements;
-    std::vector<std::tuple<uint16_t, bool>> indexes;
+    std::vector<std::pair<uint16_t, bool>> indexes;
 };
 
 struct Animal
