@@ -5,17 +5,17 @@
 #include "PropertyContext.hpp"
 #include <sstream>
 
-#define PROP_EXPECT_STREAM(condition, a, sign, b)                       \
-    ([&]() -> std::stringstream& {                                      \
-        if (!(condition)) {                                             \
-            std::stringstream str;                                      \
-            str << a << sign << b;                                      \
-            PropertyBase::fail(__FILE__, __LINE__, #condition, str);    \
-        } else {                                                        \
-            std::stringstream str;                                      \
-            PropertyBase::succeed(__FILE__, __LINE__, #condition, str); \
-        }                                                               \
-        return PropertyBase::getLastStream();                           \
+#define PROP_EXPECT_STREAM(condition, a, sign, b)                                            \
+    ([&]() -> std::stringstream& {                                                           \
+        if (!(condition)) {                                                                  \
+            std::stringstream __prop_expect_stream_str;                                      \
+            __prop_expect_stream_str << a << sign << b;                                      \
+            PropertyBase::fail(__FILE__, __LINE__, #condition, __prop_expect_stream_str);    \
+        } else {                                                                             \
+            std::stringstream __prop_expect_stream_str;                                      \
+            PropertyBase::succeed(__FILE__, __LINE__, #condition, __prop_expect_stream_str); \
+        }                                                                                    \
+        return PropertyBase::getLastStream();                                                \
     })()
 
 #define PROP_EXPECT(cond) PROP_EXPECT_STREAM(cond, "", "", "")
@@ -32,24 +32,24 @@
 #define PROP_EXPECT_STRNE(a, b, n) \
     PROP_EXPECT_STREAM(memcmp(a, b, n) != 0, proptest::Show<char*>(a, n), " equals ", proptest::Show<char*>(b, n))
 
-#define PROP_STAT(VALUE)                                               \
-    do {                                                               \
-        std::stringstream key;                                         \
-        key << (#VALUE);                                               \
-        std::stringstream value;                                       \
-        value << std::boolalpha;                                       \
-        value << (VALUE);                                              \
-        PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str()); \
+#define PROP_STAT(VALUE)                                                                       \
+    do {                                                                                       \
+        std::stringstream __prop_stat_key;                                                     \
+        __prop_stat_key << (#VALUE);                                                           \
+        std::stringstream __prop_stat_value;                                                   \
+        __prop_stat_value << std::boolalpha;                                                   \
+        __prop_stat_value << (VALUE);                                                          \
+        PropertyBase::tag(__FILE__, __LINE__, __prop_stat_key.str(), __prop_stat_value.str()); \
     } while (false)
 
-#define PROP_TAG(KEY, VALUE)                                           \
-    do {                                                               \
-        std::stringstream key;                                         \
-        key << (KEY);                                                  \
-        std::stringstream value;                                       \
-        value << std::boolalpha;                                       \
-        value << (VALUE);                                              \
-        PropertyBase::tag(__FILE__, __LINE__, key.str(), value.str()); \
+#define PROP_TAG(KEY, VALUE)                                                                   \
+    do {                                                                                       \
+        std::stringstream __prop_stat_key;                                                     \
+        __prop_stat_key << (KEY);                                                              \
+        std::stringstream __prop_stat_value;                                                   \
+        __prop_stat_value << std::boolalpha;                                                   \
+        __prop_stat_value << (VALUE);                                                          \
+        PropertyBase::tag(__FILE__, __LINE__, __prop_stat_key.str(), __prop_stat_value.str()); \
     } while (false)
 
 #define PROP_CLASSIFY(condition, KEY, VALUE)                   \
