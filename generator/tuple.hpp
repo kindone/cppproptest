@@ -87,11 +87,11 @@ decltype(auto) tuple(GEN0&& gen0, GENS&&... gens)
     // constexpr auto Size = sizeof...(GENS);
     std::tuple<std::decay_t<GEN0>, std::decay_t<GENS>...> genTup = std::make_tuple(gen0, gens...);
     // generator
-    return [genTup](Random& rand) mutable {
+    return customGen([genTup](Random& rand) mutable {
         auto elemTup = util::transformHeteroTupleWithArg<util::Generate>(std::forward<decltype(genTup)>(genTup), rand);
         auto shrinkable = make_shrinkable<decltype(elemTup)>(elemTup);
         return util::generateTupleStream(shrinkable);
-    };
+    });
 }
 
 template <typename... ARGS>

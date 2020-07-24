@@ -4,6 +4,11 @@
 
 namespace proptest {
 
+template <typename GEN>
+decltype(auto) customGen(GEN&& gen);
+template <typename T>
+struct CustomGen;
+
 template <typename GenT>
 class Filter : public GenT {
 public:
@@ -31,14 +36,14 @@ decltype(auto) filter(GEN&& gen, Criteria&& criteria)
 {
     auto genPtr = std::make_shared<std::function<Shrinkable<T>(Random&)>>(std::forward<GEN>(gen));
     auto criteriaPtr = std::make_shared<std::function<bool(const T&)>>(std::forward<Criteria>(criteria));
-    return [criteriaPtr, genPtr](Random& rand) {
+    return CustomGen<T>([criteriaPtr, genPtr](Random& rand) {
         while (true) {
             Shrinkable<T> shrinkable = (*genPtr)(rand);
             if ((*criteriaPtr)(shrinkable.getRef())) {
                 return shrinkable.filter(criteriaPtr);
             }
         }
-    };
+    });
 }
 
 // alias for filter

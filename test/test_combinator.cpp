@@ -359,6 +359,13 @@ TEST(PropTest, TestDependency3)
         },
         Arbitrary<bool>());
 
+    Arbitrary<bool>().dependency<int>([](const bool& value) {
+        if (value)
+            return fromTo(0, 10);
+        else
+            return fromTo(10, 20);
+    });
+
     int64_t seed = getCurrentTime();
     Random rand(seed);
 

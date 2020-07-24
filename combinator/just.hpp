@@ -11,7 +11,7 @@ template <typename T, typename LazyEval>
 std::function<Shrinkable<T>(Random&)> just(LazyEval&& lazyEval)
 {
     auto lazyEvalPtr = std::make_shared<std::function<T()>>(std::forward<LazyEval>(lazyEval));
-    return CustomGen<T>([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
+    return customGen([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
 }
 
 // template <typename T, typename...ARGS>
@@ -26,7 +26,7 @@ template <typename T, typename U = T>
 std::function<Shrinkable<T>(Random&)> just(U* valuePtr)
 {
     std::shared_ptr<T> sharedPtr(valuePtr);
-    return CustomGen<T>([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });
+    return customGen([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });
 }
 
 }  // namespace proptest
