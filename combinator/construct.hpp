@@ -48,6 +48,34 @@ public:
 
     Shrinkable<CLASS> operator()(Random& rand) override { return constructAccordingly(generateArgs(rand)); }
 
+    template <typename U>
+    Generator<U> transform(std::function<U(const CLASS&)> transformer)
+    {
+        auto thisPtr = clone();
+        return Generator<U>(
+            proptest::transform<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
+    }
+
+    template <typename Criteria>
+    Generator<CLASS> filter(Criteria&& criteria)
+    {
+        auto thisPtr = clone();
+        return Generator<CLASS>(proptest::filter<CLASS>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+                                                        std::forward<Criteria>(criteria)));
+    }
+
+    template <typename U>
+    Generator<std::pair<CLASS, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const CLASS&)> gengen)
+    {
+        auto thisPtr = clone();
+        return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+    }
+
+    std::shared_ptr<Construct<CLASS, ARGTYPES...>> clone()
+    {
+        return std::make_shared<Construct<CLASS, ARGTYPES...>>(*dynamic_cast<Construct<CLASS, ARGTYPES...>*>(this));
+    }
+
 private:
     template <std::size_t... index>
     decltype(auto) generateArgsHelper(Random& rand, std::index_sequence<index...>)

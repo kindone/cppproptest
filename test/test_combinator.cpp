@@ -79,6 +79,9 @@ TEST(PropTest, TestConstruct4)
             return true;
         },
         gen);
+
+    auto gen2 = gen.transform<int>([](const Animal& animal) { return animal.numFeet; });
+    std::cout << "Gen animal's feet: " << gen2(rand).get() << std::endl;
 }
 
 TEST(PropTest, TestFilter)
