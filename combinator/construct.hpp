@@ -35,7 +35,7 @@ decltype(auto) autoCastTuple(FromTuple&& tuple)
 }  // namespace util
 
 template <class CLASS, typename... ARGTYPES>
-class Construct : public Gen<CLASS> {
+class Construct : public GenBase<CLASS> {
 public:
     using ArgumentList = util::TypeList<ARGTYPES...>;
     using GenTuple = std::tuple<std::function<Shrinkable<std::remove_reference_t<ARGTYPES>>(Random&)>...>;

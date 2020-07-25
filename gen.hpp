@@ -18,19 +18,19 @@ namespace proptest {
 class Random;
 
 template <typename T>
-struct Gen
+struct GenBase
 {
     using type = T;
 
-    virtual ~Gen() {}
+    virtual ~GenBase() {}
 
-    virtual Shrinkable<T> operator()(Random&) { throw std::runtime_error("operator() should be defined for Gen"); }
+    virtual Shrinkable<T> operator()(Random&) { throw std::runtime_error("operator() should be defined for GenBase"); }
 };
 
 template <typename T>
-struct CustomGen : public Gen<T>
+struct Generator : public GenBase<T>
 {
-    CustomGen(std::function<Shrinkable<T>(Random&)> gen)
+    Generator(std::function<Shrinkable<T>(Random&)> gen)
         : genPtr(std::make_shared<std::function<Shrinkable<T>(Random&)>>(gen))
     {
     }
@@ -38,29 +38,29 @@ struct CustomGen : public Gen<T>
     virtual Shrinkable<T> operator()(Random& rand) { return (*genPtr)(rand); }
 
     template <typename U>
-    CustomGen<U> transform(std::function<U(const T&)> transformer)
+    Generator<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
-        return CustomGen<U>(
+        return Generator<U>(
             proptest::transform<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, transformer));
     }
 
     template <typename Criteria>
-    CustomGen<T> filter(Criteria&& criteria)
+    Generator<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return CustomGen<T>(proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
+        return Generator<T>(proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
                                                 std::forward<Criteria>(criteria)));
     }
 
     template <typename U>
-    CustomGen<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
+    Generator<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
-    std::shared_ptr<CustomGen<T>> clone() { return std::make_shared<CustomGen<T>>(*dynamic_cast<CustomGen<T>*>(this)); }
+    std::shared_ptr<Generator<T>> clone() { return std::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
 
     std::shared_ptr<std::function<Shrinkable<T>(Random&)>> genPtr;
 };
@@ -69,26 +69,26 @@ template <typename T>
 struct Arbitrary;
 
 template <typename T>
-struct ArbitraryBase : public Gen<T>
+struct ArbitraryBase : public GenBase<T>
 {
     template <typename U>
-    CustomGen<U> transform(std::function<U(const T&)> transformer)
+    Generator<U> transform(std::function<U(const T&)> transformer)
     {
         auto thisPtr = clone();
-        return CustomGen<U>(
+        return Generator<U>(
             proptest::transform<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
     }
 
     template <typename Criteria>
-    CustomGen<T> filter(Criteria&& criteria)
+    Generator<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return CustomGen<T>(proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+        return Generator<T>(proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
                                                 std::forward<Criteria>(criteria)));
     }
 
     template <typename U>
-    CustomGen<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
+    Generator<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
@@ -128,10 +128,10 @@ struct Arbitrary : public ArbitraryBase<T>
 };
 
 template <typename GEN>
-decltype(auto) customGen(GEN&& gen)
+decltype(auto) generator(GEN&& gen)
 {
     using RetType = typename function_traits<GEN>::return_type::type;  // cast Shrinkable<T>(Random&) -> T
-    return CustomGen<RetType>(gen);
+    return Generator<RetType>(gen);
 }
 
 }  // namespace proptest

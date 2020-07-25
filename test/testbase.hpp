@@ -102,7 +102,7 @@ struct Foo
     int a;
 };
 
-struct GenSmallInt : public proptest::Gen<int32_t>
+struct GenSmallInt : public proptest::GenBase<int32_t>
 {
     GenSmallInt() : step(0ULL) {}
     proptest::Shrinkable<int32_t> operator()(proptest::Random&)

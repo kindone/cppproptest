@@ -72,7 +72,7 @@ decltype(auto) oneOfHelper(const std::shared_ptr<std::vector<util::Weighted<T>>>
                 weight = (1.0 - sum) / static_cast<double>(numUnassigned);
         }
 
-    return customGen([genVecPtr](Random& rand) {
+    return generator([genVecPtr](Random& rand) {
         while (true) {
             auto dice = rand.getRandomSize(0, genVecPtr->size());
             const util::Weighted<T>& weighted = (*genVecPtr)[dice];

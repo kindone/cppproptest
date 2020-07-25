@@ -6,6 +6,9 @@
 
 namespace proptest {
 
+template <typename GEN>
+decltype(auto) generator(GEN&& gen);
+
 template <typename T>
 Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(),
                               T max = std::numeric_limits<T>::max())
@@ -24,13 +27,11 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
         throw std::runtime_error("invalid range");
 
     if (min >= 0)  // [3,5] -> [0,2] -> [3,5]
-        return util::binarySearchShrinkableU(static_cast<T>(value - min)).template transform<T>([min](const uint64_t& value) {
-            return static_cast<T>(value + min);
-        });
+        return util::binarySearchShrinkableU(static_cast<T>(value - min))
+            .template transform<T>([min](const uint64_t& value) { return static_cast<T>(value + min); });
     else if (max <= 0)  // [-5,-3] -> [-2,0] -> [-5,-3]
-        return util::binarySearchShrinkable(static_cast<T>(value - max)).template transform<T>([max](const int64_t& value) {
-            return static_cast<T>(value + max);
-        });
+        return util::binarySearchShrinkable(static_cast<T>(value - max))
+            .template transform<T>([max](const int64_t& value) { return static_cast<T>(value + max); });
     else  // [-2, 2]
         return util::binarySearchShrinkable(value).template transform<T>(
             [](const int64_t value) { return static_cast<T>(value); });
@@ -240,27 +241,27 @@ public:
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> nonZero(T max = std::numeric_limits<T>::max())
 {
-    return CustomGen<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
+    return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
 }
 
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> nonNegative(T max = std::numeric_limits<T>::max())
 {
-    return CustomGen<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
+    return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
 }
 
 // generates numeric in [a, b]
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> fromTo(T min, T max)
 {
-    return CustomGen<T>([min, max](Random& rand) { return generateInteger<T>(rand, min, max); });
+    return Generator<T>([min, max](Random& rand) { return generateInteger<T>(rand, min, max); });
 }
 
 // generates numeric in [a, b)
 template <typename T>
 std::function<Shrinkable<T>(Random& rand)> inRange(T fromInclusive, T toExclusive)
 {
-    return CustomGen<T>([fromInclusive, toExclusive](Random& rand) {
+    return Generator<T>([fromInclusive, toExclusive](Random& rand) {
         return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1));
     });
 }

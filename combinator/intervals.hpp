@@ -25,7 +25,7 @@ struct UInterval
     uint64_t max;
 };
 
-PROPTEST_API CustomGen<int64_t> intervals(std::initializer_list<Interval> interval_list);
-PROPTEST_API CustomGen<uint64_t> uintervals(std::initializer_list<UInterval> interval_list);
+PROPTEST_API Generator<int64_t> intervals(std::initializer_list<Interval> interval_list);
+PROPTEST_API Generator<uint64_t> uintervals(std::initializer_list<UInterval> interval_list);
 
 }  // namespace proptest

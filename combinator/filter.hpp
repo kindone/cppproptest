@@ -5,9 +5,9 @@
 namespace proptest {
 
 template <typename GEN>
-decltype(auto) customGen(GEN&& gen);
+decltype(auto) generator(GEN&& gen);
 template <typename T>
-struct CustomGen;
+struct Generator;
 
 template <typename GenT>
 class Filter : public GenT {
@@ -36,7 +36,7 @@ decltype(auto) filter(GEN&& gen, Criteria&& criteria)
 {
     auto genPtr = std::make_shared<std::function<Shrinkable<T>(Random&)>>(std::forward<GEN>(gen));
     auto criteriaPtr = std::make_shared<std::function<bool(const T&)>>(std::forward<Criteria>(criteria));
-    return CustomGen<T>([criteriaPtr, genPtr](Random& rand) {
+    return Generator<T>([criteriaPtr, genPtr](Random& rand) {
         while (true) {
             Shrinkable<T> shrinkable = (*genPtr)(rand);
             if ((*criteriaPtr)(shrinkable.getRef())) {

@@ -2,7 +2,7 @@
 
 namespace proptest {
 
-CustomGen<int64_t> intervals(std::initializer_list<Interval> intervals)
+Generator<int64_t> intervals(std::initializer_list<Interval> intervals)
 {
     using WeightedVec = std::vector<util::Weighted<int64_t>>;
 
@@ -25,7 +25,7 @@ CustomGen<int64_t> intervals(std::initializer_list<Interval> intervals)
     return util::oneOfHelper<int64_t>(genVecPtr);
 }
 
-CustomGen<uint64_t> uintervals(std::initializer_list<UInterval> intervals)
+Generator<uint64_t> uintervals(std::initializer_list<UInterval> intervals)
 {
     using WeightedVec = std::vector<util::Weighted<uint64_t>>;
 

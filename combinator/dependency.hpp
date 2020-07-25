@@ -7,13 +7,13 @@
 namespace proptest {
 
 template <typename GEN>
-decltype(auto) customGen(GEN&& gen);
+decltype(auto) generator(GEN&& gen);
 template <typename T>
-struct CustomGen;
+struct Generator;
 
 // returns a shrinkable pair of <T,U> where U depends on T
 template <typename T, typename U>
-CustomGen<std::pair<T, U>> dependency(std::function<Shrinkable<T>(Random&)> gen1,
+Generator<std::pair<T, U>> dependency(std::function<Shrinkable<T>(Random&)> gen1,
                                       std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gen2gen)
 {
     auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
@@ -54,7 +54,7 @@ CustomGen<std::pair<T, U>> dependency(std::function<Shrinkable<T>(Random&)> gen1
             });
     };
 
-    return customGen(genPair);
+    return generator(genPair);
 }
 
 }  // namespace proptest

@@ -111,7 +111,7 @@ struct Bit
 namespace proptest {
 
 template <>
-class Arbitrary<Bit> : public Gen<Bit> {
+class Arbitrary<Bit> : public GenBase<Bit> {
 public:
     Shrinkable<Bit> operator()(Random& rand)
     {

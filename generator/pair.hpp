@@ -83,7 +83,7 @@ decltype(auto) pair(GEN1&& gen1, GEN2&& gen2)
     auto genPairPtr = std::make_shared<std::pair<std::decay_t<GEN1>, std::decay_t<GEN2>>>(std::forward<GEN1>(gen1),
                                                                                           std::forward<GEN2>(gen2));
     // generator
-    return customGen([genPairPtr](Random& rand) mutable {
+    return generator([genPairPtr](Random& rand) mutable {
         auto elemPair = std::make_pair(genPairPtr->first(rand), genPairPtr->second(rand));
         auto shrinkable = make_shrinkable<decltype(elemPair)>(elemPair);
         return util::generatePairStream(shrinkable);
