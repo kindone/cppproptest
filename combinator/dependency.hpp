@@ -13,8 +13,8 @@ struct CustomGen;
 
 // returns a shrinkable pair of <T,U> where U depends on T
 template <typename T, typename U>
-CustomGen<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gen2gen,
-                                      std::function<Shrinkable<T>(Random&)> gen1)
+CustomGen<std::pair<T, U>> dependency(std::function<Shrinkable<T>(Random&)> gen1,
+                                      std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gen2gen)
 {
     auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
     auto gen2genPtr = std::make_shared<decltype(gen2gen)>(gen2gen);

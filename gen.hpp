@@ -57,7 +57,7 @@ struct CustomGen : public Gen<T>
     CustomGen<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
     {
         auto thisPtr = clone();
-        return proptest::dependency<T, U>(gengen, [thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); });
+        return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
     std::shared_ptr<CustomGen<T>> clone() { return std::make_shared<CustomGen<T>>(*dynamic_cast<CustomGen<T>*>(this)); }
@@ -91,7 +91,7 @@ struct ArbitraryBase : public Gen<T>
     CustomGen<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
     {
         auto thisPtr = clone();
-        return proptest::dependency<T, U>(gengen, [thisPtr](Random& rand) { return thisPtr->operator()(rand); });
+        return proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     std::shared_ptr<Arbitrary<T>> clone() { return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this)); }

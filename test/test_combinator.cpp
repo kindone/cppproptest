@@ -251,15 +251,13 @@ TEST(PropTest, TestRanges)
 TEST(PropTest, TestDependency)
 {
     auto intGen = fromTo(0, 2);
-    auto pairGen = dependency<int, std::vector<int>>(
-        [](const int& in) {
-            auto intGen = fromTo<int>(0, 8);
-            auto vecGen = Arbitrary<std::vector<int>>(intGen);
-            vecGen.maxSize = in;
-            vecGen.minSize = in;
-            return vecGen;
-        },
-        intGen);
+    auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
+        auto intGen = fromTo<int>(0, 8);
+        auto vecGen = Arbitrary<std::vector<int>>(intGen);
+        vecGen.maxSize = in;
+        vecGen.minSize = in;
+        return vecGen;
+    });
 
     int64_t seed = getCurrentTime();
     Random rand(seed);
@@ -289,18 +287,16 @@ TEST(PropTest, TestDependency2)
     // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = pair(numRowsGen, numElementsGen);
 
-    auto rawGen = dependency<Dimension, IndexVector>(
-        [](const Dimension& dimension) {
-            int numRows = dimension.first;
-            uint16_t numElements = dimension.second;
-            auto firstGen = fromTo<uint16_t>(0, numElements);
-            auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
-            auto indexGen = pair(firstGen, secondGen);
-            auto indexVecGen = Arbitrary<IndexVector>(indexGen);
-            indexVecGen.setSize(numRows);
-            return indexVecGen;
-        },
-        dimGen);
+    auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](const Dimension& dimension) {
+        int numRows = dimension.first;
+        uint16_t numElements = dimension.second;
+        auto firstGen = fromTo<uint16_t>(0, numElements);
+        auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
+        auto indexGen = pair(firstGen, secondGen);
+        auto indexVecGen = Arbitrary<IndexVector>(indexGen);
+        indexVecGen.setSize(numRows);
+        return indexVecGen;
+    });
 
     std::cout << "raw." << std::endl;
     double t0 = getTime();
@@ -328,14 +324,12 @@ TEST(PropTest, TestDependency2)
         std::cout << "table: " << tableDataGen(rand).get() << " / table " << i << std::endl;
     }
 
-    auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(
-        [](const TableData& td) {
-            std::vector<bool> values;
-            auto vectorGen = Arbitrary<std::vector<bool>>();
-            vectorGen.setSize(td.num_elements);
-            return vectorGen;
-        },
-        tableDataGen);
+    auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(tableDataGen, [](const TableData& td) {
+        std::vector<bool> values;
+        auto vectorGen = Arbitrary<std::vector<bool>>();
+        vectorGen.setSize(td.num_elements);
+        return vectorGen;
+    });
 
     // exhaustive(tableDataGen(rand), 0);
 
@@ -350,14 +344,13 @@ TEST(PropTest, TestDependency2)
 
 TEST(PropTest, TestDependency3)
 {
-    auto nullableIntegers = dependency<bool, int>(
-        [](const bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
+    auto nullableIntegers =
+        dependency<bool, int>(Arbitrary<bool>(), [](const bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
             if (isNull)
                 return just<int>([]() { return 0; });
             else
                 return fromTo<int>(10, 20);
-        },
-        Arbitrary<bool>());
+        });
 
     Arbitrary<bool>().dependency<int>([](const bool& value) {
         if (value)
