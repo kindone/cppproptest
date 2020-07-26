@@ -38,7 +38,7 @@ struct Generator : public GenBase<T>
     virtual Shrinkable<T> operator()(Random& rand) { return (*genPtr)(rand); }
 
     template <typename U>
-    Generator<U> transform(std::function<U(const T&)> transformer)
+    Generator<U> transform(std::function<U(T&)> transformer)
     {
         auto thisPtr = clone();
         return Generator<U>(
@@ -49,15 +49,24 @@ struct Generator : public GenBase<T>
     Generator<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return Generator<T>(proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
-                                                std::forward<Criteria>(criteria)));
+        return proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
+                                   std::forward<Criteria>(criteria));
     }
 
     template <typename U>
-    Generator<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
+    Generator<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
+    }
+
+    template <typename U>
+    Generator<std::tuple<T, U>> chain(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
+    {
+        auto thisPtr = clone();
+        auto pairGen = proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
+        return pairGen.template transform<std::tuple<T, U>>(
+            [](const std::pair<T, U>& pair) { return std::make_tuple(pair.first, pair.second); });
     }
 
     std::shared_ptr<Generator<T>> clone() { return std::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
@@ -72,26 +81,35 @@ template <typename T>
 struct ArbitraryBase : public GenBase<T>
 {
     template <typename U>
-    Generator<U> transform(std::function<U(const T&)> transformer)
+    Generator<U> transform(std::function<U(T&)> transformer)
     {
         auto thisPtr = clone();
-        return Generator<U>(
-            proptest::transform<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
+        return proptest::transform<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer);
     }
 
     template <typename Criteria>
     Generator<T> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return Generator<T>(proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
-                                                std::forward<Criteria>(criteria)));
+        return proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+                                   std::forward<Criteria>(criteria));
     }
 
     template <typename U>
-    Generator<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const T&)> gengen)
+    Generator<std::pair<T, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+    }
+
+    template <typename U>
+    Generator<std::tuple<T, U>> chain(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
+    {
+        auto thisPtr = clone();
+        auto pairGen =
+            proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+        return pairGen.template transform<std::tuple<T, U>>(
+            [](const std::pair<T, U>& pair) { return std::make_tuple(pair.first, pair.second); });
     }
 
     std::shared_ptr<Arbitrary<T>> clone() { return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this)); }

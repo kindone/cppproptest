@@ -80,7 +80,7 @@ TEST(PropTest, TestConstruct4)
         },
         gen);
 
-    auto gen2 = gen.transform<int>([](const Animal& animal) { return animal.numFeet; });
+    auto gen2 = gen.transform<int>([](Animal& animal) { return animal.numFeet; });
     std::cout << "Gen animal's feet: " << gen2(rand).get() << std::endl;
 }
 
@@ -102,13 +102,13 @@ TEST(PropTest, TestFilter2)
     Random rand(seed);
 
     Arbitrary<int> gen;
-    auto evenGen = filter<int>(gen, [](const int& value) { return value % 2 == 0; });
+    auto evenGen = filter<int>(gen, [](int& value) { return value % 2 == 0; });
 
     for (int i = 0; i < 10; i++) {
         std::cout << "even: " << evenGen(rand).get() << std::endl;
     }
 
-    auto fours = filter<int>(evenGen, [](const int& value) {
+    auto fours = filter<int>(evenGen, [](int& value) {
         EXPECT_EQ(value % 2, 0);
         return value % 4 == 0;
     });
@@ -126,7 +126,7 @@ TEST(PropTest, TestFilter3)
 
     Arbitrary<int> intGen;
     {
-        auto evenGen = filter<int>(intGen, [](const int& val) -> bool { return val % 2 == 0; });
+        auto evenGen = filter<int>(intGen, [](int& val) -> bool { return val % 2 == 0; });
 
         auto shrinkable = evenGen(rand);
         std::cout << "GenShrinks: " << shrinkable.get() << std::endl;
@@ -137,7 +137,7 @@ TEST(PropTest, TestFilter3)
     }
 
     {
-        auto evenGen = Arbitrary<int>().filter([](const int& val) -> bool { return val % 2 == 0; });
+        auto evenGen = Arbitrary<int>().filter([](int& val) -> bool { return val % 2 == 0; });
 
         auto shrinkable = evenGen(savedRand);
         std::cout << "GenShrinks2: " << shrinkable.get() << std::endl;
@@ -157,8 +157,7 @@ TEST(PropTest, TestTransform)
     Arbitrary<int> gen;
 
     {
-        auto stringGen =
-            transform<int, std::string>(gen, [](const int& value) { return "(" + std::to_string(value) + ")"; });
+        auto stringGen = transform<int, std::string>(gen, [](int& value) { return "(" + std::to_string(value) + ")"; });
 
         for (int i = 0; i < 10; i++) {
             auto shrinkable = stringGen(rand);
@@ -174,7 +173,7 @@ TEST(PropTest, TestTransform)
             }
         }
 
-        auto vectorGen = transform<std::string, std::vector<std::string>>(stringGen, [](const std::string& value) {
+        auto vectorGen = transform<std::string, std::vector<std::string>>(stringGen, [](std::string& value) {
             std::vector<std::string> vec;
             vec.push_back(value);
             return vec;
@@ -187,7 +186,7 @@ TEST(PropTest, TestTransform)
 
     {
         auto stringGen =
-            Arbitrary<int>().transform<std::string>([](const int& value) { return "(" + std::to_string(value) + ")"; });
+            Arbitrary<int>().transform<std::string>([](int& value) { return "(" + std::to_string(value) + ")"; });
 
         for (int i = 0; i < 10; i++) {
             auto shrinkable = stringGen(savedRand);
@@ -203,7 +202,7 @@ TEST(PropTest, TestTransform)
             }
         }
 
-        auto vectorGen = stringGen.transform<std::vector<std::string>>([](const std::string& value) {
+        auto vectorGen = stringGen.transform<std::vector<std::string>>([](std::string& value) {
             std::vector<std::string> vec;
             vec.push_back(value);
             return vec;
@@ -254,7 +253,7 @@ TEST(PropTest, TestRanges)
 TEST(PropTest, TestDependency)
 {
     auto intGen = fromTo(0, 2);
-    auto pairGen = dependency<int, std::vector<int>>(intGen, [](const int& in) {
+    auto pairGen = dependency<int, std::vector<int>>(intGen, [](int& in) {
         auto intGen = fromTo<int>(0, 8);
         auto vecGen = Arbitrary<std::vector<int>>(intGen);
         vecGen.maxSize = in;
@@ -290,7 +289,7 @@ TEST(PropTest, TestDependency2)
     // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = pair(numRowsGen, numElementsGen);
 
-    auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](const Dimension& dimension) {
+    auto rawGen = dependency<Dimension, IndexVector>(dimGen, [](Dimension& dimension) {
         int numRows = dimension.first;
         uint16_t numElements = dimension.second;
         auto firstGen = fromTo<uint16_t>(0, numElements);
@@ -313,7 +312,7 @@ TEST(PropTest, TestDependency2)
 
     return;
 
-    auto tableDataGen = transform<RawData, TableData>(rawGen, [](const RawData& raw) {
+    auto tableDataGen = transform<RawData, TableData>(rawGen, [](RawData& raw) {
         TableData tableData;
         auto dimension = raw.first;
         tableData.num_rows = dimension.first;
@@ -327,7 +326,7 @@ TEST(PropTest, TestDependency2)
         std::cout << "table: " << tableDataGen(rand).get() << " / table " << i << std::endl;
     }
 
-    auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(tableDataGen, [](const TableData& td) {
+    auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(tableDataGen, [](TableData& td) {
         std::vector<bool> values;
         auto vectorGen = Arbitrary<std::vector<bool>>();
         vectorGen.setSize(td.num_elements);
@@ -348,14 +347,14 @@ TEST(PropTest, TestDependency2)
 TEST(PropTest, TestDependency3)
 {
     auto nullableIntegers =
-        dependency<bool, int>(Arbitrary<bool>(), [](const bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
+        dependency<bool, int>(Arbitrary<bool>(), [](bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
             if (isNull)
                 return just<int>([]() { return 0; });
             else
                 return fromTo<int>(10, 20);
         });
 
-    Arbitrary<bool>().dependency<int>([](const bool& value) {
+    Arbitrary<bool>().dependency<int>([](bool& value) {
         if (value)
             return fromTo(0, 10);
         else
@@ -369,4 +368,38 @@ TEST(PropTest, TestDependency3)
         auto pairShr = nullableIntegers(rand);
         exhaustive(pairShr, 0);
     }
+}
+
+TEST(PropTest, TestChain)
+{
+    auto nullableIntegers = Arbitrary<bool>().chain<int>([](bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
+        if (isNull)
+            return just<int>([]() { return 0; });
+        else
+            return fromTo<int>(10, 20);
+    });
+
+    Arbitrary<bool>().dependency<int>([](bool& value) {
+        if (value)
+            return fromTo(0, 10);
+        else
+            return fromTo(10, 20);
+    });
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    for (int i = 0; i < 3; i++) {
+        auto pairShr = nullableIntegers(rand);
+        exhaustive(pairShr, 0);
+    }
+
+    nullableIntegers.chain<int>([](std::tuple<bool, int>& tup) {
+        bool isNull = std::get<0>(tup);
+        int value = std::get<1>(tup);
+        if (isNull)
+            return fromTo(0, value);
+        else
+            return fromTo(-10, value);
+    });
 }

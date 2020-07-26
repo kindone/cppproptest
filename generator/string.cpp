@@ -38,9 +38,8 @@ Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
         str[i] = elemGen(rand).get();
 
     size_t minSizeCopy = minSize;
-    return util::binarySearchShrinkableU(size - minSizeCopy).transform<std::string>([str, minSizeCopy](const uint64_t& size) {
-        return str.substr(0, size + minSizeCopy);
-    });
+    return util::binarySearchShrinkableU(size - minSizeCopy)
+        .transform<std::string>([str, minSizeCopy](const uint64_t& size) { return str.substr(0, size + minSizeCopy); });
 }
 
 }  // namespace proptest

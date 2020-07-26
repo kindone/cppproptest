@@ -59,8 +59,8 @@ struct PopBack : public VectorAction
 TEST(StateTest, States)
 {
     auto actionsGen =
-        actions<VectorAction>(transform<int, std::shared_ptr<VectorAction>>(
-                                  Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
+        actions<VectorAction>(Arbitrary<int>().transform<std::shared_ptr<VectorAction>>(
+                                  [](int& value) { return std::make_shared<PushBack>(value); }),
                               just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); }),
                               just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); }));
 
@@ -124,11 +124,11 @@ struct PopBack2 : public VectorAction2
 
 TEST(StateTest, StatesWithModel)
 {
-    auto actionsGen = actions<VectorAction2>(
-        transform<int, std::shared_ptr<VectorAction2>>(
-            Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack2>(value); }),
-        just<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<PopBack2>(); }),
-        just<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<Clear2>(); }));
+    auto actionsGen =
+        actions<VectorAction2>(Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
+                                   [](int& value) { return std::make_shared<PushBack2>(value); }),
+                               just<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<PopBack2>(); }),
+                               just<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<Clear2>(); }));
 
     auto prop = statefulProperty<VectorAction2>(
         Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
@@ -138,9 +138,9 @@ TEST(StateTest, StatesWithModel)
 TEST(StateTest, StatesWithModel2)
 {
     auto actionsGen = actions<VectorAction2>(
-        transform<int, std::shared_ptr<VectorAction2>>(
-            Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack2>(value); }),
-        transform<int, VectorAction2*>(Arbitrary<int>(), [](const int& value) { return new PushBack2(value); }),
+        Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
+            [](int& value) { return std::make_shared<PushBack2>(value); }),
+        Arbitrary<int>().transform<VectorAction2*>([](int& value) { return new PushBack2(value); }),
         just<VectorAction2*>([]() { return new PopBack2(); }), just<VectorAction2*>([]() { return new Clear2(); }));
 
     auto prop = statefulProperty<VectorAction2>(

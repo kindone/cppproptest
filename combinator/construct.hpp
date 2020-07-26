@@ -49,7 +49,7 @@ public:
     Shrinkable<CLASS> operator()(Random& rand) override { return constructAccordingly(generateArgs(rand)); }
 
     template <typename U>
-    Generator<U> transform(std::function<U(const CLASS&)> transformer)
+    Generator<U> transform(std::function<U(CLASS&)> transformer)
     {
         auto thisPtr = clone();
         return Generator<U>(

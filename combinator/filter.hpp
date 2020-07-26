@@ -35,7 +35,8 @@ template <typename T, typename GEN, typename Criteria>
 decltype(auto) filter(GEN&& gen, Criteria&& criteria)
 {
     auto genPtr = std::make_shared<std::function<Shrinkable<T>(Random&)>>(std::forward<GEN>(gen));
-    auto criteriaPtr = std::make_shared<std::function<bool(const T&)>>(std::forward<Criteria>(criteria));
+    auto criteriaPtr =
+        std::make_shared<std::function<bool(const T&)>>([criteria](const T& t) { return criteria(const_cast<T&>(t)); });
     return Generator<T>([criteriaPtr, genPtr](Random& rand) {
         while (true) {
             Shrinkable<T> shrinkable = (*genPtr)(rand);

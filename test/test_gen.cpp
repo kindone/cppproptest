@@ -41,7 +41,7 @@ TEST(PropTest, ShrinkableAndThen)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto intGen = fromTo<int>(0, 16);
-    auto evenGen = filter<int>(intGen, [](const int& val) -> bool { return val % 2 == 0; });
+    auto evenGen = filter<int>(intGen, [](int& val) -> bool { return val % 2 == 0; });
 
     auto evenShrinkable = evenGen(rand);
     std::cout << "evenShrinkable: " << evenShrinkable.get() << std::endl;

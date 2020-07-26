@@ -88,5 +88,11 @@
     "valarray": "cpp",
     "variant": "cpp"
   },
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/*.md": true,
+    "doc/**": true,
+    "doxygen.cfg": true,
+    "googletest": true
+  }
 }

@@ -45,7 +45,7 @@ TEST(StateTest, States2)
 {
     using SystemType = std::vector<int>;
 
-    auto pushBackGen = Arbitrary<int>().transform<ActionFor<SystemType>>([](const int value) {
+    auto pushBackGen = Arbitrary<int>().transform<ActionFor<SystemType>>([](int value) {
         return [value](SystemType& system) {
             std::cout << "PushBack(" << value << ")" << std::endl;
             auto size = system.size();
