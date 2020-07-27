@@ -32,7 +32,6 @@ SET(proptest_sources
     generator/unicode.cpp
     combinator/stateful.cpp
     combinator/intervals.cpp
-    combinator/concurrency.cpp
     util/fork.cpp
     util/utf8string.cpp
     util/utf16string.cpp
