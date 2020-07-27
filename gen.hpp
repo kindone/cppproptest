@@ -12,6 +12,7 @@
 #include "combinator/transform.hpp"
 #include "combinator/filter.hpp"
 #include "combinator/dependency.hpp"
+#include "combinator/chain.hpp"
 
 namespace proptest {
 
@@ -61,12 +62,10 @@ struct Generator : public GenBase<T>
     }
 
     template <typename U>
-    Generator<std::tuple<T, U>> chain(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
+    decltype(auto) chain(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
     {
         auto thisPtr = clone();
-        auto pairGen = proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
-        return pairGen.template transform<std::tuple<T, U>>(
-            [](const std::pair<T, U>& pair) { return std::make_tuple(pair.first, pair.second); });
+        return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
     std::shared_ptr<Generator<T>> clone() { return std::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
@@ -103,13 +102,10 @@ struct ArbitraryBase : public GenBase<T>
     }
 
     template <typename U>
-    Generator<std::tuple<T, U>> chain(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
+    decltype(auto) chain(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
     {
         auto thisPtr = clone();
-        auto pairGen =
-            proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
-        return pairGen.template transform<std::tuple<T, U>>(
-            [](const std::pair<T, U>& pair) { return std::make_tuple(pair.first, pair.second); });
+        return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     std::shared_ptr<Arbitrary<T>> clone() { return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this)); }

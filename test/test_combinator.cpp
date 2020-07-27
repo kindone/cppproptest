@@ -372,6 +372,9 @@ TEST(PropTest, TestDependency3)
 
 TEST(PropTest, TestChain)
 {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
     auto nullableIntegers = Arbitrary<bool>().chain<int>([](bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
         if (isNull)
             return just<int>([]() { return 0; });
@@ -379,27 +382,65 @@ TEST(PropTest, TestChain)
             return fromTo<int>(10, 20);
     });
 
-    Arbitrary<bool>().dependency<int>([](bool& value) {
-        if (value)
-            return fromTo(0, 10);
-        else
-            return fromTo(10, 20);
-    });
-
-    int64_t seed = getCurrentTime();
-    Random rand(seed);
-
-    for (int i = 0; i < 3; i++) {
-        auto pairShr = nullableIntegers(rand);
-        exhaustive(pairShr, 0);
-    }
-
-    nullableIntegers.chain<int>([](std::tuple<bool, int>& tup) {
-        bool isNull = std::get<0>(tup);
-        int value = std::get<1>(tup);
+    auto tupleGen = nullableIntegers.chain<int>([](Chain<bool, int>& chain) {
+        bool isNull = std::get<0>(chain);
+        int value = std::get<1>(chain);
         if (isNull)
             return fromTo(0, value);
         else
             return fromTo(-10, value);
     });
+
+    for (int i = 0; i < 3; i++) {
+        auto tupleShr = tupleGen(rand);
+        exhaustive(tupleShr, 0);
+    }
+}
+
+TEST(PropTest, TestChain2)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto tuple2Gen = Arbitrary<bool>().chain<int>([](bool& value) {
+        if (value)
+            return fromTo(0, 10);
+        else
+            return fromTo(10, 20);
+    });
+    auto tuple3Gen = tuple2Gen.chain<std::string>([](std::tuple<bool, int>& tup) {
+        std::cout << tup << std::endl;
+        if (std::get<0>(tup)) {
+            auto gen = Arbitrary<std::string>(fromTo<char>('A', 'M'));
+            gen.setSize(1, 3);
+            return gen;
+        } else {
+            auto gen = Arbitrary<std::string>(fromTo<char>('N', 'Z'));
+            gen.setSize(1, 3);
+            return gen;
+        }
+    });
+
+    auto tuple3Gen2 = tuple2Gen.chain<int>([](std::tuple<bool, int>& tup) {
+        if (std::get<0>(tup)) {
+            return fromTo(10, 20);
+        } else {
+            return fromTo(20, 30);
+        }
+    });
+
+    for (int i = 0; i < 3; i++) {
+        auto tupleShr = tuple2Gen(rand);
+        exhaustive(tupleShr, 0);
+    }
+
+    for (int i = 0; i < 3; i++) {
+        auto tupleShr = tuple3Gen(rand);
+        exhaustive(tupleShr, 0);
+    }
+
+    for (int i = 0; i < 3; i++) {
+        auto tupleShr = tuple3Gen2(rand);
+        exhaustive(tupleShr, 0);
+    }
 }

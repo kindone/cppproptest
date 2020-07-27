@@ -262,6 +262,27 @@ TEST(PropTest, TupleGen2)
     }
 }
 
+TEST(PropTest, TupleGen3)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    while (true) {
+        auto intGen = Arbitrary<int>();
+        auto shrinkable = intGen(rand);
+        auto value = shrinkable.get();
+        if (value > -20 && value < 20) {
+            break;
+        }
+    }
+
+    auto smallIntGen = fromTo(0, 3);
+    auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
+    for (int i = 0; i < 3; i++) {
+        auto shrinkable = tupleGen(rand);
+        exhaustive(shrinkable, 0);
+    }
+}
+
 TEST(PropTest, GenVectorPerf)
 {
     struct Log
