@@ -8,7 +8,7 @@
 namespace proptest {
 
 template <typename T, typename LazyEval>
-std::function<Shrinkable<T>(Random&)> just(LazyEval&& lazyEval)
+Generator<T> just(LazyEval&& lazyEval)
 {
     auto lazyEvalPtr = std::make_shared<std::function<T()>>(std::forward<LazyEval>(lazyEval));
     return generator([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
@@ -23,7 +23,7 @@ std::function<Shrinkable<T>(Random&)> just(LazyEval&& lazyEval)
 // }
 
 template <typename T, typename U = T>
-std::function<Shrinkable<T>(Random&)> just(U* valuePtr)
+Generator<T> just(U* valuePtr)
 {
     std::shared_ptr<T> sharedPtr(valuePtr);
     return generator([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });

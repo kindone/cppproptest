@@ -239,27 +239,27 @@ public:
 };
 
 template <typename T>
-std::function<Shrinkable<T>(Random& rand)> nonZero(T max = std::numeric_limits<T>::max())
+Generator<T> nonZero(T max = std::numeric_limits<T>::max())
 {
     return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
 }
 
 template <typename T>
-std::function<Shrinkable<T>(Random& rand)> nonNegative(T max = std::numeric_limits<T>::max())
+Generator<T> nonNegative(T max = std::numeric_limits<T>::max())
 {
     return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
 }
 
 // generates numeric in [a, b]
 template <typename T>
-std::function<Shrinkable<T>(Random& rand)> fromTo(T min, T max)
+Generator<T> fromTo(T min, T max)
 {
     return Generator<T>([min, max](Random& rand) { return generateInteger<T>(rand, min, max); });
 }
 
 // generates numeric in [a, b)
 template <typename T>
-std::function<Shrinkable<T>(Random& rand)> inRange(T fromInclusive, T toExclusive)
+Generator<T> inRange(T fromInclusive, T toExclusive)
 {
     return Generator<T>([fromInclusive, toExclusive](Random& rand) {
         return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1));
