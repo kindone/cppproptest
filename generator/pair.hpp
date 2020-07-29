@@ -23,7 +23,7 @@ private:
         using e_shrinkable_t = Shrinkable<ARG1>;
         using element_t = typename e_shrinkable_t::type;
 
-        static auto gen = [](const shrinkable_t& parent) -> stream_t {
+        static auto gen = +[](const shrinkable_t& parent) -> stream_t {
             std::shared_ptr<pair_t> parentRef = parent.getSharedPtr();
 
             e_shrinkable_t& elem = parentRef->first;
@@ -42,7 +42,7 @@ private:
         using e_shrinkable_t = Shrinkable<ARG2>;
         using element_t = typename e_shrinkable_t::type;
 
-        static auto gen = [](const shrinkable_t& parent) -> stream_t {
+        static auto gen = +[](const shrinkable_t& parent) -> stream_t {
             std::shared_ptr<pair_t> parentRef = parent.getSharedPtr();
 
             e_shrinkable_t& elem = parentRef->second;
@@ -60,7 +60,7 @@ public:
     static Shrinkable<out_pair_t> generateStream(const shrinkable_t& shrinkable)
     {
         auto concatenated = shrinkable.concat(genStream1()).concat(genStream2());
-        return concatenated.template transform<out_pair_t>([](const pair_t& pair) {
+        return concatenated.template transform<out_pair_t>(+[](const pair_t& pair) {
             return make_shrinkable<out_pair_t>(std::make_pair(pair.first.get(), pair.second.get()));
         });
     }

@@ -72,7 +72,7 @@ std::stringstream& PropertyContext::getLastStream()
 
 std::stringstream PropertyContext::flushFailures(int indent)
 {
-    const auto doIndent = [](std::stringstream& str, int indent) {
+    const auto doIndent = +[](std::stringstream& str, int indent) {
         for (int i = 0; i < indent; i++)
             str << " ";
     };

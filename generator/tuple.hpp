@@ -39,7 +39,7 @@ private:
         using e_shrinkable_t = typename std::tuple_element<N, tuple_t>::type;
         using element_t = typename e_shrinkable_t::type;
 
-        return [](const shrinkable_t& parent) -> stream_t {
+        return +[](const shrinkable_t& parent) -> stream_t {
             if (Size == 0 || N > Size - 1)
                 return stream_t::empty();
 
@@ -65,7 +65,7 @@ public:
 
     static Shrinkable<out_tuple_t> generateStream(const shrinkable_t& shrinkable)
     {
-        return ConcatHelper<0>(shrinkable).template transform<out_tuple_t>([](const tuple_t& tuple) {
+        return ConcatHelper<0>(shrinkable).template transform<out_tuple_t>(+[](const tuple_t& tuple) {
             return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(std::move(tuple)));
         });
     }

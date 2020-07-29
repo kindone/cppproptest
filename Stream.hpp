@@ -136,7 +136,7 @@ struct Stream
 
     static std::function<Stream<T>()> done()
     {
-        static auto produceEmpty = []() -> Stream<T> { return empty(); };
+        static auto produceEmpty = +[]() -> Stream<T> { return empty(); };
         return produceEmpty;
     }
 

@@ -71,7 +71,7 @@ public:
                 return make_shrinkable<std::set<Shrinkable<T>>>(begin, last);
             });
 
-        return shrinkable.template transform<std::set<T>>([](const std::set<Shrinkable<T>>& shr) {
+        return shrinkable.template transform<std::set<T>>(+[](const std::set<Shrinkable<T>>& shr) {
             auto value = make_shrinkable<std::set<T>>();
             std::set<T>& valueSet = value.getRef();
 

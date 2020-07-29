@@ -27,7 +27,7 @@ public:
         if (rand.getRandomBool(0.95)) {
             Shrinkable<T> shrinkable = gen(rand);
             return shrinkable.template transform<Nullable<T>>(
-                [](const Shrinkable<T>& shr) { return make_shrinkable<Nullable<T>>(shr.getSharedPtr()); });
+                +[](const Shrinkable<T>& shr) { return make_shrinkable<Nullable<T>>(shr.getSharedPtr()); });
         } else {
             // null
             return make_shrinkable<Nullable<T>>();

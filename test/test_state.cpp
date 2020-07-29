@@ -61,8 +61,8 @@ TEST(StateTest, States)
     auto actionsGen =
         actions<VectorAction>(Arbitrary<int>().transform<std::shared_ptr<VectorAction>>(
                                   [](int& value) { return std::make_shared<PushBack>(value); }),
-                              just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); }),
-                              just<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); }));
+                              lazy<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); }),
+                              lazy<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); }));
 
     auto prop = statefulProperty<VectorAction>(Arbitrary<std::vector<int>>(), actionsGen);
     prop.forAll();
@@ -127,8 +127,8 @@ TEST(StateTest, StatesWithModel)
     auto actionsGen =
         actions<VectorAction2>(Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
                                    [](int& value) { return std::make_shared<PushBack2>(value); }),
-                               just<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<PopBack2>(); }),
-                               just<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<Clear2>(); }));
+                               lazy<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<PopBack2>(); }),
+                               lazy<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<Clear2>(); }));
 
     auto prop = statefulProperty<VectorAction2>(
         Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
@@ -141,7 +141,7 @@ TEST(StateTest, StatesWithModel2)
         Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
             [](int& value) { return std::make_shared<PushBack2>(value); }),
         Arbitrary<int>().transform<VectorAction2*>([](int& value) { return new PushBack2(value); }),
-        just<VectorAction2*>([]() { return new PopBack2(); }), just<VectorAction2*>([]() { return new Clear2(); }));
+        lazy<VectorAction2*>([]() { return new PopBack2(); }), lazy<VectorAction2*>([]() { return new Clear2(); }));
 
     auto prop = statefulProperty<VectorAction2>(
         Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);

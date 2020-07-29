@@ -56,10 +56,11 @@ std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::typ
                  std::function<Shrinkable<std::shared_ptr<ActionType>>(Random&)>>
 toSharedPtrGen(GEN&& gen)
 {
-    return transform<ActionType*, std::shared_ptr<ActionType>>(gen, [](const ActionType* actionType) {
-        std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
-        return sharedPtr;
-    });
+    return transform<ActionType*, std::shared_ptr<ActionType>>(
+        gen, +[](const ActionType* actionType) {
+            std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
+            return sharedPtr;
+        });
 }
 
 template <typename ActionType, typename GEN>
@@ -85,7 +86,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen
     using SystemType = typename ActionType::SystemType;
 
     return property(
-        [](SystemType obj, std::vector<std::shared_ptr<ActionType>> actions) {
+        +[](SystemType obj, std::vector<std::shared_ptr<ActionType>> actions) {
             for (auto action : actions) {
                 if (action->precondition(obj))
                     PROP_ASSERT(action->run(obj));

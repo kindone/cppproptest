@@ -43,7 +43,7 @@ Generator<Chain<T, U>> chainImpl(std::function<Shrinkable<T>(Random&)> gen1,
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
-            intermediate.andThen([](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
+            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
                 // assume interShr has no shrinks
                 Intermediate& interpair = interShr.getRef();
                 T& t = interpair.first;
@@ -57,7 +57,7 @@ Generator<Chain<T, U>> chainImpl(std::function<Shrinkable<T>(Random&)> gen1,
 
         // reformat std::pair<T, Shrinkable<U>> to Chain<T, U>
         return intermediate.template transform<Chain<T, U>>(
-            [](const Intermediate& interpair) -> Shrinkable<std::tuple<T, U>> {
+            +[](const Intermediate& interpair) -> Shrinkable<std::tuple<T, U>> {
                 const T& t = interpair.first;
                 return make_shrinkable<Chain<T, U>>(
                     std::tuple_cat(std::tuple<T>(t), std::make_tuple(interpair.second.getRef())));
@@ -96,7 +96,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
-            intermediate.andThen([](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
+            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
                 // assume interShr has no shrinks
                 Intermediate& interpair = interShr.getRef();
                 Chain<T0, T1, Ts...>& ts = interpair.first;
@@ -111,7 +111,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(
 
         // reformat std::pair<Chain<T0, T1, Ts...>, Shrinkable<U>> to Chain<T0, T1, Ts..., U>
         return intermediate.template transform<Chain<T0, T1, Ts..., U>>(
-            [](const Intermediate& interpair) -> Shrinkable<std::tuple<T0, T1, Ts..., U>> {
+            +[](const Intermediate& interpair) -> Shrinkable<std::tuple<T0, T1, Ts..., U>> {
                 const Chain<T0, T1, Ts...>& ts = interpair.first;
                 return make_shrinkable<Chain<T0, T1, Ts..., U>>(
                     std::tuple_cat(ts, std::tuple<U>(interpair.second.getRef())));

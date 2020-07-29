@@ -14,7 +14,7 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
     using genfunc_t = typename std::function<stream_t(int64_t, int64_t)>;
 
     // given min, max, generate stream
-    static genfunc_t genpos = [](int64_t min, int64_t max) {
+    static genfunc_t genpos = +[](int64_t min, int64_t max) {
         int64_t mid = static_cast<int64_t>(min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? 1 : 0));
 
         if (min + 1 >= max) {
@@ -26,7 +26,7 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
                             [=]() { return genpos(mid, max); });
     };
 
-    static genfunc_t genneg = [](int64_t min, int64_t max) {
+    static genfunc_t genneg = +[](int64_t min, int64_t max) {
         int64_t mid = static_cast<int64_t>(min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? -1 : 0));
 
         if (min + 1 >= max) {
@@ -55,7 +55,7 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
     using genfunc_t = typename std::function<stream_t(uint64_t, uint64_t)>;
 
     // given min, max, generate stream
-    static genfunc_t genpos = [](uint64_t min, uint64_t max) {
+    static genfunc_t genpos = +[](uint64_t min, uint64_t max) {
         uint64_t mid = static_cast<uint64_t>(min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? 1 : 0));
 
         if (min + 1 >= max) {
@@ -67,7 +67,7 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
                             [=]() { return genpos(mid, max); });
     };
 
-    static genfunc_t genneg = [](uint64_t min, uint64_t max) {
+    static genfunc_t genneg = +[](uint64_t min, uint64_t max) {
         uint64_t mid = static_cast<uint64_t>(min / 2 + max / 2 + ((min % 2 != 0 && max % 2 != 0) ? -1 : 0));
 
         if (min + 1 >= max) {

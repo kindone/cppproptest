@@ -73,7 +73,7 @@ private:
 template <typename ActionType>
 bool Concurrency<ActionType>::check()
 {
-    static auto emptyPostCheck = [](SystemType&, ModelType&) {};
+    static auto emptyPostCheck = +[](SystemType&, ModelType&) {};
     return check(emptyPostCheck);
 }
 

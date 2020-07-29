@@ -60,17 +60,18 @@ public:
                     return make_shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>>(begin, last);
                 });
 
-        return shrinkable.template transform<std::map<Key, T>>([](const std::map<Shrinkable<Key>, Shrinkable<T>>& shr) {
-            auto value = make_shrinkable<std::map<Key, T>>();
-            std::map<Key, T>& valueMap = value.getRef();
+        return shrinkable.template transform<std::map<Key, T>>(
+            +[](const std::map<Shrinkable<Key>, Shrinkable<T>>& shr) {
+                auto value = make_shrinkable<std::map<Key, T>>();
+                std::map<Key, T>& valueMap = value.getRef();
 
-            for (auto itr = shr.begin(); itr != shr.end(); ++itr) {
-                auto& pair = *itr;
-                valueMap.insert(std::pair<Key, T>(pair.first.getRef(), pair.second.getRef()));
-            }
+                for (auto itr = shr.begin(); itr != shr.end(); ++itr) {
+                    auto& pair = *itr;
+                    valueMap.insert(std::pair<Key, T>(pair.first.getRef(), pair.second.getRef()));
+                }
 
-            return value;
-        });
+                return value;
+            });
     }
 
     Arbitrary<Map> setKeyGen(const Arbitrary<Key>& _keyGen)

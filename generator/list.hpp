@@ -43,8 +43,8 @@ public:
     {
         static std::function<stream_t(const shrinkable_t&, size_t, size_t, const shrinkable_t&, size_t, size_t,
                                       std::shared_ptr<std::vector<e_stream_t>>)>
-            genStream = [](const shrinkable_t& ancestor, size_t power, size_t offset, const shrinkable_t& parent,
-                           size_t frompos, size_t topos, std::shared_ptr<std::vector<e_stream_t>> elemStreams) {
+            genStream = +[](const shrinkable_t& ancestor, size_t power, size_t offset, const shrinkable_t& parent,
+                            size_t frompos, size_t topos, std::shared_ptr<std::vector<e_stream_t>> elemStreams) {
                 const size_t size = topos - frompos;
                 if (size == 0)
                     return stream_t::empty();
@@ -166,13 +166,14 @@ public:
                 return make_shrinkable<std::vector<Shrinkable<T>>>(begin, last);
             });
 
-        shrinkable = shrinkable.andThen([](const shrinkable_t& shr) { return shrinkBulkRecursive(shr, 0, 0); });
+        shrinkable = shrinkable.andThen(+[](const shrinkable_t& shr) { return shrinkBulkRecursive(shr, 0, 0); });
 
-        auto listShrinkable = shrinkable.template transform<std::list<T>>([](const vector_t& shrinkVec) {
+        auto listShrinkable = shrinkable.template transform<std::list<T>>(+[](const vector_t& shrinkVec) {
             auto value = make_shrinkable<std::list<T>>();
             std::list<T>& valueList = value.getRef();
-            std::transform(shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueList),
-                           [](const Shrinkable<T>& shr) -> T { return std::move(shr.getRef()); });
+            std::transform(
+                shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueList),
+                +[](const Shrinkable<T>& shr) -> T { return std::move(shr.getRef()); });
             return value;
         });
 

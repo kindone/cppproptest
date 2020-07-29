@@ -82,8 +82,8 @@ TEST(ConcurrencyTest2, WithModel)
 {
     auto pushBackActionGen = Arbitrary<int>().transform<std::shared_ptr<VectorAction4>>(
         [](int& value) { return std::make_shared<PushBack4>(value); });
-    auto popBackActionGen = just<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<PopBack4>(); });
-    auto clearActionGen = just<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<Clear4>(); });
+    auto popBackActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<PopBack4>(); });
+    auto clearActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<Clear4>(); });
 
     auto actionsGen = actions<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
 

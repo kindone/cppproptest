@@ -8,25 +8,30 @@
 namespace proptest {
 
 template <typename T, typename LazyEval>
-Generator<T> just(LazyEval&& lazyEval)
+Generator<T> lazy(LazyEval&& lazyEval)
 {
     auto lazyEvalPtr = std::make_shared<std::function<T()>>(std::forward<LazyEval>(lazyEval));
     return generator([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
 }
-
-// template <typename T, typename...ARGS>
-// std::function<Shrinkable<T>(Random&)> just2(ARGS&&... args) {
-//     auto valuePtr = std::make_shared<T>(std::forward<ARGS>(args)...);
-//     return [valuePtr](Random& rand) {
-//         return make_shrinkable<T>(valuePtr);
-//     };
-// }
 
 template <typename T, typename U = T>
 Generator<T> just(U* valuePtr)
 {
     std::shared_ptr<T> sharedPtr(valuePtr);
     return generator([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });
+}
+
+template <typename T>
+std::enable_if_t<std::is_trivial<T>::value, Generator<T>> just(T&& value)
+{
+    return generator([value](Random&) { return make_shrinkable<T>(value); });
+}
+
+template <typename T>
+std::enable_if_t<!std::is_trivial<T>::value, Generator<T>> just(const T& value)
+{
+    auto ptr = std::make_shared<T>(value);  // requires copy constructor
+    return generator([ptr](Random&) { return Shrinkable<T>(ptr); });
 }
 
 }  // namespace proptest

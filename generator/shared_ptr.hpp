@@ -24,7 +24,7 @@ public:
         auto gen = Arbitrary<T>();
         Shrinkable<T> shrinkable = gen(rand);
         return shrinkable.template transform<std::shared_ptr<T>>(
-            [](const Shrinkable<T>& shr) { return make_shrinkable<std::shared_ptr<T>>(shr.getSharedPtr()); });
+            +[](const Shrinkable<T>& shr) { return make_shrinkable<std::shared_ptr<T>>(shr.getSharedPtr()); });
     }
 
     std::function<Shrinkable<T>(Random&)> elemGen;

@@ -14,8 +14,7 @@ using ActionFor = std::function<bool(SystemType&)>;
 template <typename SystemType>
 decltype(auto) actionFor(ActionFor<SystemType> func)
 {
-    auto funcPtr = std::make_shared<decltype(func)>(func);
-    return just<ActionFor<SystemType>>([funcPtr]() { return *funcPtr; });
+    return just<ActionFor<SystemType>>(func);
 }
 
 template <typename SystemType, typename... GENS>

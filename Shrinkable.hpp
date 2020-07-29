@@ -214,7 +214,7 @@ private:
     std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> emptyPtr()
     {
         static const auto empty =
-            std::make_shared<std::function<Stream<Shrinkable<T>>()>>([]() { return Stream<Shrinkable<T>>::empty(); });
+            std::make_shared<std::function<Stream<Shrinkable<T>>()>>(+[]() { return Stream<Shrinkable<T>>::empty(); });
         return empty;
     }
 

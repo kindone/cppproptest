@@ -43,9 +43,9 @@ private:
     {
         static std::function<stream_t(const shrinkable_t&, size_t, size_t, const shrinkable_t&, size_t, size_t,
                                       std::shared_ptr<std::vector<e_stream_t>>)>
-            genStream = [](const shrinkable_t& ancestor, size_t power, size_t offset, const shrinkable_t& parent,
-                           size_t frompos, size_t topos,
-                           std::shared_ptr<std::vector<e_stream_t>> elemStreams) -> stream_t {
+            genStream =
+                +[](const shrinkable_t& ancestor, size_t power, size_t offset, const shrinkable_t& parent,
+                    size_t frompos, size_t topos, std::shared_ptr<std::vector<e_stream_t>> elemStreams) -> stream_t {
             const size_t size = topos - frompos;
             if (size == 0)
                 return stream_t::empty();
@@ -169,14 +169,15 @@ public:
             });
 
         shrinkable =
-            shrinkable.andThen([](const shrinkable_t& shr) -> stream_t { return shrinkBulkRecursive(shr, 0, 0); });
+            shrinkable.andThen(+[](const shrinkable_t& shr) -> stream_t { return shrinkBulkRecursive(shr, 0, 0); });
 
         auto vecShrinkable =
-            shrinkable.template transform<std::vector<T>>([](const vector_t& shrinkVec) -> Shrinkable<std::vector<T>> {
+            shrinkable.template transform<std::vector<T>>(+[](const vector_t& shrinkVec) -> Shrinkable<std::vector<T>> {
                 auto value = make_shrinkable<std::vector<T>>();
                 std::vector<T>& valueVec = value.getRef();
-                std::transform(shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueVec),
-                               [](const Shrinkable<T>& shr) -> T { return std::move(shr.getRef()); });
+                std::transform(
+                    shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueVec),
+                    +[](const Shrinkable<T>& shr) -> T { return std::move(shr.getRef()); });
                 return value;
             });
 
