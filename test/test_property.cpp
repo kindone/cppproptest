@@ -14,7 +14,6 @@ TEST(PropTest, TestCheckAssert)
     forAll([](std::string a, int i, std::string b) -> bool {
         if (i % 2 == 0)
             PROP_SUCCESS();
-        PROP_DISCARD();
 
         PROP_ASSERT_STREQ(a.c_str(), b.c_str(), a.size());
         PROP_STAT(i < 0);

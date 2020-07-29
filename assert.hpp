@@ -65,13 +65,15 @@ std::ostream& errorOrEmpty(bool condition);
         }                                                                                                  \
     } while (false)
 
-#define PROP_ASSERT_STREAM(condition, a, sign, b)                                 \
-    do {                                                                          \
-        if (!(condition)) {                                                       \
-            std::stringstream __prop_assert_stream_str;                           \
-            __prop_assert_stream_str << #condition << " with " << a << sign << b; \
-            PROP_ASSERT_VARGS(__prop_assert_stream_str, {});                      \
-        }                                                                         \
+#define PROP_ASSERT_STREAM(condition, a, sign, b)                                                                  \
+    do {                                                                                                           \
+        if (!(condition)) {                                                                                        \
+            std::stringstream __prop_assert_stream_str;                                                            \
+            __prop_assert_stream_str << #condition << " with " << a << sign << b;                                  \
+            ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {}, __prop_assert_stream_str.str(), \
+                                                           nullptr);                                               \
+            throw __proptest_except_obj;                                                                           \
+        }                                                                                                          \
     } while (false)
 
 #define PROP_ASSERT(condition) PROP_ASSERT_VARGS(condition, {})
@@ -85,11 +87,29 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_LE(a, b) PROP_ASSERT_STREAM(a <= b, a, " > ", b)
 #define PROP_ASSERT_GE(a, b) PROP_ASSERT_STREAM(a >= b, a, " < ", b)
 
-#define PROP_ASSERT_STREQ(a, b, n) \
-    PROP_ASSERT_STREAM(memcmp(a, b, n) == 0, proptest::Show<char*>(a, n), " not equals ", proptest::Show<char*>(b, n))
+#define PROP_ASSERT_STREQ(a, b, n)                                                                            \
+    do {                                                                                                      \
+        if (!(memcmp(a, b, n) == 0)) {                                                                        \
+            std::stringstream __prop_assert_stream_str;                                                       \
+            __prop_assert_stream_str << #a << " not equals " << #b << " with " << proptest::Show<char*>(a, n) \
+                                     << " not equals " << proptest::Show<char*>(b, n);                        \
+            ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                            \
+                                                           __prop_assert_stream_str.str().c_str(), nullptr);  \
+            throw __proptest_except_obj;                                                                      \
+        }                                                                                                     \
+    } while (false)
 
-#define PROP_ASSERT_STRNE(a, b, n) \
-    PROP_ASSERT_STREAM(memcmp(a, b, n) != 0, proptest::Show<char*>(a, n), " equals ", proptest::Show<char*>(b, n))
+#define PROP_ASSERT_STRNE(a, b, n)                                                                           \
+    do {                                                                                                     \
+        if (!(memcmp(a, b, n) != 0)) {                                                                       \
+            std::stringstream __prop_assert_stream_str;                                                      \
+            __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n)    \
+                                     << " equals " << proptest::Show<char*>(b, n);                           \
+            ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \
+                                                           __prop_assert_stream_str.str().c_str(), nullptr); \
+            throw __proptest_except_obj;                                                                     \
+        }                                                                                                    \
+    } while (false)
 
 #define PROP_DISCARD()                                                  \
     do {                                                                \
