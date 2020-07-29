@@ -224,14 +224,14 @@ Standard generators and combinators returns `Generator<T>`, which is of the form
 * `filter(filterer)`: apply `filter` combinator on itself.
 
 	```cpp
-        // two equivalent ways to generate random even numbers
-        auto evenGen = Arbitrary<int>().filter([](int& num) {
-            return num % 2 == 0;
-        });
-
-        auto evenGen = filter<int>(Arbitrary<int>(),[](int& num) {
-            return num % 2 == 0;
-        });
+	// two equivalent ways to generate random even numbers
+	auto evenGen = Arbitrary<int>().filter([](int& num) {
+	    return num % 2 == 0;
+	});
+	
+	auto evenGen = filter<int>(Arbitrary<int>(),[](int& num) {
+	    return num % 2 == 0;
+	});
 	```
 
 * `dependency<U>(genUGen)` or `chain<U>(genUGen)`: chains itself to create a generator of pair or tuple
