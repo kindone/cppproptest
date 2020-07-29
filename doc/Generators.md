@@ -41,7 +41,7 @@ There are useful helpers for creating new generators from existing ones.
 ```cpp
 auto anyIntGen = Arbitrary<int>();
 // generates even numbers
-auto evenGen = suchThat<int>(anyIntGen, [](const int& num) {
+auto evenGen = suchThat<int>(anyIntGen, [](int& num) {
     return num % 2 == 0;
 });
 ```
@@ -85,26 +85,27 @@ Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbi
 		vecInt.setSize(10); // generated vector will always have size 10
 		vecInt.setMinSize(1); // generated vector will have size greater than or equal to 1
 		vecInt.setMaxSize(10); // generated vector will have size less than or equal to 10
+                vecInt.setSize(1, 10); // generated vector will have size greater than or equal to 1 and less than or equal to 10
 		```
 
 ## Generator Combinators
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
-* `just<T>(T*)` or `just<T>(function<T()>)`: always generates specific value
+* `just<T>(T*)` or `just<T>(T)`: always generates specific value
 
 ### Pair and Tuples
 
 * `pair<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
 
 	```cpp
-	auto pairGen = pair<int, std::string>(Arbitrary<int>(), Arbitrary<std::string>());
+	auto pairGen = pair(Arbitrary<int>(), Arbitrary<std::string>());
 	```
 
 * `tuple<T1, ..., TN>(gen1, ..., genN)`: generates a `std::tuple<T1,...,TN>` based on result of generators `gen1` through `genN`
 
 	```cpp
-	auto tupleGen = tuple<int, std::string, double>(Arbitrary<int>(), Arbitrary<std::string>(), Arbitrary<double>());
+	auto tupleGen = tuple(Arbitrary<int>(), Arbitrary<std::string>(), Arbitrary<double>());
 	```
 
 ### Constructing an object
@@ -128,7 +129,7 @@ Generator combinators are provided for building a new generator based on existin
 
 	```cpp
 	// generates even numbers
-	auto evenGen = filter<int>(Arbitrary<int>(),[](const int& num) {
+	auto evenGen = filter<int>(Arbitrary<int>(),[](int& num) {
 	    return num % 2 == 0;
 	});
 	```
@@ -139,7 +140,7 @@ Generator combinators are provided for building a new generator based on existin
 
 	```cpp
 	// generates string from integers (e.g. "0", "1", ... , "-16384")
-	auto numStringGen = transform<int, std::string>(Arbitrary<int>(),[](const int& num) {
+	auto numStringGen = transform<int, std::string>(Arbitrary<int>(),[](int& num) {
 	    return std::string(num);
 	});
 	```
@@ -162,21 +163,95 @@ Generator combinators are provided for building a new generator based on existin
 
 ### Generating with dependencies
 
-* `dependency<T,U>(genUgen, genT)`: generates a `std::pair<T,U>` with a generator `genT` for type `T` and `genUgen`. `genUgen` receives a type `T` and returns a generator for type `U`. This can effectively create a pair of two independne
+* `dependency<T,U>(genT, genUgen)`: generates a `std::pair<T,U>` with a generator `genT` for type `T` and `genUgen`. `genUgen` receives a type `T` and returns a generator for type `U`. This can effectively create a generator for a pair where second item depends on the first one.
 
 	```cpp
-	auto sizeAndVectorGen = dependency<int, std::vector<bool>>([](const int& num) {
+	auto sizeAndVectorGen = dependency<int, std::vector<bool>>(Arbitrary<bool>(), [](int& num) {
 	    auto vectorGen = Arbitrary<std::vector<int>>();
 	    vectorGen.maxLen = num;
 	    // generates a vector with maximum size of num
 	    return vectorGen;
-	}, Arbitrary<int>());
+	});
 
-	auto nullableIntegers = dependency<bool, int>([](const bool& isNull) {
-		if(isNull)
-			return just<int>([]() { return 0; });
+	auto nullableIntegers = dependency<bool, int>(Arbitrary<bool>(), [](bool& isNull) {
+	    if(isNull)
+		return just<int>([]() { return 0; });
 	    else
-			return fromTo<int>(10, 20);
-	}, Arbitrary<bool>());
+		return fromTo<int>(10, 20);
+	});
 	```
+
+* `chain<Ts..., U>(genUgen, genT)`: similar to `dependency`, but takes a tuple generator for `std::tuple<Ts...>` and generates a `std::tuple<Ts..., U>` instead of a `std::pair`. `chain` can be repeatedly applied to itself, and results in a tuple one element larger than the previous one. You can chain multiple dependencies with this form.
+
+        ```cpp
+	auto yearMonthGen = tuple(fromTo(0, 9999), fromTo(1,12));
+	// number of days of month depends on month (28~31 days) and year (whether it's a leap year)
+	auto yearMonthDayGen = chain<std::tuple<int, int>, int>(yearMonthGen, [](std::tuple<int,int>& yearMonth) {
+	    int year = std::get<0>(yearMonth);
+	    int month = std::get<1>(yearMonth);
+	    if(monthHas31Days(month)) {
+	    	return fromTo(1, 31);
+	    }
+	    else if(monthHas30Days(month)) { 
+	    	return fromTo(1, 30);
+	    }
+	    else { // february has 28 or 29 days
+	    	if(isLeapYear(year))
+		    return fromTo(1, 29);
+		else
+		    return fromTo(1, 28);
+	    }
+	});
+	// yearMonthDayGen generates std::tuple<int, int, int> of (year, month, day)
+	```
+
+### `Generator<T>` with basic functionality
+
+Standard generators and combinators returns `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>`, but has additional combinator methods included for ease of use. `Arbitrary<T>` shares the same property.
+
+* `transform<U>(transformer)`: effectively calls `transform<T,U>(gen, transformer)` combinator on itself with type `T` and generator `gen`.
+
+        ```cpp
+        // generator for strings of arbitrary number
+        Arbitrary<int>().transform<std::string>([](int &num) {
+            return std::to_string(num);
+        });
+	// this is equivalent to:
+	transform<int, std::string>(Arbitrary<int>(), [](int &num) {
+            return std::to_string(num);
+        });
+        ```
+
+* `filter(filterer)`: apply `filter` combinator on itself.
+
+        ```cpp
+        // two equivalent ways to generate random even numbers
+        auto evenGen = Arbitrary<int>().filter([](int& num) {
+            return num % 2 == 0;
+        });
+
+        auto evenGen = filter<int>(Arbitrary<int>(),[](int& num) {
+            return num % 2 == 0;
+        });
+        ```
+
+* `dependency<U>(genUGen)` or `chain<U>(genUGen)`: chains itself to create a generator of pair or tuple
+	```cpp
+	Arbitrary<bool>().chain<int>([](bool& isEven) {
+	    if(isEven)
+	        return Arbitrary<int>().filter([](int& value) {
+	            return value % 2 == 0;
+		});
+	    else
+	        return Arbitrary<int>().filter([](int& value) {
+	            return value % 2 == 1;
+		});
+        }).chain<std::string>([](std::tuple<bool, int>& tuple) {
+	    int size = std::get<1>(tuple);
+	    auto stringGen = Arbitrary<std::string>();
+	    stringGen.setSize(size);
+	    return stringGen;
+	});
+	```
+
 
