@@ -19,6 +19,7 @@
 #include "combinator/filter.hpp"
 #include "combinator/transform.hpp"
 #include "combinator/construct.hpp"
+#include "combinator/elementof.hpp"
 #include "combinator/oneof.hpp"
 #include "combinator/intervals.hpp"
 #include "combinator/dependency.hpp"

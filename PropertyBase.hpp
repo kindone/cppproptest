@@ -29,8 +29,14 @@
 #define PROP_EXPECT_GE(a, b) PROP_EXPECT_STREAM(a >= b, a, " < ", b)
 #define PROP_EXPECT_STREQ(a, b, n) \
     PROP_EXPECT_STREAM(memcmp(a, b, n) == 0, proptest::Show<char*>(a, n), " not equals ", proptest::Show<char*>(b, n))
+#define PROP_EXPECT_STREQ2(a, b, n1, n2)                                                                      \
+    PROP_EXPECT_STREAM(memcmp(a, b, (n1 <= n2 ? n1 : n2)) == 0, proptest::Show<char*>(a, n1), " not equals ", \
+                       proptest::Show<char*>(b, n2))
 #define PROP_EXPECT_STRNE(a, b, n) \
     PROP_EXPECT_STREAM(memcmp(a, b, n) != 0, proptest::Show<char*>(a, n), " equals ", proptest::Show<char*>(b, n))
+#define PROP_EXPECT_STRNE2(a, b, n1, n2)                                                                  \
+    PROP_EXPECT_STREAM(memcmp(a, b, (n1 <= n2 ? n1 : n2)) != 0, proptest::Show<char*>(a, n1), " equals ", \
+                       proptest::Show<char*>(b, n2))
 
 #define PROP_STAT(VALUE)                                                                       \
     do {                                                                                       \

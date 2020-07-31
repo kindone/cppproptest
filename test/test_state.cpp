@@ -124,11 +124,10 @@ struct PopBack2 : public VectorAction2
 
 TEST(StateTest, StatesWithModel)
 {
-    auto actionsGen =
-        actions<VectorAction2>(Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
-                                   [](int& value) { return std::make_shared<PushBack2>(value); }),
-                               lazy<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<PopBack2>(); }),
-                               lazy<std::shared_ptr<VectorAction2>>([]() { return std::make_shared<Clear2>(); }));
+    auto actionsGen = actions<VectorAction2>(Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
+                                                 [](int& value) { return std::make_shared<PushBack2>(value); }),
+                                             just<std::shared_ptr<VectorAction2>>(std::make_shared<PopBack2>()),
+                                             just<std::shared_ptr<VectorAction2>>(std::make_shared<Clear2>()));
 
     auto prop = statefulProperty<VectorAction2>(
         Arbitrary<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);

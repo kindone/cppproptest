@@ -247,7 +247,25 @@ TEST(PropTest, TestOneOfWeighted)
     auto intGen = Arbitrary<int>();
     auto smallIntGen = GenSmallInt();
 
-    auto gen = oneOf<int>(just(0), weighted<int>(just(1), 0.2));
+    auto gen = oneOf<int>(just(0), weightedGen<int>(just(1), 0.2));
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for (int i = 0; i < 10; i++)
+        std::cout << gen(rand).get() << std::endl;
+}
+
+TEST(PropTest, TestElementOf)
+{
+    auto gen = elementOf<int>(0, 2);
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for (int i = 0; i < 10; i++)
+        std::cout << gen(rand).get() << std::endl;
+}
+
+TEST(PropTest, TestElementOfWeighted)
+{
+    auto gen = elementOf<int>(0, weightedVal<int>(1, 0.1), weightedVal(2, 0.1));
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)

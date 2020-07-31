@@ -14,7 +14,7 @@ struct Weighted;
 }
 
 template <typename T, typename GEN>
-util::Weighted<T> weighted(GEN&& gen, double weight);
+util::Weighted<T> weightedGen(GEN&& gen, double weight);
 
 namespace util {
 
@@ -32,7 +32,7 @@ struct Weighted
 template <typename T, typename GEN>
 std::enable_if_t<!std::is_same<std::decay_t<GEN>, Weighted<T>>::value, Weighted<T>> GenToWeighted(GEN&& gen)
 {
-    return weighted<T>(std::forward<GEN>(gen), 0.0);
+    return weightedGen<T>(std::forward<GEN>(gen), 0.0);
 }
 
 template <typename T>
@@ -93,14 +93,14 @@ decltype(auto) oneOfHelper(const std::shared_ptr<std::vector<util::Weighted<T>>>
 }  // namespace util
 
 template <typename T, typename GEN>
-util::Weighted<T> weighted(GEN&& gen, double weight)
+util::Weighted<T> weightedGen(GEN&& gen, double weight)
 {
     using FuncType = std::function<Shrinkable<T>(Random&)>;
     std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
     return util::Weighted<T>(funcPtr, weight);
 }
 
-// a GEN can be a generator or a weighted(GEN, weight)
+// a GEN can be a generator or a weightedGen(GEN, weight)
 template <typename T, typename... GENS>
 decltype(auto) oneOf(GENS&&... gens)
 {

@@ -30,7 +30,6 @@ SET(proptest_sources
     generator/cesu8string.cpp
     generator/util.cpp
     generator/unicode.cpp
-    combinator/stateful.cpp
     combinator/intervals.cpp
     util/fork.cpp
     util/utf8string.cpp
@@ -96,9 +95,13 @@ TARGET_LINK_LIBRARIES(test_proptest
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
+set(profile_compile false)
+
 if(profile_compile)
 ### compile
 SET(compile_sources
+    test/compile/oneof.cpp
+    test/compile/elementof.cpp
     test/compile/integral.cpp
     test/compile/floating.cpp
     test/compile/vector.cpp

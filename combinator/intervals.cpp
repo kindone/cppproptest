@@ -16,8 +16,8 @@ Generator<int64_t> intervals(std::initializer_list<Interval> intervals)
 
     WeightedVec* genVec = new WeightedVec();
     for (auto interval : intervals) {
-        genVec->push_back(
-            weighted<int64_t>(fromTo<int64_t>(interval.min, interval.max), static_cast<double>(interval.size()) / sum));
+        genVec->push_back(weightedGen<int64_t>(fromTo<int64_t>(interval.min, interval.max),
+                                               static_cast<double>(interval.size()) / sum));
     }
 
     std::shared_ptr<WeightedVec> genVecPtr(genVec);
@@ -40,8 +40,8 @@ Generator<uint64_t> uintervals(std::initializer_list<UInterval> intervals)
 
     WeightedVec* genVec = new WeightedVec();
     for (auto interval : intervals) {
-        genVec->push_back(weighted<uint64_t>(fromTo<uint64_t>(interval.min, interval.max),
-                                             static_cast<double>(interval.size()) / sum));
+        genVec->push_back(weightedGen<uint64_t>(fromTo<uint64_t>(interval.min, interval.max),
+                                                static_cast<double>(interval.size()) / sum));
     }
 
     std::shared_ptr<WeightedVec> genVecPtr(genVec);

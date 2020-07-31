@@ -18,8 +18,6 @@ struct EmptyModel
     static EmptyModel value;
 };
 
-Shrinkable<EmptyModel> EmptyModelGen(Random&);
-
 template <typename SYSTEM, typename MODEL>
 struct Action
 {
@@ -41,13 +39,6 @@ struct ActionWithoutModel : public Action<SYSTEM, EmptyModel>
 {
     virtual ~ActionWithoutModel() {}
 };
-
-// template <typename ActionType, typename... GENS>
-// std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions(GENS&&... gens) {
-//     auto actionGen = oneOf<std::shared_ptr<ActionType>>(std::forward<GENS>(gens)...);
-//     auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
-//     return actionVecGen;
-// }
 
 namespace util {
 

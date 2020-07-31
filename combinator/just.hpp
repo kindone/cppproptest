@@ -18,7 +18,13 @@ template <typename T, typename U = T>
 Generator<T> just(U* valuePtr)
 {
     std::shared_ptr<T> sharedPtr(valuePtr);
-    return generator([sharedPtr](Random&) { return make_shrinkable<T>(sharedPtr); });
+    return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });
+}
+
+template <typename T, typename U = T>
+Generator<T> just(std::shared_ptr<T> sharedPtr)
+{
+    return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });
 }
 
 template <typename T>
