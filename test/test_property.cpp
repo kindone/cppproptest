@@ -7,7 +7,7 @@ TEST(PropTest, TestCheckAssert)
     forAll([](std::string a, int i, std::string b) -> bool {
         if (i % 2 == 0)
             PROP_DISCARD();
-        PROP_EXPECT_STREQ(a.c_str(), b.c_str(), a.size());
+        PROP_EXPECT_STREQ2(a.c_str(), b.c_str(), a.size(), b.size());
         return true;
     });
 
@@ -15,7 +15,7 @@ TEST(PropTest, TestCheckAssert)
         if (i % 2 == 0)
             PROP_SUCCESS();
 
-        PROP_ASSERT_STREQ(a.c_str(), b.c_str(), a.size());
+        PROP_ASSERT_STREQ2(a.c_str(), b.c_str(), a.size(), b.size());
         PROP_STAT(i < 0);
         return true;
     });
@@ -77,11 +77,15 @@ TEST(PropTest, TestCheckBasic)
         return true;
     });
 
+    std::string a = "Hello";
+    std::string b = "World";
     forAll([](std::string a, std::string b) -> bool {
         std::string c /*(allocator())*/, d /*(allocator())*/;
         c = a + b;
         d = b + a;
         EXPECT_EQ(c.size(), d.size());
+        EXPECT_EQ((a + b).substr(0, a.length()), a);
+        EXPECT_EQ((a + b).substr(a.length()), b);
         return true;
     });
 

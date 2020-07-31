@@ -99,12 +99,36 @@ std::ostream& errorOrEmpty(bool condition);
         }                                                                                                     \
     } while (false)
 
+#define PROP_ASSERT_STREQ2(a, b, n1, n2)                                                                       \
+    do {                                                                                                       \
+        if (!(memcmp(a, b, (n1 <= n2 ? n1 : n2)) == 0)) {                                                      \
+            std::stringstream __prop_assert_stream_str;                                                        \
+            __prop_assert_stream_str << #a << " not equals " << #b << " with " << proptest::Show<char*>(a, n1) \
+                                     << " not equals " << proptest::Show<char*>(b, n2);                        \
+            ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                             \
+                                                           __prop_assert_stream_str.str().c_str(), nullptr);   \
+            throw __proptest_except_obj;                                                                       \
+        }                                                                                                      \
+    } while (false)
+
 #define PROP_ASSERT_STRNE(a, b, n)                                                                           \
     do {                                                                                                     \
         if (!(memcmp(a, b, n) != 0)) {                                                                       \
             std::stringstream __prop_assert_stream_str;                                                      \
             __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n)    \
                                      << " equals " << proptest::Show<char*>(b, n);                           \
+            ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \
+                                                           __prop_assert_stream_str.str().c_str(), nullptr); \
+            throw __proptest_except_obj;                                                                     \
+        }                                                                                                    \
+    } while (false)
+
+#define PROP_ASSERT_STRNE2(a, b, n1, n2)                                                                     \
+    do {                                                                                                     \
+        if (!(memcmp(a, b, (n1 <= n2 ? n1 : n2)) != 0)) {                                                    \
+            std::stringstream __prop_assert_stream_str;                                                      \
+            __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n1)   \
+                                     << " equals " << proptest::Show<char*>(b, n2);                          \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \
                                                            __prop_assert_stream_str.str().c_str(), nullptr); \
             throw __proptest_except_obj;                                                                     \
