@@ -408,6 +408,34 @@ TEST(PropTest, TestDependency3)
     }
 }
 
+TEST(PropTest, TestDependency4)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto intGen = elementOf<int>(0, 1, 2, 3);
+    auto intStringGen = dependency<int, std::string>(intGen, [](int& value) {
+        auto gen = Arbitrary<std::string>();
+        gen.setMaxSize(value);
+        return gen;
+    });
+
+    auto stringGen =
+        intStringGen.template transform<std::string>([](std::pair<int, std::string>& pair) { return pair.second; });
+
+    Random saveRand = rand;
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = intStringGen(rand);
+        exhaustive(shr, 0);
+    }
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = stringGen(saveRand);
+        exhaustive(shr, 0);
+    }
+}
+
 TEST(PropTest, TestChain)
 {
     int64_t seed = getCurrentTime();
@@ -480,5 +508,23 @@ TEST(PropTest, TestChain2)
     for (int i = 0; i < 3; i++) {
         auto tupleShr = tuple3Gen2(rand);
         exhaustive(tupleShr, 0);
+    }
+}
+
+TEST(PropTest, TestDerive)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto intGen = elementOf<int>(2, 4, 6);
+    auto stringGen = derive<int, std::string>(intGen, [](int& value) {
+        auto gen = Arbitrary<std::string>();
+        gen.setMaxSize(value);
+        return gen;
+    });
+
+    for (int i = 0; i < 10; i++) {
+        auto shr = stringGen(rand);
+        exhaustive(shr, 0);
     }
 }

@@ -95,11 +95,12 @@ TARGET_LINK_LIBRARIES(test_proptest
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
-set(profile_compile false)
+set(profile_compile true)
 
 if(profile_compile)
 ### compile
 SET(compile_sources
+    test/compile/derive.cpp
     test/compile/oneof.cpp
     test/compile/elementof.cpp
     test/compile/integral.cpp

@@ -24,5 +24,6 @@
 #include "combinator/intervals.hpp"
 #include "combinator/dependency.hpp"
 #include "combinator/chain.hpp"
+#include "combinator/derive.hpp"
 #include "combinator/just.hpp"
 #include "combinator/stateful.hpp"

@@ -166,14 +166,14 @@ struct Shrinkable
     Shrinkable<T> andThen(std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> thenPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
-        return with([thisShrinksPtr, thenPtr]() {
-            return (*thisShrinksPtr)().template transform<Shrinkable<T>>([thenPtr](const Shrinkable<T>& shr) {
-                if (shr.shrinks().isEmpty())
-                    return shr.with(thenPtr);
-                else
-                    return shr.andThen(thenPtr);
+        if (shrinks().isEmpty()) {
+            return with(thenPtr);
+        } else {
+            return with([thisShrinksPtr, thenPtr]() {
+                return (*thisShrinksPtr)().template transform<Shrinkable<T>>(
+                    [thenPtr](const Shrinkable<T>& shr) { return shr.andThen(thenPtr); });
             });
-        });
+        }
     }
 
     Shrinkable<T> andThen(std::function<Stream<Shrinkable<T>>(const Shrinkable<T>&)> then) const
@@ -185,14 +185,15 @@ struct Shrinkable
     Shrinkable<T> andThen(std::shared_ptr<std::function<Stream<Shrinkable<T>>(const Shrinkable<T>&)>> thenPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
-        return with([thisShrinksPtr, thenPtr]() {
-            return (*thisShrinksPtr)().template transform<Shrinkable<T>>([thenPtr](const Shrinkable<T>& shr) {
-                if (shr.shrinks().isEmpty())
-                    return shr.with([shr, thenPtr]() { return (*thenPtr)(shr); });
-                else
-                    return shr.andThen(thenPtr);
+        auto selfSharedPtr = std::make_shared<Shrinkable<T>>(*this);
+        if (shrinks().isEmpty()) {
+            return with([selfSharedPtr, thenPtr]() { return (*thenPtr)(*selfSharedPtr); });
+        } else {
+            return with([thisShrinksPtr, thenPtr]() {
+                return (*thisShrinksPtr)().template transform<Shrinkable<T>>(
+                    [thenPtr](const Shrinkable<T>& shr) { return shr.andThen(thenPtr); });
             });
-        });
+        }
     }
 
     Shrinkable<T> take(int n) const
