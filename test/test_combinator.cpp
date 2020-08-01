@@ -26,6 +26,22 @@ TEST(PropTest, TestJust2)
     // std::cout << "vector: " << vecGen(rand).get() << std::endl;
 }
 
+TEST(PropTest, TestLazy)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto ptrGen = lazy<std::shared_ptr<int>>([]() { return std::make_shared<int>(1); });
+    auto vecGen = Arbitrary<std::vector<std::shared_ptr<int>>>(ptrGen);
+
+    auto vec = ptrGen(rand).get();
+
+    std::cout << "lazy: " << vec << std::endl;
+    auto shr = vecGen(rand);
+    exhaustive(shr, 0);
+    // std::cout << "vector: " << vecGen(rand).get() << std::endl;
+}
+
 TEST(PropTest, TestConstruct)
 {
     int64_t seed = getCurrentTime();
