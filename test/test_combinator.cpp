@@ -12,6 +12,20 @@ TEST(PropTest, TestJust)
     std::cout << "just: " << gen(rand).get() << std::endl;
 }
 
+TEST(PropTest, TestJust2)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto ptrGen = just<std::shared_ptr<int>>(std::make_shared<int>(0));
+    auto vecGen = Arbitrary<std::vector<std::shared_ptr<int>>>(ptrGen);
+
+    std::cout << "just: " << ptrGen(rand).get() << std::endl;
+    auto shr = vecGen(rand);
+    exhaustive(shr, 0);
+    // std::cout << "vector: " << vecGen(rand).get() << std::endl;
+}
+
 TEST(PropTest, TestConstruct)
 {
     int64_t seed = getCurrentTime();

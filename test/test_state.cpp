@@ -2,7 +2,6 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
-#include "testbase.hpp"
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -122,54 +121,6 @@ struct PopBack2 : public VectorAction2
         return true;
     }
 };
-
-namespace proptest {
-namespace util {
-
-template <>
-struct ShowDefault<std::shared_ptr<VectorAction2>>
-{
-    static std::ostream& show(std::ostream& os, const std::shared_ptr<VectorAction2>&)
-    {
-        os << "TODO";
-        return os;
-    }
-};
-
-template <>
-struct ShowDefault<std::shared_ptr<VectorAction>>
-{
-    static std::ostream& show(std::ostream& os, const std::shared_ptr<VectorAction>&)
-    {
-        os << "TODO";
-        return os;
-    }
-};
-
-}  // namespace util
-
-}  // namespace proptest
-
-std::ostream& operator<<(std::ostream& os, const std::vector<std::shared_ptr<VectorAction2>>& vec)
-{
-    os << "[ ";
-    if (!vec.empty()) {
-        auto ptr = vec[0];
-        if (!ptr)
-            os << "(null)";
-        else
-            os << "(not null)";
-    }
-    for (size_t i = 0; i < vec.size(); i++) {
-        auto ptr = vec[i];
-        if (!ptr)
-            os << ", (null)";
-        else
-            os << ", (not null)";
-    }
-    os << " ]";
-    return os;
-}
 
 TEST(StateTest, StatesWithModel)
 {

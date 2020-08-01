@@ -100,6 +100,7 @@ set(profile_compile true)
 if(profile_compile)
 ### compile
 SET(compile_sources
+    test/compile/printing.cpp
     test/compile/derive.cpp
     test/compile/oneof.cpp
     test/compile/elementof.cpp

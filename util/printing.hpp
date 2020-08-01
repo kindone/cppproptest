@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <map>
 #include <set>
 #include <memory>
 #include "../Shrinkable.hpp"
@@ -37,6 +38,8 @@ std::ostream& show(std::ostream& os, const double&);
 
 // forward declaration is needed to be available at call sites
 template <typename T>
+std::ostream& show(std::ostream& os, const T& obj);
+template <typename T>
 std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
 template <typename... ARGS>
 std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple);
@@ -48,8 +51,10 @@ template <typename T, typename Allocator>
 std::ostream& show(std::ostream& os, const std::list<T, Allocator>& list);
 template <typename T, typename Compare, typename Allocator>
 std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input);
-// template <typename T>
-// std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr);
+template <class Key, class T, class Compare, class Allocator>
+std::ostream& show(std::ostream& os, const std::map<Key, T, Compare, Allocator>& input);
+template <typename T>
+std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr);
 template <typename T>
 std::ostream& show(std::ostream& os, const Nullable<T>& nullable);
 
@@ -70,7 +75,9 @@ struct HasShow
 };
 
 // default printer
-template <typename T, bool = !util::HasShow<T>::value>
+template <typename T>
+struct ShowDefault;
+template <typename T>
 struct ShowDefault
 {
     static std::ostream& show(std::ostream& os, const T&)
@@ -80,20 +87,10 @@ struct ShowDefault
     }
 };
 
-template <typename T>
-struct ShowDefault<T, false>
-{
-    static std::ostream& show(std::ostream& os, const T& obj)
-    {
-        os << obj;
-        return os;
-    }
-};
-
 }  // namespace util
 
 template <typename T>
-static std::ostream& show(std::ostream& os, const T& obj)
+std::ostream& show(std::ostream& os, const T& obj)
 {
     util::ShowDefault<T>::show(os, obj);
     return os;
@@ -235,15 +232,34 @@ std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& inpu
     return os;
 }
 
-// template <typename T>
-// std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr)
-// {
-//     if (static_cast<bool>(ptr))
-//         show(os, *ptr);
-//     else
-//         os << "(null)";
-//     return os;
-// }
+template <typename Key, typename T, typename Compare, typename Allocator>
+std::ostream& show(std::ostream& os, const std::map<Key, T, Compare, Allocator>& input)
+{
+    os << "{ ";
+    if (input.size() == 1) {
+        os << Show<std::pair<Key, T>>(*input.begin());
+    } else if (input.size() > 0) {
+        os << Show<std::pair<Key, T>>(*input.begin());
+        auto second = input.begin();
+        second++;
+        for (auto itr = second; itr != input.end(); ++itr) {
+            os << ", " << Show<std::pair<Key, T>>(*itr);
+        }
+    }
+
+    os << " }";
+    return os;
+}
+
+template <typename T>
+std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr)
+{
+    if (static_cast<bool>(ptr))
+        os << Show<T>(*ptr);
+    else
+        os << "(null)";
+    return os;
+}
 
 template <typename T>
 std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
@@ -252,8 +268,6 @@ std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
         os << Show<T>(*nullable.ptr);
     else
         os << "(null)";
-    return os;
-    // show(os, nullable.ptr);
     return os;
 }
 

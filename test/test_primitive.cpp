@@ -433,4 +433,6 @@ TEST(PropTest, GenNullable)
     for (int i = 0; i < 100; i++) {
         std::cout << "int: " << nullableGen(rand).getRef() << std::endl;
     }
+
+    // exhaustive(nullableGen(rand), 0);
 }
