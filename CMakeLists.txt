@@ -70,15 +70,16 @@ SET(proptest_testsources
     test/test_property.cpp
     test/test_primitive.cpp
     test/test_combinator.cpp
+    test/test_combinator2.cpp
     test/test_shrinkable.cpp
     test/test_mock.cpp
     test/test_util.cpp
     test/test_state.cpp
     test/test_state2.cpp
     test/test_concurrency.cpp
+    test/test_concurrency2.cpp
     test/test_stream.cpp
     test/test_fork.cpp
-    test/test_concurrency2.cpp
 )
 
 
@@ -95,7 +96,7 @@ TARGET_LINK_LIBRARIES(test_proptest
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
-set(profile_compile true)
+set(profile_compile false)
 
 if(profile_compile)
 ### compile

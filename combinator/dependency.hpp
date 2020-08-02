@@ -38,12 +38,12 @@ Generator<std::pair<T, U>> dependency(std::function<Shrinkable<T>(Random&)> gen1
         intermediate =
             intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
                 // assume interShr has no shrinks
-                Intermediate& interpair = interShr.getRef();
-                T& t = interpair.first;
-                Shrinkable<U>& shrinkableU = interpair.second;
+                std::shared_ptr<Intermediate> interpair = interShr.getSharedPtr();
+                Shrinkable<U>& shrinkableU = interpair->second;
                 Shrinkable<Intermediate> newShrinkableU =
-                    shrinkableU.template transform<Intermediate>([t](const U& u) mutable {
-                        return make_shrinkable<std::pair<T, Shrinkable<U>>>(std::make_pair(t, make_shrinkable<U>(u)));
+                    shrinkableU.template transform<Intermediate>([interpair](const U& u) mutable {
+                        return make_shrinkable<std::pair<T, Shrinkable<U>>>(
+                            std::make_pair(interpair->first, make_shrinkable<U>(u)));
                     });
                 return newShrinkableU.shrinks();
             });

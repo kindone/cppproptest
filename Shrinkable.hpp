@@ -186,7 +186,7 @@ struct Shrinkable
     {
         auto thisShrinksPtr = shrinksPtr;
         auto selfSharedPtr = std::make_shared<Shrinkable<T>>(*this);
-        if (shrinks().isEmpty()) {
+        if (shrinksPtr->operator()().isEmpty()) {
             return with([selfSharedPtr, thenPtr]() { return (*thenPtr)(*selfSharedPtr); });
         } else {
             return with([thisShrinksPtr, thenPtr]() {

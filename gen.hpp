@@ -13,6 +13,7 @@
 #include "combinator/filter.hpp"
 #include "combinator/dependency.hpp"
 #include "combinator/chain.hpp"
+#include "combinator/derive.hpp"
 
 namespace proptest {
 
@@ -68,6 +69,13 @@ struct Generator : public GenBase<T>
         return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
+    template <typename U>
+    Generator<U> derive(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
+    {
+        auto thisPtr = clone();
+        return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
+    }
+
     std::shared_ptr<Generator<T>> clone() { return std::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
 
     std::shared_ptr<std::function<Shrinkable<T>(Random&)>> genPtr;
@@ -106,6 +114,13 @@ struct ArbitraryBase : public GenBase<T>
     {
         auto thisPtr = clone();
         return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+    }
+
+    template <typename U>
+    Generator<U> derive(std::function<std::function<Shrinkable<U>(Random&)>(T&)> gengen)
+    {
+        auto thisPtr = clone();
+        return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     std::shared_ptr<Arbitrary<T>> clone() { return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this)); }
