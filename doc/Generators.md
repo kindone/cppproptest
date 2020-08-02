@@ -1,6 +1,8 @@
 # Using and Defining Generators 
 
-You can use generators to generate randomized arguments for properties. 
+## `GenFunction<T>`
+
+You use _generators_ to generate randomized arguments for properties. 
 
 A generator is a callable (function, functor, or lambda) with following signature:
 
@@ -8,14 +10,14 @@ A generator is a callable (function, functor, or lambda) with following signatur
 // (Random&) -> Shrinkable<T>
 ```
 
-This can be represented with standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`.
+This can be represented with (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term throughout the documentation.
 
 ```cpp
 template <typename T>
 using GenFunction = std::function<Shrinkable<T>(Random&);
 ```
 
-You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but you can basically treat it as a wrapper for a value of type `T` here. So a generator generates a value of type `T` from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
+By the way, you can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but you can basically treat it as a wrapper for a value of type `T` here. So a generator generates a value of type `T` from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
 
 ```cpp
 auto myIntGen = [](Random& rand) {
@@ -26,7 +28,7 @@ auto myIntGen = [](Random& rand) {
 
 ## `Generator<T>`
 
-Template class `Generator<T>` is an abstract functor class that coerces to `GenFunction<T>`. `Generator` gives access to some useful methods and you can wrap your generator callable with this to decorate with those methods.
+Template class `Generator<T>` is an abstract functor class that coerces to `GenFunction<T>`. A `Generator` gives access to some useful methods and you can wrap your generator callable with this to decorate with those methods. All generators and combinators of `cppproptest` produce decorated generators, so that you can use the utility methods with ease.
 
 ```cpp
 auto myIntGen = Generator<int>([](Random& rand) {
@@ -40,12 +42,10 @@ auto evenGen = myIntGen.filter([](int& value) {
 }); // generates even numbers only
 ```
 
-All generators and combinators of `cppproptest` produce decorated generators, so that you can use the utility methods with ease.
-
 
 ## Arbitraries
 
-An `Arbitrary` refers to globally defined default generator for a type. You can additionaly define an `Arbitrary<T>` for your type `T`, if it isn't already defined yet. By defining an `Arbitrary`, you can omit the custom generator argument that would have been needed to be passed everytime you define a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `proptest` namespace in order to be accessible in the framework.
+An `Arbitrary` refers to globally defined default _generator_ for a type. You can additionaly define an `Arbitrary<T>` for your type `T`, if it isn't already defined yet. By defining an `Arbitrary`, you can omit the custom generator argument that would have been needed to be passed everytime you define a property for that type. Following shows an example for defining an `Arbitrary`. Note that it should be defined under `proptest` namespace in order to be accessible in the framework.
 
 ```cpp
 namespace proptest { // you should define your Arbitrary<T> inside the namespace
