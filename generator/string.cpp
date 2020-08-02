@@ -25,7 +25,7 @@ Arbitrary<std::string>::Arbitrary(Arbitrary<char>& _elemGen)
 {
 }
 
-Arbitrary<std::string>::Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen)
+Arbitrary<std::string>::Arbitrary(GenFunction<char> _elemGen)
     : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }

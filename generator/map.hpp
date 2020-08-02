@@ -86,20 +86,20 @@ public:
         return *this;
     }
 
-    Arbitrary<Map> setKeyGen(std::function<Shrinkable<Key>(Random&)> _keyGen)
+    Arbitrary<Map> setKeyGen(GenFunction<Key> _keyGen)
     {
         keyGen = _keyGen;
         return *this;
     }
 
-    Arbitrary<Map> setElemGen(std::function<Shrinkable<T>(Random&)> _elemGen)
+    Arbitrary<Map> setElemGen(GenFunction<T> _elemGen)
     {
         elemGen = _elemGen;
         return *this;
     }
 
-    std::function<Shrinkable<Key>(Random&)> keyGen;
-    std::function<Shrinkable<T>(Random&)> elemGen;
+    GenFunction<Key> keyGen;
+    GenFunction<T> elemGen;
 };
 
 template <typename Key, typename T>

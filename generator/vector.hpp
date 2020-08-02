@@ -28,7 +28,7 @@ public:
     {
     }
 
-    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen)
+    Arbitrary(GenFunction<T> _elemGen)
         : ArbitraryContainer<std::vector<T>>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
     {
     }
@@ -186,7 +186,7 @@ public:
 
     // FIXME: turn to shared_ptr
 private:
-    std::function<Shrinkable<T>(Random&)> elemGen;
+    GenFunction<T> elemGen;
 };
 
 template <typename T>

@@ -38,7 +38,7 @@ template <class CLASS, typename... ARGTYPES>
 class Construct : public GenBase<CLASS> {
 public:
     using ArgumentList = util::TypeList<ARGTYPES...>;
-    using GenTuple = std::tuple<std::function<Shrinkable<std::remove_reference_t<ARGTYPES>>(Random&)>...>;
+    using GenTuple = std::tuple<GenFunction<std::remove_reference_t<ARGTYPES>>...>;
 
     static constexpr auto Size = sizeof...(ARGTYPES);
 
@@ -49,11 +49,11 @@ public:
     Shrinkable<CLASS> operator()(Random& rand) override { return constructAccordingly(generateArgs(rand)); }
 
     template <typename U>
-    Generator<U> transform(std::function<U(CLASS&)> transformer)
+    Generator<U> map(std::function<U(CLASS&)> mapper)
     {
         auto thisPtr = clone();
         return Generator<U>(
-            proptest::transform<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, transformer));
+            proptest::transform<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, mapper));
     }
 
     template <typename Criteria>
@@ -65,10 +65,25 @@ public:
     }
 
     template <typename U>
-    Generator<std::pair<CLASS, U>> dependency(std::function<std::function<Shrinkable<U>(Random&)>(const CLASS&)> gengen)
+    Generator<std::pair<CLASS, U>> pair(std::function<GenFunction<U>(const CLASS&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+    }
+
+    template <typename U>
+    decltype(auto) tuple(std::function<GenFunction<U>(CLASS&)> gengen)
+    {
+        auto thisPtr = clone();
+        return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+    }
+
+    template <typename U>
+    Generator<U> flatmap(std::function<U(CLASS&)> gengen)
+    {
+        auto thisPtr = clone();
+        return Generator<U>(
+            proptest::derive<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen));
     }
 
     std::shared_ptr<Construct<CLASS, ARGTYPES...>> clone()

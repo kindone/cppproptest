@@ -12,7 +12,7 @@ template <typename T>
 struct Generator;
 
 template <typename T, typename U>
-Generator<U> transform(std::function<Shrinkable<T>(Random&)> gen, std::function<U(T&)> transformer)
+Generator<U> transform(GenFunction<T> gen, std::function<U(T&)> transformer)
 {
     auto genPtr = std::make_shared<decltype(gen)>(gen);
     auto transformerPtr = std::make_shared<std::function<U(const T&)>>(

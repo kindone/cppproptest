@@ -42,7 +42,7 @@ TEST(PropTest, TestTransform)
 
     {
         auto stringGen =
-            Arbitrary<int>().transform<std::string>(+[](int& value) { return "(" + std::to_string(value) + ")"; });
+            Arbitrary<int>().map<std::string>(+[](int& value) { return "(" + std::to_string(value) + ")"; });
 
         for (int i = 0; i < 10; i++) {
             auto shrinkable = stringGen(savedRand);
@@ -58,7 +58,7 @@ TEST(PropTest, TestTransform)
             }
         }
 
-        auto vectorGen = stringGen.transform<std::vector<std::string>>(+[](std::string& value) {
+        auto vectorGen = stringGen.map<std::vector<std::string>>(+[](std::string& value) {
             std::vector<std::string> vec;
             vec.push_back(value);
             return vec;
@@ -182,14 +182,14 @@ TEST(PropTest, TestDependency2)
 TEST(PropTest, TestDependency3)
 {
     auto nullableIntegers = dependency<bool, int>(
-        Arbitrary<bool>(), +[](bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
+        Arbitrary<bool>(), +[](bool& isNull) -> GenFunction<int> {
             if (isNull)
                 return just(0);
             else
                 return fromTo<int>(10, 20);
         });
 
-    Arbitrary<bool>().dependency<int>(+[](bool& value) {
+    Arbitrary<bool>().pair<int>(+[](bool& value) {
         if (value)
             return fromTo(0, 10);
         else
@@ -217,8 +217,7 @@ TEST(PropTest, TestDependency4)
         return gen;
     });
 
-    auto stringGen =
-        intStringGen.template transform<std::string>([](std::pair<int, std::string>& pair) { return pair.second; });
+    auto stringGen = intStringGen.map<std::string>([](std::pair<int, std::string>& pair) { return pair.second; });
 
     Random saveRand = rand;
 
@@ -238,14 +237,14 @@ TEST(PropTest, TestChain)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto nullableIntegers = Arbitrary<bool>().chain<int>(+[](bool& isNull) -> std::function<Shrinkable<int>(Random&)> {
+    auto nullableIntegers = Arbitrary<bool>().tuple<int>(+[](bool& isNull) -> GenFunction<int> {
         if (isNull)
             return just(0);
         else
             return fromTo<int>(10, 20);
     });
 
-    auto tupleGen = nullableIntegers.chain<int>(+[](Chain<bool, int>& chain) {
+    auto tupleGen = nullableIntegers.tuple<int>(+[](Chain<bool, int>& chain) {
         bool isNull = std::get<0>(chain);
         int value = std::get<1>(chain);
         if (isNull)
@@ -265,13 +264,13 @@ TEST(PropTest, TestChain2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto tuple2Gen = Arbitrary<bool>().chain<int>(+[](bool& value) {
+    auto tuple2Gen = Arbitrary<bool>().tuple<int>(+[](bool& value) {
         if (value)
             return fromTo(0, 10);
         else
             return fromTo(10, 20);
     });
-    auto tuple3Gen = tuple2Gen.chain<std::string>(+[](std::tuple<bool, int>& tup) {
+    auto tuple3Gen = tuple2Gen.tuple<std::string>(+[](std::tuple<bool, int>& tup) {
         std::cout << tup << std::endl;
         if (std::get<0>(tup)) {
             auto gen = Arbitrary<std::string>(fromTo<char>('A', 'M'));
@@ -284,7 +283,7 @@ TEST(PropTest, TestChain2)
         }
     });
 
-    auto tuple3Gen2 = tuple2Gen.chain<int>(+[](std::tuple<bool, int>& tup) {
+    auto tuple3Gen2 = tuple2Gen.tuple<int>(+[](std::tuple<bool, int>& tup) {
         if (std::get<0>(tup)) {
             return fromTo(10, 20);
         } else {
@@ -332,7 +331,7 @@ TEST(PropTest, TestDerive2)
     Random rand(seed);
 
     auto intGen = elementOf<int>(2, 4, 6);
-    auto stringGen = intGen.template derive<std::string>([](int& value) {
+    auto stringGen = intGen.template flatMap<std::string>([](int& value) {
         auto gen = Arbitrary<std::string>();
         gen.setMaxSize(value);
         return gen;

@@ -38,10 +38,7 @@ public:
     {
     }
 
-    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen)
-        : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
-    {
-    }
+    Arbitrary(GenFunction<T> _elemGen) : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(_elemGen) {}
 
     Shrinkable<Set> operator()(Random& rand) override
     {
@@ -83,7 +80,7 @@ public:
         });
     }
 
-    std::function<Shrinkable<T>(Random&)> elemGen;
+    GenFunction<T> elemGen;
 };
 
 template <typename T>

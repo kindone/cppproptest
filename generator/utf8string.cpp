@@ -25,7 +25,7 @@ Arbitrary<UTF8String>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
 {
 }
 
-Arbitrary<UTF8String>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+Arbitrary<UTF8String>::Arbitrary(GenFunction<uint32_t> _elemGen)
     : ArbitraryContainer<UTF8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }

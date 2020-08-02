@@ -26,7 +26,7 @@ Arbitrary<UTF16BEString>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
 {
 }
 
-Arbitrary<UTF16BEString>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+Arbitrary<UTF16BEString>::Arbitrary(GenFunction<uint32_t> _elemGen)
     : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
@@ -136,7 +136,7 @@ Arbitrary<UTF16LEString>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
 {
 }
 
-Arbitrary<UTF16LEString>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+Arbitrary<UTF16LEString>::Arbitrary(GenFunction<uint32_t> _elemGen)
     : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }

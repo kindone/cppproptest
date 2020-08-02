@@ -20,7 +20,7 @@ template <typename... ARGS>
 class Property final : public PropertyBase {
 public:
     using Func = std::function<bool(ARGS...)>;
-    using GenTuple = std::tuple<std::function<Shrinkable<std::decay_t<ARGS>>(Random&)>...>;
+    using GenTuple = std::tuple<GenFunction<std::decay_t<ARGS>>...>;
     using ValueTuple = std::tuple<Shrinkable<std::decay_t<ARGS>>...>;
     using ShrinksTuple = std::tuple<Stream<Shrinkable<std::decay_t<ARGS>>>...>;
 
@@ -225,7 +225,7 @@ decltype(auto) asFunction(Callable&& callable)
 
 template <typename... ARGS>
 decltype(auto) createProperty(std::function<bool(ARGS...)> func,
-                              std::tuple<std::function<Shrinkable<std::decay_t<ARGS>>(Random&)>...>&& genTup)
+                              std::tuple<GenFunction<std::decay_t<ARGS>>...>&& genTup)
 {
     return Property<ARGS...>(func, genTup);
 }

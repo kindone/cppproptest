@@ -110,7 +110,7 @@ TEST(PropTest, TestConstruct4)
         },
         gen);
 
-    auto gen2 = gen.transform<int>(+[](Animal& animal) { return animal.numFeet; });
+    auto gen2 = gen.map<int>(+[](Animal& animal) { return animal.numFeet; });
     std::cout << "Gen animal's feet: " << gen2(rand).get() << std::endl;
 }
 

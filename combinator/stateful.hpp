@@ -44,7 +44,7 @@ namespace util {
 
 template <typename ActionType, typename GEN>
 std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value,
-                 std::function<Shrinkable<std::shared_ptr<ActionType>>(Random&)>>
+                 GenFunction<std::shared_ptr<ActionType>>>
 toSharedPtrGen(GEN&& gen)
 {
     return transform<ActionType*, std::shared_ptr<ActionType>>(
@@ -64,7 +64,7 @@ std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::ty
 }  // namespace util
 
 template <typename ActionType, typename... GENS>
-std::function<Shrinkable<std::vector<std::shared_ptr<ActionType>>>(Random&)> actions(GENS&&... gens)
+GenFunction<std::vector<std::shared_ptr<ActionType>>> actions(GENS&&... gens)
 {
     auto actionGen = oneOf<std::shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
     auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);

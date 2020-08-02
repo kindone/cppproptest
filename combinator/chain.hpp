@@ -20,11 +20,10 @@ template <class... Ts>
 using Chain = std::tuple<Ts...>;
 
 template <typename U, typename T>
-Generator<Chain<T, U>> chainImpl(std::function<Shrinkable<T>(Random&)> gen1,
-                                 std::function<std::function<Shrinkable<U>(Random&)>(T&)> gen2gen)
+Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, std::function<GenFunction<U>(T&)> gen2gen)
 {
     auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = std::make_shared<std::function<std::function<Shrinkable<U>(Random&)>(const T&)>>(
+    auto gen2genPtr = std::make_shared<std::function<GenFunction<U>(const T&)>>(
         [gen2gen](const T& t) { return gen2gen(const_cast<T&>(t)); });
 
     auto genTuple = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<Chain<T, U>> {
@@ -68,14 +67,12 @@ Generator<Chain<T, U>> chainImpl(std::function<Shrinkable<T>(Random&)> gen1,
 }
 
 template <typename U, typename T0, typename T1, typename... Ts>
-Generator<Chain<T0, T1, Ts..., U>> chainImpl(
-    std::function<Shrinkable<Chain<T0, T1, Ts...>>(Random&)> gen1,
-    std::function<std::function<Shrinkable<U>(Random&)>(Chain<T0, T1, Ts...>&)> gen2gen)
+Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> gen1,
+                                             std::function<GenFunction<U>(Chain<T0, T1, Ts...>&)> gen2gen)
 {
     auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr =
-        std::make_shared<std::function<std::function<Shrinkable<U>(Random&)>(const Chain<T0, T1, Ts...>&)>>(
-            [gen2gen](const Chain<T0, T1, Ts...>& ts) { return gen2gen(const_cast<Chain<T0, T1, Ts...>&>(ts)); });
+    auto gen2genPtr = std::make_shared<std::function<GenFunction<U>(const Chain<T0, T1, Ts...>&)>>(
+        [gen2gen](const Chain<T0, T1, Ts...>& ts) { return gen2gen(const_cast<Chain<T0, T1, Ts...>&>(ts)); });
 
     auto genTuple = [gen1Ptr, gen2genPtr](Random & rand) -> Shrinkable<Chain<T0, T1, Ts..., U>>
     {
@@ -127,7 +124,7 @@ decltype(auto) chain(GEN1&& gen1, GEN2GEN&& gen2gen)
 {
     using CHAIN = typename function_traits<GEN1>::return_type::type;  // get the T from shrinkable<T>(Random&)
     using RetType = typename function_traits<GEN2GEN>::return_type;
-    std::function<Shrinkable<CHAIN>(Random&)> funcGen1 = gen1;
+    GenFunction<CHAIN> funcGen1 = gen1;
     std::function<RetType(CHAIN&)> funcGen2Gen = gen2gen;
     return chainImpl(funcGen1, funcGen2Gen);
 }

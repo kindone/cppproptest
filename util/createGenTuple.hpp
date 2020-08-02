@@ -33,8 +33,7 @@ decltype(auto) createGenHelperListed(std::index_sequence<index...>)
 
 // returns a std::Tuple<Arbitrary<ARGS...>>
 template <typename... ARGS>
-std::tuple<std::function<Shrinkable<std::decay_t<ARGS>>(Random&)>...> createGenTuple(
-    TypeList<ARGS...> /*argument_list*/)
+std::tuple<GenFunction<std::decay_t<ARGS>>...> createGenTuple(TypeList<ARGS...> /*argument_list*/)
 {
     using ArgsAsTuple = std::tuple<std::decay_t<ARGS>...>;
     constexpr auto Size = std::tuple_size<ArgsAsTuple>::value;
@@ -53,7 +52,7 @@ createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 
 template <typename... ARGS, typename... EXPGENS>
 std::enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGS)),
-                 std::tuple<std::function<Shrinkable<std::decay_t<ARGS>>(Random&)>...>>
+                 std::tuple<GenFunction<std::decay_t<ARGS>>...>>
 createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     constexpr auto ExplicitSize = sizeof...(EXPGENS);

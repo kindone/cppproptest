@@ -13,8 +13,7 @@ struct Generator;
 
 // returns a shrinkable pair of <T,U> where U depends on T
 template <typename T, typename U>
-Generator<U> derive(std::function<Shrinkable<T>(Random&)> gen1,
-                    std::function<std::function<Shrinkable<U>(Random&)>(T&)> gen2gen)
+Generator<U> derive(GenFunction<T> gen1, std::function<GenFunction<U>(T&)> gen2gen)
 {
     auto gen1Ptr = std::make_shared<decltype(gen1)>(gen1);
     auto gen2genPtr = std::make_shared<std::function<Generator<U>(const T&)>>(

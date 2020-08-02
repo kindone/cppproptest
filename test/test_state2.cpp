@@ -18,7 +18,7 @@ decltype(auto) actionFor(ActionFor<SystemType> func)
 }
 
 template <typename SystemType, typename... GENS>
-std::function<Shrinkable<std::vector<std::function<bool(SystemType&)>>>(Random&)> actions2(GENS&&... gens)
+GenFunction<std::vector<std::function<bool(SystemType&)>>> actions2(GENS&&... gens)
 {
     auto actionGen = oneOf<std::function<bool(SystemType&)>>(std::forward<GENS>(gens)...);
     auto actionVecGen = Arbitrary<std::vector<std::function<bool(SystemType&)>>>(actionGen);
@@ -44,7 +44,7 @@ TEST(StateTest, States2)
 {
     using SystemType = std::vector<int>;
 
-    auto pushBackGen = Arbitrary<int>().transform<ActionFor<SystemType>>([](int value) {
+    auto pushBackGen = Arbitrary<int>().map<ActionFor<SystemType>>([](int value) {
         return [value](SystemType& system) {
             std::cout << "PushBack(" << value << ")" << std::endl;
             auto size = system.size();

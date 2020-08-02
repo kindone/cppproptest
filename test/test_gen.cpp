@@ -400,7 +400,7 @@ TEST(PropTest, Polymorphic)
     };
 
     {
-        auto carGen = Arbitrary<int>().template transform<Vehicle>([](int&) { return Car(); });
+        auto carGen = Arbitrary<int>().template map<Vehicle>([](int&) { return Car(); });
         auto carShrinkable = carGen(rand);
         // polymorphism doesn't work!
         std::cout << "car.get(): " << carShrinkable.getRef().get() << std::endl;
@@ -408,7 +408,7 @@ TEST(PropTest, Polymorphic)
 
     {
         auto carGen =
-            Arbitrary<int>().template transform<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
+            Arbitrary<int>().template map<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
         auto carShrinkable = carGen(rand);
         // polymorphism works
         std::cout << "car.get(): " << carShrinkable.getRef()->get() << std::endl;

@@ -21,7 +21,7 @@ namespace util {
 template <typename T>
 struct Weighted
 {
-    using FuncType = std::function<Shrinkable<T>(Random&)>;
+    using FuncType = GenFunction<T>;
 
     Weighted(std::shared_ptr<FuncType> funcPtr, double weight) : funcPtr(funcPtr), weight(weight) {}
 
@@ -95,7 +95,7 @@ decltype(auto) oneOfHelper(const std::shared_ptr<std::vector<util::Weighted<T>>>
 template <typename T, typename GEN>
 util::Weighted<T> weightedGen(GEN&& gen, double weight)
 {
-    using FuncType = std::function<Shrinkable<T>(Random&)>;
+    using FuncType = GenFunction<T>;
     std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
     return util::Weighted<T>(funcPtr, weight);
 }

@@ -21,11 +21,11 @@ template <typename ActionType>
 class PROPTEST_API Concurrency {
 public:
     using SystemType = typename ActionType::SystemType;
-    using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using SystemTypeGen = GenFunction<SystemType>;
     using ModelType = typename ActionType::ModelType;
     using ModelTypeGen = typename std::function<ModelType(SystemType&)>;
     using Actions = std::vector<std::shared_ptr<ActionType>>;
-    using ActionsGen = std::function<Shrinkable<Actions>(Random&)>;
+    using ActionsGen = GenFunction<Actions>;
 
     static constexpr uint32_t defaultNumRuns = 200;
 
@@ -230,11 +230,10 @@ template <typename ActionType, typename InitialGen, typename ActionsGen>
 decltype(auto) concurrency(InitialGen&& initialGen, ActionsGen&& actionsGen)
 {
     using SystemType = typename ActionType::SystemType;
-    using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using SystemTypeGen = GenFunction<SystemType>;
     using Actions = std::vector<std::shared_ptr<ActionType>>;
     auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
-    auto actionsGenPtr =
-        std::make_shared<std::function<Shrinkable<Actions>(Random&)>>(std::forward<ActionsGen>(actionsGen));
+    auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(std::forward<ActionsGen>(actionsGen));
     return Concurrency<ActionType>(initialGenPtr, actionsGenPtr);
 }
 
@@ -248,11 +247,10 @@ decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory,
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
     using SystemType = typename ActionType::SystemType;
-    using SystemTypeGen = std::function<Shrinkable<SystemType>(Random&)>;
+    using SystemTypeGen = GenFunction<SystemType>;
     using Actions = std::vector<std::shared_ptr<ActionType>>;
     auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
-    auto actionsGenPtr =
-        std::make_shared<std::function<Shrinkable<Actions>(Random&)>>(std::forward<ActionsGen>(actionsGen));
+    auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(std::forward<ActionsGen>(actionsGen));
     return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
 }
 

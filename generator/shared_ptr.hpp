@@ -17,7 +17,7 @@ public:
     {
     }
 
-    Arbitrary(std::function<Shrinkable<T>(Random&)> _elemGen) : elemGen(_elemGen) {}
+    Arbitrary(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
 
     Shrinkable<std::shared_ptr<T>> operator()(Random& rand) override
     {
@@ -27,7 +27,7 @@ public:
             +[](const T& obj) { return std::make_shared<T>(obj); });
     }
 
-    std::function<Shrinkable<T>(Random&)> elemGen;
+    GenFunction<T> elemGen;
 };
 
 }  // namespace proptest

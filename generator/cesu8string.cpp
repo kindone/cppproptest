@@ -26,7 +26,7 @@ Arbitrary<CESU8String>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
 {
 }
 
-Arbitrary<CESU8String>::Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen)
+Arbitrary<CESU8String>::Arbitrary(GenFunction<uint32_t> _elemGen)
     : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }

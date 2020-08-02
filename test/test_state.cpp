@@ -58,11 +58,10 @@ struct PopBack : public VectorAction
 
 TEST(StateTest, States)
 {
-    auto actionsGen =
-        actions<VectorAction>(Arbitrary<int>().transform<std::shared_ptr<VectorAction>>(
-                                  [](int& value) { return std::make_shared<PushBack>(value); }),
-                              lazy<std::shared_ptr<VectorAction>>([]() { return std::make_shared<PopBack>(); }),
-                              lazy<std::shared_ptr<VectorAction>>([]() { return std::make_shared<Clear>(); }));
+    auto actionsGen = actions<VectorAction>(Arbitrary<int>().map<std::shared_ptr<VectorAction>>(
+                                                [](int& value) { return std::make_shared<PushBack>(value); }),
+                                            just<std::shared_ptr<VectorAction>>(std::make_shared<PopBack>()),
+                                            just<std::shared_ptr<VectorAction>>(std::make_shared<Clear>()));
 
     auto prop = statefulProperty<VectorAction>(Arbitrary<std::vector<int>>(), actionsGen);
     prop.forAll();
@@ -124,7 +123,7 @@ struct PopBack2 : public VectorAction2
 
 TEST(StateTest, StatesWithModel)
 {
-    auto actionsGen = actions<VectorAction2>(Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
+    auto actionsGen = actions<VectorAction2>(Arbitrary<int>().map<std::shared_ptr<VectorAction2>>(
                                                  [](int& value) { return std::make_shared<PushBack2>(value); }),
                                              just<std::shared_ptr<VectorAction2>>(std::make_shared<PopBack2>()),
                                              just<std::shared_ptr<VectorAction2>>(std::make_shared<Clear2>()));
@@ -137,9 +136,9 @@ TEST(StateTest, StatesWithModel)
 TEST(StateTest, StatesWithModel2)
 {
     auto actionsGen = actions<VectorAction2>(
-        Arbitrary<int>().transform<std::shared_ptr<VectorAction2>>(
+        Arbitrary<int>().map<std::shared_ptr<VectorAction2>>(
             [](int& value) { return std::make_shared<PushBack2>(value); }),
-        Arbitrary<int>().transform<VectorAction2*>([](int& value) { return new PushBack2(value); }),
+        Arbitrary<int>().map<VectorAction2*>([](int& value) { return new PushBack2(value); }),
         lazy<VectorAction2*>([]() { return new PopBack2(); }), lazy<VectorAction2*>([]() { return new Clear2(); }));
 
     auto prop = statefulProperty<VectorAction2>(

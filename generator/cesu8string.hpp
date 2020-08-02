@@ -15,11 +15,11 @@ public:
 
     Arbitrary();
     Arbitrary(Arbitrary<uint32_t>& _elemGen);
-    Arbitrary(std::function<Shrinkable<uint32_t>(Random&)> _elemGen);
+    Arbitrary(GenFunction<uint32_t> _elemGen);
 
     Shrinkable<CESU8String> operator()(Random& rand) override;
 
-    std::function<Shrinkable<uint32_t>(Random&)> elemGen;
+    GenFunction<uint32_t> elemGen;
 };
 
 }  // namespace proptest

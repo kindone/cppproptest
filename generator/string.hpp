@@ -18,11 +18,11 @@ public:
 
     Arbitrary();
     Arbitrary(Arbitrary<char>& _elemGen);
-    Arbitrary(std::function<Shrinkable<char>(Random&)> _elemGen);
+    Arbitrary(GenFunction<char> _elemGen);
 
     Shrinkable<std::string> operator()(Random& rand) override;
     // FIXME: turn to shared_ptr
-    std::function<Shrinkable<char>(Random&)> elemGen;
+    GenFunction<char> elemGen;
 };
 
 }  // namespace proptest
