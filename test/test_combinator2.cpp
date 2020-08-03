@@ -83,10 +83,10 @@ TEST(PropTest, TestTranform2)
 
 TEST(PropTest, TestDependency)
 {
-    auto intGen = fromTo(0, 2);
+    auto intGen = interval(0, 2);
     auto pairGen = dependency<int, std::vector<int>>(
         intGen, +[](int& in) {
-            auto intGen = fromTo<int>(0, 8);
+            auto intGen = interval<int>(0, 8);
             auto vecGen = Arbitrary<std::vector<int>>(intGen);
             vecGen.maxSize = in;
             vecGen.minSize = in;
@@ -115,17 +115,15 @@ TEST(PropTest, TestDependency2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    // auto numRowsGen = inRange<int>(1, 100000+1);
-    auto numRowsGen = fromTo<int>(10000, 10000);
+    auto numRowsGen = interval<int>(10000, 10000);
     auto numElementsGen = Arbitrary<uint16_t>();
-    // auto numElementsGen = inRange<uint16_t>(60000, 60000);
     auto dimGen = pair(numRowsGen, numElementsGen);
 
     auto rawGen = dependency<Dimension, IndexVector>(
         dimGen, +[](Dimension& dimension) {
             int numRows = dimension.first;
             uint16_t numElements = dimension.second;
-            auto firstGen = fromTo<uint16_t>(0, numElements);
+            auto firstGen = interval<uint16_t>(0, numElements);
             auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
             auto indexGen = pair(firstGen, secondGen);
             auto indexVecGen = Arbitrary<IndexVector>(indexGen);
@@ -186,14 +184,14 @@ TEST(PropTest, TestDependency3)
             if (isNull)
                 return just(0);
             else
-                return fromTo<int>(10, 20);
+                return interval<int>(10, 20);
         });
 
     Arbitrary<bool>().pair<int>(+[](bool& value) {
         if (value)
-            return fromTo(0, 10);
+            return interval(0, 10);
         else
-            return fromTo(10, 20);
+            return interval(10, 20);
     });
 
     int64_t seed = getCurrentTime();
@@ -241,16 +239,16 @@ TEST(PropTest, TestChain)
         if (isNull)
             return just(0);
         else
-            return fromTo<int>(10, 20);
+            return interval<int>(10, 20);
     });
 
     auto tupleGen = nullableIntegers.tuple<int>(+[](Chain<bool, int>& chain) {
         bool isNull = std::get<0>(chain);
         int value = std::get<1>(chain);
         if (isNull)
-            return fromTo(0, value);
+            return interval(0, value);
         else
-            return fromTo(-10, value);
+            return interval(-10, value);
     });
 
     for (int i = 0; i < 3; i++) {
@@ -266,18 +264,18 @@ TEST(PropTest, TestChain2)
 
     auto tuple2Gen = Arbitrary<bool>().tuple<int>(+[](bool& value) {
         if (value)
-            return fromTo(0, 10);
+            return interval(0, 10);
         else
-            return fromTo(10, 20);
+            return interval(10, 20);
     });
     auto tuple3Gen = tuple2Gen.tuple<std::string>(+[](std::tuple<bool, int>& tup) {
         std::cout << tup << std::endl;
         if (std::get<0>(tup)) {
-            auto gen = Arbitrary<std::string>(fromTo<char>('A', 'M'));
+            auto gen = Arbitrary<std::string>(interval<char>('A', 'M'));
             gen.setSize(1, 3);
             return gen;
         } else {
-            auto gen = Arbitrary<std::string>(fromTo<char>('N', 'Z'));
+            auto gen = Arbitrary<std::string>(interval<char>('N', 'Z'));
             gen.setSize(1, 3);
             return gen;
         }
@@ -285,9 +283,9 @@ TEST(PropTest, TestChain2)
 
     auto tuple3Gen2 = tuple2Gen.tuple<int>(+[](std::tuple<bool, int>& tup) {
         if (std::get<0>(tup)) {
-            return fromTo(10, 20);
+            return interval(10, 20);
         } else {
-            return fromTo(20, 30);
+            return interval(20, 30);
         }
     });
 
@@ -331,7 +329,7 @@ TEST(PropTest, TestDerive2)
     Random rand(seed);
 
     auto intGen = elementOf<int>(2, 4, 6);
-    auto stringGen = intGen.template flatMap<std::string>([](int& value) {
+    auto stringGen = intGen.flatMap<std::string>([](int& value) {
         auto gen = Arbitrary<std::string>();
         gen.setMaxSize(value);
         return gen;

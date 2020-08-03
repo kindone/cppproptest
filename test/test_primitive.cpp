@@ -51,10 +51,10 @@ TYPED_TEST(IntegralTest, GenInRange)
     Random rand(seed);
     bool isSigned = std::numeric_limits<TypeParam>::min() < 0;
 
-    auto gen0 = isSigned ? fromTo<TypeParam>(-10, 10) : fromTo<TypeParam>(0, 20);
+    auto gen0 = isSigned ? interval<TypeParam>(-10, 10) : interval<TypeParam>(0, 20);
     TypeParam min = gen0(rand).get();
     TypeParam max = min + rand.getRandomInt32(0, 10);
-    auto gen = fromTo<TypeParam>(min, max);
+    auto gen = interval<TypeParam>(min, max);
     std::cout << "min: " << min << ", max: " << max << std::endl;
 
     for (int i = 0; i < 20; i++) {
@@ -79,7 +79,7 @@ TEST(PropTest, GenString)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto alphabets = inRange<char>('A', 'z');
+    auto alphabets = interval<char>('A', 'z');
     Arbitrary<std::string> gen(alphabets);
     gen.setSize(5);
 
@@ -398,7 +398,7 @@ TEST(PropTest, GenMap2)
     Random rand(seed);
     Arbitrary<std::map<int, int>> gen;
     gen.setMaxSize(8);
-    gen.setElemGen(inRange<int>(0, 100));
+    gen.setElemGen(integers<int>(0, 100));
     gen.setKeyGen(Arbitrary<int>());
     auto shr = gen(rand);
     exhaustive(shr, 0);
@@ -411,7 +411,7 @@ TEST(PropTest, GenList)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::list<int>> gen(inRange<int>(0, 100));
+    Arbitrary<std::list<int>> gen(integers<int>(0, 100));
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
@@ -424,7 +424,7 @@ TEST(PropTest, GenNullable)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::list<int>> gen(inRange<int>(0, 100));
+    Arbitrary<std::list<int>> gen(integers<int>(0, 100));
     gen.setMaxSize(8);
     Arbitrary<Nullable<std::list<int>>> nullableGen(gen);
     auto shr = nullableGen(rand);

@@ -64,7 +64,7 @@ TEST(PropTest, TestConstruct2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(fromTo<int>(0, 10), Arbitrary<std::string>(),
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbitrary<std::string>(),
                                                                       Arbitrary<std::vector<int>>());
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
@@ -82,7 +82,7 @@ TEST(PropTest, TestConstruct3)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(fromTo<int>(0, 10));
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10));
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
@@ -99,7 +99,7 @@ TEST(PropTest, TestConstruct4)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(fromTo<int>(0, 10), Arbitrary<std::string>());
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbitrary<std::string>());
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 

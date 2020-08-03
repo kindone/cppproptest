@@ -15,7 +15,7 @@ size_t Arbitrary<std::string>::defaultMaxSize = 200;
 
 // defaults to ascii characters
 Arbitrary<std::string>::Arbitrary()
-    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(fromTo<char>(0x1, 0x7f))
+    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(interval<char>(0x1, 0x7f))
 {
 }
 

@@ -119,7 +119,18 @@ private:
     GenTuple genTup;
 };
 
-// all implicits
+/**
+ * Generates a CLASS type by specifying target constructor's paremeter types
+ *      struct Point {
+ *          Point() : x(0), y(0) {}
+ *          Point(int x, int y) : x(x), y(y) {}
+ *          int x;
+ *          int y;
+ *      };
+ *      GenFunction<Point> objectGen = construct<Point>(); // calls Point()
+ *      GenFunction<Point> objectGen2 = construct<Point, int, int>(nonNegative(), nonNegative()); // calls Point(int,
+ * int) GenFunction<Point> objectGen3 = construct<Point, int, int>(); // ints are generated using Arbitrary<int>
+ */
 template <typename CLASS, typename... ARGTYPES>
 decltype(auto) construct()
 {

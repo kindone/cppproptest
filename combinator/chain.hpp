@@ -11,13 +11,10 @@ decltype(auto) generator(GEN&& gen);
 template <typename T>
 struct Generator;
 
-// template <class... Ts>
-// struct Chain : public std::tuple<Ts...>
-// {
-// };
-
 template <class... Ts>
 using Chain = std::tuple<Ts...>;
+
+namespace util {
 
 template <typename U, typename T>
 Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, std::function<GenFunction<U>(T&)> gen2gen)
@@ -118,7 +115,17 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
     return generator(genTuple);
 }
 
+}  // namespace util
+
 // this is required to overcome deduction failure for callables that we'd like to have as std::functions
+/**
+ * Generates a std::tuple<T,U> with dependency. Useful when generator for U is decided by T
+ *     GenFunction<std::tuple<T,U>> tupleGen = chain(intGen, [](int& intVal) {
+ *         auto stringGen = Arbitrary<std::string>();
+ *         stringGen.setMaxSize(intVal); // string size is dependent to intVal generated from intGen
+ *         return intVal;
+ *     });
+ */
 template <typename GEN1, typename GEN2GEN>
 decltype(auto) chain(GEN1&& gen1, GEN2GEN&& gen2gen)
 {
@@ -126,7 +133,7 @@ decltype(auto) chain(GEN1&& gen1, GEN2GEN&& gen2gen)
     using RetType = typename function_traits<GEN2GEN>::return_type;
     GenFunction<CHAIN> funcGen1 = gen1;
     std::function<RetType(CHAIN&)> funcGen2Gen = gen2gen;
-    return chainImpl(funcGen1, funcGen2Gen);
+    return util::chainImpl(funcGen1, funcGen2Gen);
 }
 
 }  // namespace proptest

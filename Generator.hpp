@@ -24,7 +24,7 @@ struct Generator : public GenBase<T>
 {
     Generator(GenFunction<T> gen) : genPtr(std::make_shared<GenFunction<T>>(gen)) {}
 
-    virtual Shrinkable<T> operator()(Random& rand) { return (*genPtr)(rand); }
+    virtual Shrinkable<T> operator()(Random& rand) override { return (*genPtr)(rand); }
 
     template <typename U>
     Generator<U> map(std::function<U(T&)> mapper)

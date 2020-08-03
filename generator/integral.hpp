@@ -242,32 +242,43 @@ public:
                                                   UINT8_MAX + 1};
 };
 
+/**
+ * Generates a positive integer, excluding 0
+ */
 template <typename T>
-Generator<T> nonZero(T max = std::numeric_limits<T>::max())
+Generator<T> natural(T max = std::numeric_limits<T>::max())
 {
     return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
 }
 
+/**
+ * Generates 0 or a positive integer
+ */
 template <typename T>
 Generator<T> nonNegative(T max = std::numeric_limits<T>::max())
 {
     return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
 }
 
-// generates numeric in [a, b]
+/**
+ * Generates numeric values in [min, max]
+ * e.g. interval(0,100) generates a value in {0, ..., 100}
+ */
 template <typename T>
-Generator<T> fromTo(T min, T max)
+Generator<T> interval(T min, T max)
 {
     return Generator<T>([min, max](Random& rand) { return generateInteger<T>(rand, min, max); });
 }
 
-// generates numeric in [a, b)
+/**
+ * Generates numeric values in [a, a+count)
+ * e.g. integers(0,100) generates a value in {0, ..., 99}
+ */
 template <typename T>
-Generator<T> inRange(T fromInclusive, T toExclusive)
+Generator<T> integers(T start, T count)
 {
-    return Generator<T>([fromInclusive, toExclusive](Random& rand) {
-        return generateInteger<T>(rand, fromInclusive, static_cast<T>(toExclusive - 1));
-    });
+    return Generator<T>(
+        [start, count](Random& rand) { return generateInteger<T>(rand, start, static_cast<T>(start + count - 1)); });
 }
 
 }  // namespace proptest

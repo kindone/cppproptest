@@ -7,7 +7,7 @@ TEST(PropTest, GenVectorOfInt)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto smallIntGen = fromTo<int>(0, 4);
+    auto smallIntGen = interval<int>(0, 4);
     Arbitrary<std::vector<int>> gen(smallIntGen);
     gen.setSize(3);
 
@@ -28,7 +28,7 @@ TEST(PropTest, GenVectorWithNoArbitrary)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto fooGen = construct<Foo, int>(fromTo<int>(0, 4));
+    auto fooGen = construct<Foo, int>(interval<int>(0, 4));
     Arbitrary<std::vector<Foo>> gen(fooGen);
     gen.setSize(3);
 
@@ -40,7 +40,7 @@ TEST(PropTest, ShrinkableAndThen)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto intGen = fromTo<int>(0, 16);
+    auto intGen = interval<int>(0, 16);
     auto evenGen = filter<int>(intGen, [](int& val) -> bool { return val % 2 == 0; });
 
     auto evenShrinkable = evenGen(rand);
@@ -202,7 +202,7 @@ TEST(PropTest, ShrinkVectorFromGen)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     using T = int8_t;
-    auto genVec = Arbitrary<std::vector<T>>(fromTo<T>(-8, 8));
+    auto genVec = Arbitrary<std::vector<T>>(interval<T>(-8, 8));
     genVec.setMaxSize(8);
     genVec.setMinSize(0);
     auto vecShrinkable = genVec(rand);
@@ -247,7 +247,7 @@ TEST(PropTest, TupleGen2)
         }
     }
 
-    auto smallIntGen = fromTo(-40, 40);
+    auto smallIntGen = interval(-40, 40);
     auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
     while (true) {
         auto shrinkable = tupleGen(rand);
@@ -275,7 +275,7 @@ TEST(PropTest, TupleGen3)
         }
     }
 
-    auto smallIntGen = fromTo(0, 3);
+    auto smallIntGen = interval(0, 3);
     auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
     for (int i = 0; i < 3; i++) {
         auto shrinkable = tupleGen(rand);
@@ -333,7 +333,7 @@ TEST(PropTest, GenTupleVector)
 
     int numRows = 8;
     uint16_t numElements = 64;
-    auto firstGen = fromTo<uint16_t>(0, numElements);
+    auto firstGen = interval<uint16_t>(0, numElements);
     auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
     auto indexGen = tuple(firstGen, secondGen);
     auto indexVecGen = Arbitrary<IndexVector>(indexGen);
@@ -348,7 +348,7 @@ TEST(PropTest, GenVectorAndShrink)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto smallIntGen = fromTo<int>(-8, 8);
+    auto smallIntGen = interval<int>(-8, 8);
     auto vectorGen = Arbitrary<std::vector<int>>(smallIntGen);
     for (size_t maxLen = 1; maxLen < 4; maxLen++) {
         while (true) {
@@ -400,15 +400,14 @@ TEST(PropTest, Polymorphic)
     };
 
     {
-        auto carGen = Arbitrary<int>().template map<Vehicle>([](int&) { return Car(); });
+        auto carGen = Arbitrary<int>().map<Vehicle>([](int&) { return Car(); });
         auto carShrinkable = carGen(rand);
         // polymorphism doesn't work!
         std::cout << "car.get(): " << carShrinkable.getRef().get() << std::endl;
     }
 
     {
-        auto carGen =
-            Arbitrary<int>().template map<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
+        auto carGen = Arbitrary<int>().map<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
         auto carShrinkable = carGen(rand);
         // polymorphism works
         std::cout << "car.get(): " << carShrinkable.getRef()->get() << std::endl;
