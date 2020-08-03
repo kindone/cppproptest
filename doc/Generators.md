@@ -110,6 +110,7 @@ Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbi
 		auto vecInt0to100 = Arbitrary<std::vector<int>>(interval<int>(0,100));
 		// otherwise, Arbitrary<int> is used
 		auto vecInt = Arbitrary<std::vector<int>>();
+	        auto uppercaseGen = Arbitrary<std::string>(interval('A', 'Z'));
 		```
 
 	* `Arbitrary<std::Map>` provides setter methods for assigning key and value generators
@@ -151,7 +152,9 @@ Some utility generators for integers are provided by `cppproptest`
 	```cpp
 	interval<int64_t>(1, 28);
 	interval(1, 48); // template type argument can be ommitted if the input type(`int`) is the same as the output type.
+	interval(1L, 48L); // template type argument can be ommitted if the input type(`int`) is the same as the output type.
 	interval(0, 10); // generates an integer in {0, ..., 10}
+	interval('A', 'Z'); // generates a char of uppercase alphabet
 	integers(0, 10); // generates an integer in {0, ..., 9}
 	integers(1, 10); // generates an integer in {1, ..., 10}
 	```
@@ -308,7 +311,7 @@ Standard generators and combinators returns `Generator<T>`, which is of the form
 
 	```cpp
 	// generator for strings of arbitrary number
-	Arbitrary<int>().template map<std::string>([](int &num) {
+	Arbitrary<int>().map<std::string>([](int &num) {
 	    return std::to_string(num);
 	});
 	// this is equivalent to:
