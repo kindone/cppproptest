@@ -119,7 +119,7 @@ TEST(PropTest, TestFilter)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    Filter<Arbitrary<Animal>> filteredGen(+[](Animal& a) -> bool {
+    auto filteredGen = Arbitrary<Animal>().filter(+[](Animal& a) -> bool {
         return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() < 10 && a.measures.size() < 10;
     });
 
