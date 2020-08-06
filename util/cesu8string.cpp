@@ -20,7 +20,7 @@ std::ostream& validCESU8Char(std::ostream& os, uint8_t c)
 {
     if (static_cast<char>(c) == '\\')
         os << "\\\\";
-    else if (c < 0x20) {
+    else if (c < 0x20 || c == 0x7f) {
         util::IosFlagSaver iosFlagSaver(os);
         os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c);
     } else

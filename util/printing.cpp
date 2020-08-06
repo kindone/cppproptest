@@ -10,7 +10,7 @@ namespace proptest {
 PROPTEST_API std::ostream& show(std::ostream& os, const char* c_str, size_t len)
 {
     std::string str(c_str, len);
-    os << "(" << util::StringAsHex(str) << ")";
+    os << "\"" << util::StringPrintable(str) << "\" (" << util::StringAsHex(str) << ")";
     return os;
 }
 

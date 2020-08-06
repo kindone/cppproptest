@@ -25,6 +25,13 @@ std::ostream& codepage(std::ostream& os, uint32_t code)
     return os;
 }
 
+std::ostream& validString(std::ostream& os, const std::string& str)
+{
+    for (size_t i = 0; i < str.size(); i++)
+        validChar(os, static_cast<uint8_t>(str[i]));
+    return os;
+}
+
 std::ostream& charAsHex(std::ostream& os, uint8_t c)
 {
     util::IosFlagSaver iosFlagSaver(os);
@@ -88,7 +95,7 @@ std::ostream& validChar(std::ostream& os, uint8_t c)
 {
     if (static_cast<char>(c) == '\\')
         os << "\\\\";
-    else if (c < 0x20) {
+    else if (c < 0x20 || c == 0x7f) {
         util::IosFlagSaver iosFlagSaver(os);
         os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c);
     } else
@@ -101,7 +108,7 @@ std::ostream& validChar2(std::ostream& os, uint8_t c)
 {
     if (static_cast<char>(c) == '\\')
         os << "\\\\";
-    else if (c < 0x20) {
+    else if (c < 0x20 || c == 0x7f) {
         util::IosFlagSaver iosFlagSaver(os);
         os << "\\u" << std::setfill('0') << std::setw(4) << std::hex << static_cast<int>(c);
     } else
