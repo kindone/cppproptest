@@ -81,12 +81,12 @@ std::ostream& operator<<(std::ostream& os, const TableData& td)
     os << "{ num_rows: " << td.num_rows << ", num_elements: " << td.num_elements << ", indexes: ";
     os << "[ ";
     if (!td.indexes.empty()) {
-        auto tup = td.indexes[0];
-        os << "{ first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+        auto pair = td.indexes[0];
+        os << "{ first: " << pair.first << ", second: " << pair.second << " }";
     }
     for (size_t i = 1; i < td.indexes.size(); i++) {
-        auto tup = td.indexes[i];
-        os << ", { first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+        auto pair = td.indexes[i];
+        os << ", { first: " << pair.first << ", second: " << pair.second << " }";
     }
     os << " ]";
     return os;

@@ -54,10 +54,10 @@ public:
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
             util::binarySearchShrinkableU(size - minSizeCopy)
-                .template transform<uint64_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
+                .template map<uint64_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
         // this make sure shrinking is possible towards minSize
         Shrinkable<std::set<Shrinkable<T>>> shrinkable =
-            rangeShrinkable.template transform<std::set<Shrinkable<T>>>([shrinkSet](const size_t& size) {
+            rangeShrinkable.template flatMap<std::set<Shrinkable<T>>>([shrinkSet](const size_t& size) {
                 if (size == 0)
                     return make_shrinkable<std::set<Shrinkable<T>>>();
 
@@ -68,7 +68,7 @@ public:
                 return make_shrinkable<std::set<Shrinkable<T>>>(begin, last);
             });
 
-        return shrinkable.template transform<std::set<T>>(+[](const std::set<Shrinkable<T>>& shr) {
+        return shrinkable.template flatMap<std::set<T>>(+[](const std::set<Shrinkable<T>>& shr) {
             auto value = make_shrinkable<std::set<T>>();
             std::set<T>& valueSet = value.getRef();
 

@@ -172,7 +172,7 @@ Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
     // substring shrinking
     size_t minSizeCopy = minSize;
     return util::binarySearchShrinkableU(len - minSizeCopy)
-        .template transform<UTF8String>([str, minSizeCopy, positions](const uint64_t& size) -> UTF8String {
+        .template map<UTF8String>([str, minSizeCopy, positions](const uint64_t& size) -> UTF8String {
             if (positions.empty())
                 return UTF8String();
             else

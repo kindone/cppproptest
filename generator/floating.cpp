@@ -67,8 +67,8 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
 
         auto expShrinkable = util::binarySearchShrinkable(exp);
         // shrink exponent
-        auto floatShrinkable = expShrinkable.transform<FLOATTYPE>(
-            [fraction](const int& exp) { return util::composeFloat(fraction, exp); });
+        auto floatShrinkable =
+            expShrinkable.map<FLOATTYPE>([fraction](const int& exp) { return util::composeFloat(fraction, exp); });
 
         // prepend 0.0
         floatShrinkable = floatShrinkable.with([shrinksPtr = floatShrinkable.shrinksPtr]() {

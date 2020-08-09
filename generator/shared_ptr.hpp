@@ -23,8 +23,7 @@ public:
     {
         auto gen = Arbitrary<T>();
         Shrinkable<T> shrinkable = gen(rand);
-        return shrinkable.template transform<std::shared_ptr<T>>(
-            +[](const T& obj) { return std::make_shared<T>(obj); });
+        return shrinkable.template map<std::shared_ptr<T>>(+[](const T& obj) { return std::make_shared<T>(obj); });
     }
 
     GenFunction<T> elemGen;

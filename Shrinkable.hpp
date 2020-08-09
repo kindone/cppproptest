@@ -43,56 +43,57 @@ struct Shrinkable
     std::shared_ptr<T> getSharedPtr() const { return ptr; }
 
     template <typename U = T>
-    Shrinkable<U> transform(std::function<U(const T&)> transformer) const
+    Shrinkable<U> map(std::function<U(const T&)> transformer) const
     {
         auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
-        return transform<U>(transformerPtr);
+        return map<U>(transformerPtr);
     }
 
     template <typename U = T>
-    Shrinkable<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr) const
+    Shrinkable<U> map(std::shared_ptr<std::function<U(const T&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
         auto shrinkable = make_shrinkable<U>(std::move((*transformerPtr)(getRef())));
         return shrinkable.with([thisShrinksPtr, transformerPtr]() {
             return (*thisShrinksPtr)().template transform<Shrinkable<U>>(
-                [transformerPtr](const Shrinkable<T>& shr) { return shr.transform(transformerPtr); });
+                [transformerPtr](const Shrinkable<T>& shr) { return shr.map(transformerPtr); });
         });
     }
 
     template <typename U = T>
-    Shrinkable<U> transform(std::function<Shrinkable<U>(const T&)> transformer) const
+    Shrinkable<U> flatMap(std::function<Shrinkable<U>(const T&)> transformer) const
     {
         auto transformerPtr = std::make_shared<std::function<Shrinkable<U>(const T&)>>(transformer);
-        return transform<U>(transformerPtr);
+        return flatMap<U>(transformerPtr);
     }
 
     template <typename U = T>
-    Shrinkable<U> transform(std::shared_ptr<std::function<Shrinkable<U>(const T&)>> transformerPtr) const
+    Shrinkable<U> flatMap(std::shared_ptr<std::function<Shrinkable<U>(const T&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
         auto shrinkable = (*transformerPtr)(getRef());
         return shrinkable.with([thisShrinksPtr, transformerPtr]() {
             return (*thisShrinksPtr)().template transform<Shrinkable<U>>(
-                [transformerPtr](const Shrinkable<T>& shr) { return shr.transform(transformerPtr); });
+                [transformerPtr](const Shrinkable<T>& shr) { return shr.flatMap(transformerPtr); });
         });
     }
 
     template <typename U = T>
-    Shrinkable<U> transform(std::function<Shrinkable<U>(const Shrinkable<T>&)> transformer) const
+    Shrinkable<U> mapShrinkable(std::function<Shrinkable<U>(const Shrinkable<T>&)> transformer) const
     {
         auto transformerPtr = std::make_shared<std::function<Shrinkable<U>(const Shrinkable<T>&)>>(transformer);
-        return transform<U>(transformerPtr);
+        return mapShrinkable<U>(transformerPtr);
     }
 
     template <typename U = T>
-    Shrinkable<U> transform(std::shared_ptr<std::function<Shrinkable<U>(const Shrinkable<T>&)>> transformerPtr) const
+    Shrinkable<U> mapShrinkable(
+        std::shared_ptr<std::function<Shrinkable<U>(const Shrinkable<T>&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
         auto shrinkable = (*transformerPtr)(*this);
         return shrinkable.with([thisShrinksPtr, transformerPtr]() {
             return (*thisShrinksPtr)().template transform<Shrinkable<U>>(
-                [transformerPtr](const Shrinkable<T>& shr) { return shr.transform(transformerPtr); });
+                [transformerPtr](const Shrinkable<T>& shr) { return shr.mapShrinkable(transformerPtr); });
         });
     }
 
@@ -122,18 +123,18 @@ struct Shrinkable
     }
 
     // concat: continues with then after horizontal dead end
-    Shrinkable<T> concat(std::function<Stream<Shrinkable<T>>()> then) const
+    Shrinkable<T> concatStatic(std::function<Stream<Shrinkable<T>>()> then) const
     {
         auto thenPtr = std::make_shared<decltype(then)>(then);
-        return concat(thenPtr);
+        return concatStatic(thenPtr);
     }
 
-    Shrinkable<T> concat(std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> thenPtr) const
+    Shrinkable<T> concatStatic(std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> thenPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
         return with([thisShrinksPtr, thenPtr]() {
             auto shrinkablesWithThen = (*thisShrinksPtr)().template transform<Shrinkable<T>>(
-                [thenPtr](const Shrinkable<T>& shr) { return shr.concat(thenPtr); });
+                [thenPtr](const Shrinkable<T>& shr) { return shr.concatStatic(thenPtr); });
             return shrinkablesWithThen.concat((*thenPtr)());
         });
     }
@@ -156,14 +157,14 @@ struct Shrinkable
     }
 
     // andThen: continues with then after vertical dead end
-    Shrinkable<T> andThen(std::function<Stream<Shrinkable<T>>()> then) const
+    Shrinkable<T> andThenStatic(std::function<Stream<Shrinkable<T>>()> then) const
     {
         auto thisShrinksPtr = shrinksPtr;
         auto thenPtr = std::make_shared<decltype(then)>(then);
-        return andThen(thenPtr);
+        return andThenStatic(thenPtr);
     }
 
-    Shrinkable<T> andThen(std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> thenPtr) const
+    Shrinkable<T> andThenStatic(std::shared_ptr<std::function<Stream<Shrinkable<T>>()>> thenPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
         if (shrinks().isEmpty()) {
@@ -171,7 +172,7 @@ struct Shrinkable
         } else {
             return with([thisShrinksPtr, thenPtr]() {
                 return (*thisShrinksPtr)().template transform<Shrinkable<T>>(
-                    [thenPtr](const Shrinkable<T>& shr) { return shr.andThen(thenPtr); });
+                    [thenPtr](const Shrinkable<T>& shr) { return shr.andThenStatic(thenPtr); });
             });
         }
     }

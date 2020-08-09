@@ -154,11 +154,11 @@ public:
 
         // shrink vector size with subvector using binary numeric shrink of sizes
         size_t minSizeCopy = minSize;
-        auto rangeShrinkable = util::binarySearchShrinkableU(size - minSizeCopy)
-                                   .template transform<size_t>(
-                                       [minSizeCopy](const uint64_t& size) -> size_t { return size + minSizeCopy; });
+        auto rangeShrinkable =
+            util::binarySearchShrinkableU(size - minSizeCopy)
+                .template map<size_t>([minSizeCopy](const uint64_t& size) -> size_t { return size + minSizeCopy; });
         // this make sure shrinking is possible towards minSize
-        shrinkable_t shrinkable = rangeShrinkable.template transform<std::vector<Shrinkable<T>>>(
+        shrinkable_t shrinkable = rangeShrinkable.template flatMap<std::vector<Shrinkable<T>>>(
             [shrinkVec](const size_t& size) -> Shrinkable<std::vector<Shrinkable<T>>> {
                 if (size <= 0)
                     return make_shrinkable<std::vector<Shrinkable<T>>>();
@@ -172,7 +172,7 @@ public:
             shrinkable.andThen(+[](const shrinkable_t& shr) -> stream_t { return shrinkBulkRecursive(shr, 0, 0); });
 
         auto vecShrinkable =
-            shrinkable.template transform<std::vector<T>>(+[](const vector_t& shrinkVec) -> Shrinkable<std::vector<T>> {
+            shrinkable.template flatMap<std::vector<T>>(+[](const vector_t& shrinkVec) -> Shrinkable<std::vector<T>> {
                 auto value = make_shrinkable<std::vector<T>>();
                 std::vector<T>& valueVec = value.getRef();
                 std::transform(

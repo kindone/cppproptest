@@ -26,7 +26,7 @@ Generator<std::pair<T, U>> dependency(GenFunction<T> gen1, std::function<GenFunc
 
         // shrink strategy 1: expand Shrinkable<T>
         Shrinkable<std::pair<T, Shrinkable<U>>> intermediate =
-            shrinkableT.template transform<std::pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
+            shrinkableT.template flatMap<std::pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
                 // generate U
                 auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
@@ -40,7 +40,7 @@ Generator<std::pair<T, U>> dependency(GenFunction<T> gen1, std::function<GenFunc
                 std::shared_ptr<Intermediate> interpair = interShr.getSharedPtr();
                 Shrinkable<U>& shrinkableU = interpair->second;
                 Shrinkable<Intermediate> newShrinkableU =
-                    shrinkableU.template transform<Intermediate>([interpair](const U& u) mutable {
+                    shrinkableU.template flatMap<Intermediate>([interpair](const U& u) mutable {
                         return make_shrinkable<std::pair<T, Shrinkable<U>>>(
                             std::make_pair(interpair->first, make_shrinkable<U>(u)));
                     });
@@ -48,7 +48,7 @@ Generator<std::pair<T, U>> dependency(GenFunction<T> gen1, std::function<GenFunc
             });
 
         // reformat std::pair<T, Shrinkable<U>> to std::pair<T, U>
-        return intermediate.template transform<std::pair<T, U>>(
+        return intermediate.template flatMap<std::pair<T, U>>(
             +[](const Intermediate& interpair) -> Shrinkable<std::pair<T, U>> {
                 return make_shrinkable<std::pair<T, U>>(std::make_pair(interpair.first, interpair.second.getRef()));
             });

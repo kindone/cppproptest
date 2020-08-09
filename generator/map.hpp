@@ -43,35 +43,34 @@ public:
         // shrink map size with submap using binary numeric shrink of sizes
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
-            util::binarySearchShrinkable(size - minSizeCopy)
-                .template transform<size_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
+            util::binarySearchShrinkable(size - minSizeCopy).template map<size_t>([minSizeCopy](const uint64_t& size) {
+                return size + minSizeCopy;
+            });
 
         // this make sure shrinking is possible towards minSize
         Shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>> shrinkable =
-            rangeShrinkable.template transform<std::map<Shrinkable<Key>, Shrinkable<T>>>(
-                [shrinkMap](const size_t& size) {
-                    if (size == 0)
-                        return make_shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>>();  // empty map
+            rangeShrinkable.template flatMap<std::map<Shrinkable<Key>, Shrinkable<T>>>([shrinkMap](const size_t& size) {
+                if (size == 0)
+                    return make_shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>>();  // empty map
 
-                    size_t i = 0;
-                    auto begin = shrinkMap->begin();
-                    auto last = shrinkMap->begin();
-                    for (; last != shrinkMap->end() && i < size; ++last, ++i) {}
-                    return make_shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>>(begin, last);
-                });
-
-        return shrinkable.template transform<std::map<Key, T>>(
-            +[](const std::map<Shrinkable<Key>, Shrinkable<T>>& shr) {
-                auto value = make_shrinkable<std::map<Key, T>>();
-                std::map<Key, T>& valueMap = value.getRef();
-
-                for (auto itr = shr.begin(); itr != shr.end(); ++itr) {
-                    auto& pair = *itr;
-                    valueMap.insert(std::pair<Key, T>(pair.first.getRef(), pair.second.getRef()));
-                }
-
-                return value;
+                size_t i = 0;
+                auto begin = shrinkMap->begin();
+                auto last = shrinkMap->begin();
+                for (; last != shrinkMap->end() && i < size; ++last, ++i) {}
+                return make_shrinkable<std::map<Shrinkable<Key>, Shrinkable<T>>>(begin, last);
             });
+
+        return shrinkable.template flatMap<std::map<Key, T>>(+[](const std::map<Shrinkable<Key>, Shrinkable<T>>& shr) {
+            auto value = make_shrinkable<std::map<Key, T>>();
+            std::map<Key, T>& valueMap = value.getRef();
+
+            for (auto itr = shr.begin(); itr != shr.end(); ++itr) {
+                auto& pair = *itr;
+                valueMap.insert(std::pair<Key, T>(pair.first.getRef(), pair.second.getRef()));
+            }
+
+            return value;
+        });
     }
 
     Arbitrary<Map> setKeyGen(const Arbitrary<Key>& _keyGen)

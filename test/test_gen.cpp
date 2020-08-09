@@ -49,10 +49,10 @@ TEST(PropTest, ShrinkableAndThen)
         exhaustive(evenShrinkable, 0);
     }
 
-    auto andThen =
-        evenShrinkable.andThen([evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
+    auto andThen = evenShrinkable.andThenStatic(
+        [evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
 
-    std::cout << "even.andThen([1000]): " << andThen.get() << std::endl;
+    std::cout << "even.andThenStatic([1000]): " << andThen.get() << std::endl;
     {
         exhaustive(andThen, 0);
     }
@@ -66,10 +66,10 @@ TEST(PropTest, ShrinkableAndThen)
         exhaustive(andThen2, 0);
     }
 
-    auto concat =
-        evenShrinkable.concat([evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
+    auto concat = evenShrinkable.concatStatic(
+        [evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
 
-    std::cout << "even.concat(1000): " << concat.get() << std::endl;
+    std::cout << "even.concatStatic(1000): " << concat.get() << std::endl;
     {
         exhaustive(concat, 0);
     }
@@ -158,7 +158,7 @@ TEST(PropTest, ShrinkableConcat)
 {
     auto shrinkable = util::binarySearchShrinkable(8);
 
-    auto concat = shrinkable.concat([shrinkable]() { return shrinkable.shrinks(); });
+    auto concat = shrinkable.concatStatic([shrinkable]() { return shrinkable.shrinks(); });
 
     exhaustive(concat, 0);
 }
@@ -176,15 +176,14 @@ TEST(PropTest, ShrinkVector)
 
     // return make_shrinkable<std::vector<T>>(std::move(vec));
 
-    auto shrinkableVector =
-        util::binarySearchShrinkable(len).template transform<std::vector<T>>([vec](const int64_t& len) {
-            if (len <= 0)
-                return std::vector<T>();
+    auto shrinkableVector = util::binarySearchShrinkable(len).template map<std::vector<T>>([vec](const int64_t& len) {
+        if (len <= 0)
+            return std::vector<T>();
 
-            auto begin = vec.begin();
-            auto last = vec.begin() + len;
-            return std::vector<T>(begin, last);
-        });
+        auto begin = vec.begin();
+        auto last = vec.begin() + len;
+        return std::vector<T>(begin, last);
+    });
 
     auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<std::vector<T>>& shr) {
         std::vector<T> copy = shr.get();

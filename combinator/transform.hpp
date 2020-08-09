@@ -19,7 +19,7 @@ Generator<U> transform(GenFunction<T> gen, std::function<U(T&)> transformer)
         [transformer](const T& t) { return transformer(const_cast<T&>(t)); });
     return generator([genPtr, transformerPtr](Random& rand) {
         Shrinkable<T> shrinkable = (*genPtr)(rand);
-        return shrinkable.transform(transformerPtr);
+        return shrinkable.map(transformerPtr);
     });
 }
 

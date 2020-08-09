@@ -251,7 +251,7 @@ TEST(UtilTestCase, ShrinkableString)
 {
     auto str = std::string("hello world");
     int len = str.size();
-    auto shrinkable = util::binarySearchShrinkable(len).template transform<std::string>(
+    auto shrinkable = util::binarySearchShrinkable(len).template map<std::string>(
         [str](const int64_t& len) { return str.substr(0, len); });
 
     for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {

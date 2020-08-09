@@ -30,7 +30,7 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, std::function<GenFunction<
 
         // shrink strategy 1: expand Shrinkable<T>
         Shrinkable<std::pair<T, Shrinkable<U>>> intermediate =
-            shrinkableTs.template transform<std::pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
+            shrinkableTs.template flatMap<std::pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
                 // generate U
                 auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
@@ -45,14 +45,14 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, std::function<GenFunction<
                 T& t = interpair.first;
                 Shrinkable<U>& shrinkableU = interpair.second;
                 Shrinkable<Intermediate> newShrinkableU =
-                    shrinkableU.template transform<Intermediate>([t](const U& u) mutable {
+                    shrinkableU.template flatMap<Intermediate>([t](const U& u) mutable {
                         return make_shrinkable<std::pair<T, Shrinkable<U>>>(std::make_pair(t, make_shrinkable<U>(u)));
                     });
                 return newShrinkableU.shrinks();
             });
 
         // reformat std::pair<T, Shrinkable<U>> to Chain<T, U>
-        return intermediate.template transform<Chain<T, U>>(
+        return intermediate.template flatMap<Chain<T, U>>(
             +[](const Intermediate& interpair) -> Shrinkable<std::tuple<T, U>> {
                 const T& t = interpair.first;
                 return make_shrinkable<Chain<T, U>>(
@@ -79,7 +79,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
 
         // shrink strategy 1: expand Shrinkable<std::tuple<Ts...>>
         Shrinkable<std::pair<Chain<T0, T1, Ts...>, Shrinkable<U>>> intermediate =
-            shrinkableTs.template transform<std::pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
+            shrinkableTs.template flatMap<std::pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
                 [&rand, gen2genPtr](const Chain<T0, T1, Ts...>& ts) {
                     // generate U
                     auto gen2 = (*gen2genPtr)(ts);
@@ -96,7 +96,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
                 Chain<T0, T1, Ts...>& ts = interpair.first;
                 Shrinkable<U>& shrinkableU = interpair.second;
                 Shrinkable<Intermediate> newShrinkableU =
-                    shrinkableU.template transform<Intermediate>([ts](const U& u) mutable {
+                    shrinkableU.template flatMap<Intermediate>([ts](const U& u) mutable {
                         return make_shrinkable<std::pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
                             std::make_pair(ts, make_shrinkable<U>(u)));
                     });
@@ -104,7 +104,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
             });
 
         // reformat std::pair<Chain<T0, T1, Ts...>, Shrinkable<U>> to Chain<T0, T1, Ts..., U>
-        return intermediate.template transform<Chain<T0, T1, Ts..., U>>(
+        return intermediate.template flatMap<Chain<T0, T1, Ts..., U>>(
             +[](const Intermediate& interpair) -> Shrinkable<std::tuple<T0, T1, Ts..., U>> {
                 const Chain<T0, T1, Ts...>& ts = interpair.first;
                 return make_shrinkable<Chain<T0, T1, Ts..., U>>(

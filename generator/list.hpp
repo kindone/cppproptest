@@ -151,10 +151,10 @@ public:
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
             util::binarySearchShrinkable(size - minSizeCopy)
-                .template transform<uint64_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
+                .template map<uint64_t>([minSizeCopy](const uint64_t& size) { return size + minSizeCopy; });
         // this make sure shrinking is possible towards minSize
         shrinkable_t shrinkable =
-            rangeShrinkable.template transform<std::vector<Shrinkable<T>>>([shrinkVec](const size_t& size) {
+            rangeShrinkable.template flatMap<std::vector<Shrinkable<T>>>([shrinkVec](const size_t& size) {
                 if (size == 0)
                     return make_shrinkable<std::vector<Shrinkable<T>>>();
 
@@ -165,7 +165,7 @@ public:
 
         shrinkable = shrinkable.andThen(+[](const shrinkable_t& shr) { return shrinkBulkRecursive(shr, 0, 0); });
 
-        auto listShrinkable = shrinkable.template transform<std::list<T>>(+[](const vector_t& shrinkVec) {
+        auto listShrinkable = shrinkable.template flatMap<std::list<T>>(+[](const vector_t& shrinkVec) {
             auto value = make_shrinkable<std::list<T>>();
             std::list<T>& valueList = value.getRef();
             std::transform(

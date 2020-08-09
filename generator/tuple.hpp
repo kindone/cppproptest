@@ -48,7 +48,7 @@ private:
             e_shrinkable_t& elem = std::get<N>(*parentRef);
             // {0,2,3} to {[x,x,x,0], ...,[x,x,x,3]}
             // make sure {1} shrinked from 2 is also transformed to [x,x,x,1]
-            shrinkable_t tupWithElems = elem.template transform<tuple_t>([parentRef](const element_t& val) {
+            shrinkable_t tupWithElems = elem.template flatMap<tuple_t>([parentRef](const element_t& val) {
                 std::get<N>(*parentRef) = make_shrinkable<element_t>(val);
                 return make_shrinkable<tuple_t>(*parentRef);
             });
@@ -65,7 +65,7 @@ public:
 
     static Shrinkable<out_tuple_t> generateStream(const shrinkable_t& shrinkable)
     {
-        return ConcatHelper<0>(shrinkable).template transform<out_tuple_t>(+[](const tuple_t& tuple) {
+        return ConcatHelper<0>(shrinkable).template flatMap<out_tuple_t>(+[](const tuple_t& tuple) {
             return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(std::move(tuple)));
         });
     }

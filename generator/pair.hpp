@@ -27,7 +27,7 @@ private:
             std::shared_ptr<pair_t> parentRef = parent.getSharedPtr();
 
             e_shrinkable_t& elem = parentRef->first;
-            shrinkable_t pairWithElems = elem.template transform<pair_t>([parentRef](const element_t& val) {
+            shrinkable_t pairWithElems = elem.template flatMap<pair_t>([parentRef](const element_t& val) {
                 auto copy = *parentRef;
                 copy.first = make_shrinkable<element_t>(val);
                 return make_shrinkable<pair_t>(copy);
@@ -46,7 +46,7 @@ private:
             std::shared_ptr<pair_t> parentRef = parent.getSharedPtr();
 
             e_shrinkable_t& elem = parentRef->second;
-            shrinkable_t pairWithElems = elem.template transform<pair_t>([parentRef](const element_t& val) {
+            shrinkable_t pairWithElems = elem.template flatMap<pair_t>([parentRef](const element_t& val) {
                 auto copy = *parentRef;
                 copy.second = make_shrinkable<element_t>(val);
                 return make_shrinkable<pair_t>(copy);
@@ -60,7 +60,7 @@ public:
     static Shrinkable<out_pair_t> generateStream(const shrinkable_t& shrinkable)
     {
         auto concatenated = shrinkable.concat(genStream1()).concat(genStream2());
-        return concatenated.template transform<out_pair_t>(+[](const pair_t& pair) {
+        return concatenated.template flatMap<out_pair_t>(+[](const pair_t& pair) {
             return make_shrinkable<out_pair_t>(std::make_pair(pair.first.get(), pair.second.get()));
         });
     }
