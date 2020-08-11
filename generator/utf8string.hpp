@@ -6,16 +6,16 @@
 namespace proptest {
 
 template <>
-class PROPTEST_API Arbitrary<UTF8String> final : public ArbitraryContainer<UTF8String> {
+class PROPTEST_API Arbi<UTF8String> final : public ArbiContainer<UTF8String> {
 public:
-    using ArbitraryContainer<UTF8String>::minSize;
-    using ArbitraryContainer<UTF8String>::maxSize;
+    using ArbiContainer<UTF8String>::minSize;
+    using ArbiContainer<UTF8String>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary();
-    Arbitrary(Arbitrary<uint32_t>& _elemGen);
-    Arbitrary(GenFunction<uint32_t> _elemGen);
+    Arbi();
+    Arbi(Arbi<uint32_t>& _elemGen);
+    Arbi(GenFunction<uint32_t> _elemGen);
 
     Shrinkable<UTF8String> operator()(Random& rand) override;
 

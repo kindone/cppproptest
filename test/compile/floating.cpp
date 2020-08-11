@@ -8,6 +8,6 @@ using namespace proptest;
 TEST(Compile, floating)
 {
     Random rand(1);
-    auto gen = Arbitrary<float>();
+    auto gen = Arbi<float>();
     gen(rand);
 }

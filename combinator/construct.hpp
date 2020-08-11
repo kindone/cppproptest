@@ -129,7 +129,7 @@ private:
  *      };
  *      GenFunction<Point> objectGen = construct<Point>(); // calls Point()
  *      GenFunction<Point> objectGen2 = construct<Point, int, int>(nonNegative(), nonNegative()); // calls Point(int,
- * int) GenFunction<Point> objectGen3 = construct<Point, int, int>(); // ints are generated using Arbitrary<int>
+ * int) GenFunction<Point> objectGen3 = construct<Point, int, int>(); // ints are generated using Arbi<int>
  */
 template <typename CLASS, typename... ARGTYPES>
 decltype(auto) construct()

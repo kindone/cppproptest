@@ -19,10 +19,10 @@
 namespace proptest {
 
 template <typename T>
-struct Arbitrary;
+struct Arbi;
 
 template <typename T>
-struct ArbitraryBase : public GenBase<T>
+struct ArbiBase : public GenBase<T>
 {
     template <typename U>
     Generator<U> map(std::function<U(T&)> mapper)
@@ -60,13 +60,13 @@ struct ArbitraryBase : public GenBase<T>
         return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
-    std::shared_ptr<Arbitrary<T>> clone() { return std::make_shared<Arbitrary<T>>(*dynamic_cast<Arbitrary<T>*>(this)); }
+    std::shared_ptr<Arbi<T>> clone() { return std::make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
 };
 
 template <typename T>
-struct ArbitraryContainer : public ArbitraryBase<T>
+struct ArbiContainer : public ArbiBase<T>
 {
-    ArbitraryContainer(size_t minSize, size_t maxSize) : minSize(minSize), maxSize(maxSize) {}
+    ArbiContainer(size_t minSize, size_t maxSize) : minSize(minSize), maxSize(maxSize) {}
 
     void setMinSize(size_t size) { minSize = size; }
 
@@ -89,7 +89,7 @@ struct ArbitraryContainer : public ArbitraryBase<T>
 };
 
 template <typename T>
-struct Arbitrary : public ArbitraryBase<T>
+struct Arbi : public ArbiBase<T>
 {
 };
 

@@ -67,7 +67,7 @@ template <typename ActionType, typename... GENS>
 GenFunction<std::vector<std::shared_ptr<ActionType>>> actions(GENS&&... gens)
 {
     auto actionGen = oneOf<std::shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
-    auto actionVecGen = Arbitrary<std::vector<std::shared_ptr<ActionType>>>(actionGen);
+    auto actionVecGen = Arbi<std::vector<std::shared_ptr<ActionType>>>(actionGen);
     return actionVecGen;
 }
 

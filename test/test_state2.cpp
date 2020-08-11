@@ -21,7 +21,7 @@ template <typename SystemType, typename... GENS>
 GenFunction<std::vector<std::function<bool(SystemType&)>>> actions2(GENS&&... gens)
 {
     auto actionGen = oneOf<std::function<bool(SystemType&)>>(std::forward<GENS>(gens)...);
-    auto actionVecGen = Arbitrary<std::vector<std::function<bool(SystemType&)>>>(actionGen);
+    auto actionVecGen = Arbi<std::vector<std::function<bool(SystemType&)>>>(actionGen);
     return actionVecGen;
 }
 
@@ -37,14 +37,14 @@ decltype(auto) statefulProperty2(GENS&&... gens)
             }
             return true;
         },
-        Arbitrary<SystemType>(), actionsGen);
+        Arbi<SystemType>(), actionsGen);
 }
 
 TEST(StateTest, States2)
 {
     using SystemType = std::vector<int>;
 
-    auto pushBackGen = Arbitrary<int>().map<ActionFor<SystemType>>([](int value) {
+    auto pushBackGen = Arbi<int>().map<ActionFor<SystemType>>([](int value) {
         return [value](SystemType& system) {
             std::cout << "PushBack(" << value << ")" << std::endl;
             auto size = system.size();

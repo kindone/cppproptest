@@ -28,10 +28,10 @@ decltype(auto) genToFunc(GEN&& gen)
 template <typename Tuple, std::size_t... index>
 decltype(auto) createGenHelperListed(std::index_sequence<index...>)
 {
-    return std::make_tuple(genToFunc(Arbitrary<std::tuple_element_t<index, Tuple>>())...);
+    return std::make_tuple(genToFunc(Arbi<std::tuple_element_t<index, Tuple>>())...);
 }
 
-// returns a std::Tuple<Arbitrary<ARGS...>>
+// returns a std::Tuple<Arbi<ARGS...>>
 template <typename... ARGS>
 std::tuple<GenFunction<std::decay_t<ARGS>>...> createGenTuple(TypeList<ARGS...> /*argument_list*/)
 {

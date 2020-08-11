@@ -8,7 +8,7 @@ TEST(PropTest, TestTransform)
     Random rand(seed);
     Random savedRand = rand;
 
-    Arbitrary<int> gen;
+    Arbi<int> gen;
 
     {
         auto stringGen = transform<int, std::string>(
@@ -41,8 +41,7 @@ TEST(PropTest, TestTransform)
     }
 
     {
-        auto stringGen =
-            Arbitrary<int>().map<std::string>(+[](int& value) { return "(" + std::to_string(value) + ")"; });
+        auto stringGen = Arbi<int>().map<std::string>(+[](int& value) { return "(" + std::to_string(value) + ")"; });
 
         for (int i = 0; i < 10; i++) {
             auto shrinkable = stringGen(savedRand);
@@ -75,7 +74,7 @@ TEST(PropTest, TestTranform2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     static auto gen = transform<uint8_t, uint8_t>(
-        Arbitrary<uint8_t>(), +[](uint8_t& vbit) { return (1 << 0) & vbit; });
+        Arbi<uint8_t>(), +[](uint8_t& vbit) { return (1 << 0) & vbit; });
 
     for (int i = 0; i < 10; i++)
         std::cout << gen(rand).get() << std::endl;
@@ -87,7 +86,7 @@ TEST(PropTest, TestDependency)
     auto pairGen = dependency<int, std::vector<int>>(
         intGen, +[](int& in) {
             auto intGen = interval<int>(0, 8);
-            auto vecGen = Arbitrary<std::vector<int>>(intGen);
+            auto vecGen = Arbi<std::vector<int>>(intGen);
             vecGen.maxSize = in;
             vecGen.minSize = in;
             return vecGen;
@@ -116,7 +115,7 @@ TEST(PropTest, TestDependency2)
     Random rand(seed);
 
     auto numRowsGen = interval<int>(10000, 10000);
-    auto numElementsGen = Arbitrary<uint16_t>();
+    auto numElementsGen = Arbi<uint16_t>();
     auto dimGen = pair(numRowsGen, numElementsGen);
 
     auto rawGen = dependency<Dimension, IndexVector>(
@@ -124,9 +123,9 @@ TEST(PropTest, TestDependency2)
             int numRows = dimension.first;
             uint16_t numElements = dimension.second;
             auto firstGen = interval<uint16_t>(0, numElements);
-            auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
+            auto secondGen = Arbi<bool>();  // TODO true : false should be 2:1
             auto indexGen = pair(firstGen, secondGen);
-            auto indexVecGen = Arbitrary<IndexVector>(indexGen);
+            auto indexVecGen = Arbi<IndexVector>(indexGen);
             indexVecGen.setSize(numRows);
             return indexVecGen;
         });
@@ -161,7 +160,7 @@ TEST(PropTest, TestDependency2)
     auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(
         tableDataGen, +[](TableData& td) {
             std::vector<bool> values;
-            auto vectorGen = Arbitrary<std::vector<bool>>();
+            auto vectorGen = Arbi<std::vector<bool>>();
             vectorGen.setSize(td.num_elements);
             return vectorGen;
         });
@@ -180,14 +179,14 @@ TEST(PropTest, TestDependency2)
 TEST(PropTest, TestDependency3)
 {
     auto nullableIntegers = dependency<bool, int>(
-        Arbitrary<bool>(), +[](bool& isNull) -> GenFunction<int> {
+        Arbi<bool>(), +[](bool& isNull) -> GenFunction<int> {
             if (isNull)
                 return just(0);
             else
                 return interval<int>(10, 20);
         });
 
-    Arbitrary<bool>().pair<int>(+[](bool& value) {
+    Arbi<bool>().pair<int>(+[](bool& value) {
         if (value)
             return interval(0, 10);
         else
@@ -210,7 +209,7 @@ TEST(PropTest, TestDependency4)
 
     auto intGen = elementOf<int>(0, 1, 2, 3);
     auto intStringGen = dependency<int, std::string>(intGen, [](int& value) {
-        auto gen = Arbitrary<std::string>();
+        auto gen = Arbi<std::string>();
         gen.setMaxSize(value);
         return gen;
     });
@@ -235,7 +234,7 @@ TEST(PropTest, TestChain)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto nullableIntegers = Arbitrary<bool>().tuple<int>(+[](bool& isNull) -> GenFunction<int> {
+    auto nullableIntegers = Arbi<bool>().tuple<int>(+[](bool& isNull) -> GenFunction<int> {
         if (isNull)
             return just(0);
         else
@@ -262,7 +261,7 @@ TEST(PropTest, TestChain2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto tuple2Gen = Arbitrary<bool>().tuple<int>(+[](bool& value) {
+    auto tuple2Gen = Arbi<bool>().tuple<int>(+[](bool& value) {
         if (value)
             return interval(0, 10);
         else
@@ -271,11 +270,11 @@ TEST(PropTest, TestChain2)
     auto tuple3Gen = tuple2Gen.tuple<std::string>(+[](std::tuple<bool, int>& tup) {
         std::cout << tup << std::endl;
         if (std::get<0>(tup)) {
-            auto gen = Arbitrary<std::string>(interval<char>('A', 'M'));
+            auto gen = Arbi<std::string>(interval<char>('A', 'M'));
             gen.setSize(1, 3);
             return gen;
         } else {
-            auto gen = Arbitrary<std::string>(interval<char>('N', 'Z'));
+            auto gen = Arbi<std::string>(interval<char>('N', 'Z'));
             gen.setSize(1, 3);
             return gen;
         }
@@ -312,7 +311,7 @@ TEST(PropTest, TestDerive)
 
     auto intGen = elementOf<int>(2, 4, 6);
     auto stringGen = derive<int, std::string>(intGen, [](int& value) {
-        auto gen = Arbitrary<std::string>();
+        auto gen = Arbi<std::string>();
         gen.setMaxSize(value);
         return gen;
     });
@@ -330,7 +329,7 @@ TEST(PropTest, TestDerive2)
 
     auto intGen = elementOf<int>(2, 4, 6);
     auto stringGen = intGen.flatMap<std::string>([](int& value) {
-        auto gen = Arbitrary<std::string>();
+        auto gen = Arbi<std::string>();
         gen.setMaxSize(value);
         return gen;
     });

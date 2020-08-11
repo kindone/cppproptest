@@ -5,7 +5,7 @@
 namespace proptest {
 
 template <>
-class PROPTEST_API Arbitrary<bool> final : public ArbitraryBase<bool> {
+class PROPTEST_API Arbi<bool> final : public ArbiBase<bool> {
 public:
     Shrinkable<bool> operator()(Random& rand) override
     {
@@ -19,6 +19,6 @@ public:
     }
 };
 
-// template struct Arbitrary<bool>;
+// template struct Arbi<bool>;
 
 }  // namespace proptest

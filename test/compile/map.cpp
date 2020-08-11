@@ -8,6 +8,6 @@ using namespace proptest;
 TEST(Compile, map)
 {
     Random rand(3);
-    auto gen = Arbitrary<std::map<std::string, std::string>>();
+    auto gen = Arbi<std::map<std::string, std::string>>();
     gen(rand);
 }

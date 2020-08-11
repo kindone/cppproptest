@@ -7,8 +7,8 @@ using namespace proptest;
 
 TEST(Compile, oneOf)
 {
-    oneOf<int>(Arbitrary<int>(), Arbitrary<int>(), Arbitrary<int>());
-    oneOf<int>(weightedGen<int>(Arbitrary<int>(), 0.1), Arbitrary<int>(), Arbitrary<int>());
-    oneOf<int>(weightedGen<int>(Arbitrary<int>(), 0.1), weightedGen<int>(Arbitrary<int>(), 0.1),
-               weightedGen<int>(Arbitrary<int>(), 0.8));
+    oneOf<int>(Arbi<int>(), Arbi<int>(), Arbi<int>());
+    oneOf<int>(weightedGen<int>(Arbi<int>(), 0.1), Arbi<int>(), Arbi<int>());
+    oneOf<int>(weightedGen<int>(Arbi<int>(), 0.1), weightedGen<int>(Arbi<int>(), 0.1),
+               weightedGen<int>(Arbi<int>(), 0.8));
 }

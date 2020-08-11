@@ -104,7 +104,7 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
     }
 }
 
-Shrinkable<float> Arbitrary<float>::operator()(Random& rand)
+Shrinkable<float> Arbi<float>::operator()(Random& rand)
 {
     auto raw = rand.getRandomUInt32();
     float value = *reinterpret_cast<float*>(&raw);
@@ -112,7 +112,7 @@ Shrinkable<float> Arbitrary<float>::operator()(Random& rand)
     return make_shrinkable<float>(value).with([value]() { return shrinkFloat(value); });
 }
 
-Shrinkable<double> Arbitrary<double>::operator()(Random& rand)
+Shrinkable<double> Arbi<double>::operator()(Random& rand)
 {
     auto raw = rand.getRandomUInt64();
     double value = *reinterpret_cast<double*>(&raw);
@@ -120,7 +120,7 @@ Shrinkable<double> Arbitrary<double>::operator()(Random& rand)
     return make_shrinkable<double>(value).with([value]() { return shrinkFloat(value); });
 }
 
-constexpr float Arbitrary<float>::boundaryValues[];
-constexpr double Arbitrary<double>::boundaryValues[];
+constexpr float Arbi<float>::boundaryValues[];
+constexpr double Arbi<double>::boundaryValues[];
 
 }  // namespace proptest

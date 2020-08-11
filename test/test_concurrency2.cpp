@@ -80,13 +80,13 @@ struct PopBack4 : public VectorAction4
 
 TEST(ConcurrencyTest2, WithModel)
 {
-    auto pushBackActionGen = Arbitrary<int>().map<std::shared_ptr<VectorAction4>>(
-        [](int& value) { return std::make_shared<PushBack4>(value); });
+    auto pushBackActionGen =
+        Arbi<int>().map<std::shared_ptr<VectorAction4>>([](int& value) { return std::make_shared<PushBack4>(value); });
     auto popBackActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<PopBack4>(); });
     auto clearActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<Clear4>(); });
 
     auto actionsGen = actions<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
 
-    auto prop = concurrency<VectorAction4>(Arbitrary<std::vector<int>>(), actionsGen);
+    auto prop = concurrency<VectorAction4>(Arbi<std::vector<int>>(), actionsGen);
     prop.check();
 }

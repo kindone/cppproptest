@@ -12,22 +12,19 @@
 
 namespace proptest {
 
-size_t Arbitrary<CESU8String>::defaultMinSize = 0;
-size_t Arbitrary<CESU8String>::defaultMaxSize = 200;
+size_t Arbi<CESU8String>::defaultMinSize = 0;
+size_t Arbi<CESU8String>::defaultMaxSize = 200;
 
-Arbitrary<CESU8String>::Arbitrary()
-    : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
-{
-}
+Arbi<CESU8String>::Arbi() : ArbiContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
 
-Arbitrary<CESU8String>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
-    : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize),
+Arbi<CESU8String>::Arbi(Arbi<uint32_t>& _elemGen)
+    : ArbiContainer<CESU8String>(defaultMinSize, defaultMaxSize),
       elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
-Arbitrary<CESU8String>::Arbitrary(GenFunction<uint32_t> _elemGen)
-    : ArbitraryContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+Arbi<CESU8String>::Arbi(GenFunction<uint32_t> _elemGen)
+    : ArbiContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
 
@@ -45,7 +42,7 @@ Arbitrary<CESU8String>::Arbitrary(GenFunction<uint32_t> _elemGen)
  * U+E000..U+FFFF     EE..EF   80..BF   80..BF
  * U+10000..U+10FFFF: 6-byte surrogate pairs (U+D800..U+DBFF + U+DC00..U+DFFF)
  */
-Shrinkable<CESU8String> Arbitrary<CESU8String>::operator()(Random& rand)
+Shrinkable<CESU8String> Arbi<CESU8String>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;

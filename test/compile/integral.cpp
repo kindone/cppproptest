@@ -8,6 +8,6 @@ using namespace proptest;
 TEST(Compile, integral)
 {
     Random rand(1);
-    auto gen = Arbitrary<int32_t>();
+    auto gen = Arbi<int32_t>();
     gen(rand);
 }

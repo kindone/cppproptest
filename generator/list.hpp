@@ -13,23 +13,23 @@
 namespace proptest {
 
 template <typename T>
-class PROPTEST_API Arbitrary<std::list<T>> final : public ArbitraryContainer<std::list<T>> {
+class PROPTEST_API Arbi<std::list<T>> final : public ArbiContainer<std::list<T>> {
 public:
     using List = std::list<T>;
-    using ArbitraryContainer<List>::minSize;
-    using ArbitraryContainer<List>::maxSize;
+    using ArbiContainer<List>::minSize;
+    using ArbiContainer<List>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : ArbitraryContainer<List>(defaultMinSize, defaultMaxSize), elemGen(Arbitrary<T>()) {}
+    Arbi() : ArbiContainer<List>(defaultMinSize, defaultMaxSize), elemGen(Arbi<T>()) {}
 
-    Arbitrary(const Arbitrary<T>& _elemGen)
-        : ArbitraryContainer<List>(defaultMinSize, defaultMaxSize),
+    Arbi(const Arbi<T>& _elemGen)
+        : ArbiContainer<List>(defaultMinSize, defaultMaxSize),
           elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
-    Arbitrary(GenFunction<T> _elemGen) : ArbitraryContainer<List>(defaultMinSize, defaultMaxSize), elemGen(_elemGen) {}
+    Arbi(GenFunction<T> _elemGen) : ArbiContainer<List>(defaultMinSize, defaultMaxSize), elemGen(_elemGen) {}
 
     using vector_t = std::vector<Shrinkable<T>>;
     using shrinkable_t = Shrinkable<vector_t>;
@@ -181,8 +181,8 @@ public:
 };
 
 template <typename T>
-size_t Arbitrary<std::list<T>>::defaultMinSize = 0;
+size_t Arbi<std::list<T>>::defaultMinSize = 0;
 template <typename T>
-size_t Arbitrary<std::list<T>>::defaultMaxSize = 200;
+size_t Arbi<std::list<T>>::defaultMaxSize = 200;
 
 }  // namespace proptest

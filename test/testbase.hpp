@@ -119,9 +119,9 @@ struct GenSmallInt : public proptest::GenBase<int32_t>
 
 namespace proptest {
 
-// define arbitrary of Animal using Construct
+// define Arbi of Animal using Construct
 template <>
-class Arbitrary<Animal> : public Construct<Animal, int, std::string, std::vector<int>&> {
+class Arbi<Animal> : public Construct<Animal, int, std::string, std::vector<int>&> {
 };
 
 }  // namespace proptest

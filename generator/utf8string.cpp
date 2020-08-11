@@ -12,21 +12,19 @@
 
 namespace proptest {
 
-size_t Arbitrary<UTF8String>::defaultMinSize = 0;
-size_t Arbitrary<UTF8String>::defaultMaxSize = 200;
+size_t Arbi<UTF8String>::defaultMinSize = 0;
+size_t Arbi<UTF8String>::defaultMaxSize = 200;
 
-Arbitrary<UTF8String>::Arbitrary() : ArbitraryContainer<UTF8String>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
-{
-}
+Arbi<UTF8String>::Arbi() : ArbiContainer<UTF8String>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
 
-Arbitrary<UTF8String>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
-    : ArbitraryContainer<UTF8String>(defaultMinSize, defaultMaxSize),
+Arbi<UTF8String>::Arbi(Arbi<uint32_t>& _elemGen)
+    : ArbiContainer<UTF8String>(defaultMinSize, defaultMaxSize),
       elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
-Arbitrary<UTF8String>::Arbitrary(GenFunction<uint32_t> _elemGen)
-    : ArbitraryContainer<UTF8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+Arbi<UTF8String>::Arbi(GenFunction<uint32_t> _elemGen)
+    : ArbiContainer<UTF8String>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
 
@@ -45,7 +43,7 @@ Arbitrary<UTF8String>::Arbitrary(GenFunction<uint32_t> _elemGen)
  * U+40000..U+FFFFF   F1..F3   80..BF   80..BF   80..BF
  * U+100000..U+10FFFF F4       80..8F   80..BF   80..BF
  */
-Shrinkable<UTF8String> Arbitrary<UTF8String>::operator()(Random& rand)
+Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;

@@ -7,7 +7,7 @@
 namespace proptest {
 
 template <>
-struct PROPTEST_API Arbitrary<float> : public ArbitraryBase<float>
+struct PROPTEST_API Arbi<float> : public ArbiBase<float>
 {
 public:
     Shrinkable<float> operator()(Random& rand) override;
@@ -15,7 +15,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<double> : public ArbitraryBase<double>
+struct PROPTEST_API Arbi<double> : public ArbiBase<double>
 {
 public:
     Shrinkable<double> operator()(Random& rand) override;

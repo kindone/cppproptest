@@ -15,9 +15,8 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
 {
     T value = 0;
     if (min == std::numeric_limits<T>::min() && max == std::numeric_limits<T>::max() && rand.getRandomBool()) {
-        uint32_t i =
-            rand.getRandomSize(0, sizeof(Arbitrary<T>::boundaryValues) / sizeof(Arbitrary<T>::boundaryValues[0]));
-        value = Arbitrary<T>::boundaryValues[i];
+        uint32_t i = rand.getRandomSize(0, sizeof(Arbi<T>::boundaryValues) / sizeof(Arbi<T>::boundaryValues[0]));
+        value = Arbi<T>::boundaryValues[i];
     } else if (std::numeric_limits<T>::min() < 0)
         value = rand.getRandom<T>(min, max);
     else
@@ -44,7 +43,7 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
 }
 
 template <>
-class PROPTEST_API Arbitrary<int8_t> final : public ArbitraryBase<int8_t> {
+class PROPTEST_API Arbi<int8_t> final : public ArbiBase<int8_t> {
 public:
     Shrinkable<int8_t> operator()(Random& rand) override;
     static constexpr int8_t boundaryValues[] = {INT8_MIN,     0,   INT8_MAX, -1,   1,    -2,   2,   INT8_MIN + 1,
@@ -52,7 +51,7 @@ public:
 };
 
 template <>
-class PROPTEST_API Arbitrary<int16_t> final : public ArbitraryBase<int16_t> {
+class PROPTEST_API Arbi<int16_t> final : public ArbiBase<int16_t> {
 public:
     Shrinkable<int16_t> operator()(Random& rand) override;
     static constexpr int16_t boundaryValues[] = {0,
@@ -76,7 +75,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<int32_t> final : public ArbitraryBase<int32_t>
+struct PROPTEST_API Arbi<int32_t> final : public ArbiBase<int32_t>
 {
 public:
     Shrinkable<int32_t> operator()(Random& rand) override;
@@ -110,7 +109,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<int64_t> final : public ArbitraryBase<int64_t>
+struct PROPTEST_API Arbi<int64_t> final : public ArbiBase<int64_t>
 {
 public:
     Shrinkable<int64_t> operator()(Random& rand) override;
@@ -153,14 +152,14 @@ public:
 };
 
 template <>
-class PROPTEST_API Arbitrary<char> final : public ArbitraryBase<char> {
+class PROPTEST_API Arbi<char> final : public ArbiBase<char> {
 public:
     Shrinkable<char> operator()(Random& rand) override;
     static constexpr char boundaryValues[] = {0};
 };
 
 template <>
-class PROPTEST_API Arbitrary<uint8_t> final : public ArbitraryBase<uint8_t> {
+class PROPTEST_API Arbi<uint8_t> final : public ArbiBase<uint8_t> {
 public:
     Shrinkable<uint8_t> operator()(Random& rand) override;
     static constexpr uint8_t boundaryValues[] = {
@@ -168,7 +167,7 @@ public:
 };
 
 template <>
-class PROPTEST_API Arbitrary<uint16_t> final : public ArbitraryBase<uint16_t> {
+class PROPTEST_API Arbi<uint16_t> final : public ArbiBase<uint16_t> {
 public:
     Shrinkable<uint16_t> operator()(Random& rand) override;
     static constexpr uint16_t boundaryValues[] = {0,
@@ -188,7 +187,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<uint32_t> final : public ArbitraryBase<uint32_t>
+struct PROPTEST_API Arbi<uint32_t> final : public ArbiBase<uint32_t>
 {
 public:
     Shrinkable<uint32_t> operator()(Random& rand) override;
@@ -215,7 +214,7 @@ public:
 };
 
 template <>
-struct PROPTEST_API Arbitrary<uint64_t> : public ArbitraryBase<uint64_t>
+struct PROPTEST_API Arbi<uint64_t> : public ArbiBase<uint64_t>
 {
 public:
     Shrinkable<uint64_t> operator()(Random& rand) override;

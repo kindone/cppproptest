@@ -37,7 +37,7 @@ TYPED_TEST(NumericTest, GenNumericType)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<TypeParam> gen;
+    Arbi<TypeParam> gen;
 
     for (int i = 0; i < 20; i++) {
         TypeParam val = gen(rand).get();
@@ -67,7 +67,7 @@ TEST(PropTest, GenerateBool)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<bool> gen;
+    Arbi<bool> gen;
 
     for (int i = 0; i < 20; i++) {
         bool val = gen(rand).get();
@@ -80,7 +80,7 @@ TEST(PropTest, GenString)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto alphabets = interval<char>('A', 'z');
-    Arbitrary<std::string> gen(alphabets);
+    Arbi<std::string> gen(alphabets);
     gen.setSize(5);
 
     for (int i = 0; i < 20; i++) {
@@ -90,7 +90,7 @@ TEST(PropTest, GenString)
 
 void testUTF8(PropertyContext& context, Random rand)
 {
-    Arbitrary<UTF8String> gen;
+    Arbi<UTF8String> gen;
     gen.setSize(1);
 
     for (int i = 0; i < 100000; i++) {
@@ -171,7 +171,7 @@ void testUTF32(PropertyContext& context, Random rand)
 
 void testUTF16BE(PropertyContext& context, Random rand)
 {
-    Arbitrary<UTF16BEString> gen;
+    Arbi<UTF16BEString> gen;
     gen.setSize(1);
 
     uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
@@ -211,7 +211,7 @@ void testUTF16BE(PropertyContext& context, Random rand)
 
 void testUTF16LE(PropertyContext& context, Random rand)
 {
-    Arbitrary<UTF16LEString> gen;
+    Arbi<UTF16LEString> gen;
     gen.setSize(1);
 
     uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
@@ -252,7 +252,7 @@ void testUTF16LE(PropertyContext& context, Random rand)
 
 void testCESU8(PropertyContext& context, Random rand)
 {
-    Arbitrary<CESU8String> gen;
+    Arbi<CESU8String> gen;
     gen.setSize(1);
 
     for (int i = 0; i < 100000; i++) {
@@ -320,7 +320,7 @@ TEST(PropTest, GenUTF8String2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<UTF8String> gen;
+    Arbi<UTF8String> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -330,7 +330,7 @@ TEST(PropTest, GenUTF16BEString2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<UTF16BEString> gen;
+    Arbi<UTF16BEString> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -340,7 +340,7 @@ TEST(PropTest, GenUTF16LEString2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<UTF16LEString> gen;
+    Arbi<UTF16LEString> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -350,7 +350,7 @@ TEST(PropTest, GenCESU8String2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<CESU8String> gen;
+    Arbi<CESU8String> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -360,7 +360,7 @@ TEST(PropTest, GenSharedPtr)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::shared_ptr<int>> gen;
+    Arbi<std::shared_ptr<int>> gen;
     for (int i = 0; i < 20; i++) {
         std::cout << "int: " << *gen(rand).getRef() << std::endl;
     }
@@ -370,7 +370,7 @@ TEST(PropTest, GenSet)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::set<int>> gen;
+    Arbi<std::set<int>> gen;
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
@@ -383,7 +383,7 @@ TEST(PropTest, GenMap)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::map<int, int>> gen;
+    Arbi<std::map<int, int>> gen;
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
@@ -396,10 +396,10 @@ TEST(PropTest, GenMap2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::map<int, int>> gen;
+    Arbi<std::map<int, int>> gen;
     gen.setMaxSize(8);
     gen.setElemGen(integers<int>(0, 100));
-    gen.setKeyGen(Arbitrary<int>());
+    gen.setKeyGen(Arbi<int>());
     auto shr = gen(rand);
     exhaustive(shr, 0);
     // for (int i = 0; i < 20; i++) {
@@ -411,7 +411,7 @@ TEST(PropTest, GenList)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::list<int>> gen(integers<int>(0, 100));
+    Arbi<std::list<int>> gen(integers<int>(0, 100));
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
@@ -424,9 +424,9 @@ TEST(PropTest, GenNullable)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbitrary<std::list<int>> gen(integers<int>(0, 100));
+    Arbi<std::list<int>> gen(integers<int>(0, 100));
     gen.setMaxSize(8);
-    Arbitrary<Nullable<std::list<int>>> nullableGen(gen);
+    Arbi<Nullable<std::list<int>>> nullableGen(gen);
     auto shr = nullableGen(rand);
     // exhaustive(shr, 0);
 

@@ -21,24 +21,24 @@ public:
 namespace proptest {
 
 template <typename T>
-class Arbitrary<std::set<T>> final : public ArbitraryContainer<std::set<T>> {
+class Arbi<std::set<T>> final : public ArbiContainer<std::set<T>> {
     using Set = typename std::set<T>;
-    using ArbitraryContainer<Set>::minSize;
-    using ArbitraryContainer<Set>::maxSize;
+    using ArbiContainer<Set>::minSize;
+    using ArbiContainer<Set>::maxSize;
 
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary() : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(Arbitrary<T>()) {}
+    Arbi() : ArbiContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(Arbi<T>()) {}
 
-    Arbitrary(const Arbitrary<T>& _elemGen)
-        : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize),
+    Arbi(const Arbi<T>& _elemGen)
+        : ArbiContainer<Set>(defaultMinSize, defaultMaxSize),
           elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
-    Arbitrary(GenFunction<T> _elemGen) : ArbitraryContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(_elemGen) {}
+    Arbi(GenFunction<T> _elemGen) : ArbiContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(_elemGen) {}
 
     Shrinkable<Set> operator()(Random& rand) override
     {
@@ -84,8 +84,8 @@ public:
 };
 
 template <typename T>
-size_t Arbitrary<std::set<T>>::defaultMinSize = 0;
+size_t Arbi<std::set<T>>::defaultMinSize = 0;
 template <typename T>
-size_t Arbitrary<std::set<T>>::defaultMaxSize = 200;
+size_t Arbi<std::set<T>>::defaultMaxSize = 200;
 
 }  // namespace proptest

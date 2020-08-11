@@ -9,20 +9,17 @@
 namespace proptest {
 
 template <typename T>
-class Arbitrary<Nullable<T>> final : public ArbitraryBase<Nullable<T>> {
+class Arbi<Nullable<T>> final : public ArbiBase<Nullable<T>> {
 public:
-    Arbitrary() : elemGen(Arbitrary<T>()) {}
+    Arbi() : elemGen(Arbi<T>()) {}
 
-    Arbitrary(Arbitrary<T>& _elemGen)
-        : elemGen([_elemGen](Random& rand) mutable -> Shrinkable<T> { return _elemGen(rand); })
-    {
-    }
+    Arbi(Arbi<T>& _elemGen) : elemGen([_elemGen](Random& rand) mutable -> Shrinkable<T> { return _elemGen(rand); }) {}
 
-    Arbitrary(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
+    Arbi(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
 
     Shrinkable<Nullable<T>> operator()(Random& rand) override
     {
-        auto gen = Arbitrary<T>();
+        auto gen = Arbi<T>();
         // not null
         if (rand.getRandomBool(0.95)) {
             Shrinkable<T> shrinkable = gen(rand);

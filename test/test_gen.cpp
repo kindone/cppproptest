@@ -8,7 +8,7 @@ TEST(PropTest, GenVectorOfInt)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto smallIntGen = interval<int>(0, 4);
-    Arbitrary<std::vector<int>> gen(smallIntGen);
+    Arbi<std::vector<int>> gen(smallIntGen);
     gen.setSize(3);
 
     // for(int i = 0; i < 20; i++) {
@@ -29,7 +29,7 @@ TEST(PropTest, GenVectorWithNoArbitrary)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto fooGen = construct<Foo, int>(interval<int>(0, 4));
-    Arbitrary<std::vector<Foo>> gen(fooGen);
+    Arbi<std::vector<Foo>> gen(fooGen);
     gen.setSize(3);
 
     for (int i = 0; i < 1; i++)
@@ -88,7 +88,7 @@ TEST(PropTest, FloatShrinkable)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto floatGen = Arbitrary<float>();
+    auto floatGen = Arbi<float>();
     auto shrinkable = floatGen(rand);
     std::cout << "float generated: " << std::endl;
     exhaustive(shrinkable, 0);
@@ -201,7 +201,7 @@ TEST(PropTest, ShrinkVectorFromGen)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     using T = int8_t;
-    auto genVec = Arbitrary<std::vector<T>>(interval<T>(-8, 8));
+    auto genVec = Arbi<std::vector<T>>(interval<T>(-8, 8));
     genVec.setMaxSize(8);
     genVec.setMinSize(0);
     auto vecShrinkable = genVec(rand);
@@ -210,7 +210,7 @@ TEST(PropTest, ShrinkVectorFromGen)
 }
 TEST(PropTest, TuplePair1)
 {
-    auto intGen = Arbitrary<int>();
+    auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
     auto gen = pair(intGen, smallIntGen);
@@ -222,7 +222,7 @@ TEST(PropTest, TuplePair1)
 
 TEST(PropTest, TupleGen1)
 {
-    auto intGen = Arbitrary<int>();
+    auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
     auto gen = tuple(intGen, smallIntGen);
@@ -237,7 +237,7 @@ TEST(PropTest, TupleGen2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     while (true) {
-        auto intGen = Arbitrary<int>();
+        auto intGen = Arbi<int>();
         auto shrinkable = intGen(rand);
         auto value = shrinkable.get();
         if (value > -20 && value < 20) {
@@ -266,7 +266,7 @@ TEST(PropTest, TupleGen3)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     while (true) {
-        auto intGen = Arbitrary<int>();
+        auto intGen = Arbi<int>();
         auto shrinkable = intGen(rand);
         auto value = shrinkable.get();
         if (value > -20 && value < 20) {
@@ -317,7 +317,7 @@ TEST(PropTest, GenVectorPerf)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto logGen = Construct<Log>();
-    auto vecGen = Arbitrary<std::vector<Log>>(logGen);
+    auto vecGen = Arbi<std::vector<Log>>(logGen);
     vecGen.setSize(1);
     auto shrinkable = vecGen(rand);
 
@@ -333,9 +333,9 @@ TEST(PropTest, GenTupleVector)
     int numRows = 8;
     uint16_t numElements = 64;
     auto firstGen = interval<uint16_t>(0, numElements);
-    auto secondGen = Arbitrary<bool>();  // TODO true : false should be 2:1
+    auto secondGen = Arbi<bool>();  // TODO true : false should be 2:1
     auto indexGen = tuple(firstGen, secondGen);
-    auto indexVecGen = Arbitrary<IndexVector>(indexGen);
+    auto indexVecGen = Arbi<IndexVector>(indexGen);
     indexVecGen.setMaxSize(numRows);
     indexVecGen.setMinSize(numRows / 2);
     auto shrinkable = indexVecGen(rand);
@@ -348,7 +348,7 @@ TEST(PropTest, GenVectorAndShrink)
     Random rand(seed);
 
     auto smallIntGen = interval<int>(-8, 8);
-    auto vectorGen = Arbitrary<std::vector<int>>(smallIntGen);
+    auto vectorGen = Arbi<std::vector<int>>(smallIntGen);
     for (size_t maxLen = 1; maxLen < 4; maxLen++) {
         while (true) {
             vectorGen.setMaxSize(maxLen);
@@ -399,14 +399,14 @@ TEST(PropTest, Polymorphic)
     };
 
     {
-        auto carGen = Arbitrary<int>().map<Vehicle>([](int&) { return Car(); });
+        auto carGen = Arbi<int>().map<Vehicle>([](int&) { return Car(); });
         auto carShrinkable = carGen(rand);
         // polymorphism doesn't work!
         std::cout << "car.get(): " << carShrinkable.getRef().get() << std::endl;
     }
 
     {
-        auto carGen = Arbitrary<int>().map<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
+        auto carGen = Arbi<int>().map<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
         auto carShrinkable = carGen(rand);
         // polymorphism works
         std::cout << "car.get(): " << carShrinkable.getRef()->get() << std::endl;

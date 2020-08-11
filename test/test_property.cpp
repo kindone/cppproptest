@@ -114,13 +114,13 @@ struct Bit
 namespace proptest {
 
 template <>
-class Arbitrary<Bit> : public GenBase<Bit> {
+class Arbi<Bit> : public GenBase<Bit> {
 public:
     Shrinkable<Bit> operator()(Random& rand)
     {
         static auto gen_v =
-            proptest::transform<uint8_t, uint8_t>(Arbitrary<uint8_t>(), [](uint8_t& vbit) { return (1 << 0) & vbit; });
-        static auto gen_bit = construct<Bit, uint8_t, bool>(gen_v, Arbitrary<bool>());
+            proptest::transform<uint8_t, uint8_t>(Arbi<uint8_t>(), [](uint8_t& vbit) { return (1 << 0) & vbit; });
+        static auto gen_bit = construct<Bit, uint8_t, bool>(gen_v, Arbi<bool>());
         return gen_bit(rand);
     }
 };
@@ -234,7 +234,7 @@ TEST(PropTest, TestVectorCheckFail)
     show(std::cout, tup);
     std::cout << std::endl;
 
-    auto vecGen = Arbitrary<std::vector<int>>();
+    auto vecGen = Arbi<std::vector<int>>();
     vecGen.setMaxSize(32);
 
     forAll(
@@ -314,11 +314,10 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto vecGen = Arbitrary<std::vector<int>>();
+    auto vecGen = Arbi<std::vector<int>>();
     vecGen.setMaxSize(20);
-    auto animal =
-        construct<Animal, int, std::string, std::vector<int>&>(Arbitrary<int>(), Arbitrary<std::string>(), vecGen);
-    auto animalVecGen = Arbitrary<std::vector<Animal>>(animal);
+    auto animal = construct<Animal, int, std::string, std::vector<int>&>(Arbi<int>(), Arbi<std::string>(), vecGen);
+    auto animalVecGen = Arbi<std::vector<Animal>>(animal);
     animalVecGen.setMaxSize(20);
 
     forAll(

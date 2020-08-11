@@ -6,16 +6,16 @@
 namespace proptest {
 
 template <>
-class PROPTEST_API Arbitrary<CESU8String> final : public ArbitraryContainer<CESU8String> {
+class PROPTEST_API Arbi<CESU8String> final : public ArbiContainer<CESU8String> {
 public:
-    using ArbitraryContainer<CESU8String>::minSize;
-    using ArbitraryContainer<CESU8String>::maxSize;
+    using ArbiContainer<CESU8String>::minSize;
+    using ArbiContainer<CESU8String>::maxSize;
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary();
-    Arbitrary(Arbitrary<uint32_t>& _elemGen);
-    Arbitrary(GenFunction<uint32_t> _elemGen);
+    Arbi();
+    Arbi(Arbi<uint32_t>& _elemGen);
+    Arbi(GenFunction<uint32_t> _elemGen);
 
     Shrinkable<CESU8String> operator()(Random& rand) override;
 

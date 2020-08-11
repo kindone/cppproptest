@@ -95,9 +95,9 @@ decltype(auto) tuple(GEN0&& gen0, GENS&&... gens)
 }
 
 template <typename... ARGS>
-class PROPTEST_API Arbitrary<std::tuple<ARGS...>> final : public ArbitraryBase<std::tuple<ARGS...>> {
+class PROPTEST_API Arbi<std::tuple<ARGS...>> final : public ArbiBase<std::tuple<ARGS...>> {
 public:
-    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) override { return tuple(Arbitrary<ARGS>()...)(rand); }
+    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) override { return tuple(Arbi<ARGS>()...)(rand); }
 };
 
 }  // namespace proptest

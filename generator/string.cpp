@@ -10,27 +10,27 @@
 
 namespace proptest {
 
-size_t Arbitrary<std::string>::defaultMinSize = 0;
-size_t Arbitrary<std::string>::defaultMaxSize = 200;
+size_t Arbi<std::string>::defaultMinSize = 0;
+size_t Arbi<std::string>::defaultMaxSize = 200;
 
 // defaults to ascii characters
-Arbitrary<std::string>::Arbitrary()
-    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(interval<char>(0x1, 0x7f))
+Arbi<std::string>::Arbi()
+    : ArbiContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(interval<char>(0x1, 0x7f))
 {
 }
 
-Arbitrary<std::string>::Arbitrary(Arbitrary<char>& _elemGen)
-    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize),
+Arbi<std::string>::Arbi(Arbi<char>& _elemGen)
+    : ArbiContainer<std::string>(defaultMinSize, defaultMaxSize),
       elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
-Arbitrary<std::string>::Arbitrary(GenFunction<char> _elemGen)
-    : ArbitraryContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+Arbi<std::string>::Arbi(GenFunction<char> _elemGen)
+    : ArbiContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
 
-Shrinkable<std::string> Arbitrary<std::string>::operator()(Random& rand)
+Shrinkable<std::string> Arbi<std::string>::operator()(Random& rand)
 {
     size_t size = rand.getRandomSize(minSize, maxSize + 1);
     std::string str(size, ' ' /*, allocator()*/);

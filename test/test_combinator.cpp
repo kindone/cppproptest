@@ -18,7 +18,7 @@ TEST(PropTest, TestJust2)
     Random rand(seed);
 
     auto ptrGen = just<std::shared_ptr<int>>(std::make_shared<int>(0));
-    auto vecGen = Arbitrary<std::vector<std::shared_ptr<int>>>(ptrGen);
+    auto vecGen = Arbi<std::vector<std::shared_ptr<int>>>(ptrGen);
 
     std::cout << "just: " << ptrGen(rand).get() << std::endl;
     auto shr = vecGen(rand);
@@ -32,7 +32,7 @@ TEST(PropTest, TestLazy)
     Random rand(seed);
 
     auto ptrGen = lazy<std::shared_ptr<int>>([]() { return std::make_shared<int>(1); });
-    auto vecGen = Arbitrary<std::vector<std::shared_ptr<int>>>(ptrGen);
+    auto vecGen = Arbi<std::vector<std::shared_ptr<int>>>(ptrGen);
 
     auto vec = ptrGen(rand).get();
 
@@ -64,8 +64,8 @@ TEST(PropTest, TestConstruct2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbitrary<std::string>(),
-                                                                      Arbitrary<std::vector<int>>());
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbi<std::string>(),
+                                                                      Arbi<std::vector<int>>());
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
@@ -99,7 +99,7 @@ TEST(PropTest, TestConstruct4)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbitrary<std::string>());
+    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbi<std::string>());
     Animal animal = gen(rand).get();
     std::cout << "Gen animal: " << animal << std::endl;
 
@@ -119,7 +119,7 @@ TEST(PropTest, TestFilter)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto filteredGen = Arbitrary<Animal>().filter(+[](Animal& a) -> bool {
+    auto filteredGen = Arbi<Animal>().filter(+[](Animal& a) -> bool {
         return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() < 10 && a.measures.size() < 10;
     });
 
@@ -131,7 +131,7 @@ TEST(PropTest, TestFilter2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    Arbitrary<int> gen;
+    Arbi<int> gen;
     auto evenGen = filter<int>(
         gen, +[](int& value) { return value % 2 == 0; });
 
@@ -156,7 +156,7 @@ TEST(PropTest, TestFilter3)
     Random rand(seed);
     Random savedRand = rand;
 
-    Arbitrary<int> intGen;
+    Arbi<int> intGen;
     {
         auto evenGen = filter<int>(
             intGen, +[](int& val) -> bool { return val % 2 == 0; });
@@ -170,7 +170,7 @@ TEST(PropTest, TestFilter3)
     }
 
     {
-        auto evenGen = Arbitrary<int>().filter(+[](int& val) -> bool { return val % 2 == 0; });
+        auto evenGen = Arbi<int>().filter(+[](int& val) -> bool { return val % 2 == 0; });
 
         auto shrinkable = evenGen(savedRand);
         std::cout << "GenShrinks2: " << shrinkable.get() << std::endl;
@@ -183,7 +183,7 @@ TEST(PropTest, TestFilter3)
 
 TEST(PropTest, TestOneOf)
 {
-    auto intGen = Arbitrary<int>();
+    auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
     auto gen = oneOf<int>(intGen, smallIntGen);
@@ -195,7 +195,7 @@ TEST(PropTest, TestOneOf)
 
 TEST(PropTest, TestOneOfWeighted)
 {
-    auto intGen = Arbitrary<int>();
+    auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
     auto gen = oneOf<int>(just(0), weightedGen<int>(just(1), 0.2));

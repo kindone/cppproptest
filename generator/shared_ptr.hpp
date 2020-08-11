@@ -8,20 +8,17 @@
 namespace proptest {
 
 template <typename T>
-class Arbitrary<std::shared_ptr<T>> final : public ArbitraryBase<std::shared_ptr<T>> {
+class Arbi<std::shared_ptr<T>> final : public ArbiBase<std::shared_ptr<T>> {
 public:
-    Arbitrary() : elemGen(Arbitrary<T>()) {}
+    Arbi() : elemGen(Arbi<T>()) {}
 
-    Arbitrary(const Arbitrary<T>& _elemGen)
-        : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
-    {
-    }
+    Arbi(const Arbi<T>& _elemGen) : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); }) {}
 
-    Arbitrary(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
+    Arbi(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
 
     Shrinkable<std::shared_ptr<T>> operator()(Random& rand) override
     {
-        auto gen = Arbitrary<T>();
+        auto gen = Arbi<T>();
         Shrinkable<T> shrinkable = gen(rand);
         return shrinkable.template map<std::shared_ptr<T>>(+[](const T& obj) { return std::make_shared<T>(obj); });
     }

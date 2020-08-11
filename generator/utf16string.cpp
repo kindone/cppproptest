@@ -12,22 +12,19 @@
 
 namespace proptest {
 
-size_t Arbitrary<UTF16BEString>::defaultMinSize = 0;
-size_t Arbitrary<UTF16BEString>::defaultMaxSize = 200;
+size_t Arbi<UTF16BEString>::defaultMinSize = 0;
+size_t Arbi<UTF16BEString>::defaultMaxSize = 200;
 
-Arbitrary<UTF16BEString>::Arbitrary()
-    : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
-{
-}
+Arbi<UTF16BEString>::Arbi() : ArbiContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
 
-Arbitrary<UTF16BEString>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
-    : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize),
+Arbi<UTF16BEString>::Arbi(Arbi<uint32_t>& _elemGen)
+    : ArbiContainer<UTF16BEString>(defaultMinSize, defaultMaxSize),
       elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
-Arbitrary<UTF16BEString>::Arbitrary(GenFunction<uint32_t> _elemGen)
-    : ArbitraryContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+Arbi<UTF16BEString>::Arbi(GenFunction<uint32_t> _elemGen)
+    : ArbiContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
 
@@ -41,7 +38,7 @@ Arbitrary<UTF16BEString>::Arbitrary(GenFunction<uint32_t> _elemGen)
  * U+E000..U+FFFF     (as code point in LE/BE)
  * U+10000..U+10FFFF: 4-byte surrogate pairs (U+D800..U+DBFF + U+DC00..U+DFFF)
  */
-Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
+Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;
@@ -122,22 +119,19 @@ Shrinkable<UTF16BEString> Arbitrary<UTF16BEString>::operator()(Random& rand)
         });
 }
 
-size_t Arbitrary<UTF16LEString>::defaultMinSize = 0;
-size_t Arbitrary<UTF16LEString>::defaultMaxSize = 200;
+size_t Arbi<UTF16LEString>::defaultMinSize = 0;
+size_t Arbi<UTF16LEString>::defaultMaxSize = 200;
 
-Arbitrary<UTF16LEString>::Arbitrary()
-    : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen)
-{
-}
+Arbi<UTF16LEString>::Arbi() : ArbiContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
 
-Arbitrary<UTF16LEString>::Arbitrary(Arbitrary<uint32_t>& _elemGen)
-    : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize),
+Arbi<UTF16LEString>::Arbi(Arbi<uint32_t>& _elemGen)
+    : ArbiContainer<UTF16LEString>(defaultMinSize, defaultMaxSize),
       elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
-Arbitrary<UTF16LEString>::Arbitrary(GenFunction<uint32_t> _elemGen)
-    : ArbitraryContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+Arbi<UTF16LEString>::Arbi(GenFunction<uint32_t> _elemGen)
+    : ArbiContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
 
@@ -151,7 +145,7 @@ Arbitrary<UTF16LEString>::Arbitrary(GenFunction<uint32_t> _elemGen)
  * U+E000..U+FFFF     (as code point in LE/BE)
  * U+10000..U+10FFFF: 4-byte surrogate pairs (U+D800..U+DBFF + U+DC00..U+DFFF)
  */
-Shrinkable<UTF16LEString> Arbitrary<UTF16LEString>::operator()(Random& rand)
+Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
     std::vector<uint8_t> chars /*, allocator()*/;

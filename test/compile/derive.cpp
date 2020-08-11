@@ -9,7 +9,7 @@ TEST(Compile, derive)
 {
     auto intGen = elementOf<int>(2, 4, 6);
     auto stringGen = derive<int, std::string>(intGen, [](int& value) {
-        auto gen = Arbitrary<std::string>();
+        auto gen = Arbi<std::string>();
         gen.setMaxSize(value);
         return gen;
     });

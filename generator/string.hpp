@@ -8,17 +8,17 @@
 namespace proptest {
 
 template <>
-class PROPTEST_API Arbitrary<std::string> final : public ArbitraryContainer<std::string> {
-    using ArbitraryContainer<std::string>::minSize;
-    using ArbitraryContainer<std::string>::maxSize;
+class PROPTEST_API Arbi<std::string> final : public ArbiContainer<std::string> {
+    using ArbiContainer<std::string>::minSize;
+    using ArbiContainer<std::string>::maxSize;
 
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary();
-    Arbitrary(Arbitrary<char>& _elemGen);
-    Arbitrary(GenFunction<char> _elemGen);
+    Arbi();
+    Arbi(Arbi<char>& _elemGen);
+    Arbi(GenFunction<char> _elemGen);
 
     Shrinkable<std::string> operator()(Random& rand) override;
     // FIXME: turn to shared_ptr

@@ -8,19 +8,16 @@
 
 namespace proptest {
 template <typename Key, typename T>
-class Arbitrary<std::map<Key, T>> final : public ArbitraryContainer<std::map<Key, T>> {
+class Arbi<std::map<Key, T>> final : public ArbiContainer<std::map<Key, T>> {
     using Map = typename std::map<Key, T>;
-    using ArbitraryContainer<Map>::minSize;
-    using ArbitraryContainer<Map>::maxSize;
+    using ArbiContainer<Map>::minSize;
+    using ArbiContainer<Map>::maxSize;
 
 public:
     static size_t defaultMinSize;
     static size_t defaultMaxSize;
 
-    Arbitrary()
-        : ArbitraryContainer<Map>(defaultMinSize, defaultMaxSize), keyGen(Arbitrary<Key>()), elemGen(Arbitrary<T>())
-    {
-    }
+    Arbi() : ArbiContainer<Map>(defaultMinSize, defaultMaxSize), keyGen(Arbi<Key>()), elemGen(Arbi<T>()) {}
 
     Shrinkable<Map> operator()(Random& rand) override
     {
@@ -73,25 +70,25 @@ public:
         });
     }
 
-    Arbitrary<Map> setKeyGen(const Arbitrary<Key>& _keyGen)
+    Arbi<Map> setKeyGen(const Arbi<Key>& _keyGen)
     {
         keyGen = _keyGen;
         return *this;
     }
 
-    Arbitrary<Map> setElemGen(const Arbitrary<T>& _elemGen)
+    Arbi<Map> setElemGen(const Arbi<T>& _elemGen)
     {
         elemGen = _elemGen;
         return *this;
     }
 
-    Arbitrary<Map> setKeyGen(GenFunction<Key> _keyGen)
+    Arbi<Map> setKeyGen(GenFunction<Key> _keyGen)
     {
         keyGen = _keyGen;
         return *this;
     }
 
-    Arbitrary<Map> setElemGen(GenFunction<T> _elemGen)
+    Arbi<Map> setElemGen(GenFunction<T> _elemGen)
     {
         elemGen = _elemGen;
         return *this;
@@ -102,8 +99,8 @@ public:
 };
 
 template <typename Key, typename T>
-size_t Arbitrary<std::map<Key, T>>::defaultMinSize = 0;
+size_t Arbi<std::map<Key, T>>::defaultMinSize = 0;
 template <typename Key, typename T>
-size_t Arbitrary<std::map<Key, T>>::defaultMaxSize = 200;
+size_t Arbi<std::map<Key, T>>::defaultMaxSize = 200;
 
 }  // namespace proptest
