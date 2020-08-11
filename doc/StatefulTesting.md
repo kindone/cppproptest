@@ -117,14 +117,14 @@ With our `Action`s properly defined, we can generate the sequence of `Action`s.
 auto actionSeqGen = actions<ActionWithoutModel<MyVector>>(
         // int -> PushBack(int)
         transform<int, std::shared_ptr<ActionWithoutModel<MyVector>>>(
-            Arbitrary<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
+            Arbi<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
             
         // Popback()
         just<std::shared_ptr<ActionWithoutModel<MyVector>>>([]() { return std::make_shared<PopBack>(); }),
         
         // (int, int) -> SetAt(int, int)
         transform<int, std::shared_ptr<ActionWithoutModel<MyVector>>>(
-            Arbitrary<std::pair<int,int>>(), [](const std:;pair<int,int>& posAndVal) { return std::make_shared<SetAt>(posAndVal.first, posAndVal.second); }),
+            Arbi<std::pair<int,int>>(), [](const std:;pair<int,int>& posAndVal) { return std::make_shared<SetAt>(posAndVal.first, posAndVal.second); }),
             
         // Clear()
         just<std::shared_ptr<ActionWithoutModel<MyVector>>>([]() { return std::make_shared<Clear>(); })
@@ -139,6 +139,6 @@ Finally, we will call `statefulProperty::forAll` to perform generation of action
 You should supply generator for initial state of `MyVector` to start with.
 
 ```cpp
-auto prop = statefulProperty<ActionWithoutModel<MyVector>>(Arbitrary<MyVector>(), actionSeqGen)
+auto prop = statefulProperty<ActionWithoutModel<MyVector>>(Arbi<MyVector>(), actionSeqGen)
 prop.forAll();
 ```
