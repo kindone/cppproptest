@@ -162,7 +162,7 @@ Shrinkable<CESU8String> Arbi<CESU8String>::operator()(Random& rand)
                     return CESU8String(str.substr(0, positions[size + minSizeCopy]));
             });
 
-    return shrinkRear.andThen([minSizeCopy, positions](const Shrinkable<CESU8String>& shr) {
+    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<CESU8String>& shr) {
         auto& str = shr.getRef();
         size_t maxSizeCopy = str.charsize();
         if (maxSizeCopy == minSizeCopy)

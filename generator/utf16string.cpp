@@ -119,7 +119,7 @@ Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
                     return UTF16BEString(str.substr(0, positions[size + minSizeCopy]));
             });
 
-    return shrinkRear.andThen([minSizeCopy, positions](const Shrinkable<UTF16BEString>& shr) {
+    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<UTF16BEString>& shr) {
         auto& str = shr.getRef();
         size_t maxSizeCopy = str.charsize();
         if (maxSizeCopy == minSizeCopy)
@@ -254,7 +254,7 @@ Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
                     return UTF16LEString(str.substr(0, positions[size + minSizeCopy]));
             });
 
-    return shrinkRear.andThen([minSizeCopy, positions](const Shrinkable<UTF16LEString>& shr) {
+    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<UTF16LEString>& shr) {
         auto& str = shr.getRef();
         size_t maxSizeCopy = str.charsize();
         if (maxSizeCopy == minSizeCopy)

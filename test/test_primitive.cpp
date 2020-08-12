@@ -94,7 +94,7 @@ TEST(PropTest, GenString2)
     Random rand(seed);
     auto alphabets = interval<char>('A', 'z');
     Arbi<std::string> gen(alphabets);
-    gen.setSize(1, 3);
+    gen.setSize(1, 4);
 
     for (int i = 0; i < 3; i++) {
         auto shr = gen(rand);

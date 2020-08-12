@@ -178,7 +178,7 @@ Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
                           });
 
     // shrink front
-    return shrinkRear.andThen([minSizeCopy, positions](const Shrinkable<UTF8String>& shr) {
+    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<UTF8String>& shr) {
         auto& str = shr.getRef();
         size_t maxSizeCopy = str.charsize();
         if (maxSizeCopy == minSizeCopy)

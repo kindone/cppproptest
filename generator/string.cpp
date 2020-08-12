@@ -44,7 +44,7 @@ Shrinkable<std::string> Arbi<std::string>::operator()(Random& rand)
         });
 
     // shrink front
-    return shrinkRear.andThen([minSizeCopy](const Shrinkable<std::string>& shr) {
+    return shrinkRear.concat([minSizeCopy](const Shrinkable<std::string>& shr) {
         auto& str = shr.getRef();
         size_t maxSizeCopy = str.size();
         if (maxSizeCopy == minSizeCopy)
