@@ -88,6 +88,21 @@ TEST(PropTest, GenString)
     }
 }
 
+TEST(PropTest, GenString2)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    auto alphabets = interval<char>('A', 'z');
+    Arbi<std::string> gen(alphabets);
+    gen.setSize(1, 3);
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = gen(rand);
+        std::cout << "str: \"" << static_cast<std::string>(shr.getRef()) << "\"" << std::endl;
+        exhaustive(shr, 0);
+    }
+}
+
 void testUTF8(PropertyContext& context, Random rand)
 {
     Arbi<UTF8String> gen;
@@ -316,11 +331,35 @@ TEST(PropTest, GenUnicodeString)
     context.printSummary();
 }
 
+TEST(PropTest, GenUTF8String)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbi<UTF8String> gen;
+    gen.setMaxSize(8);
+    for (int i = 0; i < 3; i++)
+        exhaustive(gen(rand), 0);
+}
+
 TEST(PropTest, GenUTF8String2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbi<UTF8String> gen;
+    gen.setSize(1, 3);
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = gen(rand);
+        std::cout << "str: \"" << static_cast<UTF8String>(shr.getRef()) << "\"" << std::endl;
+        exhaustive(shr, 0);
+    }
+}
+
+TEST(PropTest, GenUTF16BEString)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbi<UTF16BEString> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -331,6 +370,20 @@ TEST(PropTest, GenUTF16BEString2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbi<UTF16BEString> gen;
+    gen.setSize(1, 3);
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = gen(rand);
+        std::cout << "str: \"" << static_cast<UTF16BEString>(shr.getRef()) << "\"" << std::endl;
+        exhaustive(shr, 0);
+    }
+}
+
+TEST(PropTest, GenUTF16LEString)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbi<UTF16LEString> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -341,6 +394,20 @@ TEST(PropTest, GenUTF16LEString2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbi<UTF16LEString> gen;
+    gen.setSize(1, 3);
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = gen(rand);
+        std::cout << "str: \"" << static_cast<UTF16LEString>(shr.getRef()) << "\"" << std::endl;
+        exhaustive(shr, 0);
+    }
+}
+
+TEST(PropTest, GenCESU8String)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    Arbi<CESU8String> gen;
     gen.setMaxSize(8);
     for (int i = 0; i < 3; i++)
         exhaustive(gen(rand), 0);
@@ -351,9 +418,13 @@ TEST(PropTest, GenCESU8String2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     Arbi<CESU8String> gen;
-    gen.setMaxSize(8);
-    for (int i = 0; i < 3; i++)
-        exhaustive(gen(rand), 0);
+    gen.setSize(1, 3);
+
+    for (int i = 0; i < 3; i++) {
+        auto shr = gen(rand);
+        std::cout << "str: \"" << static_cast<CESU8String>(shr.getRef()) << "\"" << std::endl;
+        exhaustive(shr, 0);
+    }
 }
 
 TEST(PropTest, GenSharedPtr)

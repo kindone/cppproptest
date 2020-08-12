@@ -38,8 +38,22 @@ Shrinkable<std::string> Arbi<std::string>::operator()(Random& rand)
         str[i] = elemGen(rand).get();
 
     size_t minSizeCopy = minSize;
-    return util::binarySearchShrinkableU(size - minSizeCopy).map<std::string>([str, minSizeCopy](const uint64_t& size) {
-        return str.substr(0, size + minSizeCopy);
+    auto shrinkRear =
+        util::binarySearchShrinkableU(size - minSizeCopy).map<std::string>([str, minSizeCopy](const uint64_t& size) {
+            return str.substr(0, size + minSizeCopy);
+        });
+
+    // shrink front
+    return shrinkRear.andThen([minSizeCopy](const Shrinkable<std::string>& shr) {
+        auto& str = shr.getRef();
+        size_t maxSizeCopy = str.size();
+        if (maxSizeCopy == minSizeCopy)
+            return Stream<Shrinkable<std::string>>::empty();
+        auto newShrinkable = util::binarySearchShrinkableU(maxSizeCopy - minSizeCopy)
+                                 .map<std::string>([str, minSize = minSizeCopy, maxSizeCopy](const uint64_t& value) {
+                                     return str.substr(minSize + value, maxSizeCopy - (minSize + value));
+                                 });
+        return newShrinkable.shrinks();
     });
 }
 

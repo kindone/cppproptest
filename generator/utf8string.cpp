@@ -169,13 +169,31 @@ Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
 
     // substring shrinking
     size_t minSizeCopy = minSize;
-    return util::binarySearchShrinkableU(len - minSizeCopy)
-        .template map<UTF8String>([str, minSizeCopy, positions](const uint64_t& size) -> UTF8String {
-            if (positions.empty())
-                return UTF8String();
-            else
-                return UTF8String(str.substr(0, positions[size + minSizeCopy]));
-        });
+    auto shrinkRear = util::binarySearchShrinkableU(len - minSizeCopy)
+                          .map<UTF8String>([str, minSizeCopy, positions](const uint64_t& size) {
+                              if (positions.empty())
+                                  return UTF8String();
+                              else
+                                  return UTF8String(str.substr(0, positions[size + minSizeCopy]));
+                          });
+
+    // shrink front
+    return shrinkRear.andThen([minSizeCopy, positions](const Shrinkable<UTF8String>& shr) {
+        auto& str = shr.getRef();
+        size_t maxSizeCopy = str.charsize();
+        if (maxSizeCopy == minSizeCopy)
+            return Stream<Shrinkable<UTF8String>>::empty();
+        auto newShrinkable =
+            util::binarySearchShrinkableU(maxSizeCopy - minSizeCopy)
+                .map<UTF8String>([str, minSizeCopy, maxSizeCopy, positions](const uint64_t& value) {
+                    if (positions.empty())
+                        return UTF8String();
+                    else
+                        return UTF8String(str.substr(positions[minSizeCopy + value],
+                                                     positions[maxSizeCopy] - positions[minSizeCopy + value]));
+                });
+        return newShrinkable.shrinks();
+    });
 }
 
 }  // namespace proptest
