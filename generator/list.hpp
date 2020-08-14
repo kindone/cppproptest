@@ -170,7 +170,7 @@ public:
             std::list<T>& valueList = value.getRef();
             std::transform(
                 shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueList),
-                +[](const Shrinkable<T>& shr) -> T { return std::move(shr.getRef()); });
+                +[](const Shrinkable<T>& shr) -> T { return shr.getRef(); });
             return value;
         });
 

@@ -58,12 +58,12 @@ struct PopBack : public VectorAction
 
 TEST(StateTest, States)
 {
-    auto actionsGen = actions<VectorAction>(
+    auto actionsGen = actionClasses<VectorAction>(
         Arbi<int>().map<std::shared_ptr<VectorAction>>([](int& value) { return std::make_shared<PushBack>(value); }),
         just<std::shared_ptr<VectorAction>>(std::make_shared<PopBack>()),
         just<std::shared_ptr<VectorAction>>(std::make_shared<Clear>()));
 
-    auto prop = statefulProperty<VectorAction>(Arbi<std::vector<int>>(), actionsGen);
+    auto prop = actionClassProperty<VectorAction>(Arbi<std::vector<int>>(), actionsGen);
     prop.forAll();
 }
 
@@ -73,7 +73,7 @@ struct VectorModel
     int size;
 };
 
-struct VectorAction2 : public Action<std::vector<int>, VectorModel>
+struct VectorAction2 : public ActionWithModel<std::vector<int>, VectorModel>
 {
 };
 
@@ -123,24 +123,24 @@ struct PopBack2 : public VectorAction2
 
 TEST(StateTest, StatesWithModel)
 {
-    auto actionsGen = actions<VectorAction2>(
+    auto actionsGen = actionClasses<VectorAction2>(
         Arbi<int>().map<std::shared_ptr<VectorAction2>>([](int& value) { return std::make_shared<PushBack2>(value); }),
         just<std::shared_ptr<VectorAction2>>(std::make_shared<PopBack2>()),
         just<std::shared_ptr<VectorAction2>>(std::make_shared<Clear2>()));
 
-    auto prop = statefulProperty<VectorAction2>(
+    auto prop = actionClassProperty<VectorAction2>(
         Arbi<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
     prop.forAll();
 }
 
 TEST(StateTest, StatesWithModel2)
 {
-    auto actionsGen = actions<VectorAction2>(
+    auto actionsGen = actionClasses<VectorAction2>(
         Arbi<int>().map<std::shared_ptr<VectorAction2>>([](int& value) { return std::make_shared<PushBack2>(value); }),
         Arbi<int>().map<VectorAction2*>([](int& value) { return new PushBack2(value); }),
         lazy<VectorAction2*>([]() { return new PopBack2(); }), lazy<VectorAction2*>([]() { return new Clear2(); }));
 
-    auto prop = statefulProperty<VectorAction2>(
+    auto prop = actionClassProperty<VectorAction2>(
         Arbi<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
     prop.forAll();
 }

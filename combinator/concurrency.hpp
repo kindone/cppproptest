@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stateful.hpp"
+#include "stateful_class.hpp"
 #include "../gen.hpp"
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"

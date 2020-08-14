@@ -19,12 +19,12 @@ struct EmptyModel
 };
 
 template <typename SYSTEM, typename MODEL>
-struct Action
+struct ActionWithModel
 {
     using SystemType = SYSTEM;
     using ModelType = MODEL;
 
-    virtual ~Action() {}
+    virtual ~ActionWithModel() {}
     virtual bool precondition(const SYSTEM& system, const MODEL&) { return precondition(system); }
 
     virtual bool precondition(const SYSTEM&) { return true; }
@@ -35,7 +35,7 @@ struct Action
 };
 
 template <typename SYSTEM>
-struct ActionWithoutModel : public Action<SYSTEM, EmptyModel>
+struct ActionWithoutModel : public ActionWithModel<SYSTEM, EmptyModel>
 {
     virtual ~ActionWithoutModel() {}
 };
@@ -64,7 +64,7 @@ std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::ty
 }  // namespace util
 
 template <typename ActionType, typename... GENS>
-GenFunction<std::vector<std::shared_ptr<ActionType>>> actions(GENS&&... gens)
+GenFunction<std::vector<std::shared_ptr<ActionType>>> actionClasses(GENS&&... gens)
 {
     auto actionGen = oneOf<std::shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
     auto actionVecGen = Arbi<std::vector<std::shared_ptr<ActionType>>>(actionGen);
@@ -72,7 +72,7 @@ GenFunction<std::vector<std::shared_ptr<ActionType>>> actions(GENS&&... gens)
 }
 
 template <typename ActionType, typename InitialGen, typename ActionsGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen)
+decltype(auto) actionClassProperty(InitialGen&& initialGen, ActionsGen&& actionsGen)
 {
     using SystemType = typename ActionType::SystemType;
 
@@ -88,7 +88,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen
 }
 
 template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
+decltype(auto) actionClassProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
 {
     using ModelType = typename ActionType::ModelType;
     using SystemType = typename ActionType::SystemType;

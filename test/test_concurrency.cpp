@@ -70,7 +70,7 @@ TEST(ConcurrencyTest, States)
     auto popBackActionGen = lazy<std::shared_ptr<VectorAction3>>([]() { return std::make_shared<PopBack3>(); });
     auto clearActionGen = lazy<std::shared_ptr<VectorAction3>>([]() { return std::make_shared<Clear3>(); });
 
-    auto actionsGen = actions<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
+    auto actionsGen = actionClasses<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
 
     auto prop = concurrency<VectorAction3>(Arbi<std::vector<int>>(), actionsGen);
     prop.check();

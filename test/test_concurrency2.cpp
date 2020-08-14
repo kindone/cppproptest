@@ -32,7 +32,7 @@ TEST(ConcurrencyTest2, bitmap)
 
 TEST(ConcurrencyTest2, Container) {}
 
-struct VectorAction4 : public Action<std::vector<int>, util::Bitmap>
+struct VectorAction4 : public ActionWithModel<std::vector<int>, util::Bitmap>
 {
 };
 
@@ -85,7 +85,7 @@ TEST(ConcurrencyTest2, WithModel)
     auto popBackActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<PopBack4>(); });
     auto clearActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<Clear4>(); });
 
-    auto actionsGen = actions<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
+    auto actionsGen = actionClasses<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
 
     auto prop = concurrency<VectorAction4>(Arbi<std::vector<int>>(), actionsGen);
     prop.check();
