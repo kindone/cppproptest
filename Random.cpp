@@ -18,7 +18,7 @@ uint64_t Random::next8U()
 
 bool Random::getRandomBool(double threshold)
 {
-    return (next8U() <= static_cast<uint64_t>(UINT64_MAX * threshold));
+    return (next8U() <= static_cast<uint64_t>(static_cast<double>(UINT64_MAX) * threshold));
 }
 
 int8_t Random::getRandomInt8(int8_t min, int8_t max)
