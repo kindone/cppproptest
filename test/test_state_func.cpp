@@ -14,7 +14,6 @@ TEST(StateTest, States2)
 
     auto pushBackGen = Arbi<int>().map<Action<T>>([](int value) {
         return [value](T& obj) {
-            // std::cout << "PushBack(" << value << ")" << std::endl;
             auto size = obj.size();
             obj.push_back(value);
             PROP_ASSERT(obj.size() == size + 1);
@@ -23,7 +22,15 @@ TEST(StateTest, States2)
     });
 
     auto popBackGen = actionGen<T>([](T& obj) {
-        // std::cout << "PopBack" << std::endl;
+        auto size = obj.size();
+        if (obj.empty())
+            return true;
+        obj.pop_back();
+        PROP_ASSERT(obj.size() == size - 1);
+        return true;
+    });
+
+    auto popBackGen2 = just<Action<T>>([](T& obj) {
         auto size = obj.size();
         if (obj.empty())
             return true;
@@ -39,6 +46,6 @@ TEST(StateTest, States2)
         return true;
     });
 
-    auto prop = actionProperty<T>(pushBackGen, popBackGen, clearGen);
+    auto prop = actionProperty<T>(pushBackGen, popBackGen, popBackGen2, clearGen);
     prop.forAll();
 }
