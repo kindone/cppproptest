@@ -7,7 +7,7 @@
 namespace proptest {
 namespace util {
 
-template <typename Function, typename GenTuple, std::size_t... index>
+template <typename Function, typename GenTuple, size_t... index>
 decltype(auto) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, std::index_sequence<index...>)
 {
     auto valueTup = std::make_tuple(std::get<index>(genTup)(rand)...);

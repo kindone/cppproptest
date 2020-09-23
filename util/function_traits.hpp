@@ -19,10 +19,10 @@ template <class R, class... Args>
 struct function_traits<R(Args...)>
 {
     using return_type = R;
-    static constexpr std::size_t arity = sizeof...(Args);
+    static constexpr size_t arity = sizeof...(Args);
     using argument_type_list = util::TypeList<Args...>;
 
-    template <std::size_t N>
+    template <size_t N>
     struct argument
     {
         static_assert(N < arity, "error: invalid parameter index.");
@@ -57,11 +57,11 @@ private:
     using full_argument_type_list = typename call_type::argument_type_list;
 
 public:
-    static constexpr std::size_t arity = call_type::arity - 1;
+    static constexpr size_t arity = call_type::arity - 1;
     using return_type = typename call_type::return_type;
     using argument_type_list = typename full_argument_type_list::Tail;
 
-    template <std::size_t N>
+    template <size_t N>
     struct argument
     {
         static_assert(N < arity, "error: invalid parameter index.");

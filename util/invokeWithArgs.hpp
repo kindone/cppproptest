@@ -7,7 +7,7 @@
 namespace proptest {
 namespace util {
 
-template <typename Function, typename Tuple, std::size_t... index>
+template <typename Function, typename Tuple, size_t... index>
 decltype(auto) invokeHelper(Function&& f, Tuple&& valueTup, std::index_sequence<index...>)
 {
     return f(std::get<index>(std::forward<Tuple>(valueTup))...);
@@ -32,7 +32,7 @@ std::enable_if_t<N != M, std::tuple_element_t<M, Tuple>> ReplaceHelper(Tuple&& v
     return std::get<M>(std::forward<Tuple>(valueTup));
 }
 
-template <size_t N, typename Function, typename Tuple, typename Replace, std::size_t... index>
+template <size_t N, typename Function, typename Tuple, typename Replace, size_t... index>
 decltype(auto) invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&& replace, std::index_sequence<index...>)
 {
     /*static_assert(std::is_same<Replace,

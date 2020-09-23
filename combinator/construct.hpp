@@ -26,7 +26,7 @@ std::enable_if_t<std::is_lvalue_reference<TO>::value, TO> autoCast(SHRINKABLE&& 
     return shr.getRef();
 }
 
-template <typename ToTuple, std::size_t N, typename FromTuple>
+template <typename ToTuple, size_t N, typename FromTuple>
 decltype(auto) autoCastTuple(FromTuple&& tuple)
 {
     return autoCast<typename std::tuple_element<N, ToTuple>::type>(std::get<N>(tuple));
@@ -92,7 +92,7 @@ public:
     }
 
 private:
-    template <std::size_t... index>
+    template <size_t... index>
     decltype(auto) generateArgsHelper(Random& rand, std::index_sequence<index...>)
     {
         return std::make_tuple(std::get<index>(genTup)(rand)...);
@@ -100,7 +100,7 @@ private:
 
     decltype(auto) generateArgs(Random& rand) { return generateArgsHelper(rand, std::make_index_sequence<Size>{}); }
 
-    template <typename CastTuple, typename ValueTuple, std::size_t... index>
+    template <typename CastTuple, typename ValueTuple, size_t... index>
     static Shrinkable<CLASS> constructByTupleType(ValueTuple&& valueTuple, std::index_sequence<index...>)
     {
         return make_shrinkable<CLASS>(util::autoCastTuple<CastTuple, index>(std::forward<ValueTuple>(valueTuple))...);

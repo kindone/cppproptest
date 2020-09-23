@@ -144,7 +144,7 @@ bool toStreamFrontHelper(std::ostream& os, const T& t)
     return true;
 }
 
-template <typename Tuple, std::size_t... index>
+template <typename Tuple, size_t... index>
 decltype(auto) toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>)
 {
     [[maybe_unused]] auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};

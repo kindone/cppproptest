@@ -12,7 +12,7 @@ class Random;
 
 namespace util {
 
-template <std::size_t O, std::size_t... Is>
+template <size_t O, size_t... Is>
 std::index_sequence<(O + Is)...> addOffset(std::index_sequence<Is...>)
 {
     return {};
@@ -25,7 +25,7 @@ decltype(auto) genToFunc(GEN&& gen)
     return static_cast<std::function<retType(Random&)>>(gen);
 }
 
-template <typename Tuple, std::size_t... index>
+template <typename Tuple, size_t... index>
 decltype(auto) createGenHelperListed(std::index_sequence<index...>)
 {
     return std::make_tuple(genToFunc(Arbi<std::tuple_element_t<index, Tuple>>())...);
