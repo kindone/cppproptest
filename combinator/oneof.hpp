@@ -5,6 +5,7 @@
 #include "../Random.hpp"
 #include "../assert.hpp"
 #include "../gen.hpp"
+#include "../GenBase.hpp"
 
 namespace proptest {
 

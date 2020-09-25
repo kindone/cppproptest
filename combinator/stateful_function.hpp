@@ -10,6 +10,7 @@
 #include "../gen.hpp"
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
+#include "../GenBase.hpp"
 
 namespace proptest {
 

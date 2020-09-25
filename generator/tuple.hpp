@@ -4,6 +4,7 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 #include "../util/tuple.hpp"
+#include "util.hpp"
 #include <tuple>
 #include <memory>
 

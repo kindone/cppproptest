@@ -6,6 +6,7 @@
 #include "../Shrinkable.hpp"
 #include "../api.hpp"
 #include "../PropertyContext.hpp"
+#include "../GenBase.hpp"
 #include <memory>
 #include <list>
 #include <type_traits>

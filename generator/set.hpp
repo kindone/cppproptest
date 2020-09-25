@@ -2,6 +2,7 @@
 #include "../gen.hpp"
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
+#include "util.hpp"
 #include <memory>
 #include <set>
 

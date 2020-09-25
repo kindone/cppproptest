@@ -1,5 +1,6 @@
 #pragma once
 #include "../gen.hpp"
+#include "../util/createGenTuple.hpp"
 #include <type_traits>
 
 namespace proptest {

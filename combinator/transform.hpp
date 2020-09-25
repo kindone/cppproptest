@@ -3,6 +3,7 @@
 #include <memory>
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
+#include "../GenBase.hpp"
 
 namespace proptest {
 

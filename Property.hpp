@@ -5,6 +5,9 @@
 #include "util/function_traits.hpp"
 #include "util/tuple.hpp"
 #include "util/printing.hpp"
+#include "util/invokeWithGenTuple.hpp"
+#include "util/invokeWithArgs.hpp"
+#include "util/createGenTuple.hpp"
 #include "generator/util.hpp"
 #include "PropertyContext.hpp"
 #include "PropertyBase.hpp"
@@ -151,7 +154,7 @@ private:
         return std::get<N>(valueTup);
     }
 
-    template <std::size_t... index>
+    template <size_t... index>
     decltype(auto) shrinkEach(ValueTuple&& valueTup, ShrinksTuple&& shrinksTup, std::index_sequence<index...>)
     {
         return std::make_tuple(

@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include "../Shrinkable.hpp"
+#include "../GenBase.hpp"
 
 namespace proptest {
 
