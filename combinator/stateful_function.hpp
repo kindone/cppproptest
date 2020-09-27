@@ -11,6 +11,7 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 #include "../GenBase.hpp"
+#include "just.hpp"
 
 namespace proptest {
 

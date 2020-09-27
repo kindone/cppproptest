@@ -4,6 +4,7 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 #include "../GenBase.hpp"
+#include "../util/function_traits.hpp"
 
 namespace proptest {
 
