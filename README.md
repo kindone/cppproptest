@@ -39,7 +39,10 @@ Property-based testing approach can be considered somewhere in the middle of sta
   * Also attemts to cover edgy cases with random generated inputs
 * Issue analyses are semi-automated (See [shrinking](doc/Shrinking.md) for more)
 
-### An Example: Turning conventional unit tests into property tests
+
+&nbsp;
+
+## An Example: Turning conventional unit tests into property tests
 
 A property is in the form of function `(Input0, ... , InputN) -> bool` (or `(Input0, ... , InputN) -> void`)
 
@@ -95,18 +98,18 @@ Here is the comparison table showing some of the benefits of turning conventiona
 
 |                   | Conventional Unit Tests   | **Property-Based Tests**     |
 | ----------------- |---------------------------| ---------------------------- |
-| Paradigm          | Procedural                | Functional                   |
+| Style             | Procedural/concrete       | Functional/abstract/declarative|
 | Test inputs       | Example values            | Auto-generated combinations  |
-| Style             | Concrete                  | Abstract                     |
-| Finding bugs      | -                         | More likely                  |
+| Finds new bugs    | No                        | Yes                          |
 | Code Coverage     | -                         | Higher                       |
 | Readability       | -                         | Higher                       |
-| Debugging failures| -                         | Supported (shrinking)        |
+| Debugging failures| -                         | Automated (shrinking)        |
 | Stateful tests    | -                         | Supported                    |
 | Concurrency tests | -                         | Supported                    |
 
+&nbsp;
 
-### Why property-based testing for C++?
+## Why property-based testing for C++?
 
 Property-based tesing relies on massive input combinations to be attempted to achieve high confidence. 
 For example, if you have a function with 10 boolean flags to be thoroughly tested in runtime, you need to test it with `2`<sup>`10`</sup> ` = 1024` combinations. This kind of complexity has been often considered as unmanageable and something that should be avoided. 
