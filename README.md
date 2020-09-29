@@ -2,13 +2,44 @@
 
 `cppproptest` is a property-based testing framework for C++. 
 
-## Property-based testing
+## Introduction to Property-based testing
 
-Many property-based testing frameworks derive from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) in Haskell. 
-Its basic idea is to quickly prove a theorem, as the name 'QuickCheck' suggests. 
-You can define an abstract property of a component, and let the test framework prove or disprove that property by feeding in massive input combinations. 
+### An attempt to approximate software quality 
 
-This approach is often said to be somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in definitive fashion, as in static code analysis, but by actually running the code, as in dynamic code analysis.
+Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by checking outcomes of *properties* or *specifications* with massive input combinations. This can be viewed as an inductive way of checking software quality. 
+
+Many property-based testing frameworks derive their ideas from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck), written in Haskell. Quickcheck's basic idea is to quickly prove a theorem, as the name suggests. You can define an abstract property (or 'specification') of a software component, and let the test framework prove or disprove that property by feeding in random (but valid) input combinations. We can see it as an attempt to approximate software quality. As the number of trials grows, more accurate the approximation it becomes.
+
+### Hybrid of static and dynamic code analyses
+
+Property-based testing approach can be considered somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in the form of properties or specifications in declarative fashion, as in static code analyses, but by actually running the code, as in dynamic code analyses. By actually running the code, we can check for many software quality requirements and issues that are usually not feasible to check with static code analyses. See the following comparison:
+
+#### Static code analysis
+
+* Analyzes the (source) code in deductive fashion
+* Does not require to execute the code
+  * Can find defects that are not in usual control paths
+  * Might lacks precision of outcomes because actual execution context is not considered
+  * May raise false alarms
+* Highly depends on strength of its deduction engine
+  * Deducing for complex runtime scenarios is limited
+
+#### Dynamic code analysis
+
+* Checks the actual outcomes by executing the code
+  * Can find complex runtime issues that are not implemented in static analyses
+  * Might not cover edgy cases where the control paths are rarely taken
+* Issue analyses often require huge effort from the tester 
+
+#### Property-based testing
+
+* Checks the actual outcome of properties by executing the code multiple times, with different input combinations
+  * Attempts to inductively verify the requirements
+  * Can find complex runtime issues
+  * Also attemts to cover edgy cases with random generated inputs
+* Issue analyses are semi-automated (See [shrinking](doc/Shrinking.md) for more)
+
+### An Example: Turning conventional unit tests into property tests
 
 A property is in the form of function `(Input0, ... , InputN) -> bool` (or `(Input0, ... , InputN) -> void`)
 
@@ -59,7 +90,7 @@ TEST(Suite, test) {
 }
 ```
 
-Here are some of the benefits of turning conventional unit tests into property based tests:
+Here is the comparison table showing some of the benefits of turning conventional unit tests into property based tests:
 
 
 |                   | Conventional Unit Tests   | **Property-Based Tests**     |
@@ -73,6 +104,14 @@ Here are some of the benefits of turning conventional unit tests into property b
 | Debugging failures| -                         | Supported (shrinking)        |
 | Stateful tests    | -                         | Supported                    |
 | Concurrency tests | -                         | Supported                    |
+
+
+### Why property-based testing for C++?
+
+Property-based tesing relies on massive input combinations to be attempted to achieve high confidence. 
+For example, if you have a function with 10 boolean flags to be thoroughly tested in runtime, you need to test it with `2`<sup>`10`</sup> ` = 1024` combinations. This kind of complexity has been often considered as unmanageable and something that should be avoided. 
+
+However, as most C++ unit components (as single unit or multiple components combined) tend to execute blazingly fast on modern machines, running them 1000 times is usually not an issue. Unless it's involving external devices like secondary disk or network communication, running a typical C++ component 1000 times would normally end up finishing under 1 second barrier. This is why C++ and property-based testing is a perfect pair.
 
 
 &nbsp;
