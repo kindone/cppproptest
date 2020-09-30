@@ -6,7 +6,16 @@
 
 ### An attempt to approximate software quality 
 
-Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by checking outcomes of *properties* or *specifications* with massive input combinations. This can be viewed as an inductive way of checking software quality. 
+Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by checking the outcomes of *properties* or *specifications* with massive input combinations. This can be viewed as an inductive way of checking software quality.
+
+```cpp
+    // check the property: 'content that has been encoded and then decoded should be identical to the original' 
+    MyEncoder encoder;
+    MyDecoder decoder;
+    auto encoded = encoder.encode(original);
+    auto decoded = decoder.decode(encoded);
+    ASSERT_EQ(original, decoded);
+```
 
 Many property-based testing frameworks derive their ideas from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck), written in Haskell. Quickcheck's basic idea is to quickly prove a theorem, as the name suggests. You can define an abstract property (or 'specification') of a software component, and let the test framework prove or disprove that property by feeding in random (but valid) input combinations. We can see it as an attempt to approximate software quality. As the number of trials grows, more accurate the approximation it becomes.
 
@@ -16,11 +25,11 @@ Property-based testing approach can be considered somewhere in the middle of sta
 
 #### Static code analysis
 
-* Analyzes the (source) code in deductive fashion
+* Analyzes the code in deductive fashion, examining every possible code path 
 * Does not require to execute the code
   * Can find defects that are not in usual control paths
   * Might lacks precision of outcomes because actual execution context is not considered
-  * May raise false alarms
+* May raise false alarms
 * Highly depends on strength of its deduction engine
   * Deducing for complex runtime scenarios is limited
 
