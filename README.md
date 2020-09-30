@@ -9,8 +9,8 @@
 Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by checking the outcomes of *properties* or *specifications* with massive input combinations. This can be viewed as an inductive way of checking software quality.
 
 ```cpp
-    // check the property: "content that has been encoded and then decoded
-         should be identical to the original"
+    // check property: "content that has been encoded and then decoded
+    //                  should be identical to the original"
     MyEncoder encoder;
     MyDecoder decoder;
     auto encoded = encoder.encode(original);
@@ -24,27 +24,31 @@ Many property-based testing frameworks derive their ideas from [QuickCheck](http
 
 ### Hybrid of static and dynamic code analyses
 
-Property-based testing approach can be considered to be somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in the form of properties or specifications in declarative fashion, as in static code analyses, but by actually running the code, as in dynamic code analyses. By actually running the code, we can check for many software quality requirements and issues that are usually not feasible to check with static code analyses. See the following comparison:
+Property-based testing approach can be considered to be somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in the form of properties or specifications in automated fashion, as in static code analyses, but by actually running the code, as in dynamic code analyses. By actually running the code, we can check for many software quality requirements and issues that are usually not feasible to check with static code analyses. See the following comparison:
 
 #### Static code analysis
 
-* Analyzes the code in deductive fashion, examining every possible code path 
-* Does not require to execute the code
+* Analyzes the code with deduction, examining every possible code path 
+* Fully automated
+* Does not actually execute the code
   * Can find defects that are not in usual control paths
-  * Might lack precision in the outcomes because actual execution context is not considered
+  * Might lack precision in the outcomes because actual software context is not considered
+* Cannot deal with software-specific requirements
 * May raise false alarms
 * Highly depends on strength of its deduction engine
-  * Deducing for complex runtime scenarios is limited
+  * Deducing against complex scenarios is limited
 
 #### Dynamic code analysis
 
 * Checks the actual outcomes by executing the code
-  * Can find complex runtime issues that are not implemented in static analyses
+  * Can find complex runtime issues that are not implemented (or able to implement) in static analyses
   * Might not cover edgy cases where the control paths are rarely taken
-* Issue analyses often require huge effort from the tester 
+* Usually requires user to manually define how to test the requirements
+* Analysing an issue often require huge effort from the tester
 
 #### Property-based testing
 
+* Requirements are described as properties
 * Checks the actual outcome of properties by executing the code multiple times, with different input combinations
   * Attempts to inductively verify the requirements
   * Can find complex runtime issues
