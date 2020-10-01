@@ -6,25 +6,20 @@
 
 ### An attempt to approximate software quality 
 
-Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by checking the outcomes of *properties* or *specifications* with massive input combinations. This can be viewed as an inductive way of checking software quality.
+Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by validating the requirements of a software component, where the requirements are written as *properties* or *specifications*. They are validated using massive input combinations. This can be viewed as an inductive or approximate way of checking software quality.
 
 ```cpp
-    // check property: "content that has been encoded and then decoded
-    //                  should be identical to the original"
-    MyEncoder encoder;
-    MyDecoder decoder;
-    auto encoded = encoder.encode(original);
-    auto decoded = decoder.decode(encoded);
-    ASSERT_EQ(original, decoded);
+    // Encoder & Decoder are inverse functions: text encoded and then decoded must equal to original text
+    ASSERT(decode(encode(text)) == text);
 ```
 
-![Estimating pi using Monte Carlo method](./doc/Pi_30K.gif)
+Many property-based testing implementations derive their ideas from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck), written in Haskell. Quickcheck's basic idea is to *quickly prove a theorem*, as the name suggests. But how can anything possibly be *proved* about software? A software piece is often too complex to reason about in definitive way. If we randomly choose 100 input combinations to test your component and confirm it satisfies the required properties with every 100 of the combinations, you can argue it's still not *proving* anything. How about if we increase the number to 1000, or 10000? Certainly there still remains some possibility that one of the untested input combinations might fail the properties. But we can say this as an approximation - an approximation of software integrity or quality. As the number of evidences grows, more accurate the approximation it becomes. It's often very effective to approximate an answer when it cannot be easily obtained. It's sometimes the only feasible way. Property-based testing can do exactly that. You define a property (or 'specification') of a software component should satisfy, then you can let the test framework *prove* or *disprove* that property by feeding in random (but valid) input combinations.  
 
-Many property-based testing frameworks derive their ideas from [QuickCheck](https://en.wikipedia.org/wiki/QuickCheck), written in Haskell. Quickcheck's basic idea is to quickly prove a theorem, as the name suggests. You can define an abstract property (or 'specification') of a software component should satisfy, and let the test framework prove or disprove that property by feeding in random (but valid) input combinations. We can see it as an attempt to approximate software quality. As the number of trials grows, more accurate the approximation it becomes. It's often a very effective choice to approximate an answer when it cannot be easily obtained in definitively.
+If the goal is to find a bug in a software, or in other words, to disprove the requirements, then this approach can be very effective in those cases. Why? Because it's often easier to prove that there is some bug in a software than to prove that it does not.  
 
-### Hybrid of static and dynamic code analyses
+### Harnessing the power of automation
 
-Property-based testing approach can be considered to be somewhere in the middle of static analysis and dynamic analysis. Software integrity and defects can be validated in the form of properties or specifications in automated fashion, as in static code analyses, but by actually running the code, as in dynamic code analyses. By actually running the code, we can check for many software quality requirements and issues that are usually not feasible to check with static code analyses. See the following comparison:
+Property-based testing approach can be considered to be somewhere in the middle of static analysis and dynamic analysis. Software requirements can be validated in automated fashion as in static code analyses, but by actually running the code as in dynamic code analyses. By actually running the code, we can check for many software quality requirements and issues that are usually not feasible to check with static code analyses. See the following comparison:
 
 #### Static code analysis
 
@@ -32,7 +27,7 @@ Property-based testing approach can be considered to be somewhere in the middle 
 * Fully automated
 * Does not actually execute the code
   * Can find defects that are not in usual control paths
-  * Might lack precision in the outcomes because actual software context is not considered
+  * May lack precision in the outcomes because actual software context is not considered
 * Cannot deal with software-specific requirements
 * May raise false alarms
 * Highly depends on strength of its deduction engine
