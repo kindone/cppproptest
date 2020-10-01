@@ -12,7 +12,7 @@ While the first style using functions are easier to use and understand, the seco
 2. Define action sequence generator: Define a generator for the `action` types that can build a seqeunce of actions and pass arguments to the selected actions
 3. Run the stateful test with randomized action sequences generated as in usual property tests
 
-Say, you are to write stateful test for your `MyVector`, which is a linear container for integers, with random-access support.
+Say, you are to write stateful test for your `MyVector`, which is a linear container for integers.
 
 ```cpp
 class MyVector {
@@ -28,17 +28,17 @@ You first need to define actions for each state change. This varies between the 
 
 ## Stule 1: Using Action Functions
 
-In the first style using functions, you will typically be defining an action with lambda. 
-An `Action` under this style is formally defined as a function.
+In the first style using functions, an `Action` is formally defined as a function:
 
 ```cpp
 template <typename SystemType>
 using Action = function<bool(SystemType&)>;
 ```
-Note that `SystemType` refers to the type of the stateful object of our concern.
-The function takes the `SystemType` reference and returns a `boolean` value as a result. 
 
-Our goal is to create a generator for our action. An action generator for an action with no arguments such as `pop_back` can be defined as:
+Note that `SystemType` refers to the type of the stateful object of our concern.
+The function takes a `SystemType` reference and returns a `boolean` value as a result. You will typically be defining an `Action` with lambda. 
+
+Our goal is to create a generator for our action. A generator for an action with no arguments such as `pop_back` can be defined as:
 
 ```cpp
 auto popBackGen = just<Action<MyVector>>([](MyVector& obj) {
@@ -58,19 +58,20 @@ auto pushBackGen = Arbi<int>().map<Action<MyVector>>([](int value) {
 });
 ```
 
-Here you can see an integer generator is transformed as an action generator. The outer lambda returns an action (a function) that calls `push_back` with the integer argument. 
+Here you can see an integer generator is transformed as an action generator. The outer lambda returns an action (a function) that calls `push_back` with the integer argument `value`. 
 
-In both examples, we are returning `true`, indicating the precondition for the action. This is mainly useful when you don't want to restrict to certain state changes at a specific object state. For example, you may want to avoid a `pop_back` to be called on an empty vector, by returning `false` instead:
+In both examples, we are returning `true`, indicating the precondition for the action. This is mainly useful when you want add restriction in selecting a state change at a specific object state. For example, you may want to avoid a `pop_back` to be called on an empty vector, by returning `false` instead:
 
 ```cpp
         // ...
         if(obj.size() == 0)
             return false;
         obj.pop_back();
+        return true;
         // ...
 ```
 
-Also, you can add various assertions in the lambda. These will work as postconditions. Any failed assertion will be reported and replayed, as in ordinary property tests.
+Also, you can add various assertions in the lambda. These will work as postcondition of the action. Any failed assertion will be reported and analyzed, as in ordinary property tests.
 
 Finally, with the action generators defined, we will call `actionProperty<SystemType>::forAll` to run the stateful property test:
 
@@ -81,4 +82,4 @@ prop.forAll();
 
 ## Style 2: Using Action Classes
 
-See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. 
+See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. There is no significant difference in the expressive power between the two styles.
