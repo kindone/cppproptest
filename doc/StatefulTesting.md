@@ -6,7 +6,7 @@ There are two variants of stateful testing:
 1. Defining and testing state changes with *action functions(lambda)*
 2. Defining and testing state changes with *action classes*
 
-While the first style using functions are easier to use and understand, the second style is more formal. You may choose to use either style. Both have common process of defining and running stateful tests:
+While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful tesing. You may choose to use either style. Both have common process of defining and running stateful tests:
 
 1. Define action generator: Define `action`s that each represents unit of state change - e.g. calling `multiply` method with a numeric multiplier as an argument
 2. Define action sequence generator: Define a generator for the `action` types that can build a seqeunce of actions and pass arguments to the selected actions
