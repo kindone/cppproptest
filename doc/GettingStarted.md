@@ -97,10 +97,10 @@ You can find more about generators and the full list of built-in Arbitraries in 
 
 ### Assertions and expectations
 
-Regarding assertions, `cppproptest` provides assertion/expection macros similar to the popular [Google Test](https://github.com/google/googletest) framework.
+Regarding assertions, `cppproptest` provides assertion(fatal)/expection(non-fatal) macros similar to the popular [Google Test](https://github.com/google/googletest) framework.
 
 ```cpp
-// PROP_EXPECT* continues test upon failure
+// PROP_EXPECT*: non-fatal, continues upon failure
 PROP_EXPECT(condition);
 PROP_EXPECT_TRUE(condition);
 PROP_EXPECT_FALSE(condition);
@@ -112,7 +112,7 @@ PROP_EXPECT_LE(A, B);
 PROP_EXPECT_GE(A, B);
 PROP_EXPECT_STREQ(A, B, N);
 
-// PROP_ASSERT* breaks test upon failure
+// PROP_ASSERT*: fatal, breaks test upon failure
 PROP_ASSERT(condition);
 PROP_ASSERT_TRUE(condition);
 PROP_ASSERT_FALSE(condition);
@@ -128,8 +128,8 @@ PROP_ASSERT_STREQ(A, B, N);
 Also, there are [Google Test](https://github.com/google/googletest) compatible macros for `forAll` that fails the gtest test case or suite upon a property test failure (since with a bare `forAll`, failures won't behave as gtest failure):
 
 ```cpp
-EXPECT_FOR_ALL(...); // shorthand for EXPECT_TRUE(proptest::forAll(...));
-ASSERT_FOR_ALL(...); // shorthand for ASSERT_TRUE(proptest::forAll(...));
+EXPECT_FOR_ALL(...); // non-fatal, shorthand for EXPECT_TRUE(proptest::forAll(...));
+ASSERT_FOR_ALL(...); // fatal, shorthand for ASSERT_TRUE(proptest::forAll(...));
 ```
 
 
