@@ -2,7 +2,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
-#include "../combinator/concurrency.hpp"
+#include "../combinator/concurrency_class.hpp"
 #include <chrono>
 #include <iostream>
 #include <memory>

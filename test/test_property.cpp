@@ -320,7 +320,7 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     auto animalVecGen = Arbi<std::vector<Animal>>(animal);
     animalVecGen.setMaxSize(20);
 
-    forAll(
+    EXPECT_FOR_ALL(
         [](std::vector<Animal> animals) {
             // std::cout << "animal " << i++ << std::endl;
             if (!animals.empty()) {
