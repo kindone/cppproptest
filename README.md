@@ -50,14 +50,14 @@ This can be turned into a property-based test, which fully tests the component a
 ```cpp
 // property test 
 TEST(Suite, test) {
-    ASSERT_TRUE(forAll([](std::string original) {
+    ASSERT_TRUE_FOR_ALL([](std::string original) {
         // a text encoded and then decoded must be identical to original
         MyEncoder encoder;
         MyDecoder decoder;    
         auto encoded = encoder.encode(original);
         auto decoded = decoder.decode(encoded);
         PROP_ASSERT_EQ(original, decoded);
-    }));
+    });
 }
 ```
 
