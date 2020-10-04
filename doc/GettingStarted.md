@@ -35,11 +35,12 @@ using namespace proptest;
 
 TEST(AudioCodec, EncoderDecoder)
 {
-    ASSERT_TRUE(forAll([](SoundData soundData) {
+    // ASSERT_FOR_ALL() is shorthand for ASSERT_TRUE(forAll(...))
+    ASSERT_FOR_ALL([](SoundData soundData) {
         auto encoded = MyAudioCodec::encode(soundData);
         auto decoded = MyAudioCodec::decode(encoded);
         PROP_ASSERT_EQ(decoded, soundData);
-    }));
+    });
 }
 ```
 
