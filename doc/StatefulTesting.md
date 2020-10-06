@@ -1,14 +1,18 @@
-# Stateful testing
+# Stateful Testing
 
-While property-based testing suits well with functions and stateless objects, it's possible to test various state changes with ease. The idea of stateful testing with `cppproptest` is to define and utilize generators for state changes.
+While property-based testing suits well with functions and stateless objects, it's possible to test various state changes with ease. The idea of stateful testing with `cppproptest` is to define and utilize generators for *state changes*.
 
-* Define `action`s that each represents unit of state change - e.g. calling `add` method with arguments
-* Define a generator for `action` type that can build a seqeunce of actions and provide arguments to the selected actions
-* Run the action sequences generated as in usual property tests
+There are two variants of stateful testing:
+1. Defining and testing state changes with *action functions(lambda)*
+2. Defining and testing state changes with *action classes*
 
-## Understanding `Action`
+While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have common process of defining and running stateful tests:
 
-Say, you are to write stateful test for your `MyVector`, which is a linear container for integers with random-access support.
+1. Define action generator: Define `action`s that each represents unit of state change - e.g. calling `multiply` method with a numeric multiplier as an argument
+2. Define action sequence generator: Define a generator for the `action` types that can build a seqeunce of actions and pass arguments to the selected actions
+3. Run the stateful test with randomized action sequences generated as in usual property tests
+
+Say, you are to write stateful test for your `MyVector`, which is a linear container for integers.
 
 ```cpp
 class MyVector {
@@ -20,125 +24,62 @@ class MyVector {
 };
 ```
 
-You first need to define actions for each state change. This can be done by extending `proptest::Action` or `proptest::ActionWithoutModel` abstract class with following signature:
+You first need to define actions for each state change. This varies between the two styles.
 
+## Stule 1: Using Action Functions
+
+In the first style using functions, an `Action` is formally defined as a function:
 
 ```cpp
-template <typename SYSTEM>
-struct ActionWithoutModel
-{
-    virtual bool precondition(const SYSTEM&) { ... }
-
-    virtual bool run(SYSTEM&) { ... }
-};
+template <typename SystemType>
+using Action = function<bool(SystemType&)>;
 ```
 
-`SYSTEM` is the target stateful object type. In this case, `MyVector` is the `SYSTEM` type. `MODEL` is an optional structure to hold useful data for validation of the `SYSTEM` based on some model, throughout the test sequence.
+Note that `SystemType` refers to the type of the stateful object of our concern.
+The function takes a `SystemType` reference and returns a `boolean` value as a result. You will typically be defining an `Action` with lambda. 
 
-You would prefer `ActionWithoutModel` if you don't need a model structure and `Action` if you need one.
+Our goal is to create a generator for our action. A generator for an action with no arguments such as `pop_back` can be defined as:
 
-* `precondition` is called to check if an action in the sequence is applicable to current state. If it's not the action is skipped.
-    * Overriding `precondition` is optional and returns `true` by default
-* `run` is called to actually apply the state change and perform validations against your model after the state change
-    
 ```cpp
-template <typename SYSTEM, typename MODEL>
-struct Action
-{
-    virtual bool precondition(const SYSTEM& system, const MODEL&) { ... }
- 
-    virtual bool run(SYSTEM& system, MODEL&) { ... }
-};
+auto popBackGen = just<Action<MyVector>>([](MyVector& obj) {
+    obj.pop_back(); 
+    return true;
+});
 ```
 
-## Defining Actions
-
-For the listed methods that might change the state of a `MyVector`, we would write `Action`s for each.
+Notice the usage of `just` generator combinator which will always generate the same lambda. Compare with the `push_back` action generator that requires an integer argument:
 
 ```cpp
-void push_back(int val);
-int pop_back();
-int& at(int pos);
-void clear();
+auto pushBackGen = Arbi<int>().map<Action<MyVector>>([](int value) {
+    return [value](MyVector& obj) {
+        obj.push_back(value);
+        return true;
+    };
+});
 ```
 
+Here you can see an integer generator is transformed as an action generator. The outer lambda returns an action (a function) that calls `push_back` with the integer argument `value`. 
+
+In both examples, we are returning `true`, indicating the precondition for the action. This is mainly useful when you want add restriction in selecting a state change at a specific object state. For example, you may want to avoid a `pop_back` to be called on an empty vector, by returning `false` instead:
+
 ```cpp
-struct PushBack : public ActionWithoutModel<MyVector> {
-    int val;
-    
-    PushBack(int val) : val(val) {
-    }
-    
-    bool run(MyVector& vector) {
-        vector.push_back(val);
-    }
-};
-
-struct PopBack : public ActionWithoutModel<MyVector> {    
-    bool precondition(MyVector& vector) {
-        return vector.size() > 0;
-    }
-    
-    bool run(MyVector& vector) {
-        vector.pop_back(val);
-    }
-};
-
-struct SetAt : public ActionWithoutModel<MyVector> {
-    int pos;
-    int val;
-    
-    SetAt(int pos, int val) : pos(pos), val(val) {
-    }
-    
-    bool precondition(MyVector& vector) {
-        return pos < vector.size();
-    }
-    
-    bool run(MyVector& vector) {
-        vector.at(pos) = val;
-    }
-};
-
-struct Clear : public ActionWithoutModel<MyVector> {
-    bool run(MyVector& vector) {
-        vector.clear(val);
-    }
-};
+        // ...
+        if(obj.size() == 0)
+            return false;
+        obj.pop_back();
+        return true;
+        // ...
 ```
 
+Also, you can add various assertions in the lambda. These will work as postcondition of the action. Any failed assertion will be reported and analyzed, as in ordinary property tests.
 
-## Generating `Action` sequence
-
-With our `Action`s properly defined, we can generate the sequence of `Action`s.
-`actions` function is a useful shorthand for `oneOf` generator combinator that is specialized for generating `Action` Sequences.
+Finally, with the action generators defined, we will call `actionProperty<SystemType>::forAll` to run the stateful property test:
 
 ```cpp
-auto actionSeqGen = actions<ActionWithoutModel<MyVector>>(
-        // int -> PushBack(int)
-        transform<int, std::shared_ptr<ActionWithoutModel<MyVector>>>(
-            Arbi<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
-            
-        // Popback()
-        just<std::shared_ptr<ActionWithoutModel<MyVector>>>([]() { return std::make_shared<PopBack>(); }),
-        
-        // (int, int) -> SetAt(int, int)
-        transform<int, std::shared_ptr<ActionWithoutModel<MyVector>>>(
-            Arbi<std::pair<int,int>>(), [](const std:;pair<int,int>& posAndVal) { return std::make_shared<SetAt>(posAndVal.first, posAndVal.second); }),
-            
-        // Clear()
-        just<std::shared_ptr<ActionWithoutModel<MyVector>>>([]() { return std::make_shared<Clear>(); })
-    );
-```
-
-This defines a generator for action sequences that randomly chooses `push_back`, `pop_back`, `at`, and `clear` methods for `MyVector` with arguments.
-
-## Running stateful tests
-
-Finally, we will call `statefulProperty::forAll` to perform generation of action sequences and run the tests.
-You should supply generator for initial state of `MyVector` to start with.
-
-```cpp
-auto prop = statefulProperty<ActionWithoutModel<MyVector>>(Arbi<MyVector>(), actionSeqGen)
+auto prop = actionProperty<T>(pushBackGen, popBackGen, clearGen);
 prop.forAll();
 ```
+
+## Style 2: Using Action Classes
+
+See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. There is no significant difference in the expressive power between the two styles.

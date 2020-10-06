@@ -1,5 +1,7 @@
 ## Counterexample and Shrinking
 
+`cppproptest` fully supports shrinking for all built-in generators. Generator combinators in `cppproptest` also tends to preserve the shrinking behavior of the original generator. 
+
 Compared to [generators](Generators.md), shrinking is a relatively optional feature of property-based testing. But it plays very important role in terms of usability and debugging. 
 
 When a property fails during property-based tests, a counterexample is found.
