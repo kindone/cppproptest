@@ -5,6 +5,11 @@
 
 using namespace proptest;
 
+struct Cat
+{
+    int age;
+};
+
 TEST(Compile, elementOf)
 {
     elementOf<int>(0, 1, 2);

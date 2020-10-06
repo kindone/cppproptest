@@ -17,6 +17,12 @@
 #include <condition_variable>
 
 namespace proptest {
+namespace concurrent {
+namespace alt {
+
+using proptest::stateful::alt::actionClasses;
+using proptest::stateful::alt::ActionWithModel;
+using proptest::stateful::alt::ActionWithoutModel;
 
 template <typename ActionType>
 class PROPTEST_API Concurrency {
@@ -244,15 +250,18 @@ decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory,
     using SystemType = typename ActionType::SystemType;
     using ModelType = typename ActionType::ModelType;
     using ModelFactoryFunction = std::function<ModelType(SystemType&)>;
+    using SystemTypeGen = GenFunction<SystemType>;
+    using Actions = std::vector<std::shared_ptr<ActionType>>;
+
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
-    using SystemType = typename ActionType::SystemType;
-    using SystemTypeGen = GenFunction<SystemType>;
-    using Actions = std::vector<std::shared_ptr<ActionType>>;
     auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
     auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(std::forward<ActionsGen>(actionsGen));
     return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
 }
+
+}  // namespace alt
+}  // namespace concurrent
 
 }  // namespace proptest

@@ -1,4 +1,4 @@
-#include "proptest.hpp"
+#include "statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
@@ -9,8 +9,9 @@
 #include <mutex>
 
 using namespace proptest;
+using namespace proptest::concurrent::alt;
 
-class ConcurrencyTest : public ::testing::Test {
+class ConcurrencyAltTest : public ::testing::Test {
 };
 
 struct VectorAction3 : public ActionWithoutModel<std::vector<int>>
@@ -63,7 +64,7 @@ struct PopBack3 : public VectorAction3
     }
 };
 
-TEST(ConcurrencyTest, States)
+TEST(ConcurrencyAltTest, States)
 {
     auto pushBackActionGen =
         Arbi<int>().map<std::shared_ptr<VectorAction3>>([](int& value) { return std::make_shared<PushBack3>(value); });

@@ -1,4 +1,4 @@
-#include "proptest.hpp"
+#include "statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
@@ -7,6 +7,7 @@
 #include <memory>
 
 using namespace proptest;
+using namespace proptest::stateful::alt;
 
 class StateTestCase : public ::testing::Test {
 };
