@@ -21,27 +21,27 @@ namespace proptest {
 namespace concurrent {
 
 using stateful::Action;
-using stateful::actionListGenFrom;
-using stateful::ActionWithModel;
+using stateful::actionListGenOf;
 using stateful::EmptyModel;
+using stateful::SimpleAction;
 
-template <typename SystemType, typename ModelType>
+template <typename ObjectType, typename ModelType>
 class PROPTEST_API Concurrency {
 public:
-    using ActionFunction = std::function<bool(SystemType&, ModelType&)>;
-    using SystemTypeGen = GenFunction<SystemType>;
-    using ModelTypeGen = typename std::function<ModelType(SystemType&)>;
+    using ActionFunction = std::function<bool(ObjectType&, ModelType&)>;
+    using ObjectTypeGen = GenFunction<ObjectType>;
+    using ModelTypeGen = typename std::function<ModelType(ObjectType&)>;
     using Actions = std::list<ActionFunction>;
     using ActionsGen = GenFunction<Actions>;
 
     static constexpr uint32_t defaultNumRuns = 200;
 
-    Concurrency(std::shared_ptr<SystemTypeGen> initialGenPtr, std::shared_ptr<ActionsGen> actionsGenPtr)
+    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionsGen> actionsGenPtr)
         : initialGenPtr(initialGenPtr), actionsGenPtr(actionsGenPtr), seed(getCurrentTime()), numRuns(defaultNumRuns)
     {
     }
 
-    Concurrency(std::shared_ptr<SystemTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
+    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
                 std::shared_ptr<ActionsGen> actionsGenPtr)
         : initialGenPtr(initialGenPtr),
           modelFactoryPtr(modelFactoryPtr),
@@ -52,9 +52,9 @@ public:
     }
 
     bool check();
-    bool check(std::function<void(SystemType&, ModelType&)> postCheck);
-    bool check(std::function<void(SystemType&)> postCheck);
-    bool invoke(Random& rand, std::function<void(SystemType&, ModelType&)> postCheck);
+    bool check(std::function<void(ObjectType&, ModelType&)> postCheck);
+    bool check(std::function<void(ObjectType&)> postCheck);
+    bool invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck);
     void handleShrink(Random& savedRand, const PropertyFailedBase& e);
 
     Concurrency& setSeed(uint64_t s)
@@ -70,29 +70,29 @@ public:
     }
 
 private:
-    std::shared_ptr<SystemTypeGen> initialGenPtr;
+    std::shared_ptr<ObjectTypeGen> initialGenPtr;
     std::shared_ptr<ModelTypeGen> modelFactoryPtr;
     std::shared_ptr<ActionsGen> actionsGenPtr;
     uint64_t seed;
     int numRuns;
 };
 
-template <typename SystemType, typename ModelType>
-bool Concurrency<SystemType, ModelType>::check()
+template <typename ObjectType, typename ModelType>
+bool Concurrency<ObjectType, ModelType>::check()
 {
-    static auto emptyPostCheck = +[](SystemType&, ModelType&) {};
+    static auto emptyPostCheck = +[](ObjectType&, ModelType&) {};
     return check(emptyPostCheck);
 }
 
-template <typename SystemType, typename ModelType>
-bool Concurrency<SystemType, ModelType>::check(std::function<void(SystemType&)> postCheck)
+template <typename ObjectType, typename ModelType>
+bool Concurrency<ObjectType, ModelType>::check(std::function<void(ObjectType&)> postCheck)
 {
-    static auto fullPostCheck = [postCheck](SystemType& sys, ModelType&) { postCheck(sys); };
+    static auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
     return check(fullPostCheck);
 }
 
-template <typename SystemType, typename ModelType>
-bool Concurrency<SystemType, ModelType>::check(std::function<void(SystemType&, ModelType&)> postCheck)
+template <typename ObjectType, typename ModelType>
+bool Concurrency<ObjectType, ModelType>::check(std::function<void(ObjectType&, ModelType&)> postCheck)
 {
     Random rand(seed);
     Random savedRand(seed);
@@ -133,13 +133,13 @@ bool Concurrency<SystemType, ModelType>::check(std::function<void(SystemType&, M
     return true;
 }
 
-template <typename SystemType, typename ModelType>
+template <typename ObjectType, typename ModelType>
 struct RearRunner
 {
-    using ActionFunction = std::function<bool(SystemType&, ModelType&)>;
+    using ActionFunction = std::function<bool(ObjectType&, ModelType&)>;
     using Actions = std::list<ActionFunction>;
 
-    RearRunner(int n, SystemType& obj, ModelType& model, Actions& actions, std::atomic_bool& thread_ready,
+    RearRunner(int n, ObjectType& obj, ModelType& model, Actions& actions, std::atomic_bool& thread_ready,
                std::atomic_bool& sync_ready, std::vector<int>& log, std::atomic_int& counter)
         : n(n),
           obj(obj),
@@ -166,7 +166,7 @@ struct RearRunner
     }
 
     int n;
-    SystemType& obj;
+    ObjectType& obj;
     ModelType& model;
     Actions& actions;
     std::atomic_bool& thread_ready;
@@ -175,11 +175,11 @@ struct RearRunner
     std::atomic_int& counter;
 };
 
-template <typename SystemType, typename ModelType>
-bool Concurrency<SystemType, ModelType>::invoke(Random& rand, std::function<void(SystemType&, ModelType&)> postCheck)
+template <typename ObjectType, typename ModelType>
+bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck)
 {
-    Shrinkable<SystemType> initialShr = (*initialGenPtr)(rand);
-    SystemType& obj = initialShr.getRef();
+    Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
+    ObjectType& obj = initialShr.getRef();
     ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
     Shrinkable<Actions> frontShr = (*actionsGenPtr)(rand);
     Shrinkable<Actions> rear1Shr = (*actionsGenPtr)(rand);
@@ -203,9 +203,9 @@ bool Concurrency<SystemType, ModelType>::invoke(Random& rand, std::function<void
         log.resize(5000);
 
         std::thread rearRunner1(
-            RearRunner<SystemType, ModelType>(1, obj, model, rear1, thread1_ready, sync_ready, log, counter));
+            RearRunner<ObjectType, ModelType>(1, obj, model, rear1, thread1_ready, sync_ready, log, counter));
         std::thread rearRunner2(
-            RearRunner<SystemType, ModelType>(2, obj, model, rear2, thread2_ready, sync_ready, log, counter));
+            RearRunner<ObjectType, ModelType>(2, obj, model, rear2, thread2_ready, sync_ready, log, counter));
         while (!thread1_ready) {}
         while (!thread2_ready) {}
 
@@ -227,39 +227,39 @@ bool Concurrency<SystemType, ModelType>::invoke(Random& rand, std::function<void
     return true;
 }
 
-template <typename SystemType, typename ModelType>
-void Concurrency<SystemType, ModelType>::handleShrink(Random&, const PropertyFailedBase&)
+template <typename ObjectType, typename ModelType>
+void Concurrency<ObjectType, ModelType>::handleShrink(Random&, const PropertyFailedBase&)
 {
     // TODO
 }
 
 /* without model */
-template <typename SystemType, typename InitialGen>
-decltype(auto) concurrency(InitialGen&& initialGen, stateful::ActionListGen<SystemType, EmptyModel>& actionsGen)
+template <typename ObjectType, typename InitialGen>
+decltype(auto) concurrency(InitialGen&& initialGen, stateful::ActionListGen<ObjectType, EmptyModel>& actionsGen)
 {
-    using SystemTypeGen = GenFunction<SystemType>;
-    using ActionFunction = std::function<bool(SystemType&, EmptyModel&)>;
+    using ObjectTypeGen = GenFunction<ObjectType>;
+    using ActionFunction = std::function<bool(ObjectType&, EmptyModel&)>;
     using Actions = std::list<ActionFunction>;
-    auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
+    auto initialGenPtr = std::make_shared<ObjectTypeGen>(std::forward<InitialGen>(initialGen));
     auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(actionsGen);
-    return Concurrency<SystemType, EmptyModel>(initialGenPtr, actionsGenPtr);
+    return Concurrency<ObjectType, EmptyModel>(initialGenPtr, actionsGenPtr);
 }
 
 /* with model */
-template <typename SystemType, typename ModelType, typename InitialGen, typename ModelFactory, typename ActionsGen>
+template <typename ObjectType, typename ModelType, typename InitialGen, typename ModelFactory, typename ActionsGen>
 decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
 {
-    using ModelFactoryFunction = std::function<ModelType(SystemType&)>;
-    using SystemTypeGen = GenFunction<SystemType>;
-    using ActionFunction = std::function<bool(SystemType&, ModelType&)>;
+    using ModelFactoryFunction = std::function<ModelType(ObjectType&)>;
+    using ObjectTypeGen = GenFunction<ObjectType>;
+    using ActionFunction = std::function<bool(ObjectType&, ModelType&)>;
     using Actions = std::list<ActionFunction>;
 
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
-    auto initialGenPtr = std::make_shared<SystemTypeGen>(std::forward<InitialGen>(initialGen));
+    auto initialGenPtr = std::make_shared<ObjectTypeGen>(std::forward<InitialGen>(initialGen));
     auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(std::forward<ActionsGen>(actionsGen));
-    return Concurrency<SystemType, ModelType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
+    return Concurrency<ObjectType, ModelType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
 }
 
 }  // namespace concurrent

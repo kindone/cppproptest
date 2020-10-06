@@ -44,12 +44,12 @@ struct EmptyModel
 };
 
 template <typename SYSTEM, typename MODEL>
-struct ActionWithModel
+struct Action
 {
-    using SystemType = SYSTEM;
+    using ObjectType = SYSTEM;
     using ModelType = MODEL;
 
-    virtual ~ActionWithModel() {}
+    virtual ~Action() {}
     virtual bool precondition(const SYSTEM& system, const MODEL&) { return precondition(system); }
 
     virtual bool precondition(const SYSTEM&) { return true; }
@@ -60,9 +60,9 @@ struct ActionWithModel
 };
 
 template <typename SYSTEM>
-struct ActionWithoutModel : public ActionWithModel<SYSTEM, EmptyModel>
+struct SimpleAction : public Action<SYSTEM, EmptyModel>
 {
-    virtual ~ActionWithoutModel() {}
+    virtual ~SimpleAction() {}
 };
 
 template <typename ActionType, typename... GENS>
@@ -74,12 +74,12 @@ GenFunction<std::vector<std::shared_ptr<ActionType>>> actionClasses(GENS&&... ge
 }
 
 template <typename ActionType, typename InitialGen, typename ActionsGen>
-decltype(auto) actionClassProperty(InitialGen&& initialGen, ActionsGen&& actionsGen)
+decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen)
 {
-    using SystemType = typename ActionType::SystemType;
+    using ObjectType = typename ActionType::ObjectType;
 
     return property(
-        +[](SystemType obj, std::vector<std::shared_ptr<ActionType>> actions) {
+        +[](ObjectType obj, std::vector<std::shared_ptr<ActionType>> actions) {
             for (auto action : actions) {
                 if (action->precondition(obj))
                     PROP_ASSERT(action->run(obj));
@@ -90,16 +90,16 @@ decltype(auto) actionClassProperty(InitialGen&& initialGen, ActionsGen&& actions
 }
 
 template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
-decltype(auto) actionClassProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
+decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
 {
     using ModelType = typename ActionType::ModelType;
-    using SystemType = typename ActionType::SystemType;
-    using ModelFactoryFunction = std::function<ModelType(SystemType&)>;
+    using ObjectType = typename ActionType::ObjectType;
+    using ModelFactoryFunction = std::function<ModelType(ObjectType&)>;
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
     return property(
-        [modelFactoryPtr](SystemType obj, std::vector<std::shared_ptr<ActionType>> actions) {
+        [modelFactoryPtr](ObjectType obj, std::vector<std::shared_ptr<ActionType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
                 if (action->precondition(obj, model))

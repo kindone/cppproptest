@@ -12,7 +12,7 @@ using namespace proptest::stateful::alt;
 class StateTestCase : public ::testing::Test {
 };
 
-struct VectorAction : public ActionWithoutModel<std::vector<int>>
+struct VectorAction : public SimpleAction<std::vector<int>>
 {
 };
 
@@ -64,7 +64,7 @@ TEST(StateTest, States)
         just<std::shared_ptr<VectorAction>>(std::make_shared<PopBack>()),
         just<std::shared_ptr<VectorAction>>(std::make_shared<Clear>()));
 
-    auto prop = actionClassProperty<VectorAction>(Arbi<std::vector<int>>(), actionsGen);
+    auto prop = statefulProperty<VectorAction>(Arbi<std::vector<int>>(), actionsGen);
     prop.forAll();
 }
 
@@ -74,7 +74,7 @@ struct VectorModel
     int size;
 };
 
-struct VectorAction2 : public ActionWithModel<std::vector<int>, VectorModel>
+struct VectorAction2 : public Action<std::vector<int>, VectorModel>
 {
 };
 
@@ -129,7 +129,7 @@ TEST(StateTest, StatesWithModel)
         just<std::shared_ptr<VectorAction2>>(std::make_shared<PopBack2>()),
         just<std::shared_ptr<VectorAction2>>(std::make_shared<Clear2>()));
 
-    auto prop = actionClassProperty<VectorAction2>(
+    auto prop = statefulProperty<VectorAction2>(
         Arbi<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
     prop.forAll();
 }
@@ -141,7 +141,7 @@ TEST(StateTest, StatesWithModel2)
         Arbi<int>().map<VectorAction2*>([](int& value) { return new PushBack2(value); }),
         lazy<VectorAction2*>([]() { return new PopBack2(); }), lazy<VectorAction2*>([]() { return new Clear2(); }));
 
-    auto prop = actionClassProperty<VectorAction2>(
+    auto prop = statefulProperty<VectorAction2>(
         Arbi<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionsGen);
     prop.forAll();
 }

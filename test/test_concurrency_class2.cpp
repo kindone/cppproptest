@@ -33,7 +33,7 @@ TEST(ConcurrencyTestAlt2, bitmap)
 
 TEST(ConcurrencyTest2, Container) {}
 
-struct VectorAction4 : public ActionWithModel<std::vector<int>, util::Bitmap>
+struct VectorAction4 : public Action<std::vector<int>, util::Bitmap>
 {
 };
 
