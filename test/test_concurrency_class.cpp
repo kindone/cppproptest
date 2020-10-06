@@ -14,7 +14,7 @@ using namespace proptest::concurrent::alt;
 class ConcurrencyAltTest : public ::testing::Test {
 };
 
-struct VectorAction3 : public ActionWithoutModel<std::vector<int>>
+struct VectorAction3 : public SimpleAction<std::vector<int>>
 {
 };
 

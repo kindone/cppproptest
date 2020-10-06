@@ -19,7 +19,7 @@ public:
 
 TEST(ConcurrencyTest, WithoutModel)
 {
-    auto pushBackGen = Arbi<int>().map<Action<std::vector<int>>>([](int& value) {
+    auto pushBackGen = Arbi<int>().map<SimpleAction<std::vector<int>>>([](int& value) {
         return [value](std::vector<int>& obj) {
             // std::cout << "PushBack(" << value << ")" << std::endl;
             std::lock_guard<std::mutex> guard(getMutex());
@@ -28,7 +28,7 @@ TEST(ConcurrencyTest, WithoutModel)
         };
     });
 
-    auto popBackGen = just<Action<std::vector<int>>>([](std::vector<int>& obj) {
+    auto popBackGen = just<SimpleAction<std::vector<int>>>([](std::vector<int>& obj) {
         std::lock_guard<std::mutex> guard(getMutex());
         if (obj.empty())
             return true;
@@ -36,13 +36,13 @@ TEST(ConcurrencyTest, WithoutModel)
         return true;
     });
 
-    auto clearGen = just<Action<std::vector<int>>>([](std::vector<int>& obj) {
+    auto clearGen = just<SimpleAction<std::vector<int>>>([](std::vector<int>& obj) {
         std::lock_guard<std::mutex> guard(getMutex());
         obj.clear();
         return true;
     });
 
-    auto actionsGen = actionListGenFrom<std::vector<int>>(pushBackGen, popBackGen, clearGen);
+    auto actionsGen = actionListGenOf<std::vector<int>>(pushBackGen, popBackGen, clearGen);
 
     auto prop = concurrency<std::vector<int>>(Arbi<std::vector<int>>(), actionsGen);
     prop.check();
@@ -54,7 +54,7 @@ TEST(ConcurrencyTest, WithModel)
     {
     };
 
-    auto pushBackGen = Arbi<int>().map<ActionWithModel<std::vector<int>, Model>>([](int& value) {
+    auto pushBackGen = Arbi<int>().map<Action<std::vector<int>, Model>>([](int& value) {
         return [value](std::vector<int>& obj, Model&) {
             // std::cout << "PushBack(" << value << ")" << std::endl;
             std::lock_guard<std::mutex> guard(getMutex());
@@ -63,7 +63,7 @@ TEST(ConcurrencyTest, WithModel)
         };
     });
 
-    auto popBackGen = just<ActionWithModel<std::vector<int>, Model>>([](std::vector<int>& obj, Model&) {
+    auto popBackGen = just<Action<std::vector<int>, Model>>([](std::vector<int>& obj, Model&) {
         std::lock_guard<std::mutex> guard(getMutex());
         if (obj.empty())
             return true;
@@ -71,13 +71,13 @@ TEST(ConcurrencyTest, WithModel)
         return true;
     });
 
-    auto clearGen = just<ActionWithModel<std::vector<int>, Model>>([](std::vector<int>& obj, Model&) {
+    auto clearGen = just<Action<std::vector<int>, Model>>([](std::vector<int>& obj, Model&) {
         std::lock_guard<std::mutex> guard(getMutex());
         obj.clear();
         return true;
     });
 
-    auto actionsGen = actionListGenFrom<std::vector<int>, Model>(pushBackGen, popBackGen, clearGen);
+    auto actionsGen = actionListGenOf<std::vector<int>, Model>(pushBackGen, popBackGen, clearGen);
 
     auto prop = concurrency<std::vector<int>, Model>(
         Arbi<std::vector<int>>(), [](std::vector<int>&) { return Model(); }, actionsGen);
