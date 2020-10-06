@@ -1,18 +1,19 @@
-#include "proptest.hpp"
+#include "statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
-#include "../combinator/concurrency.hpp"
+#include "../combinator/concurrency_class.hpp"
 #include "../util/bitmap.hpp"
 #include <chrono>
 #include <iostream>
 
 using namespace proptest;
+using namespace proptest::concurrent::alt;
 
-class ConcurrencyTest2 : public ::testing::Test {
+class ConcurrencyTestAlt2 : public ::testing::Test {
 };
 
-TEST(ConcurrencyTest2, bitmap)
+TEST(ConcurrencyTestAlt2, bitmap)
 {
     util::Bitmap bitmap;
     for (int i = 0; i < util::Bitmap::size; i++) {
@@ -78,7 +79,7 @@ struct PopBack4 : public VectorAction4
     }
 };
 
-TEST(ConcurrencyTest2, WithModel)
+TEST(ConcurrencyTestAlt2, WithModel)
 {
     auto pushBackActionGen =
         Arbi<int>().map<std::shared_ptr<VectorAction4>>([](int& value) { return std::make_shared<PushBack4>(value); });

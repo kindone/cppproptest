@@ -10,9 +10,34 @@
 #include "../gen.hpp"
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
+#include "../GenBase.hpp"
 
 namespace proptest {
 
+namespace util {
+
+template <typename ActionType, typename GEN>
+std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value,
+                 GenFunction<std::shared_ptr<ActionType>>>
+toSharedPtrGen(GEN&& gen)
+{
+    return transform<ActionType*, std::shared_ptr<ActionType>>(
+        gen, +[](const ActionType* actionType) {
+            std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
+            return sharedPtr;
+        });
+}
+
+template <typename ActionType, typename GEN>
+std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::type>::value, GEN&&> toSharedPtrGen(
+    GEN&& gen)
+{
+    return std::forward<GEN>(gen);
+}
+
+}  // namespace util
+namespace stateful {
+namespace alt {
 struct EmptyModel
 {
     static EmptyModel value;
@@ -39,29 +64,6 @@ struct ActionWithoutModel : public ActionWithModel<SYSTEM, EmptyModel>
 {
     virtual ~ActionWithoutModel() {}
 };
-
-namespace util {
-
-template <typename ActionType, typename GEN>
-std::enable_if_t<std::is_pointer<typename function_traits<GEN>::return_type::type>::value,
-                 GenFunction<std::shared_ptr<ActionType>>>
-toSharedPtrGen(GEN&& gen)
-{
-    return transform<ActionType*, std::shared_ptr<ActionType>>(
-        gen, +[](const ActionType* actionType) {
-            std::shared_ptr<ActionType> sharedPtr{const_cast<ActionType*>(actionType)};
-            return sharedPtr;
-        });
-}
-
-template <typename ActionType, typename GEN>
-std::enable_if_t<!std::is_pointer<typename function_traits<GEN>::return_type::type>::value, GEN&&> toSharedPtrGen(
-    GEN&& gen)
-{
-    return std::forward<GEN>(gen);
-}
-
-}  // namespace util
 
 template <typename ActionType, typename... GENS>
 GenFunction<std::vector<std::shared_ptr<ActionType>>> actionClasses(GENS&&... gens)
@@ -108,4 +110,6 @@ decltype(auto) actionClassProperty(InitialGen&& initialGen, ModelFactory&& model
         std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionsGen));
 }
 
+}  // namespace alt
+}  // namespace stateful
 }  // namespace proptest

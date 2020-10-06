@@ -26,5 +26,3 @@
 #include "combinator/chain.hpp"
 #include "combinator/derive.hpp"
 #include "combinator/just.hpp"
-#include "combinator/stateful_class.hpp"
-#include "combinator/stateful_function.hpp"

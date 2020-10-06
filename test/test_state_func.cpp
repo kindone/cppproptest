@@ -1,4 +1,4 @@
-#include "proptest.hpp"
+#include "statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
@@ -7,8 +7,15 @@
 #include <memory>
 
 using namespace proptest;
+using namespace proptest::stateful;
 
-TEST(StateTest, States2)
+struct VectorModel2
+{
+    VectorModel2(int size) : size(size) {}
+    int size;
+};
+
+TEST(StateTest, StateFunction)
 {
     using T = std::vector<int>;
 
@@ -21,7 +28,8 @@ TEST(StateTest, States2)
         };
     });
 
-    auto popBackGen = actionGen<T>([](T& obj) {
+    // actionGen<T> is shorthand for just<Action<T>>
+    auto popBackGen = just<Action<T>>([](T& obj) {
         auto size = obj.size();
         if (obj.empty())
             return true;
@@ -39,13 +47,62 @@ TEST(StateTest, States2)
         return true;
     });
 
-    auto clearGen = actionGen<T>([](T& obj) {
+    // actionGen<T> is shorthand for just<Action<T>>
+    auto clearGen = just<Action<T>>([](T& obj) {
         // std::cout << "Clear" << std::endl;
         obj.clear();
         PROP_ASSERT(obj.size() == 0);
         return true;
     });
 
-    auto prop = actionProperty<T>(pushBackGen, popBackGen, popBackGen2, clearGen);
+    auto actionsGen = actionListGenFrom<T>(pushBackGen, popBackGen, popBackGen2, clearGen);
+    auto prop = actionProperty<T>(Arbi<T>(), actionsGen);
+    prop.forAll();
+}
+
+TEST(StateTest, StateFunctionWithModel)
+{
+    using T = std::vector<int>;
+    using Model = VectorModel2;
+
+    auto pushBackGen = Arbi<int>().map<ActionWithModel<T, Model>>([](int value) {
+        return [value](T& obj, Model&) {
+            auto size = obj.size();
+            obj.push_back(value);
+            PROP_ASSERT(obj.size() == size + 1);
+            return true;
+        };
+    });
+
+    // actionGen<T> is shorthand for just<Action<T>>
+    auto popBackGen = just<ActionWithModel<T, Model>>([](T& obj, Model&) {
+        auto size = obj.size();
+        if (obj.empty())
+            return true;
+        obj.pop_back();
+        PROP_ASSERT(obj.size() == size - 1);
+        return true;
+    });
+
+    auto popBackGen2 = just<ActionWithModel<T, Model>>([](T& obj, Model&) {
+        auto size = obj.size();
+        if (obj.empty())
+            return true;
+        obj.pop_back();
+        PROP_ASSERT(obj.size() == size - 1);
+        return true;
+    });
+
+    // actionGen<T> is shorthand for just<Action<T>>
+    auto clearGen = just<ActionWithModel<T, Model>>([](T& obj, Model&) {
+        // std::cout << "Clear" << std::endl;
+        obj.clear();
+        PROP_ASSERT(obj.size() == 0);
+        return true;
+    });
+
+    auto actionsGen = actionListGenFrom<T, Model>(pushBackGen, popBackGen, popBackGen2, clearGen);
+    auto prop = actionProperty<T, Model, GenFunction<T>>(
+        Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionsGen);
     prop.forAll();
 }

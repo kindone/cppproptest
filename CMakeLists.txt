@@ -76,8 +76,9 @@ SET(proptest_testsources
     test/test_util.cpp
     test/test_state_class.cpp
     test/test_state_func.cpp
-    test/test_concurrency.cpp
-    test/test_concurrency2.cpp
+    test/test_concurrency_class.cpp
+    test/test_concurrency_class2.cpp
+    test/test_concurrency_func.cpp
     test/test_stream.cpp
     test/test_fork.cpp
 )
