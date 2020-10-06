@@ -5,41 +5,41 @@
 
 ### Understanding `Action`
 
-In the second style, you will define actions by defining `proptest::ActionWithModel` or `proptest::ActionWithoutModel` abstract class with following signatures:
+In the second style, you will define actions by defining an `Action` or a `SimpleAction` abstract class with following signatures:
 
 ```cpp
-template <typename SYSTEM, typename MODEL>
-struct ActionWithModel
+template <typename ObjectType, typename ModelType>
+struct Action
 {
-    virtual bool precondition(const SYSTEM&, const MODEL&) { ... }
+    virtual bool precondition(const ObjectType&, const ModelType&) { ... }
 
-    virtual bool run(SYSTEM&, MODEL&) { ... }
+    virtual bool run(ObjectType&, ModelType&) { ... }
 };
 
-template <typename SYSTEM>
-struct ActionWithoutModel
+template <typename ObjectType>
+struct SimpleAction
 {
-    virtual bool precondition(const SYSTEM&) { ... }
+    virtual bool precondition(const ObjectType&) { ... }
 
-    virtual bool run(SYSTEM&) { ... }
+    virtual bool run(ObjectType&) { ... }
 };
 ```
 
-`SYSTEM` is the target stateful object type. In this case, `MyVector` is the `SYSTEM` type. `MODEL` is an optional structure to hold useful data for validation of the `SYSTEM` based on some model, throughout the test sequence.
+`ObjectType` is the target stateful object type. In this case, `MyVector` is the `ObjectType` type. `ModelType` is optional structure to hold useful data for validation of the `ObjectType` based on some model, throughout the test sequence.
 
-You would prefer to use `ActionWithoutModel` if you don't need a model structure, and `ActionWithModel` if you need one.
+You would prefer to use `SimpleAction` if you don't need a model structure, and `Action` if you need one.
 
 * `precondition` is called to check if an action in the sequence is applicable to current state. If it's not the action is skipped.
     * Overriding `precondition` is optional and returns `true` by default
 * `run` is called to actually apply the state change and perform validations against your model after the state change
     
 ```cpp
-template <typename SYSTEM, typename MODEL>
+template <typename ObjectType, typename ModelType>
 struct Action
 {
-    virtual bool precondition(const SYSTEM& system, const MODEL&) { ... }
+    virtual bool precondition(const ObjectType& system, const ModelType&) { ... }
  
-    virtual bool run(SYSTEM& system, MODEL&) { ... }
+    virtual bool run(ObjectType& system, ModelType&) { ... }
 };
 ```
 
@@ -55,7 +55,7 @@ void clear();
 ```
 
 ```cpp
-struct PushBack : public ActionWithoutModel<MyVector> {
+struct PushBack : public SimpleAction<MyVector> {
     int val;
     
     PushBack(int val) : val(val) {
@@ -66,7 +66,7 @@ struct PushBack : public ActionWithoutModel<MyVector> {
     }
 };
 
-struct PopBack : public ActionWithoutModel<MyVector> {    
+struct PopBack : public SimpleAction<MyVector> {    
     bool precondition(MyVector& vector) {
         return vector.size() > 0;
     }
@@ -76,7 +76,7 @@ struct PopBack : public ActionWithoutModel<MyVector> {
     }
 };
 
-struct SetAt : public ActionWithoutModel<MyVector> {
+struct SetAt : public SimpleAction<MyVector> {
     int pos;
     int val;
     
@@ -92,7 +92,7 @@ struct SetAt : public ActionWithoutModel<MyVector> {
     }
 };
 
-struct Clear : public ActionWithoutModel<MyVector> {
+struct Clear : public SimpleAction<MyVector> {
     bool run(MyVector& vector) {
         vector.clear(val);
     }
@@ -106,20 +106,20 @@ With our `Action`s properly defined, we can generate a sequence of `Action`s.
 `actionClasses` function is a useful shorthand for `oneOf` generator combinator that is specialized for generating `Action` Sequences.
 
 ```cpp
-auto actionSeqGen = actions<ActionWithoutModel<MyVector>>(
+auto actionListGen = actionListGenOf<SimpleAction<MyVector>>(
         // int -> PushBack(int)
-        transform<int, std::shared_ptr<ActionWithoutModel<MyVector>>>(
+        transform<int, std::shared_ptr<SimpleAction<MyVector>>>(
             Arbi<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
             
         // Popback()
-        just<std::shared_ptr<ActionWithoutModel<MyVector>>>([]() { return std::make_shared<PopBack>(); }),
+        just<std::shared_ptr<SimpleAction<MyVector>>>([]() { return std::make_shared<PopBack>(); }),
         
         // (int, int) -> SetAt(int, int)
-        transform<int, std::shared_ptr<ActionWithoutModel<MyVector>>>(
+        transform<int, std::shared_ptr<SimpleAction<MyVector>>>(
             Arbi<std::pair<int,int>>(), [](const std:;pair<int,int>& posAndVal) { return std::make_shared<SetAt>(posAndVal.first, posAndVal.second); }),
             
         // Clear()
-        just<std::shared_ptr<ActionWithoutModel<MyVector>>>([]() { return std::make_shared<Clear>(); })
+        just<std::shared_ptr<SimpleAction<MyVector>>>([]() { return std::make_shared<Clear>(); })
     );
 ```
 
@@ -127,10 +127,10 @@ This defines a generator for action sequences that randomly chooses `push_back`,
 
 ## Running stateful tests
 
-Finally, we will call `actionClasssProperty::forAll` to perform generation of action sequences and run the tests.
+Finally, we will call `statefulProperty::forAll` to perform generation of action sequences and run the tests.
 You should supply generator for initial state of `MyVector` to start with.
 
 ```cpp
-auto prop = actionClasssProperty<ActionWithoutModel<MyVector>>(Arbi<MyVector>(), actionSeqGen)
+auto prop = statefulProperty<SimpleAction<MyVector>>(Arbi<MyVector>(), actionListGen)
 prop.forAll();
 ```
