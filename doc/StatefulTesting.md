@@ -2,15 +2,13 @@
 
 While property-based testing suits well with functions and stateless objects, it's possible to test various state changes with ease. The idea of stateful testing with `cppproptest` is to define and utilize generators for *state changes*.
 
-There are two variants of stateful testing:
-1. Defining and testing state changes with *action functions(lambda)*
-2. Defining and testing state changes with *action classes*
+There are two variants of stateful testing - one with *action functions(lambda)* and one with *action classes*.
 
 While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have common process of defining and running stateful tests:
 
 1. Define action generator: Define `action`s that each represents unit of state change - e.g. calling `multiply` method with a numeric multiplier as an argument
-2. Define action sequence generator: Define a generator for the `action` types that can build a seqeunce of actions and pass arguments to the selected actions
-3. Run the stateful test with randomized action sequences generated as in usual property tests
+2. Define action list generator: Define a generator for the `action` types that can build a list of actions and pass arguments to the selected actions
+3. Run the stateful test with randomized action lists generated as in usual property tests
 
 Say, you are to write stateful test for your `MyVector`, which is a linear container for integers.
 
@@ -146,3 +144,8 @@ prop.forAll();
 ## Style 2: Using Action Classes
 
 See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
+
+
+# Further topics
+
+* See [Concurrency Testing](./ConcurrencyTesting.md) for testing for concurrent changes of a stateful object.
