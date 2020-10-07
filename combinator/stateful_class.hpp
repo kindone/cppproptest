@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdexcept>
-#include <vector>
+#include <list>
 #include <memory>
 #include <functional>
 #include "../util/function_traits.hpp"
@@ -66,10 +66,10 @@ struct SimpleAction : public Action<SYSTEM, EmptyModel>
 };
 
 template <typename ActionType, typename... GENS>
-GenFunction<std::vector<std::shared_ptr<ActionType>>> actionClasses(GENS&&... gens)
+GenFunction<std::list<std::shared_ptr<ActionType>>> actionListGenOf(GENS&&... gens)
 {
     auto actionGen = oneOf<std::shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(std::forward<GENS>(gens))...);
-    auto actionVecGen = Arbi<std::vector<std::shared_ptr<ActionType>>>(actionGen);
+    auto actionVecGen = Arbi<std::list<std::shared_ptr<ActionType>>>(actionGen);
     return actionVecGen;
 }
 
@@ -79,7 +79,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen
     using ObjectType = typename ActionType::ObjectType;
 
     return property(
-        +[](ObjectType obj, std::vector<std::shared_ptr<ActionType>> actions) {
+        +[](ObjectType obj, std::list<std::shared_ptr<ActionType>> actions) {
             for (auto action : actions) {
                 if (action->precondition(obj))
                     PROP_ASSERT(action->run(obj));
@@ -99,7 +99,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
     return property(
-        [modelFactoryPtr](ObjectType obj, std::vector<std::shared_ptr<ActionType>> actions) {
+        [modelFactoryPtr](ObjectType obj, std::list<std::shared_ptr<ActionType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
                 if (action->precondition(obj, model))

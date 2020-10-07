@@ -21,7 +21,7 @@ namespace concurrent {
 namespace alt {
 
 using proptest::stateful::alt::Action;
-using proptest::stateful::alt::actionClasses;
+using proptest::stateful::alt::actionListGenOf;
 using proptest::stateful::alt::SimpleAction;
 
 template <typename ActionType>
@@ -31,18 +31,18 @@ public:
     using ObjectTypeGen = GenFunction<ObjectType>;
     using ModelType = typename ActionType::ModelType;
     using ModelTypeGen = typename std::function<ModelType(ObjectType&)>;
-    using Actions = std::vector<std::shared_ptr<ActionType>>;
-    using ActionsGen = GenFunction<Actions>;
+    using ActionList = std::list<std::shared_ptr<ActionType>>;
+    using ActionListGen = GenFunction<ActionList>;
 
     static constexpr uint32_t defaultNumRuns = 200;
 
-    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionsGen> actionsGenPtr)
+    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionListGen> actionsGenPtr)
         : initialGenPtr(initialGenPtr), actionsGenPtr(actionsGenPtr), seed(getCurrentTime()), numRuns(defaultNumRuns)
     {
     }
 
     Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
-                std::shared_ptr<ActionsGen> actionsGenPtr)
+                std::shared_ptr<ActionListGen> actionsGenPtr)
         : initialGenPtr(initialGenPtr),
           modelFactoryPtr(modelFactoryPtr),
           actionsGenPtr(actionsGenPtr),
@@ -72,7 +72,7 @@ public:
 private:
     std::shared_ptr<ObjectTypeGen> initialGenPtr;
     std::shared_ptr<ModelTypeGen> modelFactoryPtr;
-    std::shared_ptr<ActionsGen> actionsGenPtr;
+    std::shared_ptr<ActionListGen> actionsGenPtr;
     uint64_t seed;
     int numRuns;
 };
@@ -138,9 +138,9 @@ struct RearRunner
 {
     using ObjectType = typename ActionType::ObjectType;
     using ModelType = typename ActionType::ModelType;
-    using Actions = std::vector<std::shared_ptr<ActionType>>;
+    using ActionList = std::list<std::shared_ptr<ActionType>>;
 
-    RearRunner(int n, ObjectType& obj, ModelType& model, Actions& actions, std::atomic_bool& thread_ready,
+    RearRunner(int n, ObjectType& obj, ModelType& model, ActionList& actions, std::atomic_bool& thread_ready,
                std::atomic_bool& sync_ready, std::vector<int>& log, std::atomic_int& counter)
         : n(n),
           obj(obj),
@@ -170,7 +170,7 @@ struct RearRunner
     int n;
     ObjectType& obj;
     ModelType& model;
-    Actions& actions;
+    ActionList& actions;
     std::atomic_bool& thread_ready;
     std::atomic_bool& sync_ready;
     std::vector<int>& log;
@@ -183,12 +183,12 @@ bool Concurrency<ActionType>::invoke(Random& rand, std::function<void(ObjectType
     Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
     ObjectType& obj = initialShr.getRef();
     ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
-    Shrinkable<Actions> frontShr = (*actionsGenPtr)(rand);
-    Shrinkable<Actions> rear1Shr = (*actionsGenPtr)(rand);
-    Shrinkable<Actions> rear2Shr = (*actionsGenPtr)(rand);
-    Actions& front = frontShr.getRef();
-    Actions& rear1 = rear1Shr.getRef();
-    Actions& rear2 = rear2Shr.getRef();
+    Shrinkable<ActionList> frontShr = (*actionsGenPtr)(rand);
+    Shrinkable<ActionList> rear1Shr = (*actionsGenPtr)(rand);
+    Shrinkable<ActionList> rear2Shr = (*actionsGenPtr)(rand);
+    ActionList& front = frontShr.getRef();
+    ActionList& rear1 = rear1Shr.getRef();
+    ActionList& rear2 = rear2Shr.getRef();
 
     // front
     for (auto action : front) {
@@ -233,32 +233,32 @@ void Concurrency<ActionType>::handleShrink(Random&, const PropertyFailedBase&)
 {
 }
 
-template <typename ActionType, typename InitialGen, typename ActionsGen>
-decltype(auto) concurrency(InitialGen&& initialGen, ActionsGen&& actionsGen)
+template <typename ActionType, typename InitialGen, typename ActionListGen>
+decltype(auto) concurrency(InitialGen&& initialGen, ActionListGen&& actionListGen)
 {
     using ObjectType = typename ActionType::ObjectType;
     using ObjectTypeGen = GenFunction<ObjectType>;
-    using Actions = std::vector<std::shared_ptr<ActionType>>;
+    using ActionList = std::list<std::shared_ptr<ActionType>>;
     auto initialGenPtr = std::make_shared<ObjectTypeGen>(std::forward<InitialGen>(initialGen));
-    auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(std::forward<ActionsGen>(actionsGen));
-    return Concurrency<ActionType>(initialGenPtr, actionsGenPtr);
+    auto actionListGenPtr = std::make_shared<GenFunction<ActionList>>(std::forward<ActionListGen>(actionListGen));
+    return Concurrency<ActionType>(initialGenPtr, actionListGenPtr);
 }
 
-template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
-decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
+template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionListGen>
+decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionListGen&& actionListGen)
 {
     using ObjectType = typename ActionType::ObjectType;
     using ModelType = typename ActionType::ModelType;
     using ModelFactoryFunction = std::function<ModelType(ObjectType&)>;
     using ObjectTypeGen = GenFunction<ObjectType>;
-    using Actions = std::vector<std::shared_ptr<ActionType>>;
+    using ActionList = std::list<std::shared_ptr<ActionType>>;
 
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
     auto initialGenPtr = std::make_shared<ObjectTypeGen>(std::forward<InitialGen>(initialGen));
-    auto actionsGenPtr = std::make_shared<GenFunction<Actions>>(std::forward<ActionsGen>(actionsGen));
-    return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionsGenPtr);
+    auto actionListGenPtr = std::make_shared<GenFunction<ActionList>>(std::forward<ActionListGen>(actionListGen));
+    return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionListGenPtr);
 }
 
 }  // namespace alt
