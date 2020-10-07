@@ -40,7 +40,7 @@ using SimpleAction = function<bool(ObjectType&)>;
 
 Note that `ObjectType` refers to the type of the stateful object of our concern. `ModelType` is the type of additional object with which we'd like to check our stateful object. This additional object is called a *model*. For example, you can mark number of elements in a model to track the inserted or removed elements in a container object. 
 
-### SimpleAction - Working without a model
+### `SimpleAction` - Working without a model
 
 You can use `SimpleAction` and its variant if you do not intend to use a model object. Let's discuss this simper variant first.
 
@@ -105,7 +105,7 @@ prop.forAll();
 
 ```
 
-### Action - Working with a model
+### `Action` - Working with a model
 
 If you need a model for advanced tracking of state changes, use `Action` instead of `SimpleAction`. `Action` takes additional parameter indicating the model.
 
@@ -145,4 +145,4 @@ prop.forAll();
 
 ## Style 2: Using Action Classes
 
-See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. There is no significant difference in the expressive power between the two styles.
+See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
