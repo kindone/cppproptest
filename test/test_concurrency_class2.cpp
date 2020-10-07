@@ -86,8 +86,8 @@ TEST(ConcurrencyTestAlt2, WithModel)
     auto popBackActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<PopBack4>(); });
     auto clearActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<Clear4>(); });
 
-    auto actionsGen = actionClasses<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
+    auto actionListGen = actionListGenOf<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
 
-    auto prop = concurrency<VectorAction4>(Arbi<std::vector<int>>(), actionsGen);
+    auto prop = concurrency<VectorAction4>(Arbi<std::vector<int>>(), actionListGen);
     prop.check();
 }
