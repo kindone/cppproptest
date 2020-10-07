@@ -42,9 +42,9 @@ TEST(ConcurrencyTest, WithoutModel)
         return true;
     });
 
-    auto actionsGen = actionListGenOf<std::vector<int>>(pushBackGen, popBackGen, clearGen);
+    auto actionListGen = actionListGenOf<std::vector<int>>(pushBackGen, popBackGen, clearGen);
 
-    auto prop = concurrency<std::vector<int>>(Arbi<std::vector<int>>(), actionsGen);
+    auto prop = concurrency<std::vector<int>>(Arbi<std::vector<int>>(), actionListGen);
     prop.check();
 }
 
@@ -77,9 +77,9 @@ TEST(ConcurrencyTest, WithModel)
         return true;
     });
 
-    auto actionsGen = actionListGenOf<std::vector<int>, Model>(pushBackGen, popBackGen, clearGen);
+    auto actionListGen = actionListGenOf<std::vector<int>, Model>(pushBackGen, popBackGen, clearGen);
 
     auto prop = concurrency<std::vector<int>, Model>(
-        Arbi<std::vector<int>>(), [](std::vector<int>&) { return Model(); }, actionsGen);
+        Arbi<std::vector<int>>(), [](std::vector<int>&) { return Model(); }, actionListGen);
     prop.check();
 }

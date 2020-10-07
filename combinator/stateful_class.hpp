@@ -74,7 +74,7 @@ GenFunction<std::list<std::shared_ptr<ActionType>>> actionListGenOf(GENS&&... ge
 }
 
 template <typename ActionType, typename InitialGen, typename ActionsGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen)
+decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionListGen)
 {
     using ObjectType = typename ActionType::ObjectType;
 
@@ -86,11 +86,11 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionsGen
             }
             return true;
         },
-        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionsGen));
+        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionListGen));
 }
 
 template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionsGen)
+decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionListGen)
 {
     using ModelType = typename ActionType::ModelType;
     using ObjectType = typename ActionType::ObjectType;
@@ -107,7 +107,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
             }
             return true;
         },
-        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionsGen));
+        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionListGen));
 }
 
 }  // namespace alt

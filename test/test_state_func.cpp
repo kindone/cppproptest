@@ -55,8 +55,8 @@ TEST(StateTest, StateFunction)
         return true;
     });
 
-    auto actionsGen = actionListGenOf<T>(pushBackGen, popBackGen, popBackGen2, clearGen);
-    auto prop = statefulProperty<T>(Arbi<T>(), actionsGen);
+    auto actionListGen = actionListGenOf<T>(pushBackGen, popBackGen, popBackGen2, clearGen);
+    auto prop = statefulProperty<T>(Arbi<T>(), actionListGen);
     prop.forAll();
 }
 
@@ -101,8 +101,8 @@ TEST(StateTest, StateFunctionWithModel)
         return true;
     });
 
-    auto actionsGen = actionListGenOf<T, Model>(pushBackGen, popBackGen, popBackGen2, clearGen);
+    auto actionListGen = actionListGenOf<T, Model>(pushBackGen, popBackGen, popBackGen2, clearGen);
     auto prop = statefulProperty<T, Model, GenFunction<T>>(
-        Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionsGen);
+        Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionListGen);
     prop.forAll();
 }
