@@ -36,16 +36,19 @@ public:
 
     static constexpr uint32_t defaultNumRuns = 200;
 
-    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionListGen> actionsGenPtr)
-        : initialGenPtr(initialGenPtr), actionsGenPtr(actionsGenPtr), seed(getCurrentTime()), numRuns(defaultNumRuns)
+    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionListGen> actionListGenPtr)
+        : initialGenPtr(initialGenPtr),
+          actionListGenPtr(actionListGenPtr),
+          seed(getCurrentTime()),
+          numRuns(defaultNumRuns)
     {
     }
 
     Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
-                std::shared_ptr<ActionListGen> actionsGenPtr)
+                std::shared_ptr<ActionListGen> actionListGenPtr)
         : initialGenPtr(initialGenPtr),
           modelFactoryPtr(modelFactoryPtr),
-          actionsGenPtr(actionsGenPtr),
+          actionListGenPtr(actionListGenPtr),
           seed(getCurrentTime()),
           numRuns(defaultNumRuns)
     {
@@ -72,7 +75,7 @@ public:
 private:
     std::shared_ptr<ObjectTypeGen> initialGenPtr;
     std::shared_ptr<ModelTypeGen> modelFactoryPtr;
-    std::shared_ptr<ActionListGen> actionsGenPtr;
+    std::shared_ptr<ActionListGen> actionListGenPtr;
     uint64_t seed;
     int numRuns;
 };
@@ -183,9 +186,9 @@ bool Concurrency<ActionType>::invoke(Random& rand, std::function<void(ObjectType
     Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
     ObjectType& obj = initialShr.getRef();
     ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
-    Shrinkable<ActionList> frontShr = (*actionsGenPtr)(rand);
-    Shrinkable<ActionList> rear1Shr = (*actionsGenPtr)(rand);
-    Shrinkable<ActionList> rear2Shr = (*actionsGenPtr)(rand);
+    Shrinkable<ActionList> frontShr = (*actionListGenPtr)(rand);
+    Shrinkable<ActionList> rear1Shr = (*actionListGenPtr)(rand);
+    Shrinkable<ActionList> rear2Shr = (*actionListGenPtr)(rand);
     ActionList& front = frontShr.getRef();
     ActionList& rear1 = rear1Shr.getRef();
     ActionList& rear2 = rear2Shr.getRef();

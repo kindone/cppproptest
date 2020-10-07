@@ -55,7 +55,7 @@ ActionListGen<ObjectType, ModelType> actionListGenOf(GENS... gens)
 }
 
 template <typename ObjectType, typename InitialGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen<ObjectType, EmptyModel>& actionsGen)
+decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen<ObjectType, EmptyModel>& actionListGen)
 {
     static EmptyModel emptyModel;
     return property(
@@ -65,12 +65,12 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen<ObjectTyp
             }
             return true;
         },
-        /*Arbi<ObjectType>()*/ std::forward<InitialGen>(initialGen), actionsGen);
+        /*Arbi<ObjectType>()*/ std::forward<InitialGen>(initialGen), actionListGen);
 }
 
 template <typename ObjectType, typename ModelType, typename InitialGen>
 decltype(auto) statefulProperty(InitialGen&& initialGen, std::function<ModelType(ObjectType&)> modelFactory,
-                                ActionListGen<ObjectType, ModelType>& actionsGen)
+                                ActionListGen<ObjectType, ModelType>& actionListGen)
 {
     using ModelFactoryFunction = std::function<ModelType(ObjectType&)>;
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
@@ -84,7 +84,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, std::function<ModelType
             }
             return true;
         },
-        std::forward<InitialGen>(initialGen), actionsGen);
+        std::forward<InitialGen>(initialGen), actionListGen);
 }
 
 }  // namespace stateful
