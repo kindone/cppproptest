@@ -87,13 +87,14 @@ For a property to be checked, the framework requires generators for parameter ty
 You can supply a custom generator as additional argument(s) to `property()` function, as following.
 
 ```cpp
-property([](int a) -> bool {
+property([](int a, int b) -> bool {
     return true;
 }, myIntGenerator);
 ```
+Any remaining parameter in the property function with no custom generator supplied will be generated using an arbitrary. In above example, `int a` is generated using `myIntGenerator`, while `int b` will be generated using `Arbi<int>`. If there is no arbitrary defined for a type and no custom generator is supplied also, a compile error will be emitted. 
 
 Many primitive types and containers have their default generators `Arbi<T>` defined by the framework for convenience.
-You can find more about generators and the full list of built-in Arbitraries in [Generators](Generators.md) page.
+You can find more about generators and see the full list of built-in Arbitraries in [Generators](Generators.md) page.
 
 ### Assertions and expectations
 
@@ -132,4 +133,45 @@ EXPECT_FOR_ALL(...); // non-fatal, shorthand for EXPECT_TRUE(proptest::forAll(..
 ASSERT_FOR_ALL(...); // fatal, shorthand for ASSERT_TRUE(proptest::forAll(...));
 ```
 
+### Using `example` for testing for specific example
 
+You might want to test for specific combination of arguments for a property defined. This can be accomplished using `Property::example(...)`:
+
+```cpp
+// define a property
+auto prop = property([](int a, int b) -> bool {
+    return a + b == b + a;
+});
+
+// check specific examples
+prop.example(INT_MIN, INT_MIN);
+prop.example(INT_MIN, INT_MAX);
+prop.example(INT_MAX, INT_MIN);
+prop.example(INT_MAX, INT_MAX);
+
+// perform randomized test runs
+prop.forAll(); 
+```
+
+It's also common to fix only some of the arguments using `just` combinator. Rest of the parameters are random-generated as usual.
+
+```cpp
+prop.forAll(just<int>(INT_MIN));
+```
+
+### Configuring random seed and number of runs
+
+A property can be configured to have specific random seed. This can be done by calling `Property::setSeed(unsigned long seed)`.  Also, you can set the number of runs with `Property::setNumRuns(int num)`. The default number of runs is `1000`. 
+
+```cpp
+auto prop = property([](int a, int b) -> bool {
+    // ...
+});
+prop.setSeed(savedSeed).setNumRuns(100).forAll();
+```
+
+You can set default number of runs affected globally by calling the static method `PropertyBase::setDefaultNumRuns(int num)`. 
+
+```cpp
+PropertyBase::setDefaultNumRuns(100);
+```
