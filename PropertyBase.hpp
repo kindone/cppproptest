@@ -72,7 +72,6 @@ class Random;
 class PROPTEST_API PropertyBase {
 public:
     PropertyBase();
-    bool forAll();
     virtual ~PropertyBase() {}
     static void setDefaultNumRuns(uint32_t);
     static void tag(const char* filename, int lineno, std::string key, std::string value);

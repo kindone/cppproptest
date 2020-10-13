@@ -43,6 +43,64 @@ public:
         return *this;
     }
 
+    template <typename... EXPGENS>
+    bool forAll(EXPGENS&&... gens)
+    {
+        Random rand(seed);
+        Random savedRand(seed);
+        std::cout << "random seed: " << seed << std::endl;
+        PropertyContext ctx;
+        int i = 0;
+        try {
+            for (; i < numRuns; i++) {
+                bool pass = true;
+                do {
+                    pass = true;
+                    try {
+                        savedRand = rand;
+                        auto curGenTup = util::overrideTuple(genTup, gens...);
+                        bool result = util::invokeWithGenTuple(rand, func, curGenTup);
+                        std::stringstream failures = ctx.flushFailures();
+                        if (failures.rdbuf()->in_avail()) {
+                            std::cerr << "Falsifiable, after " << (i + 1) << " tests: ";
+                            std::cerr << failures.str();
+                            handleShrink(savedRand /*, e*/);
+                            return false;
+                        } else if (!result) {
+                            std::cerr << "Falsifiable, after " << (i + 1) << " tests" << std::endl;
+                            handleShrink(savedRand /*, e*/);
+                            return false;
+                        }
+                        pass = true;
+                    } catch (const Success&) {
+                        pass = true;
+                    } catch (const Discard&) {
+                        // silently discard combination
+                        pass = false;
+                    }
+                } while (!pass);
+            }
+        } catch (const PropertyFailedBase& e) {
+            std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
+                      << e.lineno << ")" << std::endl;
+            // std::cerr << ctx.flushFailures(2).str();
+            // shrink
+            handleShrink(savedRand /*, e*/);
+            return false;
+        } catch (const std::exception& e) {
+            // skip shrinking?
+            std::cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
+                      << std::endl;
+            // std::cerr << ctx.flushFailures(2).str();
+            handleShrink(savedRand /*, e*/);
+            return false;
+        }
+
+        std::cout << "OK, passed " << numRuns << " tests" << std::endl;
+        ctx.printSummary();
+        return true;
+    }
+
     bool example(ARGS&&... args)
     {
         PropertyContext context;

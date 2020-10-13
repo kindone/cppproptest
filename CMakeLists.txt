@@ -97,7 +97,7 @@ TARGET_LINK_LIBRARIES(test_proptest
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
-set(profile_compile true)
+#set(profile_compile true)
 
 if(profile_compile)
 ### compile
