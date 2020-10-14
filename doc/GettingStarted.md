@@ -47,7 +47,7 @@ TEST(AudioCodec, EncoderDecoder)
 }
 ```
 
-## `property` and `forAll`
+## `Property`
 
 `property` defines a property with optional configurations. By calling `property`, you are creating a `Property` object. `forAll` is the shorthand for calling `Property`'s method `forAll`. `Property::forAll` performs property-based test using supplied callable (function, functor, or lambda). While `forAll` would work most of the time, `property` is more versatile and configurable.
 
@@ -77,6 +77,7 @@ Defining a property requires a callable. For example, a lambda as following is s
 
 Arguments are generated automatically by the framework and the return value of the function indicates success(`true`) or failure(`false`) of a property. 
 Asserts can also be used to mark failures. If you prefer not to use boolean return value to indicate success/fail, you can use void return type.
+
 ```cpp
 [](int a) {
     PROP_ASSERT_GE(a, 0);
@@ -100,7 +101,20 @@ Any remaining parameter in the property function with no custom generator suppli
 Many primitive types and containers have their default generators `Arbi<T>` defined by the framework for convenience.
 You can find more about generators and see the full list of built-in Arbitraries in [Generators](Generators.md) page.
 
-#### Using `example` for testing for specific example
+
+#### `Property::forAll`: adjusting generators
+
+You can explicitly specify some of the generators for `forAll`, by passing them as arguments.
+It's a common way to fix only some of the arguments using `just` combinator and let the rest of the parameters generated using the generators originally set.
+
+```cpp
+// a is fixed to INT_MAX, while b is randomly generated
+prop.forAll(just<int>(INT_MIN));
+
+prop.forAll(inRange<int>(-100, 100));
+```
+
+#### Using `Property::example` for testing for specific example
 
 You might want to test for specific combination of arguments for a property defined. This can be accomplished using `Property::example(...)`. You need to specify all the parameters needed to call the callable:
 
@@ -118,18 +132,6 @@ prop.example(INT_MAX, INT_MAX);
 
 // perform randomized test runs
 prop.forAll(); 
-```
-
-#### `forAll`: adjusting generators
-
-You can explicitly specify some of the generators for `forAll`, by passing them as arguments.
-It's a common way to fix only some of the arguments using `just` combinator and let the rest of the parameters generated using the generators originally set.
-
-```cpp
-// a is fixed to INT_MAX, while b is randomly generated
-prop.forAll(just<int>(INT_MIN));
-
-prop.forAll(inRange<int>(-100, 100));
 ```
 
 #### Configuring random seed and number of runs
