@@ -50,6 +50,8 @@ public:
         Random savedRand(seed);
         std::cout << "random seed: " << seed << std::endl;
         PropertyContext ctx;
+        auto curGenTup = util::overrideTuple(genTup, gens...);
+
         int i = 0;
         try {
             for (; i < numRuns; i++) {
@@ -58,17 +60,16 @@ public:
                     pass = true;
                     try {
                         savedRand = rand;
-                        auto curGenTup = util::overrideTuple(genTup, gens...);
                         bool result = util::invokeWithGenTuple(rand, func, curGenTup);
                         std::stringstream failures = ctx.flushFailures();
                         if (failures.rdbuf()->in_avail()) {
                             std::cerr << "Falsifiable, after " << (i + 1) << " tests: ";
                             std::cerr << failures.str();
-                            handleShrink(savedRand /*, e*/);
+                            shrink(savedRand, std::forward<GenTuple>(curGenTup));
                             return false;
                         } else if (!result) {
                             std::cerr << "Falsifiable, after " << (i + 1) << " tests" << std::endl;
-                            handleShrink(savedRand /*, e*/);
+                            shrink(savedRand, std::forward<GenTuple>(curGenTup));
                             return false;
                         }
                         pass = true;
@@ -85,14 +86,14 @@ public:
                       << e.lineno << ")" << std::endl;
             // std::cerr << ctx.flushFailures(2).str();
             // shrink
-            handleShrink(savedRand /*, e*/);
+            shrink(savedRand, std::forward<GenTuple>(curGenTup));
             return false;
         } catch (const std::exception& e) {
             // skip shrinking?
             std::cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
                       << std::endl;
             // std::cerr << ctx.flushFailures(2).str();
-            handleShrink(savedRand /*, e*/);
+            shrink(savedRand, std::forward<GenTuple>(curGenTup));
             return false;
         }
 
@@ -131,8 +132,6 @@ public:
         }
         return false;
     }
-
-    virtual void handleShrink(Random& savedRand) override { shrink(savedRand); }
 
 private:
     template <size_t N, typename Replace>
@@ -219,14 +218,14 @@ private:
             shrinkN<index>(std::forward<ValueTuple>(valueTup), std::forward<ShrinksTuple>(shrinksTup))...);
     }
 
-    void shrink(Random& savedRand /*, ValueTuple&& valueTup*/)
+    void shrink(Random& savedRand, GenTuple&& curGenTup)
     {
         // std::cout << "shrinking value: ";
         // show(std::cout, valueTup);
         // std::cout << std::endl;
 
         auto generatedValueTup =
-            util::transformHeteroTupleWithArg<util::Generate>(std::forward<GenTuple>(genTup), savedRand);
+            util::transformHeteroTupleWithArg<util::Generate>(std::forward<GenTuple>(curGenTup), savedRand);
 
         std::cout << "  with args: " << Show<decltype(generatedValueTup)>(generatedValueTup) << std::endl;
         // std::cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << std::endl;
