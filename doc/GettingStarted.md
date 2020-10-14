@@ -16,8 +16,11 @@ You can edit your project's CMakeLists.txt to include the library `proptest`:
 ```CMake
 ADD_SUBDIRECTORY(<path_to_cppproptest_root>)
 
-...
+```
 
+And then add this library to `TARGET_LINK_LIBRARIES` section.
+
+```
 TARGET_LINK_LIBRARIES( ...
     ...
     proptest
