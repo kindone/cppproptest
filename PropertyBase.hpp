@@ -86,7 +86,6 @@ protected:
 
 protected:
     virtual bool invoke(Random& rand) = 0;
-    virtual void handleShrink(Random& savedRand /*, const PropertyFailedBase& e*/) = 0;
 
     static uint32_t defaultNumRuns;
 
