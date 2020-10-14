@@ -2,7 +2,7 @@
 
 `cppproptest` is a property-based testing framework for C++. It focuses on usability with following features included:
 
-* Out-of-box generators for primitives and standard containers. See [full list of built-in generators](doc/Generators.md#arbitraries-provided-by-cppproptest) for more.
+* Out-of-box generators for primitives and standard containers. See the [full list of built-in generators](doc/Generators.md#arbitraries-provided-by-cppproptest) for more.
 * Versatile generator combinators for creating custom generators. See [generator combinators](doc/Generators.md#generator-combinators) for more.
 * [Shrinking](doc/Shrinking.md) for automated debugging support
 * [Stateful testing support](doc/StatefulTesting.md)
