@@ -38,6 +38,11 @@ using SimpleAction = function<bool(ObjectType&)>;
 
 ### Option 1: `SimpleAction` - Working without a model
 
+```cpp
+template <typename ObjectType>
+using SimpleAction = function<bool(ObjectType&)>;
+```
+
 You can use `SimpleAction` and its variant if you do not intend to use a model object. Let's discuss this simper variant first. The function takes a `ObjectType` reference and returns a `boolean` value as a result. You will typically be defining a `SimpleAction` with lambda. Our first goal is to create a generator for our action. A generator for an action with no arguments such as `pop_back` can be defined as:
 
 ```cpp
@@ -97,7 +102,7 @@ auto prop = statefulProperty<T>(just<MyVector>([]() { return MyVector(); }), act
 prop.forAll();
 ```
 
-#### Putting it together
+#### Putting it together:
 
 ```cpp
 class MyVector {
@@ -130,7 +135,7 @@ TEST(MyVectorTest, Stateful)
     });
 
     auto actionListGen = actionListGenOf<MyVector>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
-    // actionListGenOf is a `oneOf` generator that can take weights, so you can reduce rate of generation of `clear()` actions with a weight
+    // actionListGenOf is an `oneOf` generator that can take weights, so you can adjust rate of generation of an action with a weight
     //    auto actionListGen = actionListGenOf<MyVector>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
     auto prop = statefulProperty<MyVector>(just<MyVector>([]() { return MyVector(); }), actionListGen);
     // Tests massive cases with randomly generated action sequences
@@ -182,7 +187,7 @@ auto prop = statefulProperty<MyVector, Counter>(Arbi<MyVector>(), [](MyVector& v
 prop.forAll();
 ```
 
-#### Putting it together
+#### Putting it together:
 
 ```cpp
 class MyVector {
@@ -224,15 +229,17 @@ TEST(MyVectorTest, Stateful)
     });
 
     auto actionListGen = actionListGenOf<MyVector, Counter>(pushBackGen, popBackGen, clearGen); 
+    // actionListGenOf is an `oneOf` generator that can take weights, so you can adjust rate of generation of an action with a weight
+    //    auto actionListGen = actionListGenOf<MyVector, Counter>(pushBackGen, popBackGen, weightedGen<Action<MyVector, Counter>>(clearGen, 0.1));
     auto prop = statefulProperty<MyVector, Counter>(/*initial state generator*/ Arbi<MyVector>(), /*initial model factory*/ [](MyVector& vec) { return Counter(vec.size()); }, actionListGen);
     // Tests massive cases with randomly generated action sequences
     prop.forAll();
 }
 ```
 
-## Style 2: Using Action Classes
+## Alternative Style: Using Action Classes
 
-See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
+See [the separate page](./StatefulTestingStyle2.md) for detail. The second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
 
 
 # Further topics
