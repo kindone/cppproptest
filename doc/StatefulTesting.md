@@ -1,6 +1,6 @@
 # Stateful Testing
 
-While property-based testing suits well with functions and stateless objects, it's also useful to test various state changes with ease. The idea of stateful testing with `cppproptest` is to utilize generators for *state changes*.
+While property-based testing suits well with functions and stateless objects, it's also useful in testing for various state changes with ease. The idea of stateful testing with `cppproptest` is to utilize generators for *state changes*.
 
 There are two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*. While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests:
 
