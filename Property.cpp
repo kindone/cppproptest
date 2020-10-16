@@ -55,6 +55,11 @@ void PropertyBase::fail(const char* file, int lineno, const char* condition, con
     context->fail(file, lineno, condition, str);
 }
 
+bool PropertyBase::invoke(Random&)
+{
+    return true;
+}
+
 std::stringstream& PropertyBase::getLastStream()
 {
     if (!context)

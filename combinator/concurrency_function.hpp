@@ -36,19 +36,19 @@ public:
 
     static constexpr uint32_t defaultNumRuns = 200;
 
-    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionListGen> actionListGenPtr)
-        : initialGenPtr(initialGenPtr),
-          actionListGenPtr(actionListGenPtr),
+    Concurrency(std::shared_ptr<ObjectTypeGen> _initialGenPtr, std::shared_ptr<ActionListGen> _actionListGenPtr)
+        : initialGenPtr(_initialGenPtr),
+          actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
           numRuns(defaultNumRuns)
     {
     }
 
-    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
-                std::shared_ptr<ActionListGen> actionListGenPtr)
-        : initialGenPtr(initialGenPtr),
-          modelFactoryPtr(modelFactoryPtr),
-          actionListGenPtr(actionListGenPtr),
+    Concurrency(std::shared_ptr<ObjectTypeGen> _initialGenPtr, std::shared_ptr<ModelTypeGen> _modelFactoryPtr,
+                std::shared_ptr<ActionListGen> _actionListGenPtr)
+        : initialGenPtr(_initialGenPtr),
+          modelFactoryPtr(_modelFactoryPtr),
+          actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
           numRuns(defaultNumRuns)
     {
@@ -142,16 +142,16 @@ struct RearRunner
     using Action = std::function<bool(ObjectType&, ModelType&)>;
     using ActionList = std::list<Action>;
 
-    RearRunner(int n, ObjectType& obj, ModelType& model, ActionList& actions, std::atomic_bool& thread_ready,
-               std::atomic_bool& sync_ready, std::vector<int>& log, std::atomic_int& counter)
-        : n(n),
-          obj(obj),
-          model(model),
-          actions(actions),
-          thread_ready(thread_ready),
-          sync_ready(sync_ready),
-          log(log),
-          counter(counter)
+    RearRunner(int _num, ObjectType& _obj, ModelType& _model, ActionList& _actions, std::atomic_bool& _thread_ready,
+               std::atomic_bool& _sync_ready, std::vector<int>& _log, std::atomic_int& _counter)
+        : num(_num),
+          obj(_obj),
+          model(_model),
+          actions(_actions),
+          thread_ready(_thread_ready),
+          sync_ready(_sync_ready),
+          log(_log),
+          counter(_counter)
     {
     }
 
@@ -164,11 +164,11 @@ struct RearRunner
             if (!action(obj, model))
                 continue;
             // std::cout << "rear2" << std::endl;
-            log[counter++] = n;
+            log[counter++] = num;
         }
     }
 
-    int n;
+    int num;
     ObjectType& obj;
     ModelType& model;
     ActionList& actions;

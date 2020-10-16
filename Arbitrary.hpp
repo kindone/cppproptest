@@ -66,7 +66,7 @@ struct ArbiBase : public GenBase<T>
 template <typename T>
 struct ArbiContainer : public ArbiBase<T>
 {
-    ArbiContainer(size_t minSize, size_t maxSize) : minSize(minSize), maxSize(maxSize) {}
+    ArbiContainer(size_t _minSize, size_t _maxSize) : minSize(_minSize), maxSize(_maxSize) {}
 
     void setMinSize(size_t size) { minSize = size; }
 

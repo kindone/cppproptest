@@ -1,4 +1,5 @@
 #pragma once
+#include "api.hpp"
 #include <exception>
 #include <system_error>
 #include <memory>
@@ -7,7 +8,7 @@
 
 namespace proptest {
 
-struct AssertFailed : public std::logic_error
+struct PROPTEST_API AssertFailed : public std::logic_error
 {
     AssertFailed(const char* fname, int line, const std::error_code& /*error*/, const char* condition,
                  const void* /*caller*/)
@@ -15,40 +16,53 @@ struct AssertFailed : public std::logic_error
     {
     }
 
+    virtual ~AssertFailed();
+
     const char* filename;
     int lineno;
 };
 
-struct PropertyFailedBase : public std::logic_error
+struct PROPTEST_API PropertyFailedBase : public std::logic_error
 {
     PropertyFailedBase(const AssertFailed& e) : logic_error(e), filename(e.filename), lineno(e.lineno) {}
+    virtual ~PropertyFailedBase();
+
     const char* filename;
     int lineno;
 };
 
 template <typename ValueTuple>
-struct PropertyFailed : public PropertyFailedBase
+struct PROPTEST_API PropertyFailed : public PropertyFailedBase
 {
     PropertyFailed(const AssertFailed& e, std::shared_ptr<ValueTuple> v) : PropertyFailedBase(e), valueTupPtr(v) {}
+    virtual ~PropertyFailed();
+
     std::shared_ptr<ValueTuple> valueTupPtr;
 };
 
-struct Discard : public std::logic_error
+template <typename ValueTuple>
+PropertyFailed<ValueTuple>::~PropertyFailed()
+{
+}
+
+struct PROPTEST_API Discard : public std::logic_error
 {
     Discard(const char* /*fname*/, int /*line*/, const std::error_code& /*error*/, const char* /*condition*/,
             const void* /*caller*/)
         : logic_error("Discard")
     {
     }
+    virtual ~Discard();
 };
 
-struct Success : public std::logic_error
+struct PROPTEST_API Success : public std::logic_error
 {
     Success(const char* /*fname*/, int /*line*/, const std::error_code& /*error*/, const char* /*condition*/,
             const void* /*caller*/)
         : logic_error("Success")
     {
     }
+    virtual ~Success();
 };
 
 namespace util {

@@ -8,7 +8,7 @@ template <typename T>
 struct Nullable
 {
     Nullable() {}
-    Nullable(std::shared_ptr<T> ptr) : ptr(ptr) {}
+    Nullable(std::shared_ptr<T> _ptr) : ptr(_ptr) {}
 
     bool isNull() const { return !static_cast<bool>(ptr); }
 

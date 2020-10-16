@@ -27,17 +27,16 @@ Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(
 
     if (min >= 0)  // [3,5] -> [0,2] -> [3,5]
     {
-        return util::binarySearchShrinkableU(static_cast<T>(value - min)).template map<T>([min](const uint64_t& value) {
-            return static_cast<T>(value + min);
-        });
+        return util::binarySearchShrinkableU(static_cast<T>(value - min))
+            .template map<T>([min](const uint64_t& _value) { return static_cast<T>(_value + min); });
     } else if (max <= 0)  // [-5,-3] -> [-2,0] -> [-5,-3]
     {
-        return util::binarySearchShrinkable(static_cast<T>(value - max)).template map<T>([max](const int64_t& value) {
-            return static_cast<T>(value + max);
+        return util::binarySearchShrinkable(static_cast<T>(value - max)).template map<T>([max](const int64_t& _value) {
+            return static_cast<T>(_value + max);
         });
     } else  // [-2, 2]
     {
-        auto transformer = +[](const int64_t& value) { return static_cast<T>(value); };
+        auto transformer = +[](const int64_t& _value) { return static_cast<T>(_value); };
         return util::binarySearchShrinkable(value).template map<T>(transformer);
     }
 }

@@ -22,6 +22,7 @@ include_directories(. googletest/googletest/include googletest/googlemock/includ
 
 ### library
 SET(proptest_sources
+    generator/bool.cpp
     generator/integral.cpp
     generator/floating.cpp
     generator/string.cpp

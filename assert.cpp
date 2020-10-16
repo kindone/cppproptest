@@ -16,4 +16,13 @@ std::ostream& errorOrEmpty(bool error)
 }
 
 }  // namespace util
+
+AssertFailed::~AssertFailed() {}
+
+PropertyFailedBase::~PropertyFailedBase() {}
+
+Discard::~Discard() {}
+
+Success::~Success() {}
+
 }  // namespace proptest

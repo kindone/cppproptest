@@ -17,6 +17,8 @@ public:
             return make_shrinkable<bool>(value);
         }
     }
+
+    virtual ~Arbi();
 };
 
 // template struct Arbi<bool>;

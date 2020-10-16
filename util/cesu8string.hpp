@@ -26,8 +26,8 @@ PROPTEST_API std::ostream& decodeCESU8(std::ostream& os, const CESU8String& str)
 
 struct PROPTEST_API DecodeCESU8
 {
-    DecodeCESU8(const std::string& str) : str(str) {}
-    DecodeCESU8(const CESU8String& str) : str(str) {}
+    DecodeCESU8(const std::string& _str) : str(_str) {}
+    DecodeCESU8(const CESU8String& _str) : str(_str) {}
     friend std::ostream& operator<<(std::ostream& os, const DecodeCESU8& obj) { return decodeCESU8(os, obj.str); }
 
     const std::string& str;

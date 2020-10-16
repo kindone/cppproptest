@@ -85,7 +85,7 @@ protected:
     static PropertyContext* context;
 
 protected:
-    virtual bool invoke(Random& rand) = 0;
+    virtual bool invoke(Random& rand);
 
     static uint32_t defaultNumRuns;
 

@@ -24,7 +24,7 @@ struct Weighted
 {
     using FuncType = GenFunction<T>;
 
-    Weighted(std::shared_ptr<FuncType> funcPtr, double weight) : funcPtr(funcPtr), weight(weight) {}
+    Weighted(std::shared_ptr<FuncType> _funcPtr, double _weight) : funcPtr(_funcPtr), weight(_weight) {}
 
     std::shared_ptr<FuncType> funcPtr;
     double weight;

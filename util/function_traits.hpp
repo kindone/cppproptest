@@ -44,7 +44,7 @@ struct function_traits<R (C::*)(Args...) const> : public function_traits<R(C&, A
 
 // member object pointer
 template <class C, class R>
-struct function_traits<R(C::*)> : public function_traits<R(C&)>
+struct function_traits<R C::*> : public function_traits<R(C&)>
 {
 };
 
