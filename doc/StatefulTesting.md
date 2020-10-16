@@ -168,7 +168,7 @@ With this defined, we can continue defining our actions.
 auto popBackGen = just<SimpleAction<MyVector, Counter>>([](MyVector& obj, Counter& counter) {
     if(obj.size() == 0)
         return false;
-    obj.pop_back(); 
+    obj.pop_back();
     counter.num--;
     return true;
 });
@@ -211,6 +211,7 @@ TEST(MyVectorTest, Stateful)
             return false;
         obj.pop_back(); 
         cnt.num--;
+        PROP_ASSERT(cnt.num == obj.size());
         return true;
     });
 
@@ -218,6 +219,7 @@ TEST(MyVectorTest, Stateful)
         return [value](MyVector& obj) {
             obj.push_back(value);
             cnt.num++;
+            PROP_ASSERT(cnt.num == obj.size());
             return true;
         };
     });
@@ -225,6 +227,7 @@ TEST(MyVectorTest, Stateful)
     auto clearGen = just<Action<MyVector, Counter>>([](MyVector& obj) {
         obj.clear();
         cnt.num = 0;
+        PROP_ASSERT(cnt.num == obj.size());
         return true;
     });
 
