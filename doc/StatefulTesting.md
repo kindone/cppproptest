@@ -24,7 +24,7 @@ class MyVector {
 
 You first need to define actions for each state change. This varies between the two styles.
 
-## Stule 1: Using Action Functions
+## Style 1: Using Action Functions
 
 In the first style using functions, an `Action` or a `SimpleAction` is formally defined as a function:
 
@@ -38,7 +38,7 @@ using SimpleAction = function<bool(ObjectType&)>;
 
 Note that `ObjectType` refers to the type of the stateful object of our concern. `ModelType` is the type of additional object with which we'd like to check our stateful object. This additional object is called a *model*. For example, you can mark number of elements in a model to track the inserted or removed elements in a container object. 
 
-### `SimpleAction` - Working without a model
+### Option 1: `SimpleAction` - Working without a model
 
 You can use `SimpleAction` and its variant if you do not intend to use a model object. Let's discuss this simper variant first.
 
@@ -103,7 +103,7 @@ prop.forAll();
 
 ```
 
-### `Action` - Working with a model
+### Option 2: `Action` - Working with a model
 
 If you need a model for advanced tracking of state changes, use `Action` instead of `SimpleAction`. `Action` takes additional parameter indicating the model.
 
