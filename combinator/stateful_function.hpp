@@ -30,6 +30,37 @@ using Action = std::function<bool(ObjectType&, ModelType&)>;
 template <typename ObjectType, typename ModelType>
 using ActionListGen = GenFunction<std::list<Action<ObjectType, ModelType>>>;
 
+template <typename ObjectType, typename ModelType>
+class StatefulProperty {
+    using InitialGen = GenFunction<ObjectType>;
+    using PropertyType = Property<ObjectType, std::list<std::function<bool(ObjectType&, ModelType&)>>>;
+    using Func = std::function<bool(ObjectType, std::list<std::function<bool(ObjectType&, ModelType&)>>)>;
+
+public:
+    StatefulProperty(Func func, InitialGen&& initialGen, ActionListGen<ObjectType, ModelType>& actionListGen)
+    {
+        auto genTup = std::make_tuple(std::forward<InitialGen>(initialGen), actionListGen);
+        prop = std::make_unique<PropertyType>(func, genTup);
+    }
+
+    StatefulProperty& setSeed(uint64_t s)
+    {
+        prop->setSeed(s);
+        return *this;
+    }
+
+    StatefulProperty& setNumRuns(uint32_t runs)
+    {
+        prop->setNumRuns(runs);
+        return *this;
+    }
+
+    bool go() { return prop->forAll(); }
+
+private:
+    std::shared_ptr<PropertyType> prop;
+};
+
 template <typename ObjectType, typename... GENS,
           std::enable_if_t<std::is_convertible<GENS, std::function<bool(ObjectType&)>>::value>...>
 ActionListGen<ObjectType, EmptyModel> actionListGenOf(GENS... gens)
@@ -58,14 +89,14 @@ template <typename ObjectType, typename InitialGen>
 decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen<ObjectType, EmptyModel>& actionListGen)
 {
     static EmptyModel emptyModel;
-    return property(
-        [](ObjectType obj, std::list<std::function<bool(ObjectType&, EmptyModel&)>> actions) {
+    return StatefulProperty<ObjectType, EmptyModel>(
+        +[](ObjectType obj, std::list<std::function<bool(ObjectType&, EmptyModel&)>> actions) {
             for (auto action : actions) {
                 PROP_ASSERT(action(obj, emptyModel));
             }
             return true;
         },
-        /*Arbi<ObjectType>()*/ std::forward<InitialGen>(initialGen), actionListGen);
+        std::forward<InitialGen>(initialGen), actionListGen);
 }
 
 template <typename ObjectType, typename ModelType, typename InitialGen>
@@ -76,7 +107,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, std::function<ModelType
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactoryFunction>(modelFactory));
 
-    return property(
+    return StatefulProperty<ObjectType, ModelType>(
         [modelFactoryPtr](ObjectType obj, std::list<std::function<bool(ObjectType&, ModelType&)>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {

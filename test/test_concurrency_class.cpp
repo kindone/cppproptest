@@ -74,5 +74,5 @@ TEST(ConcurrencyAltTest, States)
     auto actionListGen = actionListGenOf<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
 
     auto prop = concurrency<VectorAction3>(Arbi<std::vector<int>>(), actionListGen);
-    prop.check();
+    prop.go();
 }

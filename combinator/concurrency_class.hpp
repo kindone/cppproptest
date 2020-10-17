@@ -54,9 +54,9 @@ public:
     {
     }
 
-    bool check();
-    bool check(std::function<void(ObjectType&, ModelType&)> postCheck);
-    bool check(std::function<void(ObjectType&)> postCheck);
+    bool go();
+    bool go(std::function<void(ObjectType&, ModelType&)> postCheck);
+    bool go(std::function<void(ObjectType&)> postCheck);
     bool invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck);
     void handleShrink(Random& savedRand, const PropertyFailedBase& e);
 
@@ -81,21 +81,21 @@ private:
 };
 
 template <typename ActionType>
-bool Concurrency<ActionType>::check()
+bool Concurrency<ActionType>::go()
 {
     static auto emptyPostCheck = +[](ObjectType&, ModelType&) {};
-    return check(emptyPostCheck);
+    return go(emptyPostCheck);
 }
 
 template <typename ActionType>
-bool Concurrency<ActionType>::check(std::function<void(ObjectType&)> postCheck)
+bool Concurrency<ActionType>::go(std::function<void(ObjectType&)> postCheck)
 {
     static auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
-    return check(fullPostCheck);
+    return go(fullPostCheck);
 }
 
 template <typename ActionType>
-bool Concurrency<ActionType>::check(std::function<void(ObjectType&, ModelType&)> postCheck)
+bool Concurrency<ActionType>::go(std::function<void(ObjectType&, ModelType&)> postCheck)
 {
     Random rand(seed);
     Random savedRand(seed);
