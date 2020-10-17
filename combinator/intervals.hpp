@@ -9,7 +9,7 @@ namespace proptest {
 
 struct Interval
 {
-    Interval(int64_t min, int64_t max) : min(min), max(max) {}
+    Interval(int64_t _min, int64_t _max) : min(_min), max(_max) {}
     int64_t size() const { return max - min + 1; }
 
     int64_t min;
@@ -18,7 +18,7 @@ struct Interval
 
 struct UInterval
 {
-    UInterval(uint64_t min, uint64_t max) : min(min), max(max) {}
+    UInterval(uint64_t _min, uint64_t _max) : min(_min), max(_max) {}
     uint64_t size() const { return max - min + 1; }
 
     uint64_t min;

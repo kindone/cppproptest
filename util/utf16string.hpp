@@ -39,8 +39,8 @@ PROPTEST_API std::ostream& decodeUTF16BE(std::ostream& os, const UTF16BEString& 
 
 struct PROPTEST_API DecodeUTF16BE
 {
-    DecodeUTF16BE(const std::string& str) : str(str) {}
-    DecodeUTF16BE(const UTF16BEString& str) : str(str) {}
+    DecodeUTF16BE(const std::string& _str) : str(_str) {}
+    DecodeUTF16BE(const UTF16BEString& _str) : str(_str) {}
     friend std::ostream& operator<<(std::ostream& os, const DecodeUTF16BE& obj) { return decodeUTF16BE(os, obj.str); }
 
     const std::string& str;
@@ -56,8 +56,8 @@ PROPTEST_API std::ostream& decodeUTF16LE(std::ostream& os, const UTF16LEString& 
 
 struct PROPTEST_API DecodeUTF16LE
 {
-    DecodeUTF16LE(const std::string& str) : str(str) {}
-    DecodeUTF16LE(const UTF16LEString& str) : str(str) {}
+    DecodeUTF16LE(const std::string& _str) : str(_str) {}
+    DecodeUTF16LE(const UTF16LEString& _str) : str(_str) {}
     friend std::ostream& operator<<(std::ostream& os, const DecodeUTF16LE& obj) { return decodeUTF16LE(os, obj.str); }
 
     const std::string& str;

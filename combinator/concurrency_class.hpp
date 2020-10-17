@@ -36,27 +36,27 @@ public:
 
     static constexpr uint32_t defaultNumRuns = 200;
 
-    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ActionListGen> actionListGenPtr)
-        : initialGenPtr(initialGenPtr),
-          actionListGenPtr(actionListGenPtr),
+    Concurrency(std::shared_ptr<ObjectTypeGen> _initialGenPtr, std::shared_ptr<ActionListGen> _actionListGenPtr)
+        : initialGenPtr(_initialGenPtr),
+          actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
           numRuns(defaultNumRuns)
     {
     }
 
-    Concurrency(std::shared_ptr<ObjectTypeGen> initialGenPtr, std::shared_ptr<ModelTypeGen> modelFactoryPtr,
-                std::shared_ptr<ActionListGen> actionListGenPtr)
-        : initialGenPtr(initialGenPtr),
-          modelFactoryPtr(modelFactoryPtr),
-          actionListGenPtr(actionListGenPtr),
+    Concurrency(std::shared_ptr<ObjectTypeGen> _initialGenPtr, std::shared_ptr<ModelTypeGen> _modelFactoryPtr,
+                std::shared_ptr<ActionListGen> _actionListGenPtr)
+        : initialGenPtr(_initialGenPtr),
+          modelFactoryPtr(_modelFactoryPtr),
+          actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
           numRuns(defaultNumRuns)
     {
     }
 
-    bool check();
-    bool check(std::function<void(ObjectType&, ModelType&)> postCheck);
-    bool check(std::function<void(ObjectType&)> postCheck);
+    bool go();
+    bool go(std::function<void(ObjectType&, ModelType&)> postCheck);
+    bool go(std::function<void(ObjectType&)> postCheck);
     bool invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck);
     void handleShrink(Random& savedRand, const PropertyFailedBase& e);
 
@@ -81,21 +81,21 @@ private:
 };
 
 template <typename ActionType>
-bool Concurrency<ActionType>::check()
+bool Concurrency<ActionType>::go()
 {
     static auto emptyPostCheck = +[](ObjectType&, ModelType&) {};
-    return check(emptyPostCheck);
+    return go(emptyPostCheck);
 }
 
 template <typename ActionType>
-bool Concurrency<ActionType>::check(std::function<void(ObjectType&)> postCheck)
+bool Concurrency<ActionType>::go(std::function<void(ObjectType&)> postCheck)
 {
     static auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
-    return check(fullPostCheck);
+    return go(fullPostCheck);
 }
 
 template <typename ActionType>
-bool Concurrency<ActionType>::check(std::function<void(ObjectType&, ModelType&)> postCheck)
+bool Concurrency<ActionType>::go(std::function<void(ObjectType&, ModelType&)> postCheck)
 {
     Random rand(seed);
     Random savedRand(seed);
@@ -143,16 +143,16 @@ struct RearRunner
     using ModelType = typename ActionType::ModelType;
     using ActionList = std::list<std::shared_ptr<ActionType>>;
 
-    RearRunner(int n, ObjectType& obj, ModelType& model, ActionList& actions, std::atomic_bool& thread_ready,
-               std::atomic_bool& sync_ready, std::vector<int>& log, std::atomic_int& counter)
-        : n(n),
-          obj(obj),
-          model(model),
-          actions(actions),
-          thread_ready(thread_ready),
-          sync_ready(sync_ready),
-          log(log),
-          counter(counter)
+    RearRunner(int _n, ObjectType& _obj, ModelType& _model, ActionList& _actions, std::atomic_bool& _thread_ready,
+               std::atomic_bool& _sync_ready, std::vector<int>& _log, std::atomic_int& _counter)
+        : n(_n),
+          obj(_obj),
+          model(_model),
+          actions(_actions),
+          thread_ready(_thread_ready),
+          sync_ready(_sync_ready),
+          log(_log),
+          counter(_counter)
     {
     }
 

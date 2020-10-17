@@ -23,7 +23,7 @@ namespace util {
 template <typename T>
 struct WeightedValue
 {
-    WeightedValue(std::shared_ptr<T> valuePtr, double weight) : valuePtr(valuePtr), weight(weight) {}
+    WeightedValue(std::shared_ptr<T> _valuePtr, double _weight) : valuePtr(_valuePtr), weight(_weight) {}
 
     std::shared_ptr<T> valuePtr;
     double weight;

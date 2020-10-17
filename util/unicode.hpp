@@ -19,7 +19,7 @@ PROPTEST_API std::ostream& validString(std::ostream& os, const std::string& str)
 
 struct PROPTEST_API StringAsHex
 {
-    StringAsHex(const std::string& str) : str(str) {}
+    StringAsHex(const std::string& _str) : str(_str) {}
 
     friend std::ostream& operator<<(std::ostream& os, const StringAsHex& obj) { return charAsHex(os, obj.str); }
 
@@ -28,7 +28,7 @@ struct PROPTEST_API StringAsHex
 
 struct PROPTEST_API StringPrintable
 {
-    StringPrintable(const std::string& str) : str(str) {}
+    StringPrintable(const std::string& _str) : str(_str) {}
 
     friend std::ostream& operator<<(std::ostream& os, const StringPrintable& obj) { return validString(os, obj.str); }
 

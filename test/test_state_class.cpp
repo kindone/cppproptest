@@ -65,7 +65,7 @@ TEST(StateTest, States)
         just<std::shared_ptr<VectorAction>>(std::make_shared<Clear>()));
 
     auto prop = statefulProperty<VectorAction>(Arbi<std::vector<int>>(), actionListGen);
-    prop.forAll();
+    prop.go();
 }
 
 struct VectorModel
@@ -131,7 +131,7 @@ TEST(StateTest, StatesWithModel)
 
     auto prop = statefulProperty<VectorAction2>(
         Arbi<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionListGen);
-    prop.forAll();
+    prop.go();
 }
 
 TEST(StateTest, StatesWithModel2)
@@ -143,5 +143,5 @@ TEST(StateTest, StatesWithModel2)
 
     auto prop = statefulProperty<VectorAction2>(
         Arbi<std::vector<int>>(), [](std::vector<int>& sys) { return VectorModel(sys.size()); }, actionListGen);
-    prop.forAll();
+    prop.go();
 }

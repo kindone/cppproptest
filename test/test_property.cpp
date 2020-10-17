@@ -45,7 +45,7 @@ TEST(PropTest, TestPropertyBasic)
     prop.example(std::string("hello"), 10, std::string("world"));
     // with specific generators
     std::string empty("s");
-    prop.forAll(just<std::string>(empty));
+    prop.forAll(just<std::string>(empty), Arbi<int>(), just<std::string>(std::to_string(1)));
 }
 
 TEST(PropTest, TestPropertyExample)

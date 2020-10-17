@@ -308,7 +308,7 @@ bool forAll(Callable&& callable, EXPGENS&&... gens)
     return property(callable, gens...).forAll();
 }
 
-#define EXPECT_FOR_ALL(CALLABLE, GENS...) EXPECT_TRUE(proptest::forAll(CALLABLE, ##GENS))
-#define ASSERT_FOR_ALL(CALLABLE, GENS...) ASSERT_TRUE(proptest::forAll(CALLABLE, ##GENS))
+#define EXPECT_FOR_ALL(CALLABLE, ...) EXPECT_TRUE(proptest::forAll(CALLABLE, __VA_ARGS__))
+#define ASSERT_FOR_ALL(CALLABLE, ...) ASSERT_TRUE(proptest::forAll(CALLABLE, __VA_ARGS__))
 
 }  // namespace proptest

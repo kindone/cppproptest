@@ -17,7 +17,7 @@ template <typename RET>
 struct PipeResult
 {
     PipeResult() : success(false), size(0) {}
-    PipeResult(const RET& ret) : success(true), size(sizeof(ret)), ret(ret) {}
+    PipeResult(const RET& _ret) : success(true), size(sizeof(_ret)), ret(_ret) {}
     PipeResult(const std::string& error) : success(false), size(error.size()), msg(error) {}
 
     void* data()

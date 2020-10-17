@@ -41,7 +41,7 @@ private:
         static std::function<stream_t(const shrinkable_t&, size_t, size_t, const shrinkable_t&, size_t, size_t,
                                       std::shared_ptr<std::vector<e_stream_t>>)>
             genStream =
-                +[](const shrinkable_t& ancestor, size_t power, size_t offset, const shrinkable_t& parent,
+                +[](const shrinkable_t& _ancestor, size_t _power, size_t _offset, const shrinkable_t& parent,
                     size_t frompos, size_t topos, std::shared_ptr<std::vector<e_stream_t>> elemStreams) -> stream_t {
             const size_t size = topos - frompos;
             if (size == 0)
@@ -54,7 +54,7 @@ private:
             newElemStreams->reserve(size);
 
             vector_t newVec = parent.getRef();
-            vector_t& ancestorVec = ancestor.getRef();
+            vector_t& ancestorVec = _ancestor.getRef();
 
             if (newVec.size() != ancestorVec.size())
                 throw std::runtime_error("vector size error: " + std::to_string(newVec.size()) +
@@ -78,11 +78,12 @@ private:
 
             auto newShrinkable = make_shrinkable<vector_t>(newVec);
             newShrinkable = newShrinkable.with(
-                [newShrinkable, power, offset]() -> stream_t { return shrinkBulk(newShrinkable, power, offset); });
-            return stream_t(
-                newShrinkable, [ancestor, power, offset, newShrinkable, frompos, topos, newElemStreams]() -> stream_t {
-                    return genStream(ancestor, power, offset, newShrinkable, frompos, topos, newElemStreams);
-                });
+                [newShrinkable, _power, _offset]() -> stream_t { return shrinkBulk(newShrinkable, _power, _offset); });
+            return stream_t(newShrinkable,
+                            [_ancestor, _power, _offset, newShrinkable, frompos, topos, newElemStreams]() -> stream_t {
+                                return genStream(_ancestor, _power, _offset, newShrinkable, frompos, topos,
+                                                 newElemStreams);
+                            });
         };
 
         size_t parentSize = ancestor.getRef().size();
@@ -129,9 +130,9 @@ private:
             return stream_t::empty();
         // entirety
         shrinkable_t newShrinkable = shrinkable.concat([power, offset](const shrinkable_t& shr) -> stream_t {
-            size_t vecSize = shr.getRef().size();
-            size_t numSplits = static_cast<size_t>(std::pow(2, power));
-            if (vecSize / numSplits < 1 || offset >= numSplits)
+            size_t _vecSize = shr.getRef().size();
+            size_t _numSplits = static_cast<size_t>(std::pow(2, power));
+            if (_vecSize / _numSplits < 1 || offset >= _numSplits)
                 return stream_t::empty();
             // std::cout << "entire: " << power << ", " << offset << std::endl;
             return shrinkBulk(shr, power, offset);
@@ -153,15 +154,15 @@ public:
         size_t minSizeCopy = minSize;
         auto rangeShrinkable =
             util::binarySearchShrinkableU(size - minSizeCopy)
-                .template map<size_t>([minSizeCopy](const uint64_t& size) -> size_t { return size + minSizeCopy; });
+                .template map<size_t>([minSizeCopy](const uint64_t& _size) -> size_t { return _size + minSizeCopy; });
         // this make sure shrinking is possible towards minSize
         shrinkable_t shrinkable = rangeShrinkable.template flatMap<std::vector<Shrinkable<T>>>(
-            [shrinkVec](const size_t& size) -> Shrinkable<std::vector<Shrinkable<T>>> {
-                if (size <= 0)
+            [shrinkVec](const size_t& _size) -> Shrinkable<std::vector<Shrinkable<T>>> {
+                if (_size <= 0)
                     return make_shrinkable<std::vector<Shrinkable<T>>>();
 
                 auto begin = shrinkVec->begin();
-                auto last = shrinkVec->begin() + size;  // subvector of (0, size)
+                auto last = shrinkVec->begin() + _size;  // subvector of (0, size)
                 return make_shrinkable<std::vector<Shrinkable<T>>>(begin, last);
             });
 
@@ -169,11 +170,11 @@ public:
             shrinkable.andThen(+[](const shrinkable_t& shr) -> stream_t { return shrinkBulkRecursive(shr, 0, 0); });
 
         auto vecShrinkable =
-            shrinkable.template flatMap<std::vector<T>>(+[](const vector_t& shrinkVec) -> Shrinkable<std::vector<T>> {
+            shrinkable.template flatMap<std::vector<T>>(+[](const vector_t& _shrinkVec) -> Shrinkable<std::vector<T>> {
                 auto value = make_shrinkable<std::vector<T>>();
                 std::vector<T>& valueVec = value.getRef();
                 std::transform(
-                    shrinkVec.begin(), shrinkVec.end(), std::back_inserter(valueVec),
+                    _shrinkVec.begin(), _shrinkVec.end(), std::back_inserter(valueVec),
                     +[](const Shrinkable<T>& shr) -> T { return shr.getRef(); });
                 return value;
             });

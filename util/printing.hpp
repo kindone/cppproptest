@@ -106,7 +106,7 @@ std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
 template <typename T>
 struct Show
 {
-    Show(const T& value) : value(value) {}
+    Show(const T& _value) : value(_value) {}
     friend std::ostream& operator<<(std::ostream& os, const Show<T>& sh)
     {
         show(os, sh.value);
@@ -118,7 +118,7 @@ struct Show
 template <>
 struct Show<char*>
 {
-    Show(const char* value, size_t n) : value(value), n(n) {}
+    Show(const char* _value, size_t _n) : value(_value), n(_n) {}
     friend std::ostream& operator<<(std::ostream& os, const Show<char*>& sh)
     {
         show(os, sh.value, sh.n);

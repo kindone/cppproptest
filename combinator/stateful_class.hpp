@@ -65,6 +65,41 @@ struct SimpleAction : public Action<SYSTEM, EmptyModel>
     virtual ~SimpleAction() {}
 };
 
+template <typename ActionType>
+class StatefulProperty {
+    using ObjectType = typename ActionType::ObjectType;
+    using ModelType = typename ActionType::ModelType;
+    using InitialGen = GenFunction<ObjectType>;
+    // using ActionType = Action<ObjectType, ModelType>;
+    using PropertyType = Property<ObjectType, std::list<std::shared_ptr<ActionType>>>;
+    using Func = std::function<bool(ObjectType, std::list<std::shared_ptr<ActionType>>)>;
+    using ActionListGen = GenFunction<std::list<std::shared_ptr<ActionType>>>;
+
+public:
+    StatefulProperty(Func func, InitialGen&& initialGen, ActionListGen& actionListGen)
+    {
+        auto genTup = std::make_tuple(std::forward<InitialGen>(initialGen), actionListGen);
+        prop = std::make_unique<PropertyType>(func, genTup);
+    }
+
+    StatefulProperty& setSeed(uint64_t s)
+    {
+        prop->setSeed(s);
+        return *this;
+    }
+
+    StatefulProperty& setNumRuns(uint32_t runs)
+    {
+        prop->setNumRuns(runs);
+        return *this;
+    }
+
+    bool go() { return prop->forAll(); }
+
+private:
+    std::shared_ptr<PropertyType> prop;
+};
+
 template <typename ActionType, typename... GENS>
 GenFunction<std::list<std::shared_ptr<ActionType>>> actionListGenOf(GENS&&... gens)
 {
@@ -73,12 +108,12 @@ GenFunction<std::list<std::shared_ptr<ActionType>>> actionListGenOf(GENS&&... ge
     return actionVecGen;
 }
 
-template <typename ActionType, typename InitialGen, typename ActionsGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionListGen)
+template <typename ActionType, typename InitialGen, typename ActionListGen>
+decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen&& actionListGen)
 {
     using ObjectType = typename ActionType::ObjectType;
 
-    return property(
+    return StatefulProperty<ActionType>(
         +[](ObjectType obj, std::list<std::shared_ptr<ActionType>> actions) {
             for (auto action : actions) {
                 if (action->precondition(obj))
@@ -86,11 +121,11 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionsGen&& actionList
             }
             return true;
         },
-        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionListGen));
+        std::forward<InitialGen>(initialGen), std::forward<ActionListGen>(actionListGen));
 }
 
-template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionsGen>
-decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionsGen&& actionListGen)
+template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionListGen>
+decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFactory, ActionListGen&& actionListGen)
 {
     using ModelType = typename ActionType::ModelType;
     using ObjectType = typename ActionType::ObjectType;
@@ -98,7 +133,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
 
-    return property(
+    return StatefulProperty<ActionType>(
         [modelFactoryPtr](ObjectType obj, std::list<std::shared_ptr<ActionType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
@@ -107,7 +142,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
             }
             return true;
         },
-        std::forward<InitialGen>(initialGen), std::forward<ActionsGen>(actionListGen));
+        std::forward<InitialGen>(initialGen), actionListGen);
 }
 
 }  // namespace alt

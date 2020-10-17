@@ -25,8 +25,8 @@ PROPTEST_API std::ostream& decodeUTF8(std::ostream& os, const UTF8String& str);
 
 struct PROPTEST_API DecodeUTF8
 {
-    DecodeUTF8(const std::string& str) : str(str) {}
-    DecodeUTF8(const UTF8String& str) : str(str) {}
+    DecodeUTF8(const std::string& _str) : str(_str) {}
+    DecodeUTF8(const UTF8String& _str) : str(_str) {}
 
     friend std::ostream& operator<<(std::ostream& os, const DecodeUTF8& obj) { return decodeUTF8(os, obj.str); }
     const std::string& str;
