@@ -1,14 +1,13 @@
 # Stateful Testing
 
-While property-based testing suits well with functions and stateless objects, it's possible to test various state changes with ease. The idea of stateful testing with `cppproptest` is to define and utilize generators for *state changes*.
+While property-based testing suits well with functions and stateless objects, it's also useful in testing for various state changes with ease. The idea of stateful testing with `cppproptest` is to utilize generators for *state changes*.
 
-There are two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*.
+There are two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*. While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests:
 
-While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have common process of defining and running stateful tests:
+1. Define action generators: Define `action`s that each represents unit of state change - e.g. calling `.multiply(int multiplier)` method with a numeric multiplier as an argument
+2. Define an action list generator: we then need a generator for the `action` types that can build a list of actions and pass required arguments to the selected actions
+3. Run the stateful test
 
-1. Define action generator: Define `action`s that each represents unit of state change - e.g. calling `multiply()` method with a numeric multiplier as an argument
-2. Create action list generator: Create a generator for the `action` types that can build a list of actions and pass arguments to the selected actions
-3. Run the stateful test with randomized action lists generated.
 
 Say, you are to write stateful test for your `MyVector`, which is a linear container for integers.
 
@@ -24,7 +23,7 @@ class MyVector {
 
 You first need to define actions for each state change. This varies between the two styles.
 
-## Stule 1: Using Action Functions
+## Style 1: Using Action Functions
 
 In the first style using functions, an `Action` or a `SimpleAction` is formally defined as a function:
 
@@ -36,18 +35,21 @@ template <typename ObjectType>
 using SimpleAction = function<bool(ObjectType&)>;
 ```
 
-Note that `ObjectType` refers to the type of the stateful object of our concern. `ModelType` is the type of additional object with which we'd like to check our stateful object. This additional object is called a *model*. For example, you can mark number of elements in a model to track the inserted or removed elements in a container object. 
+`ObjectType` refers to the type of the stateful object of our concern. `ModelType` is the type of additional object with which we'd like to check our stateful object. This additional object is called a *model*. For example, you can mark number of elements in a model to track the inserted or removed elements in a container object.
 
-### `SimpleAction` - Working without a model
+### Option 1: `SimpleAction` - Working without a model
 
-You can use `SimpleAction` and its variant if you do not intend to use a model object. Let's discuss this simper variant first.
+```cpp
+template <typename ObjectType>
+using SimpleAction = function<bool(ObjectType&)>;
+```
 
-The function takes a `ObjectType` reference and returns a `boolean` value as a result. You will typically be defining a `SimpleAction` with lambda. 
-
-Our first goal is to create a generator for our action. A generator for an action with no arguments such as `pop_back()` can be defined as:
+You can use `SimpleAction` and its variant if you do not intend to use a model object. Let's discuss this simper variant first. The function takes a `ObjectType` reference and returns a `boolean` value as a result. You will typically be defining a `SimpleAction` with lambda. Our first goal is to create a generator for our action. A generator for an action with no arguments such as `pop_back()` can be defined as:
 
 ```cpp
 #include "statefultest.hpp"
+
+// ... 
 
 auto popBackGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
     obj.pop_back(); 
@@ -104,10 +106,48 @@ auto prop = statefulProperty<T>(
     /* action list generator */ actionListGen);
 prop.go();
 
+#### Putting it together:
 
+```cpp
+class MyVector {
+    void push_back(int val) { ... }
+    int pop_back() { ... }
+    int size() { ... }
+    int& at(int pos) { ... }
+    void clear() { ... }
+};
+
+TEST(MyVectorTest, Stateful)
+{
+    auto popBackGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
+        if(obj.size() == 0)
+            return false;
+        obj.pop_back(); 
+        return true;
+    });
+
+    auto pushBackGen = Arbi<int>().map<SimpleAction<MyVector>>([](int value) {
+        return [value](MyVector& obj) {
+            obj.push_back(value);
+            return true;
+        };
+    });
+
+    auto clearGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
+        obj.clear();
+        return true;
+    });
+
+    auto actionListGen = actionListGenOf<MyVector>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
+    // actionListGenOf is an `oneOf` generator that can take weights, so you can adjust rate of generation of an action with a weight
+    //    auto actionListGen = actionListGenOf<MyVector>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
+    auto prop = statefulProperty<MyVector>(just<MyVector>([]() { return MyVector(); }), actionListGen);
+    // Tests massive cases with randomly generated action sequences
+    prop.forAll();
+}
 ```
 
-### `Action` - Working with a model
+### Option 2: `Action` - Working with a model
 
 If you need a model for advanced tracking of state changes, use `Action` instead of `SimpleAction`. `Action` takes additional parameter indicating the model.
 
@@ -116,21 +156,29 @@ template <typename ObjectType>
 using Action = function<bool(ObjectType&, ModelType&)>;
 ```
 
+And Let's define our model for tracking number of elements for `MyVector`
+
 ```cpp
 // our simple model that tracks number of elements
 struct Counter {
     Counter(int n) : num(n) {}
     int num;
 };
+```
 
+With this defined, we can continue defining our actions.
+
+```cpp
 auto popBackGen = just<SimpleAction<MyVector, Counter>>([](MyVector& obj, Counter& counter) {
-    obj.pop_back(); 
+    if(obj.size() == 0)
+        return false;
+    obj.pop_back();
     counter.num--;
     return true;
 });
 ```
 
-You can use `actionListGenOf<ObjectType, ModelType>` to get a action list generator.
+You can use `actionListGenOf<ObjectType, ModelType>` to get a action list generator:
 
 ```cpp
 auto actionListGen = actionListGenOf(pushBackGen, popBackGen, clearGen); 
@@ -146,11 +194,62 @@ auto prop = statefulProperty<T>(
 prop.go();
 ```
 
+#### Putting it together:
 
+```cpp
+class MyVector {
+    void push_back(int val) { ... }
+    int pop_back() { ... }
+    int size() { ... }
+    int& at(int pos) { ... }
+    void clear() { ... }
+};
 
-## Style 2: Using Action Classes
+// our simple model that tracks number of elements
+struct Counter {
+    Counter(int n) : num(n) {}
+    int num;
+};
 
-See [the separate page](./StatefulTestingStyle2.md) for detail. Second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
+TEST(MyVectorTest, Stateful)
+{
+    auto popBackGen = just<Action<MyVector, Counter>>([](MyVector& obj, Counter& cnt) {
+        if(obj.size() == 0)
+            return false;
+        obj.pop_back(); 
+        cnt.num--;
+        PROP_ASSERT(cnt.num == obj.size());
+        return true;
+    });
+
+    auto pushBackGen = Arbi<int>().map<Action<MyVector, Counter>>([](int value) {
+        return [value](MyVector& obj) {
+            obj.push_back(value);
+            cnt.num++;
+            PROP_ASSERT(cnt.num == obj.size());
+            return true;
+        };
+    });
+
+    auto clearGen = just<Action<MyVector, Counter>>([](MyVector& obj) {
+        obj.clear();
+        cnt.num = 0;
+        PROP_ASSERT(cnt.num == obj.size());
+        return true;
+    });
+
+    auto actionListGen = actionListGenOf<MyVector, Counter>(pushBackGen, popBackGen, clearGen); 
+    // actionListGenOf is an `oneOf` generator that can take weights, so you can adjust rate of generation of an action with a weight
+    //    auto actionListGen = actionListGenOf<MyVector, Counter>(pushBackGen, popBackGen, weightedGen<Action<MyVector, Counter>>(clearGen, 0.1));
+    auto prop = statefulProperty<MyVector, Counter>(/*initial state generator*/ Arbi<MyVector>(), /*initial model factory*/ [](MyVector& vec) { return Counter(vec.size()); }, actionListGen);
+    // Tests massive cases with randomly generated action sequences
+    prop.forAll();
+}
+```
+
+## Alternative Style: Using Action Classes
+
+See [the separate page](./StatefulTestingStyle2.md) for detail. The second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
 
 
 # Further topics
