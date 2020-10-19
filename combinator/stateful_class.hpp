@@ -14,6 +14,9 @@
 
 namespace proptest {
 
+template <typename... ARGS>
+class Property;
+
 namespace util {
 
 template <typename ActionType, typename GEN>
@@ -79,7 +82,7 @@ public:
     StatefulProperty(Func func, InitialGen&& initialGen, ActionListGen& actionListGen)
     {
         auto genTup = std::make_tuple(std::forward<InitialGen>(initialGen), actionListGen);
-        prop = std::make_unique<PropertyType>(func, genTup);
+        prop = std::make_shared<PropertyType>(func, genTup);
     }
 
     StatefulProperty& setSeed(uint64_t s)

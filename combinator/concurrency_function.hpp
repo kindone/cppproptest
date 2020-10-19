@@ -9,6 +9,7 @@
 #include "../GenBase.hpp"
 #include <memory>
 #include <list>
+#include <array>
 #include <type_traits>
 #include <iostream>
 #include <thread>
@@ -35,12 +36,14 @@ public:
     using ActionListGen = GenFunction<ActionList>;
 
     static constexpr uint32_t defaultNumRuns = 200;
+    static constexpr int defaultNumThreads = 2;
 
     Concurrency(std::shared_ptr<ObjectTypeGen> _initialGenPtr, std::shared_ptr<ActionListGen> _actionListGenPtr)
         : initialGenPtr(_initialGenPtr),
           actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
-          numRuns(defaultNumRuns)
+          numRuns(defaultNumRuns),
+          numThreads(defaultNumThreads)
     {
     }
 
@@ -50,7 +53,8 @@ public:
           modelFactoryPtr(_modelFactoryPtr),
           actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
-          numRuns(defaultNumRuns)
+          numRuns(defaultNumRuns),
+          numThreads(defaultNumThreads)
     {
     }
 
@@ -72,12 +76,19 @@ public:
         return *this;
     }
 
+    Concurrency& setMaxConcurrency(uint32_t numThr)
+    {
+        numThreads = numThr;
+        return *this;
+    }
+
 private:
     std::shared_ptr<ObjectTypeGen> initialGenPtr;
     std::shared_ptr<ModelTypeGen> modelFactoryPtr;
     std::shared_ptr<ActionListGen> actionListGenPtr;
     uint64_t seed;
     int numRuns;
+    int numThreads;
 };
 
 template <typename ObjectType, typename ModelType>
@@ -185,37 +196,45 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void
     ObjectType& obj = initialShr.getRef();
     ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
     Shrinkable<ActionList> frontShr = (*actionListGenPtr)(rand);
-    Shrinkable<ActionList> rear1Shr = (*actionListGenPtr)(rand);
-    Shrinkable<ActionList> rear2Shr = (*actionListGenPtr)(rand);
     ActionList& front = frontShr.getRef();
-    ActionList& rear1 = rear1Shr.getRef();
-    ActionList& rear2 = rear2Shr.getRef();
 
-    // front
+    // run front
     for (auto action : front) {
         action(obj, model);
     }
 
-    // rear
+    // serial execution
+    if (numThreads <= 1) {
+        postCheck(obj, model);
+        return true;
+    }
+
+    // run rear
     std::thread spawner([&]() {
-        std::atomic_bool thread1_ready(false);
-        std::atomic_bool thread2_ready(false);
         std::atomic_bool sync_ready(false);
         std::atomic<int> counter{0};
         std::vector<int> log;
         log.resize(5000);
+        std::vector<Shrinkable<ActionList>> rearShrs;
+        std::vector<std::shared_ptr<std::atomic_bool>> thread_ready;
+        std::vector<std::thread> rearRunners;
 
-        std::thread rearRunner1(
-            RearRunner<ObjectType, ModelType>(1, obj, model, rear1, thread1_ready, sync_ready, log, counter));
-        std::thread rearRunner2(
-            RearRunner<ObjectType, ModelType>(2, obj, model, rear2, thread2_ready, sync_ready, log, counter));
-        while (!thread1_ready) {}
-        while (!thread2_ready) {}
+        for (int i = 0; i < numThreads; i++) {
+            rearShrs.push_back((*actionListGenPtr)(rand));
+            thread_ready.emplace_back(new std::atomic_bool(false));
+            rearRunners.emplace_back(RearRunner<ObjectType, ModelType>(i, obj, model, rearShrs[i].getRef(),
+                                                                       *thread_ready[i], sync_ready, log, counter));
+        }
+
+        for (int i = 0; i < numThreads; i++) {
+            while (!*thread_ready[i]) {}
+        }
 
         sync_ready = true;
 
-        rearRunner1.join();
-        rearRunner2.join();
+        for (int i = 0; i < numThreads; i++) {
+            rearRunners[i].join();
+        }
 
         std::cout << "count: " << counter << ", order: ";
         for (int i = 0; i < counter; i++) {
@@ -225,8 +244,8 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void
     });
 
     spawner.join();
-    postCheck(obj, model);
 
+    postCheck(obj, model);
     return true;
 }
 
