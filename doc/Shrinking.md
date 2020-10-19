@@ -1,4 +1,4 @@
-`cppproptest` fully supports shrinking for all built-in generators. Generator combinators in `cppproptest` also tends to preserve the shrinking behavior of the original generator. 
+`cppproptest` fully supports shrinking for all built-in generators. Generator combinators also tends to preserve the shrinking behavior of the original generator. 
 
 ## Counterexample and Shrinking
 
