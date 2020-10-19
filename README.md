@@ -135,7 +135,7 @@ Many of the property-based testing implementation in C++ are either obsolete or 
 
 * [Getting Started with `cppproptest`](doc/GettingStarted.md)
 * [Using and Defining Generators](doc/Generators.md)
-* [Counter Examples and Shrinking](doc/Shrinking.md)
+* [Counterexamples and Shrinking](doc/Shrinking.md)
 * [Stateful Testing with `cppproptest`](doc/StatefulTesting.md)
 * [Concurrency Testing with `cppproptest`](doc/ConcurrencyTesting.md)
 * [Advanced Mocking with `cppproptest`](doc/Mocking.md)
