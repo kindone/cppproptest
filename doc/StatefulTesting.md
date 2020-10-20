@@ -126,19 +126,24 @@ TEST(MyVectorTest, Stateful)
     auto popBackGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
         if(obj.size() == 0)
             return false;
+        int size = obj.size();
         obj.pop_back(); 
+        PROP_ASSERT(obj.size() == size - 1);
         return true;
     });
 
     auto pushBackGen = Arbi<int>().map<SimpleAction<MyVector>>([](int value) {
         return [value](MyVector& obj) {
+            int size = obj.size();
             obj.push_back(value);
+            PROP_ASSERT(obj.size() == size + 1);
             return true;
         };
     });
 
     auto clearGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
         obj.clear();
+        PROP_ASSERT(obj.size() == 0);
         return true;
     });
 
