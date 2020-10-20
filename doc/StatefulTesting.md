@@ -1,13 +1,16 @@
 # Stateful Testing
 
-While property-based testing suits well with functions and stateless objects, it's also useful in testing for various state changes with ease. The idea of stateful testing with `cppproptest` is to utilize generators for *state changes*.
+While property-based testing suits well with functions and stateless objects, it's also useful in testing for various state changes with ease. Typical properties we can test with stateful tests are as following:
 
-There are two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*. While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests:
+* Test for consistency of internal state
+* Test for memory leaks
+* Test for concurrent accesses (see [Concurrency Testing](./ConcurrencyTesting.md) for more)
 
-1. Define action generators: Define `action`s that each represents unit of state change - e.g. calling `.multiply(int multiplier)` method with a numeric multiplier as an argument
+The key idea of stateful testing with `cppproptest` is to generate *state changes*.
+
+1. Define action generators: Define `action`s that each represents unit of state change - e.g. For a numeric object, calling `.multiply(int multiplier)` method with a numeric multiplier as an argument, calling `.divide(int divisor)` method, etc.
 2. Define an action list generator: we then need a generator for the `action` types that can build a list of actions and pass required arguments to the selected actions
 3. Run the stateful test
-
 
 Say, you are to write stateful test for your `MyVector`, which is a linear container for integers.
 
@@ -21,11 +24,11 @@ class MyVector {
 };
 ```
 
-You first need to define actions for each state change. This varies between the two styles.
+You first need to define actions for each state change.
 
-## Style 1: Using Action Functions
+## Using Action Functions
 
-In the first style using functions, an `Action` or a `SimpleAction` is formally defined as a function:
+An `Action` or a `SimpleAction` is formally defined as a function:
 
 ```cpp
 template <typename ObjectType>
@@ -249,7 +252,7 @@ TEST(MyVectorTest, Stateful)
 
 ## Alternative Style: Using Action Classes
 
-See [the separate page](./StatefulTestingStyle2.md) for detail. The second style is more traditional way of defining actions. Both style are similar in terms of expressive power.
+There are actually two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*. While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests. See [the separate page](./StatefulTestingStyle2.md) for detail. This style is more traditional way of defining actions. Both styles are similar in terms of expressive power.
 
 
 # Further topics
