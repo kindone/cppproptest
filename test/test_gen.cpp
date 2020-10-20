@@ -3,6 +3,30 @@
 
 using namespace proptest;
 
+TEST(PropTest, FilterWithTolerance)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    auto smallIntGen = interval<int>(0,100);
+
+    for (int i = 0; i < 4; i++) {
+        auto shr = smallIntGen(rand);
+        auto criteria = [](int& v) {
+            return v % 4 == 1;
+        };
+        auto criteriaPtr =
+            std::make_shared<std::function<bool(const int&)>>([criteria](const int& t) { return criteria(const_cast<int&>(t)); });
+        if(!criteria(shr.getRef()))
+            continue;
+        std::cout << "filter with tolerance:" << std::endl;
+        exhaustive(shr.filter(criteriaPtr, 1), 0);
+        std::cout << "filter without tolerance:" << std::endl;
+        exhaustive(shr.filter(criteriaPtr), 0);
+        std::cout << "full" << std::endl;
+        exhaustive(shr, 0);
+    }
+}
+
 TEST(PropTest, GenVectorOfInt)
 {
     int64_t seed = getCurrentTime();

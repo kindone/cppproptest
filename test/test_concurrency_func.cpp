@@ -81,5 +81,6 @@ TEST(ConcurrencyTest, WithModel)
 
     auto prop = concurrency<std::vector<int>, Model>(
         Arbi<std::vector<int>>(), [](std::vector<int>&) { return Model(); }, actionListGen);
+    prop.setMaxConcurrency(1);
     prop.go();
 }

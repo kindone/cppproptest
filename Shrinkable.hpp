@@ -116,9 +116,55 @@ struct Shrinkable
                 [criteriaPtr](const Shrinkable<T>& shr) -> bool { return (*criteriaPtr)(shr.getRef()); });
             // filter stream's value, and then transform each shrinkable to call filter recursively
             return (*thisShrinksPtr)()
-                .filter(*criteriaForStream)
+                .filter(criteriaForStream)
                 .template transform<Shrinkable<T>>(
                     [criteriaPtr](const Shrinkable<T>& shr) { return shr.filter(criteriaPtr); });
+        });
+    }
+
+    // provide filtered generation, shrinking
+    Shrinkable<T> filter(std::function<bool(const T&)> criteria, int tolerance) const
+    {
+        auto criteriaPtr = std::make_shared<std::function<bool(const T&)>>(criteria);
+        return filter(criteriaPtr, tolerance);
+    }
+
+    Shrinkable<T> filter(std::shared_ptr<std::function<bool(const T&)>> criteriaPtr, int tolerance) const
+    {
+        if (!(*criteriaPtr)(getRef()))
+            throw std::invalid_argument("cannot apply criteria");
+
+        auto thisShrinksPtr = shrinksPtr;
+
+        static std::function<Stream<Shrinkable<T>>(const Stream<Shrinkable>&,
+               std::shared_ptr<std::function<bool(const Shrinkable<T>&)>>)> filterStream =
+            [tolerance](const Stream<Shrinkable>& stream,
+               std::shared_ptr<std::function<bool(const Shrinkable<T>&)>> criteriaPtr) -> Stream<Shrinkable<T>> {
+            if (stream.isEmpty()) {
+                return Stream<Shrinkable<T>>::empty();
+            } else {
+                for (auto itr = stream.iterator(); itr.hasNext();) {
+                    const Shrinkable<T>& shr = itr.next();
+                    if ((*criteriaPtr)(shr)) {
+                        auto tail = itr.stream;
+                        return Stream<Shrinkable<T>>{shr, [criteriaPtr, tail, tolerance]() { return filterStream(tail, criteriaPtr); }};
+                    } else {
+                        // extract from shr's children
+                        auto tail = itr.stream;
+                        return filterStream(shr.shrinks().take(tolerance).concat(tail), criteriaPtr);
+                    }
+                }
+                return Stream<Shrinkable<T>>::empty();
+            }
+        };
+
+        return with([thisShrinksPtr, criteriaPtr, tolerance]() {
+            auto criteriaForStream = std::make_shared<std::function<bool(const Shrinkable<T>&)>>(
+                [criteriaPtr](const Shrinkable<T>& shr) -> bool { return (*criteriaPtr)(shr.getRef()); });
+            // filter stream's value, and then transform each shrinkable to call filter recursively
+            return filterStream((*thisShrinksPtr)(), criteriaForStream)
+                .template transform<Shrinkable<T>>(
+                    [criteriaPtr, tolerance](const Shrinkable<T>& shr) { return shr.filter(criteriaPtr, tolerance); });
         });
     }
 
