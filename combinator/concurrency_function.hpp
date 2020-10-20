@@ -62,7 +62,7 @@ public:
     bool go(std::function<void(ObjectType&, ModelType&)> postCheck);
     bool go(std::function<void(ObjectType&)> postCheck);
     bool invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck);
-    void handleShrink(Random& savedRand, const PropertyFailedBase& e);
+    void handleShrink(Random& savedRand, const std::function<void(ObjectType&, ModelType&)>& postCheck);
 
     Concurrency& setSeed(uint64_t s)
     {
@@ -132,13 +132,15 @@ bool Concurrency<ObjectType, ModelType>::go(std::function<void(ObjectType&, Mode
     } catch (const PropertyFailedBase& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
                   << ")" << std::endl;
-
+        std::cerr << "    seed: " << seed << std::endl;
         // shrink
-        handleShrink(savedRand, e);
+        handleShrink(savedRand, postCheck);
         return false;
     } catch (const std::exception& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
+        // shrink
+        handleShrink(savedRand, postCheck);
         return false;
     }
 
@@ -193,9 +195,14 @@ template <typename ObjectType, typename ModelType>
 bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck)
 {
     Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
+    Shrinkable<ActionList> frontShr = (*actionListGenPtr)(rand);
+    std::vector<Shrinkable<ActionList>> rearShrs;
+    for (int i = 0; i < numThreads; i++) {
+        rearShrs.push_back((*actionListGenPtr)(rand));
+    }
+
     ObjectType& obj = initialShr.getRef();
     ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
-    Shrinkable<ActionList> frontShr = (*actionListGenPtr)(rand);
     ActionList& front = frontShr.getRef();
 
     // run front
@@ -215,12 +222,10 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void
         std::atomic<int> counter{0};
         std::vector<int> log;
         log.resize(5000);
-        std::vector<Shrinkable<ActionList>> rearShrs;
         std::vector<std::shared_ptr<std::atomic_bool>> thread_ready;
         std::vector<std::thread> rearRunners;
 
         for (int i = 0; i < numThreads; i++) {
-            rearShrs.push_back((*actionListGenPtr)(rand));
             thread_ready.emplace_back(new std::atomic_bool(false));
             rearRunners.emplace_back(RearRunner<ObjectType, ModelType>(i, obj, model, rearShrs[i].getRef(),
                                                                        *thread_ready[i], sync_ready, log, counter));
@@ -250,9 +255,15 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void
 }
 
 template <typename ObjectType, typename ModelType>
-void Concurrency<ObjectType, ModelType>::handleShrink(Random&, const PropertyFailedBase&)
+void Concurrency<ObjectType, ModelType>::handleShrink(Random&, const std::function<void(ObjectType&, ModelType&)>&)
 {
     // TODO
+    // Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
+    // Shrinkable<ActionList> frontShr = (*actionListGenPtr)(rand);
+    // std::vector<Shrinkable<ActionList>> rearShrs;
+    // for (int i = 0; i < numThreads; i++) {
+    //     rearShrs.push_back((*actionListGenPtr)(rand));
+    // }
 }
 
 /* without model */

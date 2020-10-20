@@ -17,10 +17,11 @@ decltype(auto) filter(GEN&& gen, Criteria&& criteria)
     auto criteriaPtr =
         std::make_shared<std::function<bool(const T&)>>([criteria](const T& t) { return criteria(const_cast<T&>(t)); });
     return Generator<T>([criteriaPtr, genPtr](Random& rand) {
+        // TODO: add some configurable termination criteria (e.g. maximum no. of attempts)
         while (true) {
             Shrinkable<T> shrinkable = (*genPtr)(rand);
             if ((*criteriaPtr)(shrinkable.getRef())) {
-                return shrinkable.filter(criteriaPtr);
+                return shrinkable.filter(criteriaPtr, 5); // 5: tolerance
             }
         }
     });
