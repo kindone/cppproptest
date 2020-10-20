@@ -108,6 +108,7 @@ auto prop = statefulProperty<T>(
     /* initial state generator */ just<MyVector>([]() { return MyVector(); }),
     /* action list generator */ actionListGen);
 prop.go();
+```
 
 #### Putting it together:
 
