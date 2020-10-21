@@ -58,11 +58,30 @@ public:
     {
     }
 
+    Concurrency& setOnStartup(std::function<void()> onStartup) {
+        onStartupPtr = std::make_shared<std::function<void()>>(onStartup);
+        return *this;
+    }
+
+    Concurrency& setOnCleanup(std::function<void()> onCleanup) {
+        onCleanupPtr = std::make_shared<std::function<void()>>(onCleanup);
+        return *this;
+    }
+
+    Concurrency& setPostCheck(std::function<void(ObjectType&, ModelType&)> postCheck)  {
+        postCheckPtr = std::make_shared<std::function<void(ObjectType&, ModelType&)>>(postCheck);
+        return *this;
+    }
+
+    Concurrency& setPostCheck(std::function<void(ObjectType&)> postCheck)  {
+        std::function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
+        postCheckPtr = std::make_shared(fullPostCheck);
+        return *this;
+    }
+
     bool go();
-    bool go(std::function<void(ObjectType&, ModelType&)> postCheck);
-    bool go(std::function<void(ObjectType&)> postCheck);
-    bool invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck);
-    void handleShrink(Random& savedRand, const std::function<void(ObjectType&, ModelType&)>& postCheck);
+    bool invoke(Random& rand);
+    void handleShrink(Random& savedRand);
 
     Concurrency& setSeed(uint64_t s)
     {
@@ -86,6 +105,9 @@ private:
     std::shared_ptr<ObjectTypeGen> initialGenPtr;
     std::shared_ptr<ModelTypeGen> modelFactoryPtr;
     std::shared_ptr<ActionListGen> actionListGenPtr;
+    std::shared_ptr<std::function<void()>> onStartupPtr;
+    std::shared_ptr<std::function<void()>> onCleanupPtr;
+    std::shared_ptr<std::function<void(ObjectType&, ModelType&)>> postCheckPtr;
     uint64_t seed;
     int numRuns;
     int numThreads;
@@ -93,20 +115,6 @@ private:
 
 template <typename ObjectType, typename ModelType>
 bool Concurrency<ObjectType, ModelType>::go()
-{
-    static auto emptyPostCheck = +[](ObjectType&, ModelType&) {};
-    return go(emptyPostCheck);
-}
-
-template <typename ObjectType, typename ModelType>
-bool Concurrency<ObjectType, ModelType>::go(std::function<void(ObjectType&)> postCheck)
-{
-    static auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
-    return go(fullPostCheck);
-}
-
-template <typename ObjectType, typename ModelType>
-bool Concurrency<ObjectType, ModelType>::go(std::function<void(ObjectType&, ModelType&)> postCheck)
 {
     Random rand(seed);
     Random savedRand(seed);
@@ -119,7 +127,11 @@ bool Concurrency<ObjectType, ModelType>::go(std::function<void(ObjectType&, Mode
                 pass = true;
                 try {
                     savedRand = rand;
-                    invoke(rand, postCheck);
+                    if(onStartupPtr)
+                        (*onStartupPtr)();
+                    if(invoke(rand) && onCleanupPtr)
+                        (*onCleanupPtr)();
+
                     pass = true;
                 } catch (const Success&) {
                     pass = true;
@@ -134,13 +146,13 @@ bool Concurrency<ObjectType, ModelType>::go(std::function<void(ObjectType&, Mode
                   << ")" << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
         // shrink
-        handleShrink(savedRand, postCheck);
+        handleShrink(savedRand);
         return false;
     } catch (const std::exception& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
         // shrink
-        handleShrink(savedRand, postCheck);
+        handleShrink(savedRand);
         return false;
     }
 
@@ -192,7 +204,7 @@ struct RearRunner
 };
 
 template <typename ObjectType, typename ModelType>
-bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck)
+bool Concurrency<ObjectType, ModelType>::invoke(Random& rand)
 {
     Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
     Shrinkable<ActionList> frontShr = (*actionListGenPtr)(rand);
@@ -212,7 +224,8 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void
 
     // serial execution
     if (numThreads <= 1) {
-        postCheck(obj, model);
+        if(postCheckPtr)
+            (*postCheckPtr)(obj, model);
         return true;
     }
 
@@ -250,12 +263,13 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand, std::function<void
 
     spawner.join();
 
-    postCheck(obj, model);
+    if(postCheckPtr)
+        (*postCheckPtr)(obj, model);
     return true;
 }
 
 template <typename ObjectType, typename ModelType>
-void Concurrency<ObjectType, ModelType>::handleShrink(Random&, const std::function<void(ObjectType&, ModelType&)>&)
+void Concurrency<ObjectType, ModelType>::handleShrink(Random&)
 {
     // TODO
     // Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);

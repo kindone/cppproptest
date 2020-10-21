@@ -139,19 +139,19 @@ struct Shrinkable
         static std::function<Stream<Shrinkable<T>>(const Stream<Shrinkable>&,
                std::shared_ptr<std::function<bool(const Shrinkable<T>&)>>)> filterStream =
             [tolerance](const Stream<Shrinkable>& stream,
-               std::shared_ptr<std::function<bool(const Shrinkable<T>&)>> criteriaPtr) -> Stream<Shrinkable<T>> {
+               std::shared_ptr<std::function<bool(const Shrinkable<T>&)>> _criteriaPtr) -> Stream<Shrinkable<T>> {
             if (stream.isEmpty()) {
                 return Stream<Shrinkable<T>>::empty();
             } else {
                 for (auto itr = stream.iterator(); itr.hasNext();) {
                     const Shrinkable<T>& shr = itr.next();
-                    if ((*criteriaPtr)(shr)) {
+                    if ((*_criteriaPtr)(shr)) {
                         auto tail = itr.stream;
-                        return Stream<Shrinkable<T>>{shr, [criteriaPtr, tail, tolerance]() { return filterStream(tail, criteriaPtr); }};
+                        return Stream<Shrinkable<T>>{shr, [_criteriaPtr, tail]() { return filterStream(tail, _criteriaPtr); }};
                     } else {
                         // extract from shr's children
                         auto tail = itr.stream;
-                        return filterStream(shr.shrinks().take(tolerance).concat(tail), criteriaPtr);
+                        return filterStream(shr.shrinks().take(tolerance).concat(tail), _criteriaPtr);
                     }
                 }
                 return Stream<Shrinkable<T>>::empty();

@@ -90,7 +90,7 @@ bool Concurrency<ActionType>::go()
 template <typename ActionType>
 bool Concurrency<ActionType>::go(std::function<void(ObjectType&)> postCheck)
 {
-    static auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
+    auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
     return go(fullPostCheck);
 }
 

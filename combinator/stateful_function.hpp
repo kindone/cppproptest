@@ -57,10 +57,30 @@ public:
         return *this;
     }
 
+    StatefulProperty& setOnStartup(std::function<void()> func) {
+        prop->setOnStartup(func);
+        return *this;
+    }
+
+    StatefulProperty& setOnCleanup(std::function<void()> func) {
+        prop->setOnCleanup(func);
+        return *this;
+    }
+    StatefulProperty& setPostCheck(std::function<void(ObjectType&, ModelType&)> postCheck)  {
+        postCheckPtr = std::make_shared(postCheck);
+        return *this;
+    }
+    StatefulProperty& setPostCheck(std::function<void(ObjectType&)> postCheck)  {
+        std::function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
+        postCheckPtr = std::make_shared(fullPostCheck);
+        return *this;
+    }
+
     bool go() { return prop->forAll(); }
 
 private:
     std::shared_ptr<PropertyType> prop;
+    std::shared_ptr<std::function<void(ObjectType&, ModelType&)>> postCheckPtr;
 };
 
 template <typename ObjectType, typename... GENS,

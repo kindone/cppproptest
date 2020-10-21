@@ -43,6 +43,16 @@ public:
         return *this;
     }
 
+    Property& setOnStartup(std::function<void()> onStartup) {
+        onStartupPtr = std::make_shared<std::function<void()>>(onStartup);
+        return *this;
+    }
+
+    Property& setOnCleanup(std::function<void()> onCleanup) {
+        onCleanupPtr = std::make_shared<std::function<void()>>(onCleanup);
+        return *this;
+    }
+
     template <typename... EXPGENS>
     bool forAll(EXPGENS&&... gens)
     {
@@ -60,8 +70,13 @@ public:
                     pass = true;
                     try {
                         savedRand = rand;
+                        if(onStartupPtr)
+                            (*onStartupPtr)();
                         bool result = util::invokeWithGenTuple(rand, func, curGenTup);
+                        if(onCleanupPtr)
+                            (*onCleanupPtr)();
                         std::stringstream failures = ctx.flushFailures();
+                        // failed expectations
                         if (failures.rdbuf()->in_avail()) {
                             std::cerr << "Falsifiable, after " << (i + 1) << " tests: ";
                             std::cerr << failures.str();
@@ -81,18 +96,22 @@ public:
                     }
                 } while (!pass);
             }
+        } catch (const AssertFailed& e) {
+            std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
+                      << e.lineno << ")" << std::endl;
+            // shrink
+            shrink(savedRand, std::forward<GenTuple>(curGenTup));
+            return false;
         } catch (const PropertyFailedBase& e) {
             std::cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
                       << e.lineno << ")" << std::endl;
-            // std::cerr << ctx.flushFailures(2).str();
             // shrink
             shrink(savedRand, std::forward<GenTuple>(curGenTup));
             return false;
         } catch (const std::exception& e) {
-            // skip shrinking?
             std::cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
                       << std::endl;
-            // std::cerr << ctx.flushFailures(2).str();
+            // shrink
             shrink(savedRand, std::forward<GenTuple>(curGenTup));
             return false;
         }
@@ -110,7 +129,12 @@ public:
         try {
             try {
                 try {
-                    return util::invokeWithArgs(func, std::forward<ARGS>(args)...);
+                    if(onStartupPtr)
+                        (*onStartupPtr)();
+                    bool result = util::invokeWithArgs(func, std::forward<ARGS>(args)...);
+                    if(onCleanupPtr)
+                        (*onCleanupPtr)();
+                    return result;
                 } catch (const AssertFailed& e) {
                     throw PropertyFailed<decltype(valueTup)>(e, valueTupPtr);
                 }
@@ -137,24 +161,21 @@ private:
     template <size_t N, typename Replace>
     bool test(ValueTuple&& valueTup, Replace&& replace)
     {
-        // std::cout << "    test: tuple ";
-        // show(std::cout, valueTup);
-        // std::cout << " replaced with arg " << N << ": ";
-        // show(std::cout, replace);
-        // std::cout << std::endl;
         bool result = false;
         auto values = util::transformHeteroTuple<util::ShrinkableGet>(std::forward<ValueTuple>(valueTup));
         try {
+            if(onStartupPtr)
+                (*onStartupPtr)();
             result =
                 util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
-            // std::cout << "    test done: result=" << (result ? "true" : "false") << std::endl;
+            if(onCleanupPtr)
+                (*onCleanupPtr)();
         } catch (const AssertFailed& e) {
-            std::cerr << "    assertion failed: " << e.what() << std::endl;
-            // std::cout << "    test failed with AssertFailed: result=" << (result ? "true" : "false") << std::endl;
-            // TODO: trace
+            result = false;
+            // std::cerr << "    assertion failed: " << e.what() << " (" << e.filename << ":"
+            //           << e.lineno << ")" << std::endl;
         } catch (const std::exception& e) {
-            // std::cout << "    test failed with std::exception: result=" << (result ? "true" : "false") << std::endl;
-            // TODO: trace
+            result = false;
         }
         return result;
     }
@@ -173,9 +194,6 @@ private:
     template <size_t N>
     decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple)
     {
-        // std::cout << "  shrinking arg " << N << ":";
-        // show(std::cout, valueTup);
-        // std::cout << std::endl;
         auto shrinks = std::get<N>(shrinksTuple);
         // keep shrinking until no shrinking is possible
         while (!shrinks.isEmpty()) {
@@ -191,10 +209,6 @@ private:
                     shrinks = next.shrinks();
                     std::get<N>(valueTup) = next;
                     shrinkFound = true;
-                    // std::cout << "  shrinking arg " << N << " tested false: ";
-                    // show(std::cout, valueTup);
-                    // show(std::cout, next);
-                    // std::cout << std::endl;
                     break;
                 }
             }
@@ -220,10 +234,7 @@ private:
 
     void shrink(Random& savedRand, GenTuple&& curGenTup)
     {
-        // std::cout << "shrinking value: ";
-        // show(std::cout, valueTup);
-        // std::cout << std::endl;
-
+        // regenerate failed value tuple
         auto generatedValueTup =
             util::transformHeteroTupleWithArg<util::Generate>(std::forward<GenTuple>(curGenTup), savedRand);
 
@@ -240,6 +251,8 @@ private:
 private:
     Func func;
     GenTuple genTup;
+    std::shared_ptr<std::function<void()>> onStartupPtr;
+    std::shared_ptr<std::function<void()>> onCleanupPtr;
 };
 
 namespace util {
