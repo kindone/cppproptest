@@ -170,11 +170,11 @@ private:
                 util::invokeWithArgTupleWithReplace<N>(func, std::forward<decltype(values)>(values), replace.get());
             if(onCleanupPtr)
                 (*onCleanupPtr)();
-        } catch (const AssertFailed& e) {
+        } catch (const AssertFailed&) {
             result = false;
             // std::cerr << "    assertion failed: " << e.what() << " (" << e.filename << ":"
             //           << e.lineno << ")" << std::endl;
-        } catch (const std::exception& e) {
+        } catch (const std::exception&) {
             result = false;
         }
         return result;

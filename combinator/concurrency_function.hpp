@@ -29,10 +29,10 @@ using stateful::SimpleAction;
 template <typename ObjectType, typename ModelType>
 class PROPTEST_API Concurrency {
 public:
-    using Action = Action<ObjectType,ModelType>;
+    using ActionType = Action<ObjectType,ModelType>;
     using ObjectTypeGen = GenFunction<ObjectType>;
     using ModelTypeGen = typename std::function<ModelType(ObjectType&)>;
-    using ActionList = std::list<Action>;
+    using ActionList = std::list<ActionType>;
     using ActionListGen = GenFunction<ActionList>;
 
     static constexpr uint32_t defaultNumRuns = 200;
@@ -164,8 +164,8 @@ bool Concurrency<ObjectType, ModelType>::go()
 template <typename ObjectType, typename ModelType>
 struct RearRunner
 {
-    using Action = Action<ObjectType,ModelType>;
-    using ActionList = std::list<Action>;
+    using ActionType = Action<ObjectType,ModelType>;
+    using ActionList = std::list<ActionType>;
 
     RearRunner(int _num, ObjectType& _obj, ModelType& _model, ActionList& _actions, std::atomic_bool& _thread_ready,
                std::atomic_bool& _sync_ready, std::vector<int>& _log, std::atomic_int& _counter)
@@ -285,8 +285,8 @@ template <typename ObjectType, typename InitialGen>
 decltype(auto) concurrency(InitialGen&& initialGen, stateful::ActionListGen<ObjectType, EmptyModel>& actionListGen)
 {
     using ObjectTypeGen = GenFunction<ObjectType>;
-    using Action = Action<ObjectType, EmptyModel>;
-    using ActionList = std::list<Action>;
+    using ActionType = Action<ObjectType, EmptyModel>;
+    using ActionList = std::list<ActionType>;
     auto initialGenPtr = std::make_shared<ObjectTypeGen>(std::forward<InitialGen>(initialGen));
     auto actionListGenPtr = std::make_shared<GenFunction<ActionList>>(actionListGen);
     return Concurrency<ObjectType, EmptyModel>(initialGenPtr, actionListGenPtr);
@@ -298,8 +298,8 @@ decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory,
 {
     using ModelFactoryFunction = std::function<ModelType(ObjectType&)>;
     using ObjectTypeGen = GenFunction<ObjectType>;
-    using Action = Action<ObjectType, ModelType>;
-    using ActionList = std::list<Action>;
+    using ActionType = Action<ObjectType, ModelType>;
+    using ActionList = std::list<ActionType>;
 
     std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactory>(modelFactory));
