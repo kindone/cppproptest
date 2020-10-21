@@ -24,7 +24,6 @@ TEST(StateTest, StateFunction)
             auto size = obj.size();
             obj.push_back(value);
             PROP_ASSERT(obj.size() == size + 1);
-            return true;
         });
     });
 
@@ -32,19 +31,17 @@ TEST(StateTest, StateFunction)
     auto popBackGen = just(SimpleAction<T>([](T& obj) {
         auto size = obj.size();
         if (obj.empty())
-            return true;
+            return;
         obj.pop_back();
         PROP_ASSERT(obj.size() == size - 1);
-        return true;
     }));
 
     auto popBackGen2 = just(SimpleAction<T>([](T& obj) {
         auto size = obj.size();
         if (obj.empty())
-            return true;
+            return;
         obj.pop_back();
         PROP_ASSERT(obj.size() == size - 1);
-        return true;
     }));
 
     // actionGen<T> is shorthand for just<SimpleAction<T>>
@@ -52,7 +49,6 @@ TEST(StateTest, StateFunction)
         // std::cout << "Clear" << std::endl;
         obj.clear();
         PROP_ASSERT(obj.size() == 0);
-        return true;
     }));
 
     auto actionListGen =
@@ -79,35 +75,28 @@ TEST(StateTest, StateFunctionWithModel)
             auto size = obj.size();
             obj.push_back(value);
             PROP_ASSERT(obj.size() == size + 1);
-            return true;
         });
     });
 
-    // actionGen<T> is shorthand for just<SimpleAction<T>>
     auto popBackGen = just(Action<T, Model>("PopBack", [](T& obj, Model&) {
         auto size = obj.size();
         if (obj.empty())
-            return true;
+            return;
         obj.pop_back();
         PROP_ASSERT(obj.size() == size - 1);
-        return true;
     }));
 
     auto popBackGen2 = just(Action<T, Model>("PopBack2",[](T& obj, Model&) {
         auto size = obj.size();
         if (obj.empty())
-            return true;
+            return;
         obj.pop_back();
         PROP_ASSERT(obj.size() == size - 1);
-        return true;
     }));
 
-    // actionGen<T> is shorthand for just<SimpleAction<T>>
     auto clearGen = just(Action<T, Model>("Clear", [](T& obj, Model&) {
-        // std::cout << "Clear" << std::endl;
         obj.clear();
         PROP_ASSERT(obj.size() == 0);
-        return true;
     }));
 
     auto actionListGen = actionListGenOf<T, Model>(pushBackGen, popBackGen, popBackGen2, clearGen);

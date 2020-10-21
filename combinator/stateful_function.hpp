@@ -20,11 +20,6 @@ template <typename... ARGS>
 class Property;
 namespace stateful {
 
-// template <typename ObjectType>
-// using SimpleAction = std::function<bool(ObjectType&)>;
-// template <typename ObjectType, typename ModelType>
-// using Action = std::function<bool(ObjectType&, ModelType&)>;
-
 template <typename ObjectType, typename ModelType>
 using ActionListGen = GenFunction<std::list<Action<ObjectType, ModelType>>>;
 
@@ -111,7 +106,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen<ObjectTyp
     return StatefulProperty<ObjectType, EmptyModel>(
         +[](ObjectType obj, std::list<Action<ObjectType,EmptyModel>> actions) {
             for (auto action : actions) {
-                PROP_ASSERT(action(obj, emptyModel));
+                action(obj, emptyModel);
             }
             return true;
         },
@@ -130,7 +125,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, std::function<ModelType
         [modelFactoryPtr](ObjectType obj, std::list<Action<ObjectType,ModelType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
-                PROP_ASSERT(action(obj, model));
+                action(obj, model);
             }
             return true;
         },

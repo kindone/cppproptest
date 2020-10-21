@@ -186,8 +186,7 @@ struct RearRunner
         while (!sync_ready) {}
 
         for (auto action : actions) {
-            if (!action(obj, model))
-                continue;
+            action(obj, model);
             // std::cout << "rear2" << std::endl;
             log[counter++] = num;
         }

@@ -15,13 +15,13 @@ struct EmptyModel
 
 template <typename ObjectType>
 struct SimpleAction {
-    using Function = std::function<bool(ObjectType&)>;
+    using Function = std::function<void(ObjectType&)>;
     explicit SimpleAction(Function f) : name("Action<?>"), func(std::make_shared<Function>(f)) {}
 
     SimpleAction(const std::string& _name, Function f) : name(_name), func(std::make_shared<Function>(f)) {}
 
-    bool operator()(ObjectType& obj) const {
-        return (*func)(obj);
+    void operator()(ObjectType& obj) const {
+        (*func)(obj);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const SimpleAction& obj) {
@@ -35,7 +35,7 @@ struct SimpleAction {
 
 template <typename ObjectType, typename ModelType>
 struct Action {
-    using Function = std::function<bool(ObjectType&, ModelType&)>;
+    using Function = std::function<void(ObjectType&, ModelType&)>;
     explicit Action(Function f) : name("Action<?>"), func(std::make_shared<Function>(f)) {}
 
     Action(const std::string& _name, Function f) : name(_name), func(std::make_shared<Function>(f)) {}
@@ -46,8 +46,8 @@ struct Action {
         });
     }
 
-    bool operator()(ObjectType& obj, ModelType& model) const {
-        return (*func)(obj, model);
+    void operator()(ObjectType& obj, ModelType& model) const {
+        (*func)(obj, model);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Action& action) {

@@ -24,22 +24,19 @@ TEST(ConcurrencyTest, WithoutModel)
             // std::cout << "PushBack(" << value << ")" << std::endl;
             std::lock_guard<std::mutex> guard(getMutex());
             obj.push_back(value);
-            return true;
         });
     });
 
     auto popBackGen = just(SimpleAction<std::vector<int>>([](std::vector<int>& obj) {
         std::lock_guard<std::mutex> guard(getMutex());
         if (obj.empty())
-            return true;
+            return;
         obj.pop_back();
-        return true;
     }));
 
     auto clearGen = just(SimpleAction<std::vector<int>>([](std::vector<int>& obj) {
         std::lock_guard<std::mutex> guard(getMutex());
         obj.clear();
-        return true;
     }));
 
     auto actionListGen = actionListGenOf<std::vector<int>>(pushBackGen, popBackGen, clearGen);
@@ -59,22 +56,19 @@ TEST(ConcurrencyTest, WithModel)
             // std::cout << "PushBack(" << value << ")" << std::endl;
             std::lock_guard<std::mutex> guard(getMutex());
             obj.push_back(value);
-            return true;
         });
     });
 
     auto popBackGen = just(Action<std::vector<int>, Model>([](std::vector<int>& obj, Model&) {
         std::lock_guard<std::mutex> guard(getMutex());
         if (obj.empty())
-            return true;
+            return;
         obj.pop_back();
-        return true;
     }));
 
     auto clearGen = just(Action<std::vector<int>, Model>([](std::vector<int>& obj, Model&) {
         std::lock_guard<std::mutex> guard(getMutex());
         obj.clear();
-        return true;
     }));
 
     auto actionListGen = actionListGenOf<std::vector<int>, Model>(pushBackGen, popBackGen, clearGen);
