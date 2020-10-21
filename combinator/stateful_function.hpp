@@ -5,6 +5,7 @@
 #include <memory>
 #include <functional>
 #include "../util/function_traits.hpp"
+#include "../util/action.hpp"
 #include "../combinator/transform.hpp"
 #include "../combinator/oneof.hpp"
 #include "../gen.hpp"
@@ -19,15 +20,10 @@ template <typename... ARGS>
 class Property;
 namespace stateful {
 
-struct EmptyModel
-{
-};
-
-template <typename ObjectType>
-using SimpleAction = std::function<bool(ObjectType&)>;
-
-template <typename ObjectType, typename ModelType>
-using Action = std::function<bool(ObjectType&, ModelType&)>;
+// template <typename ObjectType>
+// using SimpleAction = std::function<bool(ObjectType&)>;
+// template <typename ObjectType, typename ModelType>
+// using Action = std::function<bool(ObjectType&, ModelType&)>;
 
 template <typename ObjectType, typename ModelType>
 using ActionListGen = GenFunction<std::list<Action<ObjectType, ModelType>>>;
@@ -35,8 +31,8 @@ using ActionListGen = GenFunction<std::list<Action<ObjectType, ModelType>>>;
 template <typename ObjectType, typename ModelType>
 class StatefulProperty {
     using InitialGen = GenFunction<ObjectType>;
-    using PropertyType = Property<ObjectType, std::list<std::function<bool(ObjectType&, ModelType&)>>>;
-    using Func = std::function<bool(ObjectType, std::list<std::function<bool(ObjectType&, ModelType&)>>)>;
+    using PropertyType = Property<ObjectType, std::list<Action<ObjectType,ModelType>>>;
+    using Func = std::function<bool(ObjectType, std::list<Action<ObjectType,ModelType>>)>;
 
 public:
     StatefulProperty(Func func, InitialGen&& initialGen, ActionListGen<ObjectType, ModelType>& actionListGen)
@@ -66,10 +62,12 @@ public:
         prop->setOnCleanup(func);
         return *this;
     }
+
     StatefulProperty& setPostCheck(std::function<void(ObjectType&, ModelType&)> postCheck)  {
         postCheckPtr = std::make_shared(postCheck);
         return *this;
     }
+
     StatefulProperty& setPostCheck(std::function<void(ObjectType&)> postCheck)  {
         std::function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
         postCheckPtr = std::make_shared(fullPostCheck);
@@ -84,26 +82,25 @@ private:
 };
 
 template <typename ObjectType, typename... GENS,
-          std::enable_if_t<std::is_convertible<GENS, std::function<bool(ObjectType&)>>::value>...>
+          std::enable_if_t<std::is_convertible<GENS, SimpleAction<ObjectType>>::value>...>
 ActionListGen<ObjectType, EmptyModel> actionListGenOf(GENS... gens)
 {
-    auto actionGen = oneOf<std::function<bool(ObjectType&)>>(gens...);
+    auto actionGen = oneOf<SimpleAction<ObjectType>>(gens...);
 
-    auto actionGen2 = actionGen.template map<std::function<bool(ObjectType&, EmptyModel&)>>(
-        [](std::function<bool(ObjectType&)>& action) {
-            // TODO: shared_ptr action?
-            return [action](ObjectType& obj, EmptyModel&) { return action(obj); };
+    auto actionGen2 = actionGen.template map<Action<ObjectType, EmptyModel>>(
+        [](SimpleAction<ObjectType>& simpleAction) {
+            return Action<ObjectType,EmptyModel>(simpleAction);
         });
-    auto actionListGen2 = Arbi<std::list<std::function<bool(ObjectType&, EmptyModel&)>>>(actionGen2);
+    auto actionListGen2 = Arbi<std::list<Action<ObjectType,EmptyModel>>>(actionGen2);
     return actionListGen2;
 }
 
 template <typename ObjectType, typename ModelType, typename... GENS,
-          std::enable_if_t<std::is_convertible<GENS, std::function<bool(ObjectType&, ModelType&)>>::value>...>
+          std::enable_if_t<std::is_convertible<GENS, Action<ObjectType,ModelType>>::value>...>
 ActionListGen<ObjectType, ModelType> actionListGenOf(GENS... gens)
 {
-    auto actionGen = oneOf<std::function<bool(ObjectType&, ModelType&)>>(gens...);
-    auto actionListGen = Arbi<std::list<std::function<bool(ObjectType&, ModelType&)>>>(actionGen);
+    auto actionGen = oneOf<Action<ObjectType,ModelType>>(gens...);
+    auto actionListGen = Arbi<std::list<Action<ObjectType,ModelType>>>(actionGen);
     return actionListGen;
 }
 
@@ -112,7 +109,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen<ObjectTyp
 {
     static EmptyModel emptyModel;
     return StatefulProperty<ObjectType, EmptyModel>(
-        +[](ObjectType obj, std::list<std::function<bool(ObjectType&, EmptyModel&)>> actions) {
+        +[](ObjectType obj, std::list<Action<ObjectType,EmptyModel>> actions) {
             for (auto action : actions) {
                 PROP_ASSERT(action(obj, emptyModel));
             }
@@ -130,7 +127,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, std::function<ModelType
         std::make_shared<ModelFactoryFunction>(std::forward<ModelFactoryFunction>(modelFactory));
 
     return StatefulProperty<ObjectType, ModelType>(
-        [modelFactoryPtr](ObjectType obj, std::list<std::function<bool(ObjectType&, ModelType&)>> actions) {
+        [modelFactoryPtr](ObjectType obj, std::list<Action<ObjectType,ModelType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
                 PROP_ASSERT(action(obj, model));
