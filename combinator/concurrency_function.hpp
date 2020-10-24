@@ -194,7 +194,7 @@ struct RearRunner
 
     int num;
     ObjectType& obj;
-    ModelType& model;
+    ModelType model;
     ActionList& actions;
     std::atomic_bool& thread_ready;
     std::atomic_bool& sync_ready;

@@ -13,7 +13,7 @@ using namespace proptest::concurrent::alt;
 class ConcurrencyTestAlt2 : public ::testing::Test {
 };
 
-TEST(ConcurrencyTestAlt2, bitmap)
+TEST_F(ConcurrencyTestAlt2, bitmap_internal)
 {
     util::Bitmap bitmap;
     for (int i = 0; i < util::Bitmap::size; i++) {
@@ -31,7 +31,25 @@ TEST(ConcurrencyTestAlt2, bitmap)
     std::cout << bitmap.occupyUnavailable(2) << std::endl;
 }
 
-TEST(ConcurrencyTest2, Container) {}
+TEST_F(ConcurrencyTestAlt2, bitmap)
+{
+    util::Bitmap bitmap;
+    for (int i = 0; i < util::Bitmap::size; i++) {
+        EXPECT_NE(bitmap.acquire(), -1);
+    }
+    bitmap.reset();
+    util::Bitmap copy = bitmap;
+    int n = -1;
+    for (int i = 0; i < util::Bitmap::size; i++) {
+        EXPECT_NE((n = copy.acquire()), -1);
+    }
+    EXPECT_EQ(copy.tryAcquire(), -1);
+    copy.unacquire(n);
+    EXPECT_NE(copy.tryAcquire(), -1);
+    EXPECT_EQ(copy.tryAcquire(), -1);
+}
+
+TEST_F(ConcurrencyTestAlt2, Container) {}
 
 struct VectorAction4 : public Action<std::vector<int>, util::Bitmap>
 {
@@ -43,11 +61,14 @@ struct PushBack4 : public VectorAction4
 {
     PushBack4(int value) : value(value) {}
 
-    virtual bool run(std::vector<int>& system, util::Bitmap&)
+    virtual bool run(std::vector<int>& system, util::Bitmap& bitmap)
     {
+
         // std::cout << "PushBack(" << value << ")" << std::endl;
         std::lock_guard<std::mutex> guard(getMutex());
+        int pos = bitmap.acquire();
         system.push_back(value);
+        bitmap.unacquire(pos);
         return true;
     }
 
@@ -56,30 +77,34 @@ struct PushBack4 : public VectorAction4
 
 struct Clear4 : public VectorAction4
 {
-    virtual bool run(std::vector<int>& system, util::Bitmap&)
+    virtual bool run(std::vector<int>& system, util::Bitmap& bitmap)
     {
         // std::cout << "Clear" << std::endl;
         std::lock_guard<std::mutex> guard(getMutex());
+        int pos = bitmap.acquire();
         system.clear();
+        bitmap.unacquire(pos);
         return true;
     }
 };
 
 struct PopBack4 : public VectorAction4
 {
-    virtual bool run(std::vector<int>& system, util::Bitmap&)
+    virtual bool run(std::vector<int>& system, util::Bitmap& bitmap)
     {
         // std::cout << "PopBack" << std::endl;
         std::lock_guard<std::mutex> guard(getMutex());
         if (system.empty())
             return true;
 
+        int pos = bitmap.acquire();
         system.pop_back();
+        bitmap.unacquire(pos);
         return true;
     }
 };
 
-TEST(ConcurrencyTestAlt2, WithModel)
+TEST_F(ConcurrencyTestAlt2, WithModel)
 {
     auto pushBackActionGen =
         Arbi<int>().map<std::shared_ptr<VectorAction4>>([](int& value) { return std::make_shared<PushBack4>(value); });

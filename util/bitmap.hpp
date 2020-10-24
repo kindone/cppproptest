@@ -9,7 +9,7 @@ namespace util {
 
 struct PROPTEST_API Bitmap
 {
-    static constexpr int size = 1000;
+    static constexpr int size = 10000;
 
     typedef enum
     {
@@ -20,15 +20,25 @@ struct PROPTEST_API Bitmap
 
     Bitmap();
     Bitmap(const Bitmap&);
+
+// private:
     void setChanging(int n);
+    void setChangingFromAcquired(int n);
+    void setChangingFromUnacquired(int n);
     void take(int n);
     void put(int n);
     void reset();
 
     int occupyAvailable(int n);
     int occupyUnavailable(int n);
+public:
+    int acquire();
+    int tryAcquire();
+    void unacquire(int n);
 
+// private:
     std::atomic<State> states[size];
+
 };
 
 }  // namespace util
