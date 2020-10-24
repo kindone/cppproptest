@@ -18,6 +18,8 @@ uint64_t Random::next8U()
 
 bool Random::getRandomBool(double threshold)
 {
+    if(threshold == 1.0)
+        return true;
     return (next8U() <= static_cast<uint64_t>(static_cast<double>(UINT64_MAX) * threshold));
 }
 
