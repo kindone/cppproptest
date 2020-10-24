@@ -2,6 +2,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
+#include "../util/bitmap.hpp"
 #include "../combinator/concurrency_function.hpp"
 #include <chrono>
 #include <iostream>
@@ -75,6 +76,32 @@ TEST(ConcurrencyTest, WithModel)
 
     auto prop = concurrency<std::vector<int>, Model>(
         Arbi<std::vector<int>>(), [](std::vector<int>&) { return Model(); }, actionListGen);
-    prop.setMaxConcurrency(1);
+    prop.setMaxConcurrency(2);
+    prop.go();
+}
+
+TEST(ConcurrencyTest, bitmap)
+{
+    using Bitmap = util::Bitmap;
+
+    auto acquireGen = just(SimpleAction<Bitmap>([](Bitmap& bitmap) {
+        [[maybe_unused]] int pos = bitmap.acquire();
+        bitmap.unacquire(pos);
+    }));
+
+    [[maybe_unused]] auto unacquireGen = integers<int>(0, Bitmap::size).map<SimpleAction<Bitmap>>(+[](int& pos) {
+        return SimpleAction<Bitmap>([pos](Bitmap& bitmap) {
+            try {
+                bitmap.unacquire(pos);
+                std::cout << "unacquired" << std::endl;
+            } catch(std::runtime_error&) {
+                std::cout << "failed to unacquire" << std::endl;
+            }
+        });
+    });
+
+    auto actionListGen = actionListGenOf<Bitmap>(acquireGen/*, unacquireGen*/);
+    auto prop = concurrency<Bitmap>(
+        just<Bitmap>(Bitmap()), actionListGen);
     prop.go();
 }

@@ -20,6 +20,28 @@ Bitmap::Bitmap(const Bitmap& other)
     }
 }
 
+int Bitmap::acquire() {
+    int n = -1;
+    do {
+        n = occupyAvailable(0);
+    } while(n == -1);
+
+    take(n);
+    return n;
+}
+
+int Bitmap::tryAcquire() {
+    int n = occupyAvailable(0);
+    if(n != -1)
+        take(n);
+    return n;
+}
+
+void Bitmap::unacquire(int n) {
+    setChangingFromAcquired(n);
+    put(n);
+}
+
 void Bitmap::setChanging(int n)
 {
     State AvailableState = Available;
@@ -27,6 +49,20 @@ void Bitmap::setChanging(int n)
     // cas
     states[n].compare_exchange_strong(AvailableState, Changing) ||
         states[n].compare_exchange_strong(UnavailableState, Changing);
+}
+
+void Bitmap::setChangingFromAcquired(int n)
+{
+    State UnavailableState = Unavailable;
+    // cas
+    states[n].compare_exchange_strong(UnavailableState, Changing);
+}
+
+void Bitmap::setChangingFromUnacquired(int n)
+{
+    State AvailableState = Available;
+    // cas
+    states[n].compare_exchange_strong(AvailableState, Changing);
 }
 
 void Bitmap::take(int n)
