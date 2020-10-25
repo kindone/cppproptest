@@ -40,7 +40,7 @@ TEST(ConcurrencyTest, WithoutModel)
         obj.clear();
     }));
 
-    auto actionListGen = actionListGenOf<std::vector<int>>(pushBackGen, popBackGen, clearGen);
+    auto actionListGen = oneOf<SimpleAction<std::vector<int>>>(pushBackGen, popBackGen, clearGen);
 
     auto prop = concurrency<std::vector<int>>(Arbi<std::vector<int>>(), actionListGen);
     prop.go();
@@ -72,7 +72,7 @@ TEST(ConcurrencyTest, WithModel)
         obj.clear();
     }));
 
-    auto actionListGen = actionListGenOf<std::vector<int>, Model>(pushBackGen, popBackGen, clearGen);
+    auto actionListGen = oneOf<Action<std::vector<int>, Model>>(pushBackGen, popBackGen, clearGen);
 
     auto prop = concurrency<std::vector<int>, Model>(
         Arbi<std::vector<int>>(), [](std::vector<int>&) { return Model(); }, actionListGen);
@@ -100,7 +100,7 @@ TEST(ConcurrencyTest, bitmap)
         });
     });
 
-    auto actionListGen = actionListGenOf<Bitmap>(acquireGen/*, unacquireGen*/);
+    auto actionListGen = oneOf<SimpleAction<Bitmap>>(acquireGen/*, unacquireGen*/);
     auto prop = concurrency<Bitmap>(
         just<Bitmap>(Bitmap()), actionListGen);
     prop.go();

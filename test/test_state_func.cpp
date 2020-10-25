@@ -51,9 +51,9 @@ TEST(StateTest, StateFunction)
         PROP_ASSERT(obj.size() == 0);
     }));
 
-    auto actionListGen =
-        actionListGenOf<T>(pushBackGen, popBackGen, popBackGen2, weightedGen<SimpleAction<T>>(clearGen, 0.1));
-    auto prop = statefulProperty<T>(Arbi<T>(), actionListGen);
+    auto actionGen =
+        oneOf<SimpleAction<T>>(pushBackGen, popBackGen, popBackGen2, weightedGen<SimpleAction<T>>(clearGen, 0.1));
+    auto prop = statefulProperty<T>(Arbi<T>(), actionGen);
     prop.setOnStartup([]() {
         std::cout << "startup" << std::endl;
     });
@@ -99,9 +99,9 @@ TEST(StateTest, StateFunctionWithModel)
         PROP_ASSERT(obj.size() == 0);
     }));
 
-    auto actionListGen = actionListGenOf<T, Model>(pushBackGen, popBackGen, popBackGen2, clearGen);
+    auto actionGen = oneOf<Action<T, Model>>(pushBackGen, popBackGen, popBackGen2, clearGen);
     auto prop = statefulProperty<T, Model>(
-        Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionListGen);
+        Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionGen);
     prop.setOnStartup([]() {
         std::cout << "startup" << std::endl;
     });
