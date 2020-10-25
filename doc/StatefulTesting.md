@@ -9,7 +9,7 @@ While property-based testing suits well with functions and stateless objects, it
 The key idea of stateful testing with `cppproptest` is to generate *state changes*.
 
 1. Define action generators: Define `action`s that each represents unit of state change - e.g. For a numeric object, calling `.multiply(int multiplier)` method with a numeric multiplier as an argument, calling `.divide(int divisor)` method, etc.
-2. Define an action list generator: we then need a generator for the `action` types that can build a list of actions and pass required arguments to the selected actions
+2. Build an action list generator: we then need a generator for the `action` types that can build a list of actions and pass required arguments to the selected actions
 3. Run the stateful test
 
 Say, you are to write stateful test for your `MyVector`, which is a linear container for integers.
@@ -74,19 +74,21 @@ Here you can see an integer generator is transformed as an action generator. The
 
 You can add various assertions in the action. Any failed assertion will be reported and analyzed, as in ordinary property tests.
 
-With each action generator defined, we will call `actionListGenOf<ObjectType>()` to get a generator for a `std::list<SimpleList>`, which is the random list of actions.
+With each action generator defined, we would typically combine these generators as one, using `oneOf` combinator:
 
 ```cpp
-auto actionListGen = actionListGenOf(pushBackGen, popBackGen, clearGen); 
+auto actionGen = oneOf<SimpleAction<MyAction>>(pushBackGen, popBackGen, clearGen); 
 ```
 
-Finally, we can define a stateful property by calling `statefulProperty<ObjectType>()`. This method requires an initial state generator, and the `actionListGen` we've just obtained. Calling `statefulProperty::go()` will execute the stateful property test. 
+This will generate either of 3 actions, with evenly distributed probability (1/3).
+
+Finally, we can define a stateful property by calling `statefulProperty<ObjectType>()`. This method requires an initial state generator, and the `actionGen` we've just obtained. Calling `statefulProperty::go()` will execute the stateful property test. 
 
 ```cpp
 // we can generate initial object from an arbitrary, assuming we have an Arbi<MyVector> defined
 auto prop = statefulProperty<T>(
     /* initial state generator */ Arbi<MyVector>(),
-    /* action list generator */ actionListGen);
+    /* action generator */ actionGen);
 prop.go();
 
 // ...
@@ -94,7 +96,7 @@ prop.go();
 // or, we can just initialize the object to an empty object
 auto prop = statefulProperty<T>(
     /* initial state generator */ just<MyVector>([]() { return MyVector(); }),
-    /* action list generator */ actionListGen);
+    /* action generator */ actionGen);
 prop.go();
 ```
 
@@ -132,12 +134,12 @@ TEST(MyVectorTest, Stateful)
         PROP_ASSERT(obj.size() == 0);
     });
 
-    auto actionListGen = actionListGenOf<MyVector>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
-    // actionListGenOf is an `oneOf` generator that can take weights, so you can adjust rate of generation of an action with a weight
-    //    auto actionListGen = actionListGenOf<MyVector>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
+    auto actionGen = oneOf<SimpleAction<MyVector>>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
+    // `oneOf` can take weights, so you can adjust rate of generation of an action
+    //    auto actionGen = oneOf<SimpleAction<MyVector>>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
     auto prop = statefulProperty<MyVector>(
         /* initial state generator */ just<MyVector>([]() { return MyVector(); }),
-        /* action list generator */ actionListGen);
+        /* action generator */ actionGen);
     // Tests massive cases with randomly generated action sequences
     prop.go();
 }
@@ -166,19 +168,19 @@ auto popBackGen = just<SimpleAction<MyVector, Counter>>([](MyVector& obj, Counte
 });
 ```
 
-You can use `actionListGenOf<ObjectType, ModelType>` to get a action list generator:
+You can use `oneOf<Action<ObjectType, ModelType>>` to get the combined action generator:
 
 ```cpp
-auto actionListGen = actionListGenOf(pushBackGen, popBackGen, clearGen); 
+auto actionGen = oneOf<Action<MyVector, Counter>>(pushBackGen, popBackGen, clearGen); 
 ```
 
-Finally, we can define a stateful property by calling `statefulProperty<ObjectType,ModelType>()`. This method requires an initial state generator, and the `actionListGen` we've just obtained. Compared to `SimpleAction` case, it additionally requires a model factory in the form of `ObjectType& -> ModelType`. This factory is to induce initial model from initial object. Calling `statefulProperty::go()` will execute the stateful property test. 
+Finally, we can define a stateful property by calling `statefulProperty<ObjectType,ModelType>()`. This method requires an initial state generator, and the `actionGen` we've just obtained. Compared to `SimpleAction` case, it additionally requires a model factory in the form of `ObjectType& -> ModelType`. This factory is to induce initial model from initial object. Calling `statefulProperty::go()` will execute the stateful property test. 
 
 ```cpp
 auto prop = statefulProperty<T>(
     /* initial state generator */ Arbi<MyVector>(),
     /* model factory */ [](MyVector& vec) { return Counter(vec.size()); }, 
-    /* action list generator */ actionListGen);
+    /* action generator */ actionGen);
 prop.go();
 ```
 
@@ -225,13 +227,14 @@ TEST(MyVectorTest, Stateful)
         PROP_ASSERT(cnt.num == obj.size());
     });
 
-    auto actionListGen = actionListGenOf<MyVector, Counter>(pushBackGen, popBackGen, clearGen); 
-    // actionListGenOf is an `oneOf` generator that can take weights, so you can adjust rate of generation of an action with a weight
-    //    auto actionListGen = actionListGenOf<MyVector, Counter>(pushBackGen, popBackGen, weightedGen<Action<MyVector, Counter>>(clearGen, 0.1));
+    // combine action generators
+    auto actionGen = oneOf<Action<MyVector, Counter>>(pushBackGen, popBackGen, clearGen); 
+    // oneOf() can take weights, so you can adjust rate of generation of an action
+    //    auto actionGen = oneOf<Action<MyVector, Counter>>(pushBackGen, popBackGen, weightedGen<Action<MyVector, Counter>>(clearGen, 0.1));
     auto prop = statefulProperty<MyVector, Counter>(
         /* initial state generator */ Arbi<MyVector>(),
         /* initial model factory */ [](MyVector& vec) { return Counter(vec.size()); },
-        /* action list generator */ actionListGen);
+        /* action generator */ actionGen);
     // Tests massive cases with randomly generated action sequences
     prop.go();
 }
