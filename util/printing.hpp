@@ -13,6 +13,7 @@
 #include "utf16string.hpp"
 #include "cesu8string.hpp"
 #include "nullable.hpp"
+#include "action.hpp"
 
 namespace proptest {
 
@@ -57,6 +58,11 @@ template <typename T>
 std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr);
 template <typename T>
 std::ostream& show(std::ostream& os, const Nullable<T>& nullable);
+
+namespace stateful {
+template <typename ObjectType, typename ModelType>
+std::ostream& show(std::ostream& os, const Action<ObjectType,ModelType>& action);
+}
 
 namespace util {
 
@@ -270,5 +276,17 @@ std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
         os << "(null)";
     return os;
 }
+
+namespace stateful {
+
+template <typename ObjectType, typename ModelType>
+std::ostream& show(std::ostream& os, const Action<ObjectType,ModelType>& action)
+{
+    os << action.name;
+    return os;
+}
+
+}
+
 
 }  // namespace proptest
