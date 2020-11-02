@@ -151,6 +151,13 @@ You can set default number of runs affected globally by calling the static metho
 PropertyBase::setDefaultNumRuns(100);
 ```
 
+if no random seed is specified, current timestamp in milliseconds is used. You can override these unspecified random seeds with an environment variable `PROPTEST_SEED`. This comes handy when you encountered a failure and its random seed value is available:
+
+```Shell
+# ... failed test with random seed 15665312
+$ PROPTEST_SEED=15665312 ./my_proptest
+```
+
 
 ### Assertions and expectations
 
