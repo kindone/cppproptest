@@ -113,13 +113,13 @@ class MyVector {
 
 TEST(MyVectorTest, Stateful)
 {
-    auto popBackGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
+    auto popBackGen = just(SimpleAction<MyVector>([](MyVector& obj) {
         if(obj.size() == 0)
             return;
         int size = obj.size();
         obj.pop_back(); 
         PROP_ASSERT(obj.size() == size - 1);
-    });
+    }));
 
     auto pushBackGen = Arbi<int>().map<SimpleAction<MyVector>>([](int value) {
         return [value](MyVector& obj) {
@@ -129,10 +129,10 @@ TEST(MyVectorTest, Stateful)
         };
     });
 
-    auto clearGen = just<SimpleAction<MyVector>>([](MyVector& obj) {
+    auto clearGen = just(SimpleAction<MyVector>([](MyVector& obj) {
         obj.clear();
         PROP_ASSERT(obj.size() == 0);
-    });
+    }));
 
     auto actionGen = oneOf<SimpleAction<MyVector>>(pushBackGen, popBackGen, weightedGen<SimpleAction<MyVector>>(clearGen, 0.1)); 
     // `oneOf` can take weights, so you can adjust rate of generation of an action
@@ -160,12 +160,12 @@ struct Counter {
 With this defined, we can continue defining our actions.
 
 ```cpp
-auto popBackGen = just<SimpleAction<MyVector, Counter>>([](MyVector& obj, Counter& counter) {
+auto popBackGen = just(Action<MyVector, Counter>([](MyVector& obj, Counter& counter) {
     if(obj.size() == 0)
         return;
     obj.pop_back();
     counter.num--;
-});
+}));
 ```
 
 You can use `oneOf<Action<ObjectType, ModelType>>` to get the combined action generator:
@@ -205,13 +205,13 @@ struct Counter {
 
 TEST(MyVectorTest, Stateful)
 {
-    auto popBackGen = just<Action<MyVector, Counter>>([](MyVector& obj, Counter& cnt) {
+    auto popBackGen = just(Action<MyVector, Counter>([](MyVector& obj, Counter& cnt) {
         if(obj.size() == 0)
             return;
         obj.pop_back(); 
         cnt.num--;
         PROP_ASSERT(cnt.num == obj.size());
-    });
+    }));
 
     auto pushBackGen = Arbi<int>().map<Action<MyVector, Counter>>([](int value) {
         return [value](MyVector& obj) {
@@ -221,11 +221,11 @@ TEST(MyVectorTest, Stateful)
         };
     });
 
-    auto clearGen = just<Action<MyVector, Counter>>([](MyVector& obj) {
+    auto clearGen = just(Action<MyVector, Counter>([](MyVector& obj) {
         obj.clear();
         cnt.num = 0;
         PROP_ASSERT(cnt.num == obj.size());
-    });
+    }));
 
     // combine action generators
     auto actionGen = oneOf<Action<MyVector, Counter>>(pushBackGen, popBackGen, clearGen); 
@@ -239,6 +239,41 @@ TEST(MyVectorTest, Stateful)
     prop.go();
 }
 ```
+
+### Debugging stateful test failures
+
+A stateful test is succesful if all tried combinations were complete without issues. On the other hand, a failed assertion or an unexpected exception would end up with a stateful test failure. The framework will print the failed condition and tried input combinations so that you can debug the failure. Among the `args`, the first arg is the initial state, and the second one is the action list:
+
+```Shell
+Falsifiable, after 12 tests: vec.size() == count (test/test_state_func.cpp:111)
+  with args: { [ 1882384569, -1157159508, ..., 128, 32768, 840506558 ], [ Action<?>, Action<?>, Action<?>, ..., Action<?> ] }
+```
+
+Note that, by default, an `Action` or a `SimpleAction` has no distinctive description. This is why there are indistinguishable `Action<?>`s printed in the action list. This can be avoided by prepending a description to each action constructor:
+
+```cpp
+// action with no argument
+auto clearGen = just(SimpleAction<MyVector>>("Clear", [](MyVector& obj) {
+    // ... 
+}));
+
+// action with arguments can be printed nicely with a stringstream
+auto pushBackGen = Arbi<int>().map<SimpleAction<MyVector>>([](int value) {
+    std::stringstream str;
+    str << "PushBack(" << value << ")";
+    return SimpleAction(str.str(), [value](MyVector& obj) {
+        // ...
+    });
+});
+```
+
+Now you can see the actions are correctly printed:
+
+```Shell
+Falsifiable, after 1 tests: vec.size() < 5 (test/test_state_func.cpp:111)
+  with args: { [ 1882384569, -1157159508, ..., 128, 32768, 840506558 ], [ PushBack(1894834799), PopBack, Clear, ..., PushBack(814265512) ] }
+```
+
 
 ### Configuring stateful test runs
 
@@ -256,7 +291,6 @@ prop.go();
 // or you can simply chain the property:
 prop.setSeed(0).setNumRuns(1000).go();
 ```
-
 
 ## Alternative Style: Using Action Classes
 
