@@ -72,8 +72,6 @@ Here is the comparison table showing some of the benefits of turning conventiona
 | Code Coverage     | -                         | Higher                       |
 | Readability       | -                         | Higher                       |
 | Debugging failures| -                         | Automated (shrinking)        |
-| Stateful tests    | -                         | Supported                    |
-| Concurrency tests | -                         | Supported                    |
 
 &nbsp;
 
