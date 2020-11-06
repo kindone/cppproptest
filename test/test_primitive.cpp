@@ -491,6 +491,21 @@ TEST(PropTest, GenList)
     // }
 }
 
+TEST(PropTest, DISABLED_GenLargeVector)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    for(int i = 1 ; i < INT_MAX/16; i*=2) {
+        static uint64_t time = getCurrentTime();
+        std::cout << "starting generation: vector of size " << i << std::endl;
+        Arbi<std::vector<int>> gen(integers<int>(0, 100));
+        gen.setSize(i);
+        gen(rand);
+        uint64_t elapsed = (getCurrentTime() - time) / 1000;
+        std::cout << "vector of size " << i << " generated in " << elapsed << " seconds" << std::endl;
+    }
+}
+
 TEST(PropTest, GenNullable)
 {
     int64_t seed = getCurrentTime();
