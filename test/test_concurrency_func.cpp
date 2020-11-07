@@ -100,8 +100,8 @@ TEST(ConcurrencyTest, bitmap)
         });
     });
 
-    auto actionListGen = oneOf<SimpleAction<Bitmap>>(acquireGen/*, unacquireGen*/);
+    auto actionGen = oneOf<SimpleAction<Bitmap>>(acquireGen/*, unacquireGen*/);
     auto prop = concurrency<Bitmap>(
-        just<Bitmap>(Bitmap()), actionListGen);
+        just<Bitmap>(Bitmap()), actionGen);
     prop.go();
 }
