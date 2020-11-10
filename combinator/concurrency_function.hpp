@@ -187,9 +187,10 @@ struct RearRunner
         while (!sync_ready) {}
 
         for (auto action : actions) {
+            log[counter++] = num; // start
             action(obj, model);
             // std::cout << "rear2" << std::endl;
-            log[counter++] = num;
+            log[counter++] = num; // end
         }
     }
 
@@ -206,6 +207,8 @@ struct RearRunner
 template <typename ObjectType, typename ModelType>
 bool Concurrency<ObjectType, ModelType>::invoke(Random& rand)
 {
+    constexpr int UNINITIALIZED_THREAD_ID = -2;
+    constexpr int FRONT_THREAD_ID = -1;
     Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
 
     auto actionListGen = Arbi<std::list<Action<ObjectType,ModelType>>>(*actionGenPtr);
@@ -219,9 +222,14 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand)
     ModelType model = modelFactoryPtr ? (*modelFactoryPtr)(obj) : ModelType();
     ActionList& front = frontShr.getRef();
 
+    std::atomic<int> counter{0};
+    std::vector<int> log;
+
     // run front
     for (auto action : front) {
         action(obj, model);
+        log.push_back(FRONT_THREAD_ID);
+        counter++;
     }
 
     // serial execution
@@ -234,14 +242,22 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand)
     // run rear
     std::thread spawner([&]() {
         std::atomic_bool sync_ready(false);
-        std::atomic<int> counter{0};
-        std::vector<int> log;
-        log.resize(5000);
         std::vector<std::shared_ptr<std::atomic_bool>> thread_ready;
         std::vector<std::thread> rearRunners;
+        std::vector<ActionList> rears;
 
         for (int i = 0; i < numThreads; i++) {
             thread_ready.emplace_back(new std::atomic_bool(false));
+            auto& rear = rearShrs[i].getRef();
+            rears.emplace_back(rear);
+
+            // logging start/end of action
+            for(size_t j = 0; j < rear.size() * 2; j++)
+                log.push_back(UNINITIALIZED_THREAD_ID);
+        }
+
+        // start threads
+        for(int i = 0; i < numThreads; i++) {
             rearRunners.emplace_back(RearRunner<ObjectType, ModelType>(i, obj, model, rearShrs[i].getRef(),
                                                                        *thread_ready[i], sync_ready, log, counter));
         }
@@ -257,10 +273,35 @@ bool Concurrency<ObjectType, ModelType>::invoke(Random& rand)
         }
 
         std::cout << "count: " << counter << ", order: ";
-        for (int i = 0; i < counter; i++) {
-            std::cout << log[i];
+        auto frontItr = front.begin();
+        std::vector<typename ActionList::iterator> rearItrs;
+        std::vector<bool> rearStarted;
+        for(int i = 0; i < numThreads; i++) {
+            rearItrs.push_back(rears[i].begin());
+            rearStarted.push_back(false);
         }
-        std::cout << std::endl;
+
+        for (int i = 0; i < counter; i++) {
+            int threadId = log[i];
+            // front
+            if(threadId == FRONT_THREAD_ID) {
+                std::cout << (*frontItr) << " -> ";
+                ++frontItr;
+            }
+            // rear
+            else {
+                if(rearStarted[threadId]) {
+                    std::cout << "thr" << threadId << " " << (*rearItrs[threadId]) << " end -> ";
+                    ++rearItrs[threadId];
+                }
+                else {
+                    std::cout << "thr" << threadId << " " << (*rearItrs[threadId]) << " start -> ";
+                }
+                rearStarted[threadId] = rearStarted[threadId] ? false : true;
+            }
+        }
+
+        std::cout << "onCleanup" << std::endl;
     });
 
     spawner.join();

@@ -84,13 +84,13 @@ TEST(ConcurrencyTest, bitmap)
 {
     using Bitmap = util::Bitmap;
 
-    auto acquireGen = just(SimpleAction<Bitmap>([](Bitmap& bitmap) {
+    auto acquireGen = just(SimpleAction<Bitmap>("Acquire", [](Bitmap& bitmap) {
         [[maybe_unused]] int pos = bitmap.acquire();
         bitmap.unacquire(pos);
     }));
 
     [[maybe_unused]] auto unacquireGen = integers<int>(0, Bitmap::size).map<SimpleAction<Bitmap>>(+[](int& pos) {
-        return SimpleAction<Bitmap>([pos](Bitmap& bitmap) {
+        return SimpleAction<Bitmap>("Unacquire", [pos](Bitmap& bitmap) {
             try {
                 bitmap.unacquire(pos);
                 std::cout << "unacquired" << std::endl;

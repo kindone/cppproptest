@@ -107,7 +107,7 @@ TEST(StateTest, StateFunctionWithModel)
     });
     prop.setOnCleanup([]() {
         std::cout << "cleanup" << std::endl;
-        PROP_ASSERT(false);
+        // PROP_ASSERT(false);
     });
     prop.setSeed(0).setNumRuns(10).go();
 }
