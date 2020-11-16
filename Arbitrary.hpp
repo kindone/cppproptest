@@ -93,4 +93,14 @@ struct Arbi : public ArbiBase<T>
 {
 };
 
+/* Aliases */
+template <typename...ARGS>
+using Arbitrary = Arbi<ARGS...>;
+
+template <typename...ARGS>
+using ArbitraryBase = ArbiBase<ARGS...>;
+
+template <typename...ARGS>
+using ArbitraryContainer = ArbiContainer<ARGS...>;
+
 }  // namespace proptest
