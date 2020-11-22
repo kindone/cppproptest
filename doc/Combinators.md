@@ -209,7 +209,7 @@ Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) r
 
 | Decorated method               | Result type                   | Equivalent Standalone combinator  |
 |--------------------------------| ----------------------------- |---------------------------------- |
-| `Generator<T>::filter<U>`      | `Generator<U>`                | `filter<T,U>`                     |
+| `Generator<T>::filter`.        | `Generator<T>`                | `filter<T>`                       |
 | `Generator<T>::map<U>`         | `Generator<U>`                | `transform<T,U>`                  |
 | `Generator<T>::flatMap<U>`     | `Generator<U>`                | `derive<T,U>`                     |
 | `Generator<T>::pair<U>`        | `Generator<std::pair<T,U>>`   | `dependency<T,U>`                 |
