@@ -179,4 +179,6 @@ Built-in generators are in the form of Arbitraries. `cppproptest` provides a set
 
 ## Generator Combinators
 
-Generator combinators are toolkit for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator. See [Combinator](Combinators.md) page for the detail.
+While you can build your own generator manually, it's usually not recommended as there is a better option.
+Generator combinators are the toolkit for building a new generator based on existing ones. 
+They can be chained to create another generator out of themselves, as they receive existing generator(s) as arguments and returns a generator. See [Combinators](./Combinators.md) page for the detail. 
