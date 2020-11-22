@@ -121,7 +121,7 @@ You can find the full list of such helpers in section [Utility methods in standa
 
 &nbsp;
 
-## Built-in generators provided by `cppproptest`
+## Built-in generators
 
 Built-in generators are in the form of Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used in practice.
 
@@ -177,8 +177,8 @@ Built-in generators are in the form of Arbitraries. `cppproptest` provides a set
                 vecInt.setSize(1, 10); // 3) generated vector will have size >= 1 and size <= 10
 		```
 
-## Generator Combinators
+## Build Custom Generators with Generator Combinators
 
-While you can build your own generator manually, it's usually not recommended as there is a better option.
-Generator combinators are the toolkit for building a new generator based on existing ones. 
-They can be chained to create another generator out of themselves, as they receive existing generator(s) as arguments and returns a generator. See [Combinators](./Combinators.md) page for the detail. 
+While you can build your own generator manually defining a `GenFunction<T>`, it's usually not recommended as there is a better option - generator combinators.
+Generator combinators are the toolkit for building new generators based on existing ones. 
+They can be chained to create another generator out of themselves. See [Combinators](./Combinators.md) page for the detail. 
