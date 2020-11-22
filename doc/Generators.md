@@ -7,29 +7,31 @@ forAll([](int age, std::string name) {
 });
 ```
 
-This `forAll` takes a function having parameters of types `int` and `std::string`, the parameter types are extracted and then used to invoke the default generators for the types. Default generators are called *arbitraries* so above code is actually equivalent to the following:
+This `forAll` takes a function having parameters of types `int` and `std::string`. The parameter types are first extracted and then used to invoke the default generators for the types. Default generators are called *arbitraries* and above code is actually equivalent to the following:
 
 ```cpp
 forAll([](int age, std::string name) {
 }, Arbitrary<int>(), Arbitrary<std::string>());
-```
+``` 
+
+Now you see that `forAll` actually requires some information how to generate the values of the extracted types. They're just hidden as defaults.
 
 ## `GenFunction<T>`
 
-All generators share the same base *function* type, including the arbitraries. A generator can be a callable (function, functor, or lambda) with following common signature:
+All generators, including the default ones, share the same base *function* type. A generator can be a callable (function, functor, or lambda) with following common signature:
 
 ```cpp
 // (Random&) -> Shrinkable<T>
 ```
 
-This can be represented as (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term throughout this page.
+This can be represented as (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term *GenFunction* throughout this page to refer the generator function type.
 
 ```cpp
 template <typename T>
 using GenFunction = std::function<Shrinkable<T>(Random&);
 ```
 
-By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` here. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda: 
+By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following: 
 
 ```cpp
 // lambda style
