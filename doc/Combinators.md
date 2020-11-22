@@ -1,5 +1,5 @@
 
-## Generator Combinators
+# Generator Combinators
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
