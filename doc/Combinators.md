@@ -3,6 +3,8 @@
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
+## Basic Generator Combinators
+
 ### Constants
 
 * `just<T>(T*)` or `just<T>(T)`: always generates specific value
@@ -62,6 +64,8 @@ Generators for different types can be bound to a pair or a tuple.
 	```cpp
 	auto tupleGen = tuple(Arbi<int>(), Arbi<std::string>(), Arbi<double>());
 	```
+
+## Advanced Generator Combinators
 
 ### Selecting from generators
 
