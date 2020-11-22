@@ -3,6 +3,8 @@
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
+### Constants
+
 * `just<T>(T*)` or `just<T>(T)`: always generates specific value
 * `lazy<T>(std::function<T()>)`: generates a value by calling a function
 	```cpp
@@ -101,7 +103,7 @@ Some utility generators for integers are provided by `cppproptest`
 	```
 * `suchThat<T>`: an alias of `filter`
 
-### Transformation or mapping
+### Transforming or mapping
 
 * `transform<T,U>(gen, transformer)`: generates type `U` based on generator for type `T`, using `transformer` that transforms a value of type `T` to type `U`
 
@@ -112,7 +114,7 @@ Some utility generators for integers are provided by `cppproptest`
 	});
 	```
 
-### Generating with dependencies
+### Values with dependencies
 
 * `derive<T, U>(genT, genUGen)`: derives a new generator for type `U`, based on result of `genT`, which is a generator for type `T`. Difference to `transform<T,U>`) is that you can have greater control on the resultant generator.
 	
@@ -169,9 +171,9 @@ Some utility generators for integers are provided by `cppproptest`
 	}); // yearMonthDayGen generates std::tuple<int, int, int> of (year, month, day)
 	```
 
-### Utility methods in standard generators
+## Utility methods in standard generators
 
-Standard generators and combinators returns `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>`, but has additional combinator methods decorated for ease of use. `Arbi<T>` and `Construct<...>` share the same property. As the combinators are also decorated, they can be chained multiple times.
+Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) returns a `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>` (aliased as `GenFunction<T>`), but has additional combinator methods decorated for ease of use. They can be chained multiple times.
 
 * `.map<U>(mapper)`: effectively calls `transform<T,U>(gen, transformer)` combinator on itself with type `T` and generator `gen`.
 
