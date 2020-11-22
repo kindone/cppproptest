@@ -1,42 +1,70 @@
 # Using and Defining Generators 
 
+Generators play key role in property-based testing and `cppproptest`. You use _generators_ to generate randomized arguments for properties. A simple `forAll` statement utilizes generators under the hood.
+
+```cpp
+forAll([](int age, std::string name) {
+});
+```
+
+This `forAll` takes a function having parameters of types `int` and `std::string`, the parameter types are extracted and then used to invoke the default generators for the types. Default generators are called *arbitraries* so above code is actually equivalent to the following:
+
+```cpp
+forAll([](int age, std::string name) {
+}, Arbitrary<int>(), Arbitrary<std::string>());
+```
+
 ## `GenFunction<T>`
 
-You use _generators_ to generate randomized arguments for properties. 
-
-A generator is a callable (function, functor, or lambda) with following signature:
+All generators share the same base *function* type, including the arbitraries. A generator can be a callable (function, functor, or lambda) with following common signature:
 
 ```cpp
 // (Random&) -> Shrinkable<T>
 ```
 
-This can be represented with (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term throughout the documentation.
+This can be represented as (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term throughout this page.
 
 ```cpp
 template <typename T>
 using GenFunction = std::function<Shrinkable<T>(Random&);
 ```
 
-By the way, you can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but you can basically treat it as a wrapper for a value of type `T` here. So a generator generates a value of type `T` from a random generator. A generator can be defined as functor or lambda, as you would prefer.  
+By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` here. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda: 
 
 ```cpp
+// lambda style
 auto myIntGen = [](Random& rand) {
     int smallInt = rand.getRandomInt8();
     return make_shrinkable<int>(smallInt);
+};
+
+// function style
+Shrinkable<int> myIntGen(Random& rand) {
+    int smallInt = rand.getRandomInt8();
+    return make_shrinkable<int>(smallInt);
+}
+
+// functor style
+struct MyIntGen {
+    Shrinkable<int> operator()(Random& rand) {
+        int smallInt = rand.getRandomInt8();
+        return make_shrinkable<int>(smallInt);
+    }
 };
 ```
 
 ## `Generator<T>`
 
-Template class `Generator<T>` is an abstract functor class that coerces to `GenFunction<T>`. A `Generator` gives access to some useful methods and you can wrap your generator callable with this to decorate with those methods. All generators and combinators of `cppproptest` produce decorated generators, so that you can use the utility methods with ease.
+The template class `Generator<T>` is an abstract functor class that also coerces to `GenFunction<T>`. A `Generator<T>` gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of `cppproptest` produce decorated `Generator<T>`s, you can use the utility methods with ease.
 
 ```cpp
+// decorate a GenFunction with Generator<T>
 auto myIntGen = Generator<int>([](Random& rand) {
     int smallInt = rand.getRandomInt8();
     return make_shrinkable<int>(smallInt);
 });
 
-// .filter and other utility methods can be used once the generator is wrapped with Generator<T>
+// .filter and other utility methods can be used once the generator is decorated with Generator<T>
 auto evenGen = myIntGen.filter([](int& value) {
     return value % 2 == 0;
 }); // generates even numbers only
@@ -45,7 +73,23 @@ auto evenGen = myIntGen.filter([](int& value) {
 
 ## Arbitraries
 
-An _Arbitrary_ refers to a generator for a type that can generate an arbitrary value of that type. It serves globally defined default _generator_ for the type. You can additionaly define an `Arbi<T>` for your type `T`, if it isn't already defined yet. By defining an _Arbitrary_, you can omit the custom generator argument that would have been needed to be passed everytime you define a property for that type. Following shows an example for defining an _Arbitrary_. Note that it should be defined under `proptest` namespace in order to be accessible in the framework.
+An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type that also coerces to `GenFunction<T>`.
+These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no custom generator is provided.
+
+```cpp
+// if there is no default generator available, you should provide a generator for the type. 
+forAll([](SomeNewType x) {
+}, someNewTypeGen);
+
+
+// if there is a default generator (Arbitrary<SomeNewType>) available, you may use that generator by omitting the argument 
+forAll([](SomeNewType x) {
+});
+```
+
+With template specialization, new `Arbi<T>` (or its alias `Arbitrary<T>`) for type `T` can be defined, if it isn't already defined yet. By defining an _Arbitrary_, you are effectively adding a default generator for a type to the library.
+
+Following shows an example of defining an _Arbitrary_. Note that it should be defined under `proptest` namespace in order to be noticed and accessible in the library core.
 
 ```cpp
 namespace proptest { // you should define your Arbi<T> inside the namespace
@@ -60,9 +104,7 @@ struct Arbi<Car> : ArbiBase<Car> {
 }
 ```
 
-There are useful helpers for creating new generators from existing ones. 
-
-`filter` is such a helper. It selectively generates values that satisfies a criteria function. Following is an even number generator from the integer `Arbi`.
+As an `Arbitrary<T>` is also a `Generator<T>`, an arbitrary provides useful helpers for creating new generators from existing ones. `filter` is such a helper. It restrictively generates values that satisfy a criteria function. Following is an even number generator from the integer `Arbitrary`.
 
 ```cpp
 // generates any integers
@@ -77,11 +119,11 @@ You can find the full list of such helpers in section [Utility methods in standa
 
 &nbsp;
 
-## Arbitraries provided by `cppproptest`
+## Built-in generators provided by `cppproptest`
 
-Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used.
+Built-in generators are in the form of Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used in practice.
 
-* `char` and `bool`
+* Boolean type:`bool`
 * Character type: `char`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
@@ -90,7 +132,7 @@ Built-in generators are called Arbitraries. `cppproptest` provides a set of Arbi
 	* `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbi<UTF8String>`)
 	* `CESU8String` (similar to UTF-8, but can be used to generate valid [CESU-8](https://en.wikipedia.org/wiki/CESU-8) strings)
 	* `UTF16BEString` and `UTF16LEString` for [UTF-16](https://en.wikipedia.org/wiki/UTF-16) big and little endian strings. CESU-8 and Unicode types produce full unicode code point range of \[0x1, 0x10FFFF\], excluding forbidden surrogate code points (\[0xD800, 0xDFFF\])
-* Shared pointers: `std::shared_ptr<T>` where an `Arbi<T>` or a custom generator for `T` is available. It's useful for generating polymorphic types.
+* Shared pointers: `std::shared_ptr<T>` where an `Arbi<T>` or a custom generator for `T` is available. It's also useful for generating polymorphic types.
 	```cpp
 	struct Action {
 	    virtual int get() = 0;
