@@ -111,4 +111,10 @@ decltype(auto) oneOf(GENS&&... gens)
     return util::oneOfHelper<T>(genVecPtr);
 }
 
+/* Alias */
+template <typename T, typename... GENS>
+decltype(auto) unionOf(GENS&&... gens) {
+    return oneOf(std::forward<GENS>(gens)...);
+}
+
 }  // namespace proptest

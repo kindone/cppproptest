@@ -81,7 +81,7 @@ public:
         std::shared_ptr<ModelFactoryFunction> modelFactoryPtr =
             std::make_shared<ModelFactoryFunction>(std::forward<ModelFactoryFunction>(modelFactory));
 
-        auto func = [modelFactoryPtr](ObjectType obj, std::list<Action<ObjectType,ModelType>> actions) {
+        Func func = [modelFactoryPtr](ObjectType obj, std::list<Action<ObjectType,ModelType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
             for (auto action : actions) {
                 action(obj, model);
