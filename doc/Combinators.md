@@ -8,13 +8,13 @@ Generator combinators are provided for building a new generator based on existin
 * `just<T>(T*)` or `just<T>(T)`: always generates specific value
 * `lazy<T>(std::function<T()>)`: generates a value by calling a function
 	```cpp
-	auto zeroGen = just(0); // template argument is optional
+	auto zeroGen = just(0); // template argument is optional if type is deducible
 	auto oneGen = lazy<int>([]() { return 1; });
 	```
 
 ### Integers and intervals
 
-Some utility generators for integers are provided by `cppproptest`
+Some utility generators for integers are provided
 * `interval<INT_TYPE>(min, max)`: generates an integer type(e.g. `uint16_t`) in the closed interval `[min, max]`.
 * `integers<INT_TYPE(from, count)`: generates an integer type starting from `from`
 	```cpp
@@ -30,6 +30,8 @@ Some utility generators for integers are provided by `cppproptest`
 * `nonNegative<INT_TYPE>(max)`: : generates zero or a positive integer up to `max`(inclusive)
 
 ### Selecting from values
+
+You may want to random choose from specific list of values. 
 
 * `elementOf<T>(val1, ..., valN)`: generates a type `T` from multiple values for type `T`, by choosing one of the values randomly
 	```cpp
@@ -47,6 +49,8 @@ Some utility generators for integers are provided by `cppproptest`
 
 ### Pair and Tuples
 
+Generators for different types can be bound to a pair or a tuple.
+
 * `pair<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
 
 	```cpp
@@ -60,6 +64,8 @@ Some utility generators for integers are provided by `cppproptest`
 	```
 
 ### Selecting from generators
+
+You can combine generators to a single generator that can generate each of them with some probability. This can be considered as taking a *union* of generators.
 
 * `oneOf<T>(gen1, ..., genN)`: generates a type `T` from multiple generators for type `T`, by choosing one of the generators randomly
 
@@ -75,8 +81,11 @@ Some utility generators for integers are provided by `cppproptest`
 	// generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
 	auto evenGen = oneOf<int>(weightedGen(interval(0, 10), 0.8), weightedGen(interval(100, 1000), 0.15), interval(10000, 100000)/* weight automatically becomes 1.0 - (0.8 + 0.15) == 0.05 */);
 	```
+* `unionOf<T>` is an alias of `oneOf<T>`
 
 ### Constructing an object
+
+You can generate an object of a class or a struct type `T`, by calling a matching constructor of `T`.
 
 * `construct<T, ARG1, ..., ARGN>([gen1, ..., genM])`: generates an object of type `T` by calling its constructor that matches the signature `(ARG1, ..., ARGN)`. Custom generators `gen1`,..., `genM` can be supplied for generating arguments. If `M < N`, then rest of the arguments are generated with `Arbi`s.
 
@@ -93,6 +102,8 @@ Some utility generators for integers are provided by `cppproptest`
 
 ### Applying constraints
 
+You can add a filtering condition to a generator to restrict the generated values to have certain constraint.
+
 * `filter<T>(gen, condition_predicate)`:  generates a type `T` that satisfies condition predicate (`condition_predicate` returns `true`)
 
 	```cpp
@@ -105,6 +116,8 @@ Some utility generators for integers are provided by `cppproptest`
 
 ### Transforming or mapping
 
+You can transform an existing generator to create new generator by providing a transformer function. This is equivalent to *mapping* in functional programming context.
+
 * `transform<T,U>(gen, transformer)`: generates type `U` based on generator for type `T`, using `transformer` that transforms a value of type `T` to type `U`
 
 	```cpp
@@ -114,7 +127,9 @@ Some utility generators for integers are provided by `cppproptest`
 	});
 	```
 
-### Values with dependencies
+### Deriving or flat-mapping
+
+Another combinator that resembles `transform` is `derive`. This is equivalent to *flat-mapping* or *binding* in functional programming.
 
 * `derive<T, U>(genT, genUGen)`: derives a new generator for type `U`, based on result of `genT`, which is a generator for type `T`. Difference to `transform<T,U>`) is that you can have greater control on the resultant generator.
 	
@@ -129,6 +144,19 @@ Some utility generators for integers are provided by `cppproptest`
 	        return Arbi<std::string>(interval('0', '9'));
 	});	
 	```
+	
+Following table compares `transform` and `derive`:
+
+| Combinator                  | transformer signature       | Result type          | 
+|-----------------------------| ----------------------------|----------------------|
+| `transform<T,U>`            | `function<U(T)>`            | `Generator<U>`       |
+| `derive<T,U>`               | `function<Generator<U>(T)>` | `Generator<U>`       |
+
+
+
+### Values with dependencies
+
+You may want to include dependency in the generated values. There are two variants that do this. One generates a pair and the other one generates a tuple.
 
 * `dependency<T,U>(genT, genUgen)`: generates a `std::pair<T,U>` with a generator `genT` for type `T` and `genUgen`. `genUgen` receives a type `T` and returns a generator for type `U`. This can effectively create a generator for a pair where second item depends on the first one.
 
@@ -173,7 +201,18 @@ Some utility generators for integers are provided by `cppproptest`
 
 ## Utility methods in standard generators
 
-Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) returns a `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>` (aliased as `GenFunction<T>`), but has additional combinator methods decorated for ease of use. They can be chained multiple times.
+Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) returns a `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>` (aliased as `GenFunction<T>`), but has additional combinator methods decorated for ease of use. They in fact have equivalent standalone counterparts. Following table shows this relationship:
+
+| Decorated method               | Result type                   | Equivalent Standalone combinator  |
+|--------------------------------| ----------------------------- |---------------------------------- |
+| `Generator<T>::filter<U>`      | `Generator<U>`                | `filter<T,U>`                     |
+| `Generator<T>::map<U>`         | `Generator<U>`                | `transform<T,U>`                  |
+| `Generator<T>::flatMap<U>`     | `Generator<U>`                | `derive<T,U>`                     |
+| `Generator<T>::pair<U>`        | `Generator<std::pair<T,U>>`   | `dependency<T,U>`                 |
+| `Generator<T>::tuple<U>`       | `Generator<std::tuple<T,U>>`  | `chain<T,U>`                      |
+| `Generator<std::tuple<Ts...>>::tuple<U>`       | `Generator<std::tuple<Ts...,U>>`  | `chain<std::tuple<Ts...>,U>`             |
+
+These functions and methods can be continuously chained.
 
 * `.map<U>(mapper)`: effectively calls `transform<T,U>(gen, transformer)` combinator on itself with type `T` and generator `gen`.
 
@@ -211,7 +250,7 @@ Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) r
 	});	
 	```
 
-* `.pair<U>(genUGen)` or `tuple<U>(genUGen)`: chains itself to create a generator of pair or tuple. Effectively calls `dependency` or `chain`, respectively.
+* `.pair<U>(genUGen)` or `tuple<U>(genUGen)`: chains itself to create a generator of pair or tuple. Equivalent to `dependency` or `chain`, respectively.
 	```cpp
 	Arbi<bool>().tuple<int>([](bool& isEven) {
 	    if(isEven)
@@ -229,5 +268,4 @@ Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) r
 	    return stringGen;
 	});
 	```
-
 
