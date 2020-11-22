@@ -128,6 +128,8 @@ bool Concurrency<ActionType>::go(std::function<void(ObjectType&, ModelType&)> po
     } catch (const std::exception& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
+        // shrink
+        handleShrink(savedRand, e);
         return false;
     }
 
