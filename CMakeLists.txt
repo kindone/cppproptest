@@ -31,6 +31,8 @@ SET(proptest_sources
     generator/cesu8string.cpp
     generator/util.cpp
     generator/unicode.cpp
+    shrinker/bool.cpp
+    shrinker/string.cpp
     combinator/intervals.cpp
     util/fork.cpp
     util/utf8string.cpp
