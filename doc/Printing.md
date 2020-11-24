@@ -97,7 +97,7 @@ struct ShowDefault<CarLike<T>>
 } // namespace proptest
 ```
 
-Now it will correctly print a `CarLike<Car>` with its embedded type:
+Now it will correctly prints a `CarLike<Car>`:
 
 ```cpp
 shrinking found simpler failing arg 0: CarLike(Car(Ferari, 2020))
