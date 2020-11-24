@@ -10,13 +10,13 @@ shrinking found simpler failing arg 0: { { -10, { -1002144 } } }
 For a new type you'd like to use with `cppproptest`, you can define a printer for that type. As you can see in above example, complex recursive structures such as tuple of tuples can be printed if you have correctly defined it. If there is no printer is defined for a type yet, '???' would be printed instead, as there is no correct way of printing that type known to `cppproptest`. 
 
 ```cpp
-// a Car type that does not yet have a printing method is printed as '???':
+// Car type that does not yet have a printing method, so it's printed as '???':
 shrinking found simpler failing arg 0: ???
 ```
 
 ### Defining a printer for a type
 
-Defining a printer for type `T` can be achieved by defining the struct specialization `proptest::util::ShowDefault<T>`. This will be called whenever `T` is being printed by `cppproptest`:
+Defining a printer for type `T` can be achieved by defining the struct specialization `proptest::util::ShowDefault<T>`:
 
 ```cpp
 namespace proptest {
@@ -35,6 +35,13 @@ struct ShowDefault<Car>
 
 } // namespace util
 } // namespace proptest
+```
+
+This will be called whenever `T` is being printed by `cppproptest`:
+
+```cpp
+// Car type now has a printer
+shrinking found simpler failing arg 0: Car(Ferari, 2020)
 ```
 
 ### Defining a printer for a templated type
@@ -60,10 +67,14 @@ struct ShowDefault<CarLike<T>>
 } // namespace proptest
 ```
 
+```cpp
+shrinking found simpler failing arg 0: CarLike()
+```
+
 
 ### Utilizing other printers
 
-If your printer needs to print another type, you can use an already defined (either built-in or custom one) printer by calling `proptest::util::Show<T>(T&)`, as following:
+If your printer fneeds to print another type `T`, you can use an already defined (either built-in or custom one) printer for `T` by calling `proptest::util::Show<T>(T&)`, as following:
 
 ```cpp
 namespace proptest {
@@ -82,4 +93,10 @@ struct ShowDefault<CarLike<T>>
 
 } // namespace util
 } // namespace proptest
+```
+
+Now it will correctly print a `CarLike<Car>` with its embedded type:
+
+```cpp
+shrinking found simpler failing arg 0: CarLike(Car(Ferari, 2020))
 ```
