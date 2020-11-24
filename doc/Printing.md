@@ -6,13 +6,14 @@ It's sometimes recommended to have a printer defined for a type. It would ensure
 // a std::tuple<std::tuple<int, std::tuple<int>>> type is printed:
 shrinking found simpler failing arg 0: { { -10, { -1002144 } } }
 ```
-
-For a new type you'd like to use with `cppproptest`, you can define a printer for that type. Otherwise, '???' would be printed instead, as there is no correct way of printing that type known to `cppproptest`. 
+ a printer.
+For a new type you'd like to use with `cppproptest`, you can define a printer for that type. As you can see in above example, complex recursive structures such as tuple of tuples can be printed if you have correctly defined it. If there is no printer is defined for a type yet, '???' would be printed instead, as there is no correct way of printing that type known to `cppproptest`. 
 
 ```cpp
-// a Car type that does not have printing method is printed as ???:
+// a Car type that does not yet have a printing method is printed as '???':
 shrinking found simpler failing arg 0: ???
 ```
+
 ### Defining a printer for a type
 
 Defining a printer for type `T` can be achieved by defining the struct specialization `proptest::util::ShowDefault<T>`. This will be called whenever `T` is being printed by `cppproptest`:
@@ -73,7 +74,7 @@ struct ShowDefault<CarLike<T>>
 {
     static std::ostream& show(std::ostream& os, const CarLike<T>& carLike)
     {
-        // utilize printer for type T (??? will be printed if there is no printer defined for T)
+        // utilize printer for type T ('CarLike(???)' will be printed if there is no printer defined for T)
         os << "CarLike(" << Show<T>(carLike.t) << ")";
         return os;
     }
