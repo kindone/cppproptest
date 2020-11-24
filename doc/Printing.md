@@ -65,7 +65,7 @@ struct ShowDefault<CarLike<T>>
 
 If your printer needs to print another type, you can use an already defined (either built-in or custom one) printer by calling `proptest::util::Show<T>(T&)`, as following:
 
-```
+```cpp
 namespace proptest {
 namespace util {
 
