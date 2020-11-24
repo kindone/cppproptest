@@ -132,9 +132,9 @@ I feel many of the existing property-based testing implementation in C++ are eit
 
 * [Getting Started with `cppproptest`](doc/GettingStarted.md)
 * [Using and Defining Generators](doc/Generators.md)
-* [Generator Combinators](doc/Combinators.md)
+* [Generator Combinators for Creating Generators from Existing Ones](doc/Combinators.md)
 * [Counterexamples and Shrinking](doc/Shrinking.md)
-* Printing and debugging facilities
+* [Printing and debugging facilities](doc/Printing.md)
 * [Stateful Testing with `cppproptest`](doc/StatefulTesting.md)
 * [Concurrency Testing with `cppproptest`](doc/ConcurrencyTesting.md)
 * [Advanced Mocking with `cppproptest`](doc/Mocking.md)
