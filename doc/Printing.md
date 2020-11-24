@@ -1,4 +1,4 @@
-# Printing and Debugging Facilities
+# Printing Facilities
 
 It's sometimes recommended to have a printer defined for a type. It would ensure values of a type to be correctly printed. `cppproptest` fully defines printers for built-in types.
 
