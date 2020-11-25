@@ -14,7 +14,7 @@ namespace proptest {
 // generates e.g. (int, int)
 // and shrinks one parameter by one and then continues to the next
 template <typename GEN0, typename... GENS>
-decltype(auto) tuple(GEN0&& gen0, GENS&&... gens)
+decltype(auto) tupleOf(GEN0&& gen0, GENS&&... gens)
 {
     // constexpr auto Size = sizeof...(GENS);
     std::tuple<std::decay_t<GEN0>, std::decay_t<GENS>...> genTup = std::make_tuple(gen0, gens...);
@@ -29,7 +29,7 @@ decltype(auto) tuple(GEN0&& gen0, GENS&&... gens)
 template <typename... ARGS>
 class PROPTEST_API Arbi<std::tuple<ARGS...>> final : public ArbiBase<std::tuple<ARGS...>> {
 public:
-    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) override { return tuple(Arbi<ARGS>()...)(rand); }
+    Shrinkable<std::tuple<ARGS...>> operator()(Random& rand) override { return tupleOf(Arbi<ARGS>()...)(rand); }
 };
 
 }  // namespace proptest

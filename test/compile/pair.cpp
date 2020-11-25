@@ -10,4 +10,11 @@ TEST(Compile, pair)
     Random rand(1);
     auto gen = Arbi<std::pair<int8_t, uint8_t>>();
     gen(rand);
+
+    Arbi<bool>().pairWith<int>(+[](bool& value) {
+        if (value)
+            return interval(0, 10);
+        else
+            return interval(10, 20);
+    });
 }

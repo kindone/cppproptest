@@ -143,4 +143,5 @@ TEST(Compile, printing_custom_templated_defined)
     vec.push_back(ptr);
     show(std::cout, vec);
     std::cout << std::endl;
+
 }

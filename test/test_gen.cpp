@@ -237,7 +237,7 @@ TEST(PropTest, TuplePair1)
     auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
-    auto gen = pair(intGen, smallIntGen);
+    auto gen = pairOf(intGen, smallIntGen);
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
@@ -249,7 +249,7 @@ TEST(PropTest, TupleGen1)
     auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
-    auto gen = tuple(intGen, smallIntGen);
+    auto gen = tupleOf(intGen, smallIntGen);
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
@@ -271,7 +271,7 @@ TEST(PropTest, TupleGen2)
     }
 
     auto smallIntGen = interval(-40, 40);
-    auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
+    auto tupleGen = tupleOf(smallIntGen, smallIntGen, smallIntGen);
     while (true) {
         auto shrinkable = tupleGen(rand);
         auto valueTup = shrinkable.get();
@@ -299,7 +299,7 @@ TEST(PropTest, TupleGen3)
     }
 
     auto smallIntGen = interval(0, 3);
-    auto tupleGen = tuple(smallIntGen, smallIntGen, smallIntGen);
+    auto tupleGen = tupleOf(smallIntGen, smallIntGen, smallIntGen);
     for (int i = 0; i < 3; i++) {
         auto shrinkable = tupleGen(rand);
         exhaustive(shrinkable, 0);
@@ -358,7 +358,7 @@ TEST(PropTest, GenTupleVector)
     uint16_t numElements = 64;
     auto firstGen = interval<uint16_t>(0, numElements);
     auto secondGen = Arbi<bool>();  // TODO true : false should be 2:1
-    auto indexGen = tuple(firstGen, secondGen);
+    auto indexGen = tupleOf(firstGen, secondGen);
     auto indexVecGen = Arbi<IndexVector>(indexGen);
     indexVecGen.setMaxSize(numRows);
     indexVecGen.setMinSize(numRows / 2);
@@ -462,5 +462,6 @@ TEST(PropTest, ConstraintObject)
     // You cannot directly generate Constraint object, as it's a non-copyable object.
     // But you can create a shared_ptr of Constraint
     auto gen = lazy<std::shared_ptr<Constraint>>([]() { return std::make_shared<Constraint>(5);});
+
     gen(rand);
 }
