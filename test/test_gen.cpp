@@ -436,3 +436,31 @@ TEST(PropTest, Polymorphic)
         std::cout << "car.get(): " << carShrinkable.getRef()->get() << std::endl;
     }
 }
+
+struct Constraint
+{
+    Constraint(int) : id(nextId()) { std::cout << "Constraint create" << id << std::endl; }
+    Constraint(const Constraint&) = delete;
+    Constraint& operator=(const Constraint&) = delete;
+    Constraint(Constraint&&)
+    {
+        id = nextId();
+        std::cout << "Constraint move" << id << std::endl;
+    }
+    ~Constraint() { std::cout << "~Constraint destroy" << id << std::endl; }
+
+    int id;
+    static int maxId;
+    static int nextId() { return maxId++; }
+};
+int Constraint::maxId = 0;
+
+TEST(PropTest, ConstraintObject)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+    // You cannot directly generate Constraint object, as it's a non-copyable object.
+    // But you can create a shared_ptr of Constraint
+    auto gen = lazy<std::shared_ptr<Constraint>>([]() { return std::make_shared<Constraint>(5);});
+    gen(rand);
+}
