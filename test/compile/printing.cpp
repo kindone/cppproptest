@@ -15,6 +15,14 @@ struct Car
 };
 
 template <typename T>
+struct CarLike
+{
+    CarLike(const T& _t) : t(_t) {}
+
+    T t;
+};
+
+template <typename T>
 struct MyContainer
 {
 };
@@ -105,6 +113,17 @@ struct ShowDefault<Car>
     }
 };
 
+
+template <typename T>
+struct ShowDefault<CarLike<T>>
+{
+    static std::ostream& show(std::ostream& os, const CarLike<T>& carLike)
+    {
+        os << "CarLike(" << Show<T>(carLike.t) << ")";
+        return os;
+    }
+};
+
 }  // namespace util
 }  // namespace proptest
 
@@ -115,4 +134,14 @@ TEST(Compile, printing_container_custom_element_defined)
     vec.push_back(ptr);
     show(std::cout, vec);
     std::cout << std::endl;
+}
+
+TEST(Compile, printing_custom_templated_defined)
+{
+    std::vector<std::shared_ptr<CarLike<Car>>> vec;
+    auto ptr = std::make_shared<CarLike<Car>>(Car());
+    vec.push_back(ptr);
+    show(std::cout, vec);
+    std::cout << std::endl;
+
 }

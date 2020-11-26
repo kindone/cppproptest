@@ -40,14 +40,14 @@ struct ArbiBase : public GenBase<T>
     }
 
     template <typename U>
-    Generator<std::pair<T, U>> pair(std::function<GenFunction<U>(T&)> gengen)
+    Generator<std::pair<T, U>> pairWith(std::function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     template <typename U>
-    decltype(auto) tuple(std::function<GenFunction<U>(T&)> gengen)
+    decltype(auto) tupleWith(std::function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);

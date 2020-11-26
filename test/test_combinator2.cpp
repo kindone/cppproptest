@@ -116,7 +116,7 @@ TEST(PropTest, TestDependency2)
 
     auto numRowsGen = interval<int>(10000, 10000);
     auto numElementsGen = Arbi<uint16_t>();
-    auto dimGen = pair(numRowsGen, numElementsGen);
+    auto dimGen = pairOf(numRowsGen, numElementsGen);
 
     auto rawGen = dependency<Dimension, IndexVector>(
         dimGen, +[](Dimension& dimension) {
@@ -124,7 +124,7 @@ TEST(PropTest, TestDependency2)
             uint16_t numElements = dimension.second;
             auto firstGen = interval<uint16_t>(0, numElements);
             auto secondGen = Arbi<bool>();  // TODO true : false should be 2:1
-            auto indexGen = pair(firstGen, secondGen);
+            auto indexGen = pairOf(firstGen, secondGen);
             auto indexVecGen = Arbi<IndexVector>(indexGen);
             indexVecGen.setSize(numRows);
             return indexVecGen;
@@ -186,7 +186,7 @@ TEST(PropTest, TestDependency3)
                 return interval<int>(10, 20);
         });
 
-    Arbi<bool>().pair<int>(+[](bool& value) {
+    Arbi<bool>().pairWith<int>(+[](bool& value) {
         if (value)
             return interval(0, 10);
         else
@@ -234,14 +234,14 @@ TEST(PropTest, TestChain)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto nullableIntegers = Arbi<bool>().tuple<int>(+[](bool& isNull) -> GenFunction<int> {
+    auto nullableIntegers = Arbi<bool>().tupleWith<int>(+[](bool& isNull) -> GenFunction<int> {
         if (isNull)
             return just(0);
         else
             return interval<int>(10, 20);
     });
 
-    auto tupleGen = nullableIntegers.tuple<int>(+[](Chain<bool, int>& chain) {
+    auto tupleGen = nullableIntegers.tupleWith<int>(+[](Chain<bool, int>& chain) {
         bool isNull = std::get<0>(chain);
         int value = std::get<1>(chain);
         if (isNull)
@@ -261,13 +261,13 @@ TEST(PropTest, TestChain2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto tuple2Gen = Arbi<bool>().tuple<int>(+[](bool& value) {
+    auto tuple2Gen = Arbi<bool>().tupleWith<int>(+[](bool& value) {
         if (value)
             return interval(0, 10);
         else
             return interval(10, 20);
     });
-    auto tuple3Gen = tuple2Gen.tuple<std::string>(+[](std::tuple<bool, int>& tup) {
+    auto tuple3Gen = tuple2Gen.tupleWith<std::string>(+[](std::tuple<bool, int>& tup) {
         std::cout << tup << std::endl;
         if (std::get<0>(tup)) {
             auto gen = Arbi<std::string>(interval<char>('A', 'M'));
@@ -280,7 +280,7 @@ TEST(PropTest, TestChain2)
         }
     });
 
-    auto tuple3Gen2 = tuple2Gen.tuple<int>(+[](std::tuple<bool, int>& tup) {
+    auto tuple3Gen2 = tuple2Gen.tupleWith<int>(+[](std::tuple<bool, int>& tup) {
         if (std::get<0>(tup)) {
             return interval(10, 20);
         } else {

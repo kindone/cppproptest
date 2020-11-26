@@ -66,14 +66,14 @@ public:
     }
 
     template <typename U>
-    Generator<std::pair<CLASS, U>> pair(std::function<GenFunction<U>(const CLASS&)> gengen)
+    Generator<std::pair<CLASS, U>> pairWith(std::function<GenFunction<U>(const CLASS&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     template <typename U>
-    decltype(auto) tuple(std::function<GenFunction<U>(CLASS&)> gengen)
+    decltype(auto) tupleWith(std::function<GenFunction<U>(CLASS&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);

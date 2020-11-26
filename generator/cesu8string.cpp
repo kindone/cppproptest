@@ -4,6 +4,7 @@
 #include "unicode.hpp"
 #include "util.hpp"
 #include "integral.hpp"
+#include "../shrinker/stringlike.hpp"
 #include <vector>
 #include <iostream>
 #include <ios>
@@ -151,33 +152,7 @@ Shrinkable<CESU8String> Arbi<CESU8String>::operator()(Random& rand)
 
     // str.substr(0, positions[len]);
 
-    // substring shrinking
-    size_t minSizeCopy = minSize;
-    auto shrinkRear =
-        util::binarySearchShrinkable(len - minSizeCopy)
-            .template map<CESU8String>([str, minSizeCopy, positions](const uint64_t& size) -> CESU8String {
-                if (positions.empty())
-                    return CESU8String();
-                else
-                    return CESU8String(str.substr(0, positions[size + minSizeCopy]));
-            });
-
-    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<CESU8String>& shr) {
-        auto& str = shr.getRef();
-        size_t maxSizeCopy = str.charsize();
-        if (maxSizeCopy == minSizeCopy)
-            return Stream<Shrinkable<CESU8String>>::empty();
-        auto newShrinkable =
-            util::binarySearchShrinkableU(maxSizeCopy - minSizeCopy)
-                .map<CESU8String>([str, minSizeCopy, maxSizeCopy, positions](const uint64_t& value) {
-                    if (positions.empty())
-                        return CESU8String();
-                    else
-                        return CESU8String(str.substr(positions[minSizeCopy + value],
-                                                      positions[maxSizeCopy] - positions[minSizeCopy + value]));
-                });
-        return newShrinkable.shrinks();
-    });
+    return shrinkStringLike<CESU8String>(str, minSize, len, positions);
 }
 
 }  // namespace proptest

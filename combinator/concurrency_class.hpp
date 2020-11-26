@@ -58,7 +58,7 @@ public:
     bool go(std::function<void(ObjectType&, ModelType&)> postCheck);
     bool go(std::function<void(ObjectType&)> postCheck);
     bool invoke(Random& rand, std::function<void(ObjectType&, ModelType&)> postCheck);
-    void handleShrink(Random& savedRand, const PropertyFailedBase& e);
+    void handleShrink(Random& savedRand);
 
     Concurrency& setSeed(uint64_t s)
     {
@@ -123,11 +123,13 @@ bool Concurrency<ActionType>::go(std::function<void(ObjectType&, ModelType&)> po
                   << ")" << std::endl;
 
         // shrink
-        handleShrink(savedRand, e);
+        handleShrink(savedRand);
         return false;
     } catch (const std::exception& e) {
         std::cerr << "Falsifiable, after " << (i + 1) << " tests - std::exception occurred: " << e.what() << std::endl;
         std::cerr << "    seed: " << seed << std::endl;
+        // shrink
+        handleShrink(savedRand);
         return false;
     }
 
@@ -232,7 +234,7 @@ bool Concurrency<ActionType>::invoke(Random& rand, std::function<void(ObjectType
 }
 
 template <typename ActionType>
-void Concurrency<ActionType>::handleShrink(Random&, const PropertyFailedBase&)
+void Concurrency<ActionType>::handleShrink(Random&)
 {
 }
 

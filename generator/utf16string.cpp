@@ -1,5 +1,6 @@
 #include "../gen.hpp"
 #include "../util/utf16string.hpp"
+#include "../shrinker/stringlike.hpp"
 #include "utf16string.hpp"
 #include "util.hpp"
 #include "integral.hpp"
@@ -108,33 +109,7 @@ Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
         str[i] = chars[i];
     }
 
-    // substring shrinking
-    size_t minSizeCopy = minSize;
-    auto shrinkRear =
-        util::binarySearchShrinkableU(len - minSizeCopy)
-            .template map<UTF16BEString>([str, minSizeCopy, positions](const uint64_t& size) -> UTF16BEString {
-                if (positions.empty())
-                    return UTF16BEString();
-                else
-                    return UTF16BEString(str.substr(0, positions[size + minSizeCopy]));
-            });
-
-    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<UTF16BEString>& shr) {
-        auto& str = shr.getRef();
-        size_t maxSizeCopy = str.charsize();
-        if (maxSizeCopy == minSizeCopy)
-            return Stream<Shrinkable<UTF16BEString>>::empty();
-        auto newShrinkable =
-            util::binarySearchShrinkableU(maxSizeCopy - minSizeCopy)
-                .map<UTF16BEString>([str, minSizeCopy, maxSizeCopy, positions](const uint64_t& value) {
-                    if (positions.empty())
-                        return UTF16BEString();
-                    else
-                        return UTF16BEString(str.substr(positions[minSizeCopy + value],
-                                                        positions[maxSizeCopy] - positions[minSizeCopy + value]));
-                });
-        return newShrinkable.shrinks();
-    });
+    return shrinkStringLike<UTF16BEString>(str, minSize, len, positions);
 }
 
 size_t Arbi<UTF16LEString>::defaultMinSize = 0;
@@ -243,33 +218,7 @@ Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
         str[i] = chars[i];
     }
 
-    // substring shrinking
-    size_t minSizeCopy = minSize;
-    auto shrinkRear =
-        util::binarySearchShrinkableU(len - minSizeCopy)
-            .template map<UTF16LEString>([str, minSizeCopy, positions](const uint64_t& size) -> UTF16LEString {
-                if (positions.empty())
-                    return UTF16LEString();
-                else
-                    return UTF16LEString(str.substr(0, positions[size + minSizeCopy]));
-            });
-
-    return shrinkRear.concat([minSizeCopy, positions](const Shrinkable<UTF16LEString>& shr) {
-        auto& str = shr.getRef();
-        size_t maxSizeCopy = str.charsize();
-        if (maxSizeCopy == minSizeCopy)
-            return Stream<Shrinkable<UTF16LEString>>::empty();
-        auto newShrinkable =
-            util::binarySearchShrinkableU(maxSizeCopy - minSizeCopy)
-                .map<UTF16LEString>([str, minSizeCopy, maxSizeCopy, positions](const uint64_t& value) {
-                    if (positions.empty())
-                        return UTF16LEString();
-                    else
-                        return UTF16LEString(str.substr(positions[minSizeCopy + value],
-                                                        positions[maxSizeCopy] - positions[minSizeCopy + value]));
-                });
-        return newShrinkable.shrinks();
-    });
+    return shrinkStringLike<UTF16LEString>(str, minSize, len, positions);
 }
 
 }  // namespace proptest
