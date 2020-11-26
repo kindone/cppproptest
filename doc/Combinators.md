@@ -13,7 +13,7 @@ While you can go through this document to the bottom, you might be eager to find
 | Generate a value within a set of values            | a prime number under 100                   | `elementOf<T>`                    |
 | Generate a pair or a tuple of different types      | a `pair<int, string>`                      | `pairOf<T1,T2>`, `tupleOf<Ts...>` |
 | Union multiple generators                          | `20~39` or `60~79` combined                | `unionOf<T>` (`oneOf<T>`)         |
-| Transform into another type or a value             | `"0"` or `"1.4"` (an integer as string).   | `transform<T,U>`                  |
+| Transform into another type or a value             | `"0"` or `"1.4"` (a number as string).     | `transform<T,U>`                  |
 | Generate a struct or a class object                | a `Rectangle` object with width and height | `construct<T,ARGS...>`            |
 | Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | `filter` (`suchThat`)             |
 | Generate values with dependencies or relationships | a rectangle where `width == height * 2`    | `dependency`, `chain`, `pairWith`, `tupleWith` |
