@@ -1,7 +1,7 @@
 
 # Generator Combinators
 
-Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
+Generator combinators are provided for building a new generator based on existing ones. Many of them come from ideas and best practices of functional programming. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
 While you can go through this document from top to the bottom, you might be want to find a suitable combinator for your use case using this table:
 
@@ -152,9 +152,9 @@ You can transform an existing generator to create new generator by providing a t
 
 ### Deriving or flat-mapping
 
-Another combinator that resembles `transform` is `derive`. This is equivalent to *flat-mapping* or *binding* in functional programming.
+Another combinator that resembles `transform` is `derive`. This is equivalent to *flat-mapping* or *binding* in functional programming. Difference to `transform<T,U>` is that you can have greater control on the resultant generator.
 
-* `derive<T, U>(genT, genUGen)`: derives a new generator for type `U`, based on result of `genT`, which is a generator for type `T`. Difference to `transform<T,U>`) is that you can have greater control on the resultant generator.
+* `derive<T, U>(genT, genUGen)`: derives a new generator for type `U`, based on result of `genT`, which is a generator for type `T`. 
 	
 	```cpp
 	// generates a string something like "KOPZZFASF", "ghnpqpojv", or "49681002378", ... that consists of only uppercase/lowercase alphabets/numeric characters.
@@ -245,7 +245,7 @@ Actually you can achieve the similar goal using `filter` combinator:
 	});
 	```
 	
-However, using `filter` for generating values with complex dependency results in many generated values that do not meet the constraint to be discarded. Therefore it's usually not recommended for that purpose. 
+However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high. 
 
 
 ## Utility methods in standard generators
