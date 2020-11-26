@@ -225,26 +225,26 @@ You may want to include dependency in the generated values. There are two varian
 Actually you can achieve the similar goal using `filter` combinator:
 
     ```cpp
-        // generate any year,month,day combination
-        auto yearMonthDayGen = tupleOf(fromTo(0, 9999), fromTo(1,12), fromTo(1,31));
-        // apply filter
-        auto validYearMonthDayGen = yearMonthDayGen.filter([](std::tuple<int,int,int>& ymd) {
-            int year = std::get<0>(ymd);
-            int month = std::get<1>(ymd);
-            int day = std::get<2>(ymd);
-            if(monthHas31Days(month) && day <= 31)
+    // generate any year,month,day combination
+    auto yearMonthDayGen = tupleOf(fromTo(0, 9999), fromTo(1,12), fromTo(1,31));
+    // apply filter
+    auto validYearMonthDayGen = yearMonthDayGen.filter([](std::tuple<int,int,int>& ymd) {
+        int year = std::get<0>(ymd);
+        int month = std::get<1>(ymd);
+        int day = std::get<2>(ymd);
+        if(monthHas31Days(month) && day <= 31)
+            return true;
+        else if(monthHas30Days(month) && day <= 30)
+            return true;
+        else { // february has 28 or 29 days
+            if(isLeapYear(year) && day <= 29)
                 return true;
-            else if(monthHas30Days(month) && day <= 30)
-                return true;
-            else { // february has 28 or 29 days
-                if(isLeapYear(year) && day <= 29)
-                    return true;
-                else
-                    return day <= 28;
-            }
+            else
+                return day <= 28;
+        }
     });
-        ```
-    
+    ```
+
 However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high. 
 
 
