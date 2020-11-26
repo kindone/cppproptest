@@ -100,9 +100,6 @@ TARGET_LINK_LIBRARIES(test_proptest
 
 ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
-set(profile_compile true)
-
-if(profile_compile)
 ### compile
 SET(compile_sources
     test/compile/printing.cpp
@@ -122,6 +119,7 @@ SET(compile_sources
 )
 
 ADD_EXECUTABLE(compile_proptest
+    EXCLUDE_FROM_ALL
     ${compile_sources}
 )
 
@@ -131,5 +129,6 @@ TARGET_LINK_LIBRARIES(compile_proptest
 	gtest_main
 )
 
-ADD_TEST(NAME compile_proptest_gtest COMMAND compile_proptest)
-endif()
+ADD_TEST(compile_proptest_gtest
+    EXCLUDE_FROM_ALL
+    compile_proptest)

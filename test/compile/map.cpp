@@ -10,4 +10,7 @@ TEST(Compile, map)
     Random rand(3);
     auto gen = Arbi<std::map<std::string, std::string>>();
     gen(rand);
+    gen.map<int>([](std::map<std::string,std::string>&) {
+        return 0;
+    });
 }

@@ -200,7 +200,7 @@ TEST(PropTest, ShrinkVector)
 
     // return make_shrinkable<std::vector<T>>(std::move(vec));
 
-    auto shrinkableVector = util::binarySearchShrinkable(len).template map<std::vector<T>>([vec](const int64_t& len) {
+    auto shrinkableVector = util::binarySearchShrinkable(len).map<std::vector<T>>([vec](const int64_t& len) {
         if (len <= 0)
             return std::vector<T>();
 
