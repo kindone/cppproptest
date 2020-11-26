@@ -3,6 +3,23 @@
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
+While you can go through this document to the bottom, you might be eager to find a suitable combinator for your use case. 
+
+| Purpose                                            | Examples                                   | Related Generator/Combinator      | 
+|----------------------------------------------------| -------------------------------------------|-----------------------------------|
+| Generate just a constant                           | `0` or `"1337"`                            | `just<T>`                         |
+| Generate a list of unique values                   | `{3,5,1}` but not `{3,5,5}`                | `Arbi<set<T>>`                    |
+| Generate a value within numeric range of values    | a number within `1`~`9999`                 | `interval<T>`, `integers<T>`      |
+| Generate a value within a set of values            | a prime number under 100                   | `elementOf<T>`                    |
+| Generate a pair or a tuple of different types      | a `pair<int, string>`                      | `pairOf<T1,T2>`, `tupleOf<Ts...>` |
+| Union multiple generators                          | `20~39` or `60~79` combined                | `unionOf<T>` (`oneOf<T>`)         |
+| Transform into another type or a value             | `"0"` or `"1.4"` (an integer as string).   | `transform<T,U>`                  |
+| Generate a struct or a class object                | a `Rectangle` object with width and height | `construct<T,ARGS...>`            |
+| Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | `filter` (`suchThat`)             |
+| Generate values with dependencies or relationships | a rectangle where `width == height * 2`    | `dependency`, `chain`, `pairWith`, `tupleWith` |
+
+&nbsp;
+
 ## Basic Generator Combinators
 
 ### Constants
@@ -64,6 +81,8 @@ Generators for different types can be bound to a pair or a tuple.
 	```cpp
 	auto tupleGen = tupleOf(Arbi<int>(), Arbi<std::string>(), Arbi<double>());
 	```
+
+&nbsp;
 
 ## Advanced Generator Combinators
 
