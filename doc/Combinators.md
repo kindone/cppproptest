@@ -53,16 +53,16 @@ You may want to random choose from specific list of values.
 
 Generators for different types can be bound to a pair or a tuple.
 
-* `pair<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
+* `pairOf<T1, T2>(gen1, gen2)` : generates a `std::pair<T1,T2>` based on result of generators `gen1` and `gen2`
 
 	```cpp
-	auto pairGen = pair(Arbi<int>(), Arbi<std::string>());
+	auto pairGen = pairOf(Arbi<int>(), Arbi<std::string>());
 	```
 
-* `tuple<T1, ..., TN>(gen1, ..., genN)`: generates a `std::tuple<T1,...,TN>` based on result of generators `gen1` through `genN`
+* `tupleOf<T1, ..., TN>(gen1, ..., genN)`: generates a `std::tuple<T1,...,TN>` based on result of generators `gen1` through `genN`
 
 	```cpp
-	auto tupleGen = tuple(Arbi<int>(), Arbi<std::string>(), Arbi<double>());
+	auto tupleGen = tupleOf(Arbi<int>(), Arbi<std::string>(), Arbi<double>());
 	```
 
 ## Advanced Generator Combinators
@@ -174,7 +174,7 @@ You may want to include dependency in the generated values. There are two varian
 
 	auto nullableIntegers = dependency<bool, int>(Arbi<bool>(), [](bool& isNull) {
 	    if(isNull)
-		return just<int>([]() { return 0; });
+		return just<int>(0);
 	    else
 		return fromTo<int>(10, 20);
 	});
@@ -183,7 +183,7 @@ You may want to include dependency in the generated values. There are two varian
 * `chain<Ts..., U>(genT, genUgen)`: similar to `dependency`, but takes a tuple generator for `std::tuple<Ts...>` and generates a `std::tuple<Ts..., U>` instead of a `std::pair`. `chain` can be repeatedly applied to itself, and results in a tuple one element larger than the previous one. You can chain multiple dependencies with this form.
 
 	```cpp
-	auto yearMonthGen = tuple(fromTo(0, 9999), fromTo(1,12));
+	auto yearMonthGen = tupleOf(fromTo(0, 9999), fromTo(1,12));
 	// number of days of month depends on month (28~31 days) and year (whether it's a leap year)
 	auto yearMonthDayGen = chain<std::tuple<int, int>, int>(yearMonthGen, [](std::tuple<int,int>& yearMonth) {
 	    int year = std::get<0>(yearMonth);
@@ -212,9 +212,9 @@ Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) r
 | `Generator<T>::filter`.        | `Generator<T>`                | `filter<T>`                       |
 | `Generator<T>::map<U>`         | `Generator<U>`                | `transform<T,U>`                  |
 | `Generator<T>::flatMap<U>`     | `Generator<U>`                | `derive<T,U>`                     |
-| `Generator<T>::pair<U>`        | `Generator<std::pair<T,U>>`   | `dependency<T,U>`                 |
-| `Generator<T>::tuple<U>`       | `Generator<std::tuple<T,U>>`  | `chain<T,U>`                      |
-| `Generator<std::tuple<Ts...>>::tuple<U>`       | `Generator<std::tuple<Ts...,U>>`  | `chain<std::tuple<Ts...>,U>`             |
+| `Generator<T>::pairWith<U>`    | `Generator<std::pair<T,U>>`   | `dependency<T,U>`                 |
+| `Generator<T>::tupleWith<U>`   | `Generator<std::tuple<T,U>>`  | `chain<T,U>`                      |
+| `Generator<std::tuple<Ts...>>::tupleWith<U>`  | `Generator<std::tuple<Ts...,U>>`  | `chain<std::tuple<Ts...>,U>`             |
 
 These functions and methods can be continuously chained.
 
@@ -254,9 +254,9 @@ These functions and methods can be continuously chained.
 	});	
 	```
 
-* `.pair<U>(genUGen)` or `tuple<U>(genUGen)`: chains itself to create a generator of pair or tuple. Equivalent to `dependency` or `chain`, respectively.
+* `.pairWith<U>(genUGen)` or `tupleWith<U>(genUGen)`: chains itself to create a generator of pair or tuple. Equivalent to `dependency` or `chain`, respectively.
 	```cpp
-	Arbi<bool>().tuple<int>([](bool& isEven) {
+	Arbi<bool>().tupleWith<int>([](bool& isEven) {
 	    if(isEven)
 	        return Arbi<int>().filter([](int& value) {
 	            return value % 2 == 0;
@@ -265,11 +265,13 @@ These functions and methods can be continuously chained.
 	        return Arbi<int>().filter([](int& value) {
 	            return value % 2 == 1;
 		});
-	}).tuple<std::string>([](std::tuple<bool, int>& tuple) {
+	}).tupleWith<std::string>([](std::tuple<bool, int>& tuple) {
 	    int size = std::get<1>(tuple);
 	    auto stringGen = Arbi<std::string>();
 	    stringGen.setSize(size);
 	    return stringGen;
 	});
 	```
+
+    Notice `tupleWith` can automatically chain a tuple generator of `n` parameters into a tuple generator of `n+1` parameters (`bool` generator -> `tuple<bool, int>` generator -> `tuple<bool, int, string>` generator in above example)
 
