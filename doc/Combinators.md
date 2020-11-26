@@ -3,7 +3,7 @@
 
 Generator combinators are provided for building a new generator based on existing ones. They can be chained as they receive existing generator(s) as argument and returns new generator.
 
-While you can go through this document to the bottom, you might be eager to find a suitable combinator for your use case. 
+While you can go through this document from top to the bottom, you might be want to find a suitable combinator for your use case using this table:
 
 | Purpose                                            | Examples                                   | Related Generator/Combinator      | 
 |----------------------------------------------------| -------------------------------------------|-----------------------------------|
@@ -222,13 +222,39 @@ You may want to include dependency in the generated values. There are two varian
 	}); // yearMonthDayGen generates std::tuple<int, int, int> of (year, month, day)
 	```
 
+Actually you can achieve the similar goal using `filter` combinator:
+
+        ```cpp
+	// generate any year,month,day combination
+	auto yearMonthDayGen = tupleOf(fromTo(0, 9999), fromTo(1,12), fromTo(1,31));
+	// apply filter
+	auto validYearMonthDayGen = yearMonthDayGen.filter([](std::tuple<int,int,int>& ymd) {
+	    int year = std::get<0>(ymd);
+	    int month = std::get<1>(ymd);
+	    int day = std::get<2>(ymd);
+	    if(monthHas31Days(month) && day <= 31)
+	        return true;
+	    else if(monthHas30Days(month) && day <= 30)
+	        return true;
+	    else { // february has 28 or 29 days
+	        if(isLeapYear(year) && day <= 29)
+		    return true;
+		else
+		    return day <= 28;
+	    }
+	});
+	```
+	
+However, using `filter` for generating values with complex dependency results in many generated values that do not meet the constraint to be discarded. Therefore it's usually not recommended for that purpose. 
+
+
 ## Utility methods in standard generators
 
 Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) returns a `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>` (aliased as `GenFunction<T>`), but has additional combinator methods decorated for ease of use. They in fact have equivalent standalone counterparts. Following table shows this relationship:
 
 | Decorated method               | Result type                   | Equivalent Standalone combinator  |
 |--------------------------------| ----------------------------- |---------------------------------- |
-| `Generator<T>::filter`.        | `Generator<T>`                | `filter<T>`                       |
+| `Generator<T>::filter`         | `Generator<T>`                | `filter<T>`                       |
 | `Generator<T>::map<U>`         | `Generator<U>`                | `transform<T,U>`                  |
 | `Generator<T>::flatMap<U>`     | `Generator<U>`                | `derive<T,U>`                     |
 | `Generator<T>::pairWith<U>`    | `Generator<std::pair<T,U>>`   | `dependency<T,U>`                 |
