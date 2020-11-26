@@ -13,7 +13,7 @@ You can [get started with `cppproptest` in this page](doc/GettingStarted.md).
 
 ## Example: Turning conventional unit tests into property tests
 
-A property is in the form of function `(Input0, ... , InputN) -> bool` (or `(Input0, ... , InputN) -> void`)
+A *property function* is in the form of `function<bool(InputType...)>` (or `function<void(InputType...)`)
 
 ```cpp
 [](int a, int b) -> bool {
@@ -21,7 +21,9 @@ A property is in the form of function `(Input0, ... , InputN) -> bool` (or `(Inp
 }
 ```
 
-A property-based testing library can generate combinations of `a` and `b` and validate the given function whether it always returns `true` for all the generated combinations. 
+A property-based testing library can generate random combinations of `a` and `b` and validate the given property function whether it always returns `true` for all the generated combinations (or, returns without exception for `void` returning property functions). 
+
+A typical outcome of a property test would be:
 
 > OK, passed 1000 tests
 
@@ -34,8 +36,7 @@ or
 Among many other benefits, property-based tests can immediately replace dull dummy-based tests, such as:
 
 ```cpp
-// typical dummy-based test 
-TEST(Suite, test) {
+    // typical dummy-based test 
     // a text encoded and then decoded must be identical to original
     MyEncoder encoder;
     MyDecoder decoder;    
@@ -43,15 +44,14 @@ TEST(Suite, test) {
     auto encoded = encoder.encode(original);
     auto decoded = decoder.decode(encoded);
     ASSERT_EQ(original, decoded);
-}
+
 ```
 
 This can be turned into a property-based test, which fully tests the component againt arbitrary input strings:
 
 ```cpp
-// property test 
-TEST(Suite, test) {
-    ASSERT_FOR_ALL([](std::string original) {
+    // property test 
+    forAll([](std::string original) {
         // a text encoded and then decoded must be identical to original
         MyEncoder encoder;
         MyDecoder decoder;    
@@ -59,10 +59,24 @@ TEST(Suite, test) {
         auto decoded = decoder.decode(encoded);
         PROP_ASSERT_EQ(original, decoded);
     });
-}
 ```
 
-Here is the comparison table showing some of the benefits of turning conventional tests into property based tests:
+## Power of automation and versatility
+
+```cpp
+forAll([](int a, long b, float c, std::string d, std::vector<std::string> e, std::map<int, std::string> e) {
+  // Do stuff with a, b, ..., and e
+});
+```
+
+As seen in previous example, at the core of a property-based testing library, there is this `forAll` function. This itself is a powerful value generation engine. It identifies the parameter types of a given property function. It then automatically feeds in the random generated values of those types to the function. While you can use the out-of-box, default generators, you can build your own or fine-tune existing generators. Property-based testing libraries often accompany with versatile toolkit based on functional programming paradigm, to conveniently and precisely define new generators.
+
+Given this powerful generation engine, we can fully parameterize and randomize our tests with high flexibility but little effort. You don't need to care much about *how* to test your requirements. Much of it is automatically done for you by the test library. With property-based testing, you can focus on two things: 
+
+* Identifying requirements that your components should fulfill and writing them as test
+* Defining the inputs to be tested (i.e. generators. Optional if you're using the defaults)
+
+Here is the comparison table showing some of the benefits of writing property based tests over conventional unit tests:
 
 
 |                   | Conventional Unit Tests   | **Property-Based Tests**     |
@@ -101,22 +115,6 @@ In fact, often the underlying issues of a component are easily detected than you
 
 In property-based testing, software requirements can be validated in automated fashion as in static code analyses, but by actually running the code as in dynamic code analyses. By actually running the code, we can check for many software requirements and issues that are usually not feasible to find with static code analyses.
 
-
-### Power of automation and versatility
-
-```cpp
-forAll([](int a, long b, float c, std::string d, std::vector<std::string> e, std::map<int, std::string> e) {
-  // Do stuff with a, b, ..., and e
-});
-```
-
-At the core of a property-based testing library, there is this `forAll`. It itself is a powerful value generation engine. It identifies the parameter types of a given function (In C++, variadic template argument deduction can extract the required types). It then automatically feeds in the random generated values of those types to the function. While you can use the out-of-box, default generators, you can build your own or fine-tune existing generators. Property-based testing libraries often accompany with versatile toolkit based on function programming paradigm, to conveniently and precisely define new generators.
-
-Given this powerful generation engine, we can fully parameterize and randomize our tests with high flexibility but little effort. You don't need to care much about *how* to test your requirements. Much of it is automatically done for you by the test library. With property-based testing, you can focus on two things: 
-
-* Identifying requirements that your components should fulfill and writing them as properties
-* Defining the inputs to be tested (i.e. generators. Optional if you're using the defaults)
-
 &nbsp;
 
 
@@ -134,8 +132,9 @@ I feel many of the existing property-based testing implementation in C++ are eit
 
 * [Getting Started with `cppproptest`](doc/GettingStarted.md)
 * [Using and Defining Generators](doc/Generators.md)
-* [Generator Combinators](doc/Combinators.md)
+* [Generator Combinators for Creating Generators from Existing Ones](doc/Combinators.md)
 * [Counterexamples and Shrinking](doc/Shrinking.md)
+* [Printing and debugging facilities](doc/Printing.md)
 * [Stateful Testing with `cppproptest`](doc/StatefulTesting.md)
 * [Concurrency Testing with `cppproptest`](doc/ConcurrencyTesting.md)
 * [Advanced Mocking with `cppproptest`](doc/Mocking.md)
