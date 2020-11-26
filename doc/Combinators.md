@@ -224,7 +224,7 @@ You may want to include dependency in the generated values. There are two varian
 
 Actually you can achieve the similar goal using `filter` combinator:
 
-    ```cpp
+```cpp
     // generate any year,month,day combination
     auto yearMonthDayGen = tupleOf(fromTo(0, 9999), fromTo(1,12), fromTo(1,31));
     // apply filter
@@ -243,7 +243,7 @@ Actually you can achieve the similar goal using `filter` combinator:
                 return day <= 28;
         }
     });
-    ```
+```
 
 However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high. 
 
