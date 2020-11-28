@@ -96,6 +96,7 @@ Following shows an example of defining an _Arbitrary_. Note that it should be de
 ```cpp
 namespace proptest { // you should define your Arbi<T> inside the namespace
 
+template <>
 struct Arbi<Car> : ArbiBase<Car> {
   Shrinkable<Car> operator()(Random& rand) {
     bool isAutomatic = rand.getRandomBool();
