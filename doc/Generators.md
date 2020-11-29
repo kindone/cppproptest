@@ -57,9 +57,9 @@ struct MyIntGen {
 };
 ```
 
-## `Generator<T>` - Decorator class for supercharging generators
+## `Generator<T>` - Decorator class for supercharging a generator
 
-The template class `Generator<T>` is an abstract functor class that also coerces to `GenFunction<T>`. A `Generator<T>` gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of `cppproptest` produce decorated `Generator<T>`s, you can use the utility methods with ease.
+The template class `Generator<T>` is an abstract functor class that also coerces to `GenFunction<T>`. A `Generator<T>` gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of `cppproptest` produce decorated `Generator<T>`s, you can use the utility methods out-of-box.
 
 ```cpp
 // decorate a GenFunction with Generator<T>
@@ -73,7 +73,6 @@ auto evenGen = myIntGen.filter([](int& value) {
     return value % 2 == 0;
 }); // generates even numbers only
 ```
-
 
 ## Arbitraries - The globally default generators
 
@@ -98,6 +97,8 @@ Following shows an example of defining an _Arbitrary_. Note that it should be de
 ```cpp
 namespace proptest { // you should define your Arbi<T> inside the namespace
 
+// define a template specialization of Arbi for Car type
+// by extending ArbiBase, you are decorating your arbitrary with standard methods (map, flatMap, filter, etc.)
 template <>
 struct Arbi<Car> : ArbiBase<Car> {
   Shrinkable<Car> operator()(Random& rand) {
