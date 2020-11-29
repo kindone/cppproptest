@@ -14,6 +14,12 @@ Generator<T> lazy(LazyEval&& lazyEval)
     return generator([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
 }
 
+template <typename LazyEval, typename T = typename std::result_of<LazyEval()>::type>
+auto lazy(LazyEval&& lazyEval) -> Generator<T>
+{
+    return lazy<T>(std::forward<LazyEval>(lazyEval));
+}
+
 template <typename T, typename U = T>
 Generator<T> just(U* valuePtr)
 {

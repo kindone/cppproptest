@@ -31,7 +31,7 @@ TEST(PropTest, TestLazy)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto ptrGen = lazy<std::shared_ptr<int>>([]() { return std::make_shared<int>(1); });
+    auto ptrGen = lazy([]() { return std::make_shared<int>(1); });
     auto vecGen = Arbi<std::vector<std::shared_ptr<int>>>(ptrGen);
 
     auto vec = ptrGen(rand).get();
@@ -114,7 +114,7 @@ TEST(PropTest, TestConstruct4)
     std::cout << "Gen animal's feet: " << gen2(rand).get() << std::endl;
 }
 
-TEST(PropTest, TestFilter)
+TEST(PropTest, Tests)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
