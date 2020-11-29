@@ -121,7 +121,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
 
 // this is required to overcome deduction failure for callables that we'd like to have as std::functions
 /**
- * Generates a std::tuple<T,U> with dependency. Useful when generator for U is decided by T
+ * Generates a std::tuple<T,U> with dependency.  Generator for U is decided by T value
  *     GenFunction<std::tuple<T,U>> tupleGen = chain(intGen, [](int& intVal) {
  *         auto stringGen = Arbi<std::string>();
  *         stringGen.setMaxSize(intVal); // string size is dependent to intVal generated from intGen

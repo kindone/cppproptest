@@ -34,12 +34,17 @@ struct Generator : public GenBase<T>
             proptest::transform<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, mapper));
     }
 
-    template <typename Criteria>
-    Generator<T> filter(Criteria&& criteria)
+    template <typename F, typename U = typename std::result_of<F(T&)>::type>
+    auto map(F&& mapper) -> Generator<U>
+    {
+        return map<U>(std::forward<F>(mapper));
+    }
+
+    Generator<T> filter(std::function<bool(T&)> criteria)
     {
         auto thisPtr = clone();
         return proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
-                                   std::forward<Criteria>(criteria));
+                                   criteria);
     }
 
     template <typename U>
