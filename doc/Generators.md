@@ -1,4 +1,4 @@
-# Using and Defining Generators 
+# Using and Defining Generators
 
 ## Generators in action
 
@@ -77,7 +77,7 @@ auto evenGen = myIntGen.filter([](int& value) {
 ## Arbitraries - The globally default generators
 
 An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type that also coerces to `GenFunction<T>`.
-These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no custom generator is provided.
+These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no custom generator is provided. 
 
 ```cpp
 // if there is no default generator available, you should provide a generator for the type. 
@@ -158,7 +158,7 @@ Built-in generators are in the form of Arbitraries. `cppproptest` provides a set
 		auto vecInt0to100 = Arbi<std::vector<int>>(interval<int>(0,100));
 		// otherwise, Arbi<int> is used
 		auto vecInt = Arbi<std::vector<int>>();
-	        auto uppercaseGen = Arbi<std::string>(interval('A', 'Z'));
+		auto uppercaseGen = Arbi<std::string>(interval('A', 'Z'));
 		```
 
 	* `Arbi<std::Map>` provides setter methods for assigning key and value generators
@@ -178,7 +178,7 @@ Built-in generators are in the form of Arbitraries. `cppproptest` provides a set
 		vecInt.setSize(10); // 1) generated vector will always have size 10
 		vecInt.setMinSize(1); // 2) generated vector will have size >= 1
 		vecInt.setMaxSize(10); // generated vector will have size <= 10
-                vecInt.setSize(1, 10); // 3) generated vector will have size >= 1 and size <= 10
+		vecInt.setSize(1, 10); // 3) generated vector will have size >= 1 and size <= 10
 		```
 
 ## Building Custom Generators with Generator Combinators
