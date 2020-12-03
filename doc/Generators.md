@@ -1,4 +1,4 @@
-# Using and Defining Generators
+# Introduction to Generators
 
 ## Generators in action
 
@@ -76,6 +76,8 @@ auto evenGen = myIntGen.filter([](int& value) {
 
 ## Arbitraries - The globally default generators
 
+### Arbitrary lets you omit generator arguments
+
 An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type that also coerces to `GenFunction<T>`.
 These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no custom generator is provided. 
 
@@ -89,6 +91,8 @@ forAll([](SomeNewType x) {
 forAll([](SomeNewType x) {
 });
 ```
+
+### Defining an arbitrary
 
 With template specialization, new `Arbi<T>` (or its alias `Arbitrary<T>`) for type `T` can be defined, if it isn't already defined yet. By defining an _Arbitrary_, you are effectively adding a default generator for a type to the library.
 
@@ -110,6 +114,8 @@ struct Arbi<Car> : ArbiBase<Car> {
 }
 ```
 
+### Arbitrary provides utility methods
+
 As an `Arbitrary<T>` is also a `Generator<T>`, an arbitrary provides useful helpers for creating new generators from existing ones. `filter` is such a helper. It restrictively generates values that satisfy a criteria function. Following is an even number generator from the integer `Arbitrary`.
 
 ```cpp
@@ -125,7 +131,7 @@ You can find the full list of such helpers in section [Utility methods in standa
 
 &nbsp;
 
-## Built-in Arbitraries
+### Built-in Arbitraries
 
 Built-in generators are in the form of Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used in practice.
 
