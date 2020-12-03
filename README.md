@@ -96,12 +96,14 @@ Here is the comparison table showing some of the benefits of writing property ba
 ## Further topics and details of the library can be found in:
 
 * [Why property-based testing?](doc/WhyPropertyBasedTesting.md)
-* [Getting Started with `cppproptest`](doc/GettingStarted.md)
-* [Using and Defining Generators](doc/Generators.md)
-* [Generator Combinators for Creating Generators from Existing Ones](doc/Combinators.md)
-* [Counterexamples and Shrinking](doc/Shrinking.md)
-* [Printing and debugging facilities](doc/Printing.md)
-* [Stateful Testing with `cppproptest`](doc/StatefulTesting.md)
-* [Concurrency Testing with `cppproptest`](doc/ConcurrencyTesting.md)
-* [Advanced Mocking with `cppproptest`](doc/Mocking.md)
+* [Getting started with `cppproptest`](doc/GettingStarted.md)
+* [Introduction to generators](doc/Generators.md)
+    * [Arbitraries](doc/Generators.md#arbitraries---the-globally-default-generators)
+    * [Built-in generators](doc/Generators.md#arbitraries---the-globally-default-generators)
+* [Generator combinators for creating generators from existing ones](doc/Combinators.md)
+* [Counterexamples and notion of shrinking for automated debugging](doc/Shrinking.md)
+* [Printing facilities](doc/Printing.md)
+* [Stateful testing with `cppproptest`](doc/StatefulTesting.md)
+* [Concurrency testing with `cppproptest`](doc/ConcurrencyTesting.md)
+* [Advanced mocking with `cppproptest`](doc/Mocking.md)
 
