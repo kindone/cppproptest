@@ -16,8 +16,52 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
+#include <initializer_list>
 
 namespace proptest {
+
+template <typename... ARGS>
+struct Matrix {
+    template <size_t N>
+    static decltype(auto) pickN(std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices) {
+        auto& vec = std::get<N>(lists);
+        auto& index = indices[N];
+        return vec[index];
+    }
+
+    template <size_t... index>
+    static decltype(auto) pickEach(std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices, std::index_sequence<index...>)
+    {
+        return std::make_tuple(
+            pickN<index>(std::forward<std::tuple<std::vector<ARGS>...>>(lists), indices)...);
+    }
+
+    template <size_t N>
+    static decltype(auto) progressN(bool& incremented, std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices) {
+        auto& list = std::get<N>(lists);
+        // already incremented
+        if(incremented)
+            return incremented;
+        else if(indices[N] < list.size()-1) {
+            indices[N] ++;
+            incremented = true;
+        }
+        else {
+            incremented = false;
+            indices[N] = 0;
+        }
+        return incremented;
+    }
+
+    template <size_t... index>
+    static bool progress(std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices, std::index_sequence<index...>)
+    {
+        constexpr auto Size = sizeof...(ARGS);
+        bool incremented = false;
+        std::make_tuple(progressN<Size-index-1>(incremented, std::forward<decltype(lists)>(lists), indices)...);
+        return incremented;
+    }
+};
 
 template <typename... ARGS>
 class Property final : public PropertyBase {
@@ -123,20 +167,24 @@ public:
 
     bool example(ARGS&&... args)
     {
-        PropertyContext context;
         auto valueTup = std::make_tuple(args...);
-        auto valueTupPtr = std::make_shared<decltype(valueTup)>(valueTup);
+        return example(valueTup);
+    }
+
+    bool example(const std::tuple<ARGS...>& valueTup)
+    {
+        PropertyContext context;
         try {
             try {
                 try {
                     if(onStartupPtr)
                         (*onStartupPtr)();
-                    bool result = util::invokeWithArgs(func, std::forward<ARGS>(args)...);
+                    bool result = util::invokeWithArgs(func, valueTup);
                     if(onCleanupPtr)
                         (*onCleanupPtr)();
                     return result;
                 } catch (const AssertFailed& e) {
-                    throw PropertyFailed<decltype(valueTup)>(e, valueTupPtr);
+                    throw PropertyFailed<std::tuple<ARGS...>>(e);
                 }
             } catch (const Success&) {
                 return true;
@@ -155,6 +203,24 @@ public:
             return false;
         }
         return false;
+    }
+
+    /* TODO: Test all input combinations in the Cartesian product of input lists
+    */
+    bool matrix(std::initializer_list<ARGS>&&...lists)
+    {
+        constexpr auto Size = sizeof...(ARGS);
+        auto vecTuple = std::make_tuple(std::vector<ARGS>(lists)...);
+        std::vector<int> indices;
+        for(size_t i = 0; i < Size; i++)
+            indices.push_back(0);
+
+        do {
+            [[maybe_unused]] auto valueTup = Matrix<ARGS...>::pickEach(std::forward<decltype(vecTuple)>(vecTuple), indices, std::make_index_sequence<Size>{});
+            example(valueTup);
+        } while((Matrix<ARGS...>::progress(std::forward<decltype(vecTuple)>(vecTuple), indices, std::make_index_sequence<Size>{})));
+
+        return true;
     }
 
 private:

@@ -43,6 +43,8 @@ TEST(PropTest, TestPropertyBasic)
     prop.setSeed(0).forAll();
     // with specific arguments
     prop.example(std::string("hello"), 10, std::string("world"));
+    prop.forAll(elementOf<std::string>("", std::string("a")), just(10), elementOf<std::string>(std::string(""), std::string("b")));
+
     // with specific generators
     std::string empty("s");
     prop.forAll(just<std::string>(empty), Arbi<int>(), just<std::string>(std::to_string(1)));

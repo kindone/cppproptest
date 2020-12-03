@@ -34,10 +34,8 @@ struct PROPTEST_API PropertyFailedBase : public std::logic_error
 template <typename ValueTuple>
 struct PROPTEST_API PropertyFailed : public PropertyFailedBase
 {
-    PropertyFailed(const AssertFailed& e, std::shared_ptr<ValueTuple> v) : PropertyFailedBase(e), valueTupPtr(v) {}
+    PropertyFailed(const AssertFailed& e) : PropertyFailedBase(e) {}
     virtual ~PropertyFailed();
-
-    std::shared_ptr<ValueTuple> valueTupPtr;
 };
 
 template <typename ValueTuple>

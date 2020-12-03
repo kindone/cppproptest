@@ -23,7 +23,7 @@ TEST(UtilTestCase, invokeTest)
     };
 
     invokeWithArgTuple(func, std::make_tuple(arg1, arg2, arg3));
-    invokeWithArgs(func, arg1, arg2, arg3);
+    invokeWithArgs(func, std::make_tuple(arg1, arg2, arg3));
 }
 
 TEST(UtilTestCase, transformTest)

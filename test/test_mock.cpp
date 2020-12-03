@@ -93,7 +93,7 @@ namespace util {
 
 template <typename T>
 struct Functor {
-    Functor(std::shared_ptr<std::vector<T>> _vecptr) :  vecptr(_vecptr), i(0) {}
+    Functor(std::shared_ptr<std::vector<T>> _vecPtr) :  vecPtr(_vecPtr), i(0) {}
 
     T next() {
         if(i >= vecPtr->size())
@@ -101,7 +101,7 @@ struct Functor {
         return (*vecPtr)[i++];
     }
 
-    std::shared_ptr<std::vector<T>> vecptr;
+    std::shared_ptr<std::vector<T>> vecPtr;
     int i;
 };
 

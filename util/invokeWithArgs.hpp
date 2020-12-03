@@ -49,9 +49,8 @@ decltype(auto) invokeWithArgTupleWithReplace(Function&& f, ArgTuple&& argTup, Re
 }
 
 template <typename Function, typename... Args>
-decltype(auto) invokeWithArgs(Function&& f, Args&&... args)
+decltype(auto) invokeWithArgs(Function&& f, const std::tuple<Args...>& argTup)
 {
-    auto argTup = std::make_tuple<Args...>(std::forward<Args>(args)...);
     constexpr auto Size = sizeof...(Args);
     return invokeHelper(std::forward<Function>(f), std::forward<decltype(argTup)>(argTup),
                         std::make_index_sequence<Size>{});
