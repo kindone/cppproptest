@@ -1,8 +1,6 @@
 #include "util.hpp"
 #include "../Random.hpp"
-#include <functional>
-#include <utility>
-#include <tuple>
+#include "../util/std.hpp"
 
 namespace proptest {
 namespace util {
@@ -11,7 +9,7 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
 {
     using shrinkable_t = Shrinkable<int64_t>;
     using stream_t = Stream<shrinkable_t>;
-    using genfunc_t = typename std::function<stream_t(int64_t, int64_t)>;
+    using genfunc_t = function<stream_t(int64_t, int64_t)>;
 
     // given min, max, generate stream
     static genfunc_t genpos = +[](int64_t min, int64_t max) {
@@ -52,7 +50,7 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
 {
     using shrinkable_t = Shrinkable<uint64_t>;
     using stream_t = Stream<shrinkable_t>;
-    using genfunc_t = typename std::function<stream_t(uint64_t, uint64_t)>;
+    using genfunc_t = function<stream_t(uint64_t, uint64_t)>;
 
     // given min, max, generate stream
     static genfunc_t genpos = +[](uint64_t min, uint64_t max) {

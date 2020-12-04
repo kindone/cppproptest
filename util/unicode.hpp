@@ -1,45 +1,43 @@
 #pragma once
 
 #include "../api.hpp"
-#include <iostream>
-#include <vector>
-#include <string>
+#include "std.hpp"
 
 namespace proptest {
 namespace util {
 
-PROPTEST_API std::ostream& codepage(std::ostream& os, uint32_t code);
-std::ostream& charAsHex(std::ostream& os, uint8_t c);
-std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2);
-std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3);
-std::ostream& charAsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4);
-PROPTEST_API std::ostream& charAsHex(std::ostream& os, std::vector<uint8_t>& chars);
-PROPTEST_API std::ostream& charAsHex(std::ostream& os, const std::string& str);
-PROPTEST_API std::ostream& validString(std::ostream& os, const std::string& str);
+PROPTEST_API ostream& codepage(ostream& os, uint32_t code);
+ostream& charAsHex(ostream& os, uint8_t c);
+ostream& charAsHex(ostream& os, uint8_t c1, uint8_t c2);
+ostream& charAsHex(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3);
+ostream& charAsHex(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4);
+PROPTEST_API ostream& charAsHex(ostream& os, vector<uint8_t>& chars);
+PROPTEST_API ostream& charAsHex(ostream& os, const string& str);
+PROPTEST_API ostream& validString(ostream& os, const string& str);
 
 struct PROPTEST_API StringAsHex
 {
-    StringAsHex(const std::string& _str) : str(_str) {}
+    StringAsHex(const string& _str) : str(_str) {}
 
-    friend std::ostream& operator<<(std::ostream& os, const StringAsHex& obj) { return charAsHex(os, obj.str); }
+    friend ostream& operator<<(ostream& os, const StringAsHex& obj) { return charAsHex(os, obj.str); }
 
-    const std::string& str;
+    const string& str;
 };
 
 struct PROPTEST_API StringPrintable
 {
-    StringPrintable(const std::string& _str) : str(_str) {}
+    StringPrintable(const string& _str) : str(_str) {}
 
-    friend std::ostream& operator<<(std::ostream& os, const StringPrintable& obj) { return validString(os, obj.str); }
+    friend ostream& operator<<(ostream& os, const StringPrintable& obj) { return validString(os, obj.str); }
 
-    const std::string& str;
+    const string& str;
 };
 
-std::ostream& validChar(std::ostream& os, uint8_t c);
-std::ostream& validChar2(std::ostream& os, uint8_t c);
-// std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2);
-// std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3);
-// std::ostream& validChar(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4);
+ostream& validChar(ostream& os, uint8_t c);
+ostream& validChar2(ostream& os, uint8_t c);
+// ostream& validChar(ostream& os, uint8_t c1, uint8_t c2);
+// ostream& validChar(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3);
+// ostream& validChar(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4);
 
 }  // namespace util
 }  // namespace proptest

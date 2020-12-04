@@ -1,8 +1,6 @@
 #pragma once
 
-#include <functional>
-#include <tuple>
-#include <stdexcept>
+#include "util/std.hpp"
 #include "util/function_traits.hpp"
 #include "util/typelist.hpp"
 #include "Random.hpp"
@@ -22,25 +20,25 @@ class Random;
 template <typename T>
 struct Generator : public GenBase<T>
 {
-    Generator(GenFunction<T> gen) : genPtr(std::make_shared<GenFunction<T>>(gen)) {}
+    Generator(GenFunction<T> gen) : genPtr(make_shared<GenFunction<T>>(gen)) {}
 
     virtual Shrinkable<T> operator()(Random& rand) override { return (*genPtr)(rand); }
 
     template <typename U>
-    Generator<U> map(std::function<U(T&)> mapper)
+    Generator<U> map(function<U(T&)> mapper)
     {
         auto thisPtr = clone();
         return Generator<U>(
             proptest::transform<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, mapper));
     }
 
-    template <typename F, typename U = typename std::result_of<F(T&)>::type>
+    template <typename F, typename U = typename result_of<F(T&)>::type>
     auto map(F&& mapper) -> Generator<U>
     {
-        return map<U>(std::forward<F>(mapper));
+        return map<U>(forward<F>(mapper));
     }
 
-    Generator<T> filter(std::function<bool(T&)> criteria)
+    Generator<T> filter(function<bool(T&)> criteria)
     {
         auto thisPtr = clone();
         return proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); },
@@ -48,29 +46,29 @@ struct Generator : public GenBase<T>
     }
 
     template <typename U>
-    Generator<std::pair<T, U>> pairWith(std::function<GenFunction<U>(T&)> gengen)
+    Generator<pair<T, U>> pairWith(function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
     template <typename U>
-    decltype(auto) tupleWith(std::function<GenFunction<U>(T&)> gengen)
+    decltype(auto) tupleWith(function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
     template <typename U>
-    Generator<U> flatMap(std::function<GenFunction<U>(T&)> gengen)
+    Generator<U> flatMap(function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
-    std::shared_ptr<Generator<T>> clone() { return std::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
+    shared_ptr<Generator<T>> clone() { return make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
 
-    std::shared_ptr<GenFunction<T>> genPtr;
+    shared_ptr<GenFunction<T>> genPtr;
 };
 
 template <typename GEN>

@@ -1,7 +1,5 @@
 #pragma once
-#include <vector>
-#include <functional>
-
+#include "../util/std.hpp"
 #include "../Random.hpp"
 #include "../assert.hpp"
 #include "../gen.hpp"
@@ -24,22 +22,22 @@ struct Weighted
 {
     using FuncType = GenFunction<T>;
 
-    Weighted(std::shared_ptr<FuncType> _funcPtr, double _weight) : funcPtr(_funcPtr), weight(_weight) {}
+    Weighted(shared_ptr<FuncType> _funcPtr, double _weight) : funcPtr(_funcPtr), weight(_weight) {}
 
-    std::shared_ptr<FuncType> funcPtr;
+    shared_ptr<FuncType> funcPtr;
     double weight;
 };
 
 template <typename T, typename GEN>
-std::enable_if_t<!std::is_same<std::decay_t<GEN>, Weighted<T>>::value, Weighted<T>> GenToWeighted(GEN&& gen)
+enable_if_t<!is_same<decay_t<GEN>, Weighted<T>>::value, Weighted<T>> GenToWeighted(GEN&& gen)
 {
-    return weightedGen<T>(std::forward<GEN>(gen), 0.0);
+    return weightedGen<T>(forward<GEN>(gen), 0.0);
 }
 
 template <typename T>
 Weighted<T> GenToWeighted(Weighted<T>&& weighted)
 {
-    return std::forward<Weighted<T>>(weighted);
+    return forward<Weighted<T>>(weighted);
 }
 
 template <typename T>
@@ -49,7 +47,7 @@ Weighted<T>& GenToWeighted(Weighted<T>& weighted)
 }
 
 template <typename T>
-decltype(auto) oneOfHelper(const std::shared_ptr<std::vector<util::Weighted<T>>>& genVecPtr)
+decltype(auto) oneOfHelper(const shared_ptr<vector<util::Weighted<T>>>& genVecPtr)
 {
     // calculate and assign unassigned weights
     double sum = 0.0;
@@ -57,14 +55,14 @@ decltype(auto) oneOfHelper(const std::shared_ptr<std::vector<util::Weighted<T>>>
     for (size_t i = 0; i < genVecPtr->size(); i++) {
         double weight = (*genVecPtr)[i].weight;
         if (weight < 0.0 || weight > 1.0)
-            throw std::runtime_error("invalid weight: " + std::to_string(weight));
+            throw runtime_error("invalid weight: " + to_string(weight));
         sum += weight;
         if (weight == 0.0)
             numUnassigned++;
     }
 
     if (sum > 1.0)
-        throw std::runtime_error("sum of weight exceeds 1.0");
+        throw runtime_error("sum of weight exceeds 1.0");
 
     if (numUnassigned > 0 && sum < 1.0)
         for (size_t i = 0; i < genVecPtr->size(); i++) {
@@ -97,7 +95,7 @@ template <typename T, typename GEN>
 util::Weighted<T> weightedGen(GEN&& gen, double weight)
 {
     using FuncType = GenFunction<T>;
-    std::shared_ptr<FuncType> funcPtr = std::make_shared<FuncType>(std::forward<GEN>(gen));
+    shared_ptr<FuncType> funcPtr = make_shared<FuncType>(forward<GEN>(gen));
     return util::Weighted<T>(funcPtr, weight);
 }
 
@@ -105,8 +103,8 @@ util::Weighted<T> weightedGen(GEN&& gen, double weight)
 template <typename T, typename... GENS>
 decltype(auto) oneOf(GENS&&... gens)
 {
-    using WeightedVec = std::vector<util::Weighted<T>>;
-    std::shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(std::forward<GENS>(gens))...});
+    using WeightedVec = vector<util::Weighted<T>>;
+    shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(forward<GENS>(gens))...});
 
     return util::oneOfHelper<T>(genVecPtr);
 }
@@ -114,7 +112,7 @@ decltype(auto) oneOf(GENS&&... gens)
 /* Alias */
 template <typename T, typename... GENS>
 decltype(auto) unionOf(GENS&&... gens) {
-    return oneOf(std::forward<GENS>(gens)...);
+    return oneOf(forward<GENS>(gens)...);
 }
 
 }  // namespace proptest

@@ -1,6 +1,6 @@
 #pragma once
 #include "../Shrinkable.hpp"
-#include <memory>
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -8,34 +8,34 @@ namespace util {
 
 template <typename T>
 struct VectorShrinker {
-    using shrinkable_vector_t = std::vector<Shrinkable<T>>;
+    using shrinkable_vector_t = vector<Shrinkable<T>>;
     using shrinkable_t = Shrinkable<shrinkable_vector_t>;
     using stream_t = Stream<shrinkable_t>;
     using e_stream_t = Stream<Shrinkable<T>>;
 
     static stream_t shrinkBulk(const shrinkable_t& ancestor, size_t power, size_t offset)
     {
-        static std::function<stream_t(const shrinkable_t&, size_t, size_t, const shrinkable_t&, size_t, size_t,
-                                      std::shared_ptr<std::vector<e_stream_t>>)>
+        static function<stream_t(const shrinkable_t&, size_t, size_t, const shrinkable_t&, size_t, size_t,
+                                      shared_ptr<vector<e_stream_t>>)>
             genStream =
                 +[](const shrinkable_t& _ancestor, size_t _power, size_t _offset, const shrinkable_t& parent,
-                    size_t frompos, size_t topos, std::shared_ptr<std::vector<e_stream_t>> elemStreams) -> stream_t {
+                    size_t frompos, size_t topos, shared_ptr<vector<e_stream_t>> elemStreams) -> stream_t {
             const size_t size = topos - frompos;
             if (size == 0)
                 return stream_t::empty();
 
             if (elemStreams->size() != size)
-                throw std::runtime_error("element streams size error");
+                throw runtime_error("element streams size error");
 
-            std::shared_ptr<std::vector<e_stream_t>> newElemStreams = std::make_shared<std::vector<e_stream_t>>();
+            shared_ptr<vector<e_stream_t>> newElemStreams = make_shared<vector<e_stream_t>>();
             newElemStreams->reserve(size);
 
             shrinkable_vector_t newVec = parent.getRef();
             shrinkable_vector_t& ancestorVec = _ancestor.getRef();
 
             if (newVec.size() != ancestorVec.size())
-                throw std::runtime_error("list size error: " + std::to_string(newVec.size()) +
-                                         " != " + std::to_string(ancestorVec.size()));
+                throw runtime_error("list size error: " + to_string(newVec.size()) +
+                                         " != " + to_string(ancestorVec.size()));
 
             // shrink each element in frompos~topos, put parent if shrink no longer possible
             bool nothingToDo = true;
@@ -64,22 +64,22 @@ struct VectorShrinker {
         };
 
         size_t parentSize = ancestor.getRef().size();
-        size_t numSplits = static_cast<size_t>(std::pow(2, power));
+        size_t numSplits = static_cast<size_t>(pow(2, power));
         if (parentSize / numSplits < 1)
             return stream_t::empty();
 
         if (offset >= numSplits)
-            throw std::runtime_error("offset should not reach numSplits");
+            throw runtime_error("offset should not reach numSplits");
 
         size_t frompos = parentSize * offset / numSplits;
         size_t topos = parentSize * (offset + 1) / numSplits;
 
         if (topos < parentSize)
-            throw std::runtime_error("topos error: " + std::to_string(topos) + " != " + std::to_string(parentSize));
+            throw runtime_error("topos error: " + to_string(topos) + " != " + to_string(parentSize));
 
         const size_t size = topos - frompos;
         shrinkable_vector_t& parentVec = ancestor.getRef();
-        std::shared_ptr<std::vector<e_stream_t>> elemStreams = std::make_shared<std::vector<e_stream_t>>();
+        shared_ptr<vector<e_stream_t>> elemStreams = make_shared<vector<e_stream_t>>();
         elemStreams->reserve(size);
 
         bool nothingToDo = true;
@@ -102,16 +102,16 @@ struct VectorShrinker {
             return stream_t::empty();
 
         size_t vecSize = shrinkable.getRef().size();
-        size_t numSplits = static_cast<size_t>(std::pow(2, power));
+        size_t numSplits = static_cast<size_t>(pow(2, power));
         if (vecSize / numSplits < 1 || offset >= numSplits)
             return stream_t::empty();
         // entirety
         shrinkable_t newShrinkable = shrinkable.concat([power, offset](const shrinkable_t& shr) -> stream_t {
             size_t _vecSize = shr.getRef().size();
-            size_t _numSplits = static_cast<size_t>(std::pow(2, power));
+            size_t _numSplits = static_cast<size_t>(pow(2, power));
             if (_vecSize / _numSplits < 1 || offset >= _numSplits)
                 return stream_t::empty();
-            // std::cout << "entire: " << power << ", " << offset << std::endl;
+            // cout << "entire: " << power << ", " << offset << endl;
             return shrinkBulk(shr, power, offset);
         });
 
@@ -124,8 +124,8 @@ struct VectorShrinker {
 
 
 template <template <typename...> class ListLike, typename T>
-Shrinkable<ListLike<T>> shrinkListLike(const std::shared_ptr<std::vector<Shrinkable<T>>>& shrinkableVector, size_t minSize) {
-    using shrinkable_vector_t = std::vector<Shrinkable<T>>;
+Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize) {
+    using shrinkable_vector_t = vector<Shrinkable<T>>;
     using shrinkable_t = Shrinkable<shrinkable_vector_t>;
 
     size_t size = shrinkableVector->size();
@@ -151,8 +151,8 @@ Shrinkable<ListLike<T>> shrinkListLike(const std::shared_ptr<std::vector<Shrinka
         shrinkable.template flatMap<ListLike<T>>(+[](const shrinkable_vector_t& _shrinkableVector) -> Shrinkable<ListLike<T>> {
             auto value = make_shrinkable<ListLike<T>>();
             ListLike<T>& valueVec = value.getRef();
-            std::transform(
-                _shrinkableVector.begin(), _shrinkableVector.end(), std::back_inserter(valueVec),
+            transform(
+                _shrinkableVector.begin(), _shrinkableVector.end(), back_inserter(valueVec),
                 +[](const Shrinkable<T>& shr) -> T { return shr.getRef(); });
             return value;
         });

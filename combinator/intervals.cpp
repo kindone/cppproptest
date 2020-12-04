@@ -2,15 +2,15 @@
 
 namespace proptest {
 
-Generator<int64_t> intervals(std::initializer_list<Interval> intervals)
+Generator<int64_t> intervals(initializer_list<Interval> intervals)
 {
-    using WeightedVec = std::vector<util::Weighted<int64_t>>;
+    using WeightedVec = vector<util::Weighted<int64_t>>;
 
     uint64_t sum = 0;
     for (auto interval : intervals) {
         if (interval.size() == 0)
-            throw std::runtime_error("invalid empty interval: [" + std::to_string(interval.min) + ", " +
-                                     std::to_string(interval.max) + "]");
+            throw runtime_error("invalid empty interval: [" + to_string(interval.min) + ", " +
+                                     to_string(interval.max) + "]");
         sum += interval.size();
     }
 
@@ -20,21 +20,21 @@ Generator<int64_t> intervals(std::initializer_list<Interval> intervals)
                                                static_cast<double>(interval.size()) / sum));
     }
 
-    std::shared_ptr<WeightedVec> genVecPtr(genVec);
+    shared_ptr<WeightedVec> genVecPtr(genVec);
 
     return util::oneOfHelper<int64_t>(genVecPtr);
 }
 
-Generator<uint64_t> uintervals(std::initializer_list<UInterval> intervals)
+Generator<uint64_t> uintervals(initializer_list<UInterval> intervals)
 {
-    using WeightedVec = std::vector<util::Weighted<uint64_t>>;
+    using WeightedVec = vector<util::Weighted<uint64_t>>;
 
     uint64_t sum = 0;
 
     for (auto interval : intervals) {
         if (interval.size() == 0)
-            throw std::runtime_error("invalid empty interval: [" + std::to_string(interval.min) + ", " +
-                                     std::to_string(interval.max) + "]");
+            throw runtime_error("invalid empty interval: [" + to_string(interval.min) + ", " +
+                                     to_string(interval.max) + "]");
         sum += interval.size();
     }
 
@@ -44,7 +44,7 @@ Generator<uint64_t> uintervals(std::initializer_list<UInterval> intervals)
                                                 static_cast<double>(interval.size()) / sum));
     }
 
-    std::shared_ptr<WeightedVec> genVecPtr(genVec);
+    shared_ptr<WeightedVec> genVecPtr(genVec);
 
     return util::oneOfHelper<uint64_t>(genVecPtr);
 }

@@ -1,7 +1,7 @@
 #include "../api.hpp"
 #include "utf8string.hpp"
 #include "unicode.hpp"
-#include <stdexcept>
+#include "std.hpp"
 
 namespace proptest {
 
@@ -9,35 +9,35 @@ size_t UTF8String::charsize() const
 {
     int size = util::UTF8CharSize(*this);
     if (size < 0)
-        throw std::runtime_error("Not a valid UTF-8 string");
+        throw runtime_error("Not a valid UTF-8 string");
 
     return static_cast<size_t>(size);
 }
 
 namespace util {
 
-IosFlagSaver::IosFlagSaver(std::ostream& _ios) : ios(_ios), f(_ios.flags()) {}
+IosFlagSaver::IosFlagSaver(ostream& _ios) : ios(_ios), f(_ios.flags()) {}
 IosFlagSaver::~IosFlagSaver()
 {
     ios.flags(f);
 }
 
-std::ostream& UTF8ToHex(std::ostream& os, std::vector<uint8_t>& chars)
+ostream& UTF8ToHex(ostream& os, vector<uint8_t>& chars)
 {
     util::IosFlagSaver iosFlagSaver(os);
 
     if (chars.size() > 0)
-        os << /*"\\x" <<*/ std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[0]);
+        os << /*"\\x" <<*/ setfill('0') << setw(2) << hex << static_cast<int>(chars[0]);
     for (size_t i = 1; i < chars.size(); i++) {
-        os << " " << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[i]);
+        os << " " << setfill('0') << setw(2) << hex << static_cast<int>(chars[i]);
     }
 
     return os;
 }
 
-std::ostream& decodeUTF8(std::ostream& os, const std::string& str)
+ostream& decodeUTF8(ostream& os, const string& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -45,9 +45,9 @@ std::ostream& decodeUTF8(std::ostream& os, const std::string& str)
     return decodeUTF8(os, chars);
 }
 
-std::ostream& decodeUTF8(std::ostream& os, const UTF8String& str)
+ostream& decodeUTF8(ostream& os, const UTF8String& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -71,7 +71,7 @@ std::ostream& decodeUTF8(std::ostream& os, const UTF8String& str)
  * U+100000..U+10FFFF F4       80..8F   80..BF   80..BF
  *
  */
-std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
+ostream& decodeUTF8(ostream& os, vector<uint8_t>& chars)
 {
     for (size_t i = 0; i < chars.size(); i++) {
         // U+0000..U+007F
@@ -178,9 +178,9 @@ std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
-int UTF8CharSize(const std::string& str)
+int UTF8CharSize(const string& str)
 {
-    std::vector<uint8_t> chars(str.size());
+    vector<uint8_t> chars(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars[i] = str[i];
     }
@@ -191,13 +191,13 @@ int UTF8CharSize(const std::string& str)
         return -1;
 }
 
-bool isValidUTF8(std::vector<uint8_t>& chars)
+bool isValidUTF8(vector<uint8_t>& chars)
 {
     int numChars = 0;
     return isValidUTF8(chars, numChars);
 }
 
-bool isValidUTF8(std::vector<uint8_t>& chars, int& numChars)
+bool isValidUTF8(vector<uint8_t>& chars, int& numChars)
 {
     numChars = 0;
     for (size_t i = 0; i < chars.size(); i++, numChars++) {

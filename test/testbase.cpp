@@ -16,67 +16,67 @@ double getTime()
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-std::ostream& operator<<(std::ostream& os, const proptest::UTF8String& str)
+ostream& operator<<(ostream& os, const proptest::UTF8String& str)
 {
     os << proptest::Show<proptest::UTF8String>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const proptest::UTF16BEString& str)
+ostream& operator<<(ostream& os, const proptest::UTF16BEString& str)
 {
     os << proptest::Show<proptest::UTF16BEString>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const proptest::UTF16LEString& str)
+ostream& operator<<(ostream& os, const proptest::UTF16LEString& str)
 {
     os << proptest::Show<proptest::UTF16LEString>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const proptest::CESU8String& str)
+ostream& operator<<(ostream& os, const proptest::CESU8String& str)
 {
     os << proptest::Show<proptest::CESU8String>(str);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<Foo>& input)
+ostream& operator<<(ostream& os, const vector<Foo>& input)
 {
-    os << proptest::Show<std::vector<Foo>>(input);
+    os << proptest::Show<vector<Foo>>(input);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& input)
+ostream& operator<<(ostream& os, const vector<int>& input)
 {
-    os << proptest::Show<std::vector<int>>(input);
+    os << proptest::Show<vector<int>>(input);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<int8_t>& input)
+ostream& operator<<(ostream& os, const vector<int8_t>& input)
 {
-    os << proptest::Show<std::vector<int8_t>>(input);
+    os << proptest::Show<vector<int8_t>>(input);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::set<int>& input)
+ostream& operator<<(ostream& os, const set<int>& input)
 {
-    os << proptest::Show<std::set<int>>(input);
+    os << proptest::Show<set<int>>(input);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::map<int, int>& input)
+ostream& operator<<(ostream& os, const map<int, int>& input)
 {
-    os << proptest::Show<std::map<int, int>>(input);
+    os << proptest::Show<map<int, int>>(input);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::list<int>& input)
+ostream& operator<<(ostream& os, const list<int>& input)
 {
-    os << proptest::Show<std::list<int>>(input);
+    os << proptest::Show<list<int>>(input);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TableData& td)
+ostream& operator<<(ostream& os, const TableData& td)
 {
     os << "{ num_rows: " << td.num_rows << ", num_elements: " << td.num_elements << ", indexes: ";
     os << "[ ";
@@ -92,22 +92,22 @@ std::ostream& operator<<(std::ostream& os, const TableData& td)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<std::tuple<uint16_t, bool>>& indexVec)
+ostream& operator<<(ostream& os, const vector<tuple<uint16_t, bool>>& indexVec)
 {
     os << "[ ";
     if (!indexVec.empty()) {
         auto tup = indexVec[0];
-        os << "{ first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+        os << "{ first: " << get<0>(tup) << ", second: " << get<1>(tup) << " }";
     }
     for (size_t i = 0; i < indexVec.size(); i++) {
         auto tup = indexVec[i];
-        os << ", { first: " << std::get<0>(tup) << ", second: " << std::get<1>(tup) << " }";
+        os << ", { first: " << get<0>(tup) << ", second: " << get<1>(tup) << " }";
     }
     os << " ]";
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Animal& input)
+ostream& operator<<(ostream& os, const Animal& input)
 {
     os << "{ ";
     os << "numFeet: " << input.numFeet;

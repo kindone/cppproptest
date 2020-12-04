@@ -2,9 +2,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
-#include <chrono>
-#include <iostream>
-#include <memory>
+#include "../util/std.hpp"
 
 using namespace proptest;
 using namespace proptest::stateful;
@@ -17,7 +15,7 @@ struct VectorModel2
 
 TEST(StateTest, StateFunction)
 {
-    using T = std::vector<int>;
+    using T = vector<int>;
 
     auto pushBackGen = Arbi<int>().map<SimpleAction<T>>([](int value) {
         return SimpleAction<T>([value](T& obj) {
@@ -46,7 +44,7 @@ TEST(StateTest, StateFunction)
 
     // actionGen<T> is shorthand for just<SimpleAction<T>>
     auto clearGen = just(SimpleAction<T>([](T& obj) {
-        // std::cout << "Clear" << std::endl;
+        // cout << "Clear" << endl;
         obj.clear();
         PROP_ASSERT(obj.size() == 0);
     }));
@@ -55,21 +53,21 @@ TEST(StateTest, StateFunction)
         oneOf<SimpleAction<T>>(pushBackGen, popBackGen, popBackGen2, weightedGen<SimpleAction<T>>(clearGen, 0.1));
     auto prop = statefulProperty<T>(Arbi<T>(), actionGen);
     prop.setOnStartup([]() {
-        std::cout << "startup" << std::endl;
+        cout << "startup" << endl;
     });
     prop.setOnCleanup([]() {
-        std::cout << "cleanup" << std::endl;
+        cout << "cleanup" << endl;
     });
     prop.setSeed(0).setNumRuns(100).go();
 }
 
 TEST(StateTest, StateFunctionWithModel)
 {
-    using T = std::vector<int>;
+    using T = vector<int>;
     using Model = VectorModel2;
 
     auto pushBackGen = Arbi<int>().map<Action<T, Model>>([](int value) {
-        std::stringstream str;
+        stringstream str;
         str << "PushBack(" << value << ")";
         return Action<T, Model>(str.str(), [value](T& obj, Model&) {
             auto size = obj.size();
@@ -103,10 +101,10 @@ TEST(StateTest, StateFunctionWithModel)
     auto prop = statefulProperty<T, Model>(
         Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionGen);
     prop.setOnStartup([]() {
-        std::cout << "startup" << std::endl;
+        cout << "startup" << endl;
     });
     prop.setOnCleanup([]() {
-        std::cout << "cleanup" << std::endl;
+        cout << "cleanup" << endl;
         // PROP_ASSERT(false);
     });
     prop.setSeed(0).setNumRuns(10).go();

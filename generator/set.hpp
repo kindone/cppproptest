@@ -4,8 +4,7 @@
 #include "../Shrinkable.hpp"
 #include "../shrinker/set.hpp"
 #include "util.hpp"
-#include <memory>
-#include <set>
+#include "../util/std.hpp"
 
 namespace std {
 
@@ -23,8 +22,8 @@ public:
 namespace proptest {
 
 template <typename T>
-class Arbi<std::set<T>> final : public ArbiContainer<std::set<T>> {
-    using Set = typename std::set<T>;
+class Arbi<set<T>> final : public ArbiContainer<set<T>> {
+    using Set = set<T>;
     using ArbiContainer<Set>::minSize;
     using ArbiContainer<Set>::maxSize;
 
@@ -46,7 +45,7 @@ public:
     {
         // generate random Ts using elemGen
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
-        std::shared_ptr<std::set<Shrinkable<T>>> shrinkableSet = std::make_shared<std::set<Shrinkable<T>>>();
+        shared_ptr<set<Shrinkable<T>>> shrinkableSet = make_shared<set<Shrinkable<T>>>();
 
         while (shrinkableSet->size() < size) {
             auto elem = elemGen(rand);
@@ -59,8 +58,8 @@ public:
 };
 
 template <typename T>
-size_t Arbi<std::set<T>>::defaultMinSize = 0;
+size_t Arbi<set<T>>::defaultMinSize = 0;
 template <typename T>
-size_t Arbi<std::set<T>>::defaultMaxSize = 200;
+size_t Arbi<set<T>>::defaultMaxSize = 200;
 
 }  // namespace proptest

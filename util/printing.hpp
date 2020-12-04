@@ -1,13 +1,5 @@
 #pragma once
-#include <iostream>
-#include <tuple>
-#include <utility>
-#include <string>
-#include <list>
-#include <vector>
-#include <map>
-#include <set>
-#include <memory>
+#include "std.hpp"
 #include "../Shrinkable.hpp"
 #include "utf8string.hpp"
 #include "utf16string.hpp"
@@ -17,67 +9,67 @@
 
 namespace proptest {
 
-std::ostream& show(std::ostream& os, const char*);
-std::ostream& show(std::ostream& os, const char*, size_t len);
-std::ostream& show(std::ostream& os, const std::string&);
-std::ostream& show(std::ostream& os, const UTF8String&);
-std::ostream& show(std::ostream& os, const CESU8String&);
-std::ostream& show(std::ostream& os, const UTF16BEString&);
-std::ostream& show(std::ostream& os, const UTF16LEString&);
-std::ostream& show(std::ostream& os, const bool&);
-std::ostream& show(std::ostream& os, const char&);
-std::ostream& show(std::ostream& os, const int8_t&);
-std::ostream& show(std::ostream& os, const uint8_t&);
-std::ostream& show(std::ostream& os, const int16_t&);
-std::ostream& show(std::ostream& os, const uint16_t&);
-std::ostream& show(std::ostream& os, const int32_t&);
-std::ostream& show(std::ostream& os, const uint32_t&);
-std::ostream& show(std::ostream& os, const int64_t&);
-std::ostream& show(std::ostream& os, const uint64_t&);
-std::ostream& show(std::ostream& os, const float&);
-std::ostream& show(std::ostream& os, const double&);
+ostream& show(ostream& os, const char*);
+ostream& show(ostream& os, const char*, size_t len);
+ostream& show(ostream& os, const string&);
+ostream& show(ostream& os, const UTF8String&);
+ostream& show(ostream& os, const CESU8String&);
+ostream& show(ostream& os, const UTF16BEString&);
+ostream& show(ostream& os, const UTF16LEString&);
+ostream& show(ostream& os, const bool&);
+ostream& show(ostream& os, const char&);
+ostream& show(ostream& os, const int8_t&);
+ostream& show(ostream& os, const uint8_t&);
+ostream& show(ostream& os, const int16_t&);
+ostream& show(ostream& os, const uint16_t&);
+ostream& show(ostream& os, const int32_t&);
+ostream& show(ostream& os, const uint32_t&);
+ostream& show(ostream& os, const int64_t&);
+ostream& show(ostream& os, const uint64_t&);
+ostream& show(ostream& os, const float&);
+ostream& show(ostream& os, const double&);
 
 // forward declaration is needed to be available at call sites
 template <typename T>
-std::ostream& show(std::ostream& os, const T& obj);
+ostream& show(ostream& os, const T& obj);
 template <typename T>
-std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable);
+ostream& show(ostream& os, const Shrinkable<T>& shrinkable);
 template <typename... ARGS>
-std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple);
+ostream& show(ostream& os, const tuple<ARGS...>& tuple);
 template <typename ARG1, typename ARG2>
-std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair);
+ostream& show(ostream& os, const pair<ARG1, ARG2>& pair);
 template <typename T, typename Allocator>
-std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& vec);
+ostream& show(ostream& os, const vector<T, Allocator>& vec);
 template <typename T, typename Allocator>
-std::ostream& show(std::ostream& os, const std::list<T, Allocator>& list);
+ostream& show(ostream& os, const list<T, Allocator>& list);
 template <typename T, typename Compare, typename Allocator>
-std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input);
+ostream& show(ostream& os, const set<T, Compare, Allocator>& input);
 template <class Key, class T, class Compare, class Allocator>
-std::ostream& show(std::ostream& os, const std::map<Key, T, Compare, Allocator>& input);
+ostream& show(ostream& os, const map<Key, T, Compare, Allocator>& input);
 template <typename T>
-std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr);
+ostream& show(ostream& os, const shared_ptr<T>& ptr);
 template <typename T>
-std::ostream& show(std::ostream& os, const Nullable<T>& nullable);
+ostream& show(ostream& os, const Nullable<T>& nullable);
 
 namespace stateful {
 template <typename ObjectType, typename ModelType>
-std::ostream& show(std::ostream& os, const Action<ObjectType,ModelType>& action);
+ostream& show(ostream& os, const Action<ObjectType,ModelType>& action);
 }
 
 namespace util {
 
 struct HasShowImpl
 {
-    template <typename T, typename CRITERIA = decltype(show(std::cout, std::declval<T>()))>
-    static std::true_type test(const T&);
+    template <typename T, typename CRITERIA = decltype(show(cout, declval<T>()))>
+    static true_type test(const T&);
 
-    static std::false_type test(...);
+    static false_type test(...);
 };
 
 template <typename T>
 struct HasShow
 {
-    static constexpr bool value = decltype(HasShowImpl::test(std::declval<T>()))::value;
+    static constexpr bool value = decltype(HasShowImpl::test(declval<T>()))::value;
 };
 
 // default printer
@@ -86,7 +78,7 @@ struct ShowDefault;
 template <typename T>
 struct ShowDefault
 {
-    static std::ostream& show(std::ostream& os, const T&)
+    static ostream& show(ostream& os, const T&)
     {
         os << "<\?\?\?>";
         return os;
@@ -96,14 +88,14 @@ struct ShowDefault
 }  // namespace util
 
 template <typename T>
-std::ostream& show(std::ostream& os, const T& obj)
+ostream& show(ostream& os, const T& obj)
 {
     util::ShowDefault<T>::show(os, obj);
     return os;
 }
 
 template <typename T>
-std::ostream& show(std::ostream& os, const Shrinkable<T>& shrinkable)
+ostream& show(ostream& os, const Shrinkable<T>& shrinkable)
 {
     show(os, shrinkable.getRef());
     return os;
@@ -113,7 +105,7 @@ template <typename T>
 struct Show
 {
     Show(const T& _value) : value(_value) {}
-    friend std::ostream& operator<<(std::ostream& os, const Show<T>& sh)
+    friend ostream& operator<<(ostream& os, const Show<T>& sh)
     {
         show(os, sh.value);
         return os;
@@ -125,7 +117,7 @@ template <>
 struct Show<char*>
 {
     Show(const char* _value, size_t _n) : value(_value), n(_n) {}
-    friend std::ostream& operator<<(std::ostream& os, const Show<char*>& sh)
+    friend ostream& operator<<(ostream& os, const Show<char*>& sh)
     {
         show(os, sh.value, sh.n);
         return os;
@@ -137,60 +129,60 @@ struct Show<char*>
 namespace util {
 
 template <typename T>
-bool toStreamLast(std::ostream& os, const T& t)
+bool toStreamLast(ostream& os, const T& t)
 {
     show(os, t);
     return true;
 }
 
 template <typename T>
-bool toStreamFrontHelper(std::ostream& os, const T& t)
+bool toStreamFrontHelper(ostream& os, const T& t)
 {
     os << Show<T>(t) << ", ";
     return true;
 }
 
 template <typename Tuple, size_t... index>
-decltype(auto) toStreamFront(std::ostream& os, const Tuple& tuple, std::index_sequence<index...>)
+decltype(auto) toStreamFront(ostream& os, const Tuple& tuple, index_sequence<index...>)
 {
-    [[maybe_unused]] auto dummy = {toStreamFrontHelper(os, std::get<index>(tuple))...};
+    [[maybe_unused]] auto dummy = {toStreamFrontHelper(os, get<index>(tuple))...};
 }
 
 template <size_t Size, typename Tuple>
 struct ToStreamEach
 {
-    void get(std::ostream& os, const Tuple& tuple) { toStreamFront(os, tuple, std::make_index_sequence<Size>{}); }
+    void get(ostream& os, const Tuple& tuple) { toStreamFront(os, tuple, make_index_sequence<Size>{}); }
 };
 
 template <typename Tuple>
 struct ToStreamEach<0, Tuple>
 {
-    void get(std::ostream&, const Tuple&) {}
+    void get(ostream&, const Tuple&) {}
 };
 
 }  // namespace util
 
 template <typename ARG1, typename ARG2>
-std::ostream& show(std::ostream& os, const std::pair<ARG1, ARG2>& pair)
+ostream& show(ostream& os, const pair<ARG1, ARG2>& pair)
 {
     os << "( " << Show<ARG1>(pair.first) << ", " << Show<ARG2>(pair.second) << " )";
     return os;
 }
 
 template <typename... ARGS>
-std::ostream& show(std::ostream& os, const std::tuple<ARGS...>& tuple)
+ostream& show(ostream& os, const tuple<ARGS...>& tup)
 {
     constexpr auto Size = sizeof...(ARGS);
     os << "{ ";
-    util::ToStreamEach<Size - 1, std::tuple<ARGS...>> toStreamEach;
-    toStreamEach.get(os, tuple);
-    util::toStreamLast(os, std::get<Size - 1>(tuple));
+    util::ToStreamEach<Size - 1, tuple<ARGS...>> toStreamEach;
+    toStreamEach.get(os, tup);
+    util::toStreamLast(os, get<Size - 1>(tup));
     os << " }";
     return os;
 }
 
 template <typename T, typename Allocator>
-std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& seq)
+ostream& show(ostream& os, const vector<T, Allocator>& seq)
 {
     os << "[ ";
     auto begin = seq.begin();
@@ -205,7 +197,7 @@ std::ostream& show(std::ostream& os, const std::vector<T, Allocator>& seq)
 }
 
 template <typename T, typename Allocator>
-std::ostream& show(std::ostream& os, const std::list<T, Allocator>& seq)
+ostream& show(ostream& os, const list<T, Allocator>& seq)
 {
     os << "[ ";
     auto begin = seq.begin();
@@ -220,7 +212,7 @@ std::ostream& show(std::ostream& os, const std::list<T, Allocator>& seq)
 }
 
 template <typename T, typename Compare, typename Allocator>
-std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& input)
+ostream& show(ostream& os, const set<T, Compare, Allocator>& input)
 {
     os << "{ ";
     if (input.size() == 1) {
@@ -239,17 +231,17 @@ std::ostream& show(std::ostream& os, const std::set<T, Compare, Allocator>& inpu
 }
 
 template <typename Key, typename T, typename Compare, typename Allocator>
-std::ostream& show(std::ostream& os, const std::map<Key, T, Compare, Allocator>& input)
+ostream& show(ostream& os, const map<Key, T, Compare, Allocator>& input)
 {
     os << "{ ";
     if (input.size() == 1) {
-        os << Show<std::pair<Key, T>>(*input.begin());
+        os << Show<pair<Key, T>>(*input.begin());
     } else if (input.size() > 0) {
-        os << Show<std::pair<Key, T>>(*input.begin());
+        os << Show<pair<Key, T>>(*input.begin());
         auto second = input.begin();
         second++;
         for (auto itr = second; itr != input.end(); ++itr) {
-            os << ", " << Show<std::pair<Key, T>>(*itr);
+            os << ", " << Show<pair<Key, T>>(*itr);
         }
     }
 
@@ -258,7 +250,7 @@ std::ostream& show(std::ostream& os, const std::map<Key, T, Compare, Allocator>&
 }
 
 template <typename T>
-std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr)
+ostream& show(ostream& os, const shared_ptr<T>& ptr)
 {
     if (static_cast<bool>(ptr))
         os << Show<T>(*ptr);
@@ -268,7 +260,7 @@ std::ostream& show(std::ostream& os, const std::shared_ptr<T>& ptr)
 }
 
 template <typename T>
-std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
+ostream& show(ostream& os, const Nullable<T>& nullable)
 {
     if (!nullable.isNull())
         os << Show<T>(*nullable.ptr);
@@ -280,7 +272,7 @@ std::ostream& show(std::ostream& os, const Nullable<T>& nullable)
 namespace stateful {
 
 template <typename ObjectType, typename ModelType>
-std::ostream& show(std::ostream& os, const Action<ObjectType,ModelType>& action)
+ostream& show(ostream& os, const Action<ObjectType,ModelType>& action)
 {
     os << action.name;
     return os;

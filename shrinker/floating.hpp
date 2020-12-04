@@ -44,16 +44,16 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
     int exp = 0;
     if (value == 0.0f) {
         return Stream<Shrinkable<FLOATTYPE>>::empty();
-    } else if (std::isnan(value)) {
+    } else if (isnan(value)) {
         return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
     } else {
         FLOATTYPE fraction = 0.0f;
-        if (std::isinf(value)) {
+        if (isinf(value)) {
             if (value > 0) {
-                auto max = std::numeric_limits<FLOATTYPE>::max();
+                auto max = numeric_limits<FLOATTYPE>::max();
                 fraction = util::decomposeFloat(max, &exp);
             } else {
-                auto min = std::numeric_limits<FLOATTYPE>::lowest();
+                auto min = numeric_limits<FLOATTYPE>::lowest();
                 fraction = util::decomposeFloat(min, &exp);
             }
         } else {
@@ -89,7 +89,7 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
         floatShrinkable = floatShrinkable.andThen(+[](const Shrinkable<FLOATTYPE>& shr) {
             auto value = shr.get();
             auto intValue = static_cast<int>(value);
-            if (intValue != 0 && std::abs(intValue) < std::abs(value)) {
+            if (intValue != 0 && abs(intValue) < abs(value)) {
                 return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(intValue));
             } else
                 return Stream<Shrinkable<FLOATTYPE>>::empty();

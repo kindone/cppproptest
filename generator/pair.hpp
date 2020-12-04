@@ -4,8 +4,7 @@
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 #include "../shrinker/pair.hpp"
-#include <utility>
-#include <memory>
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -15,8 +14,8 @@ namespace proptest {
 template <typename GEN1, typename GEN2>
 decltype(auto) pairOf(GEN1&& gen1, GEN2&& gen2)
 {
-    auto genPairPtr = std::make_shared<std::pair<std::decay_t<GEN1>, std::decay_t<GEN2>>>(std::forward<GEN1>(gen1),
-                                                                                          std::forward<GEN2>(gen2));
+    auto genPairPtr = make_shared<pair<decay_t<GEN1>, decay_t<GEN2>>>(forward<GEN1>(gen1),
+                                                                                          forward<GEN2>(gen2));
     // generator
     return generator([genPairPtr](Random& rand) mutable {
         return shrinkPair(genPairPtr->first(rand), genPairPtr->second(rand));
@@ -24,9 +23,9 @@ decltype(auto) pairOf(GEN1&& gen1, GEN2&& gen2)
 }
 
 template <typename ARG1, typename ARG2>
-class PROPTEST_API Arbi<std::pair<ARG1, ARG2>> final : public ArbiBase<std::pair<ARG1, ARG2>> {
+class PROPTEST_API Arbi<pair<ARG1, ARG2>> final : public ArbiBase<pair<ARG1, ARG2>> {
 public:
-    Shrinkable<std::pair<ARG1, ARG2>> operator()(Random& rand) override
+    Shrinkable<pair<ARG1, ARG2>> operator()(Random& rand) override
     {
         return pairOf(Arbi<ARG1>(), Arbi<ARG2>())(rand);
     }

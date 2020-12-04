@@ -1,42 +1,39 @@
 #pragma once
 #include "../api.hpp"
 #include "misc.hpp"
-#include <iostream>
-#include <ios>
-#include <iomanip>
-#include <vector>
+#include "std.hpp"
 
 namespace proptest {
 
-class PROPTEST_API UTF8String : public std::string {
+class PROPTEST_API UTF8String : public string {
 public:
-    explicit UTF8String(std::string&& other) : std::string(other) {}
-    explicit UTF8String(std::string& other) : std::string(other) {}
-    using std::string::string;
+    explicit UTF8String(string&& other) : string(other) {}
+    explicit UTF8String(string& other) : string(other) {}
+    using string::string;
 
     size_t charsize() const;
 };
 
 namespace util {
 
-PROPTEST_API std::ostream& UTF8ToHex(std::ostream& os, std::vector<uint8_t>& chars);
-PROPTEST_API std::ostream& decodeUTF8(std::ostream& os, const std::string& str);
-PROPTEST_API std::ostream& decodeUTF8(std::ostream& os, const UTF8String& str);
+PROPTEST_API ostream& UTF8ToHex(ostream& os, vector<uint8_t>& chars);
+PROPTEST_API ostream& decodeUTF8(ostream& os, const string& str);
+PROPTEST_API ostream& decodeUTF8(ostream& os, const UTF8String& str);
 
 struct PROPTEST_API DecodeUTF8
 {
-    DecodeUTF8(const std::string& _str) : str(_str) {}
+    DecodeUTF8(const string& _str) : str(_str) {}
     DecodeUTF8(const UTF8String& _str) : str(_str) {}
 
-    friend std::ostream& operator<<(std::ostream& os, const DecodeUTF8& obj) { return decodeUTF8(os, obj.str); }
-    const std::string& str;
+    friend ostream& operator<<(ostream& os, const DecodeUTF8& obj) { return decodeUTF8(os, obj.str); }
+    const string& str;
 };
 
-PROPTEST_API std::ostream& decodeUTF8(std::ostream& os, std::vector<uint8_t>& chars);
+PROPTEST_API ostream& decodeUTF8(ostream& os, vector<uint8_t>& chars);
 
-PROPTEST_API bool isValidUTF8(std::vector<uint8_t>& chars);
-PROPTEST_API bool isValidUTF8(std::vector<uint8_t>& chars, int& numChars);
-PROPTEST_API int UTF8CharSize(const std::string& str);
+PROPTEST_API bool isValidUTF8(vector<uint8_t>& chars);
+PROPTEST_API bool isValidUTF8(vector<uint8_t>& chars, int& numChars);
+PROPTEST_API int UTF8CharSize(const string& str);
 
 }  // namespace util
 

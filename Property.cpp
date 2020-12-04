@@ -1,8 +1,7 @@
 #include "PropertyBase.hpp"
 #include "assert.hpp"
 #include "util/tuple.hpp"
-#include <exception>
-#include <utility>
+#include "util/std.hpp"
 
 namespace proptest {
 
@@ -19,7 +18,7 @@ uint64_t getGlobalSeed()
     }
 }
 
-}  // namespace util
+}  // namespace utilr
 
 PropertyContext* PropertyBase::context = nullptr;
 uint32_t PropertyBase::defaultNumRuns = 1000;
@@ -31,26 +30,26 @@ void PropertyBase::setContext(PropertyContext* ctx)
     context = ctx;
 }
 
-void PropertyBase::tag(const char* file, int lineno, std::string key, std::string value)
+void PropertyBase::tag(const char* file, int lineno, string key, string value)
 {
     if (!context)
-        throw std::runtime_error("context is not set");
+        throw runtime_error("context is not set");
 
     context->tag(file, lineno, key, value);
 }
 
-void PropertyBase::succeed(const char* file, int lineno, const char* condition, const std::stringstream& str)
+void PropertyBase::succeed(const char* file, int lineno, const char* condition, const stringstream& str)
 {
     if (!context)
-        throw std::runtime_error("context is not set");
+        throw runtime_error("context is not set");
 
     context->succeed(file, lineno, condition, str);
 }
 
-void PropertyBase::fail(const char* file, int lineno, const char* condition, const std::stringstream& str)
+void PropertyBase::fail(const char* file, int lineno, const char* condition, const stringstream& str)
 {
     if (!context)
-        throw std::runtime_error("context is not set");
+        throw runtime_error("context is not set");
 
     context->fail(file, lineno, condition, str);
 }
@@ -60,10 +59,10 @@ bool PropertyBase::invoke(Random&)
     return true;
 }
 
-std::stringstream& PropertyBase::getLastStream()
+stringstream& PropertyBase::getLastStream()
 {
     if (!context)
-        throw std::runtime_error("context is not set");
+        throw runtime_error("context is not set");
 
     return context->getLastStream();
 }

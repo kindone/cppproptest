@@ -1,8 +1,6 @@
 #pragma once
 
-#include <functional>
-#include <tuple>
-#include <stdexcept>
+#include "util/std.hpp"
 #include "util/function_traits.hpp"
 #include "util/typelist.hpp"
 #include "api.hpp"
@@ -25,19 +23,19 @@ template <typename T>
 struct ArbiBase : public GenBase<T>
 {
     template <typename U>
-    Generator<U> map(std::function<U(T&)> mapper)
+    Generator<U> map(function<U(T&)> mapper)
     {
         auto thisPtr = clone();
         return proptest::transform<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, mapper);
     }
 
-    template <typename F, typename U = typename std::result_of<F(T&)>::type>
+    template <typename F, typename U = typename result_of<F(T&)>::type>
     auto map(F&& mapper) -> Generator<U>
     {
-        return map<U>(std::forward<F>(mapper));
+        return map<U>(forward<F>(mapper));
     }
 
-    Generator<T> filter(std::function<bool(T&)> criteria)
+    Generator<T> filter(function<bool(T&)> criteria)
     {
         auto thisPtr = clone();
         return proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
@@ -45,27 +43,27 @@ struct ArbiBase : public GenBase<T>
     }
 
     template <typename U>
-    Generator<std::pair<T, U>> pairWith(std::function<GenFunction<U>(T&)> gengen)
+    Generator<pair<T, U>> pairWith(function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     template <typename U>
-    decltype(auto) tupleWith(std::function<GenFunction<U>(T&)> gengen)
+    decltype(auto) tupleWith(function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
     template <typename U>
-    Generator<U> flatMap(std::function<GenFunction<U>(T&)> gengen)
+    Generator<U> flatMap(function<GenFunction<U>(T&)> gengen)
     {
         auto thisPtr = clone();
         return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
-    std::shared_ptr<Arbi<T>> clone() { return std::make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
+    shared_ptr<Arbi<T>> clone() { return make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
 };
 
 template <typename T>

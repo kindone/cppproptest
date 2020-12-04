@@ -23,7 +23,7 @@ TEST(ForkTestCase, SafeCall1)
 TEST(ForkTestCase, SafeCall2)
 {
     EXPECT_ANY_THROW(util::safeCall<int>([]() {
-        throw std::runtime_error("error!");
+        throw runtime_error("error!");
         return 4;
     }));
 }
@@ -69,7 +69,7 @@ TEST(ForkTestCase, Fork)
         close(ptoc[0]);
 
         if (0 >= write(ctop[1], "hello from child", 20))
-            throw std::runtime_error("write error");
+            throw runtime_error("write error");
 
         int* a = nullptr;
         printf("a: %d\n", *a);  // kill
@@ -80,7 +80,7 @@ TEST(ForkTestCase, Fork)
         close(ctop[1]);
 
         if (0 >= write(ptoc[1], "hello from parent", 20))
-            throw std::runtime_error("write error");
+            throw runtime_error("write error");
         close(ptoc[1]);
 
         printf("parent process: counter=%d\n", ++counter);

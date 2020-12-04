@@ -1,7 +1,7 @@
-#include <memory>
-#include <atomic>
-#include <exception>
+
+#include "std.hpp"
 #include "bitmap.hpp"
+#include <atomic>
 
 namespace proptest {
 namespace util {
@@ -69,14 +69,14 @@ void Bitmap::take(int n)
 {
     // assert
     if (states[n] != Changing)
-        throw std::runtime_error("invalid state");
+        throw runtime_error("invalid state");
     states[n] = Unavailable;
 }
 
 void Bitmap::put(int n)
 {
     if (states[n] != Changing)
-        throw std::runtime_error("invalid state");
+        throw runtime_error("invalid state");
     states[n] = Available;
 }
 
@@ -114,7 +114,7 @@ int Bitmap::occupyUnavailable(int n)
     for (int i = 0; i < n; i++) {
         State UnavailableState = Unavailable;
         if (states[i].compare_exchange_strong(UnavailableState, Changing))
-            return i;
+            return i;   
     }
     return -1;
 }

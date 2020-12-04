@@ -1,8 +1,7 @@
 #pragma once
 
-#include <random>
-#include <stdexcept>
 #include "api.hpp"
+#include "util/std.hpp"
 
 namespace proptest {
 
@@ -28,20 +27,20 @@ public:
     template <typename T>
     T getRandom(int64_t /*min*/, int64_t /*max*/)
     {
-        throw std::runtime_error("getRandom for type not defined");
+        throw runtime_error("getRandom for type not defined");
     }
 
     template <typename T>
     T getRandomU(uint64_t /*min*/, uint64_t /*max*/)
     {
-        throw std::runtime_error("getRandom for type not defined");
+        throw runtime_error("getRandom for type not defined");
     }
 
 private:
     uint64_t next8U();
-    // std::default_random_engine engine;
-    std::mt19937_64 engine;
-    std::uniform_int_distribution<uint64_t> dist;
+    // default_random_engine engine;
+    mt19937_64 engine;
+    uniform_int_distribution<uint64_t> dist;
 };
 
 template <>

@@ -1,16 +1,15 @@
 #include "assert.hpp"
-#include <iostream>
-#include <sstream>
+#include "util/std.hpp"
 
 namespace proptest {
 namespace util {
 
-std::ostream& errorOrEmpty(bool error)
+ostream& errorOrEmpty(bool error)
 {
-    static std::stringstream str;
-    static std::ostream& empty = str;
+    static stringstream str;
+    static ostream& empty = str;
     if (error)
-        return std::cerr;
+        return cerr;
     else
         return empty;
 }

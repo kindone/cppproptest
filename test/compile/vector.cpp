@@ -8,6 +8,6 @@ using namespace proptest;
 TEST(Compile, vector)
 {
     Random rand(1);
-    auto gen = Arbi<std::vector<int64_t>>();
+    auto gen = Arbi<vector<int64_t>>();
     gen(rand);
 }

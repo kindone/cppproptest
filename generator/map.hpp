@@ -4,13 +4,12 @@
 #include "../Shrinkable.hpp"
 #include "../shrinker/map.hpp"
 #include "set.hpp"
-#include <memory>
-#include <map>
+#include "../util/std.hpp"
 
 namespace proptest {
 template <typename Key, typename T>
-class Arbi<std::map<Key, T>> final : public ArbiContainer<std::map<Key, T>> {
-    using Map = typename std::map<Key, T>;
+class Arbi<map<Key, T>> final : public ArbiContainer<map<Key, T>> {
+    using Map = map<Key, T>;
     using ArbiContainer<Map>::minSize;
     using ArbiContainer<Map>::maxSize;
 
@@ -24,19 +23,19 @@ public:
     {
         // generate random Ts using elemGen
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
-        std::shared_ptr<std::set<Shrinkable<Key>>> shrinkSet = std::make_shared<std::set<Shrinkable<Key>>>();
+        shared_ptr<set<Shrinkable<Key>>> shrinkSet = make_shared<set<Shrinkable<Key>>>();
 
         while (shrinkSet->size() < size) {
             auto elem = elemGen(rand);
             shrinkSet->insert(elem);
         }
 
-        std::shared_ptr<std::map<Shrinkable<Key>, Shrinkable<T>>> shrinkableMap =
-            std::make_shared<std::map<Shrinkable<Key>, Shrinkable<T>>>();
+        shared_ptr<map<Shrinkable<Key>, Shrinkable<T>>> shrinkableMap =
+            make_shared<map<Shrinkable<Key>, Shrinkable<T>>>();
 
         for (auto itr = shrinkSet->begin(); itr != shrinkSet->end(); ++itr) {
             auto key = keyGen(rand);
-            shrinkableMap->insert(std::pair<Shrinkable<Key>, Shrinkable<T>>(*itr, key));
+            shrinkableMap->insert(pair<Shrinkable<Key>, Shrinkable<T>>(*itr, key));
         }
 
         return shrinkMap(shrinkableMap, minSize);
@@ -71,8 +70,8 @@ public:
 };
 
 template <typename Key, typename T>
-size_t Arbi<std::map<Key, T>>::defaultMinSize = 0;
+size_t Arbi<map<Key, T>>::defaultMinSize = 0;
 template <typename Key, typename T>
-size_t Arbi<std::map<Key, T>>::defaultMaxSize = 200;
+size_t Arbi<map<Key, T>>::defaultMaxSize = 200;
 
 }  // namespace proptest

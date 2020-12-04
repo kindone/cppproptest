@@ -1,59 +1,57 @@
 #pragma once
 
-#include <utility>
-#include <tuple>
-#include <type_traits>
+#include "std.hpp"
 
 namespace proptest {
 namespace util {
 
 template <typename Function, typename Tuple, size_t... index>
-decltype(auto) invokeHelper(Function&& f, Tuple&& valueTup, std::index_sequence<index...>)
+decltype(auto) invokeHelper(Function&& f, Tuple&& valueTup, index_sequence<index...>)
 {
-    return f(std::get<index>(std::forward<Tuple>(valueTup))...);
+    return f(get<index>(forward<Tuple>(valueTup))...);
 }
 
 template <typename Function, typename ArgTuple>
 decltype(auto) invokeWithArgTuple(Function&& f, ArgTuple&& argTup)
 {
-    constexpr auto Size = std::tuple_size<ArgTuple>::value;
-    return invokeHelper(std::forward<Function>(f), std::forward<ArgTuple>(argTup), std::make_index_sequence<Size>{});
+    constexpr auto Size = tuple_size<ArgTuple>::value;
+    return invokeHelper(forward<Function>(f), forward<ArgTuple>(argTup), make_index_sequence<Size>{});
 }
 
 template <size_t N, size_t M, typename Tuple, typename Replace>
-std::enable_if_t<N == M, Replace&&> ReplaceHelper(Tuple&&, Replace&& replace)
+enable_if_t<N == M, Replace&&> ReplaceHelper(Tuple&&, Replace&& replace)
 {
-    return std::forward<Replace>(replace);
+    return forward<Replace>(replace);
 }
 
 template <size_t N, size_t M, typename Tuple, typename Replace>
-std::enable_if_t<N != M, std::tuple_element_t<M, Tuple>> ReplaceHelper(Tuple&& valueTup, Replace&&)
+enable_if_t<N != M, tuple_element_t<M, Tuple>> ReplaceHelper(Tuple&& valueTup, Replace&&)
 {
-    return std::get<M>(std::forward<Tuple>(valueTup));
+    return get<M>(forward<Tuple>(valueTup));
 }
 
 template <size_t N, typename Function, typename Tuple, typename Replace, size_t... index>
-decltype(auto) invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&& replace, std::index_sequence<index...>)
+decltype(auto) invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&& replace, index_sequence<index...>)
 {
-    /*static_assert(std::is_same<Replace,
-        typename std::tuple_element<N,Tuple>::type >::value, "");*/
-    return f(ReplaceHelper<N, index>(std::forward<Tuple>(valueTup), std::forward<Replace>(replace))...);
+    /*static_assert(is_same<Replace,
+        typename tuple_element<N,Tuple>::type >::value, "");*/
+    return f(ReplaceHelper<N, index>(forward<Tuple>(valueTup), forward<Replace>(replace))...);
 }
 
 template <size_t N, typename Function, typename ArgTuple, typename Replace>
 decltype(auto) invokeWithArgTupleWithReplace(Function&& f, ArgTuple&& argTup, Replace&& replace)
 {
-    constexpr auto Size = std::tuple_size<ArgTuple>::value;
-    return invokeWithReplaceHelper<N>(std::forward<Function>(f), std::forward<decltype(argTup)>(argTup),
-                                      std::forward<Replace>(replace), std::make_index_sequence<Size>{});
+    constexpr auto Size = tuple_size<ArgTuple>::value;
+    return invokeWithReplaceHelper<N>(forward<Function>(f), forward<decltype(argTup)>(argTup),
+                                      forward<Replace>(replace), make_index_sequence<Size>{});
 }
 
 template <typename Function, typename... Args>
-decltype(auto) invokeWithArgs(Function&& f, const std::tuple<Args...>& argTup)
+decltype(auto) invokeWithArgs(Function&& f, const tuple<Args...>& argTup)
 {
     constexpr auto Size = sizeof...(Args);
-    return invokeHelper(std::forward<Function>(f), std::forward<decltype(argTup)>(argTup),
-                        std::make_index_sequence<Size>{});
+    return invokeHelper(forward<Function>(f), forward<decltype(argTup)>(argTup),
+                        make_index_sequence<Size>{});
 }
 
 }  // namespace util

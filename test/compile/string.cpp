@@ -8,11 +8,11 @@ using namespace proptest;
 TEST(Compile, string)
 {
     Random rand(1);
-    auto gen = Arbi<std::string>();
+    auto gen = Arbi<string>();
     gen(rand);
 }
 
 TEST(Compile, stringGen)
 {
-    Arbi<std::string>(interval('A', 'Z'));
+    Arbi<string>(interval('A', 'Z'));
 }

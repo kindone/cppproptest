@@ -5,11 +5,7 @@
 #include "util.hpp"
 #include "integral.hpp"
 #include "unicode.hpp"
-#include <vector>
-#include <iostream>
-#include <ios>
-#include <iomanip>
-#include <sstream>
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -42,15 +38,15 @@ Arbi<UTF16BEString>::Arbi(GenFunction<uint32_t> _elemGen)
 Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
-    std::vector<uint8_t> chars /*, allocator()*/;
-    std::vector<int> positions /*, allocator()*/;
-    std::vector<uint32_t> codes;
+    vector<uint8_t> chars /*, allocator()*/;
+    vector<int> positions /*, allocator()*/;
+    vector<uint32_t> codes;
 
     chars.reserve(len * 4 + 2);
     codes.reserve(len);
     positions.reserve(len);
 
-    // std::cout << "UTF16 BE gen, len = " << len << std::endl;
+    // cout << "UTF16 BE gen, len = " << len << endl;
 
     for (size_t i = 0; i < len; i++) {
         // U+D800..U+DFFF is forbidden for surrogate use
@@ -76,13 +72,13 @@ Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
             uint8_t c2 = surrogates[1] >> 8;
             uint8_t c3 = surrogates[1] & 0xFF;
             if (!(0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)) {
-                std::stringstream os;
+                stringstream os;
                 os << "invalid surrogate pairs: ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c0) << " ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << " ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2) << " ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c3) << " ";
-                throw std::runtime_error(os.str());
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c0) << " ";
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c1) << " ";
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c2) << " ";
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c3) << " ";
+                throw runtime_error(os.str());
             }
 
             chars.push_back(c0);
@@ -96,12 +92,12 @@ Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
     chars.push_back(0);
 
     if (!util::isValidUTF16BE(chars)) {
-        std::stringstream os;
+        stringstream os;
         os << "not a valid UTF-16 BE string: ";
         for (size_t i = 0; i < chars.size(); i++) {
             os << static_cast<int>(chars[i]) << " ";
         }
-        throw std::runtime_error(os.str());
+        throw runtime_error(os.str());
     }
 
     UTF16BEString str(chars.size(), ' ' /*, allocator()*/);
@@ -141,15 +137,15 @@ Arbi<UTF16LEString>::Arbi(GenFunction<uint32_t> _elemGen)
 Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
-    std::vector<uint8_t> chars /*, allocator()*/;
-    std::vector<int> positions /*, allocator()*/;
-    std::vector<uint32_t> codes;
+    vector<uint8_t> chars /*, allocator()*/;
+    vector<int> positions /*, allocator()*/;
+    vector<uint32_t> codes;
 
     chars.reserve(len * 4);
     codes.reserve(len);
     positions.reserve(len);
 
-    // std::cout << "UTF16 LE gen, len = " << len << std::endl;
+    // cout << "UTF16 LE gen, len = " << len << endl;
 
     for (size_t i = 0; i < len; i++) {
         // U+D800..U+DFFF is forbidden for surrogate use
@@ -175,14 +171,14 @@ Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
             uint8_t c2 = surrogates[1] >> 8;
             uint8_t c3 = surrogates[1] & 0xFF;
             if (!(0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)) {
-                std::stringstream os;
+                stringstream os;
                 os << "invalid surrogate pairs: ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << " ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c0) << " ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c3) << " ";
-                os << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2) << " ";
-                throw std::runtime_error(os.str());
-                // throw std::runtime_error("invalid surrogate pairs: ");
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c1) << " ";
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c0) << " ";
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c3) << " ";
+                os << setfill('0') << setw(2) << hex << static_cast<int>(c2) << " ";
+                throw runtime_error(os.str());
+                // throw runtime_error("invalid surrogate pairs: ");
             }
             chars.push_back(c1);
             chars.push_back(c0);
@@ -195,7 +191,7 @@ Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
     chars.push_back(0);
 
     if (!util::isValidUTF16LE(chars)) {
-        std::stringstream os;
+        stringstream os;
         os << "not a valid UTF-16 LE string: ";
         printf("not a valid UTF-16 LE string: ");
         for (size_t i = 0; i < chars.size(); i++) {
@@ -204,14 +200,14 @@ Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
         }
         printf("\n");
 
-        throw std::runtime_error(os.str());
+        throw runtime_error(os.str());
     }
 
-    // std::cout << "hex = {";
-    // util::UTF16LEToHex(std::cout, chars);
-    // std::cout << "}, decoded = \"";
-    // util::decodeUTF16LE(std::cout, chars);
-    // std::cout << "\"" << std::endl;
+    // cout << "hex = {";
+    // util::UTF16LEToHex(cout, chars);
+    // cout << "}, decoded = \"";
+    // util::decodeUTF16LE(cout, chars);
+    // cout << "\"" << endl;
 
     UTF16LEString str(chars.size(), ' ' /*, allocator()*/);
     for (size_t i = 0; i < chars.size(); i++) {

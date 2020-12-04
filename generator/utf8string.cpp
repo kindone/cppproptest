@@ -5,11 +5,7 @@
 #include "unicode.hpp"
 #include "util.hpp"
 #include "integral.hpp"
-#include <vector>
-#include <iostream>
-#include <ios>
-#include <iomanip>
-#include <sstream>
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -47,15 +43,15 @@ Arbi<UTF8String>::Arbi(GenFunction<uint32_t> _elemGen)
 Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
 {
     size_t len = rand.getRandomSize(minSize, maxSize + 1);
-    std::vector<uint8_t> chars /*, allocator()*/;
-    std::vector<int> positions /*, allocator()*/;
-    std::vector<uint32_t> codes;
+    vector<uint8_t> chars /*, allocator()*/;
+    vector<int> positions /*, allocator()*/;
+    vector<uint32_t> codes;
 
     chars.reserve(len * 4);
     codes.reserve(len);
     positions.reserve(len);
 
-    // std::cout << "utf8 gen, len = " << len << std::endl;
+    // cout << "utf8 gen, len = " << len << endl;
 
     for (size_t i = 0; i < len; i++) {
         // U+D800..U+DFFF is forbidden for surrogate use
@@ -98,7 +94,7 @@ Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
             chars.push_back(c1);
             chars.push_back(c2);
         } else if (code <= 0xDFFF) {
-            throw std::runtime_error("should not reach here. surrogate region");
+            throw runtime_error("should not reach here. surrogate region");
         } else if (code <= 0xFFFF) {
             code -= 0xE000;
             uint8_t c0 = (code >> 12) + 0xee;
@@ -139,13 +135,13 @@ Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
             chars.push_back(c3);
 
         } else {
-            throw std::runtime_error("should not reach here. code too big");
+            throw runtime_error("should not reach here. code too big");
         }
     }
     positions.push_back(chars.size());
 
     if (!util::isValidUTF8(chars)) {
-        std::stringstream os;
+        stringstream os;
         os << "not a valid UTF-8 string: ";
         printf("not a valid UTF-8 string: ");
         for (size_t i = 0; i < chars.size(); i++) {
@@ -154,14 +150,14 @@ Shrinkable<UTF8String> Arbi<UTF8String>::operator()(Random& rand)
         }
         printf("\n");
 
-        throw std::runtime_error(os.str());
+        throw runtime_error(os.str());
     }
 
-    // std::cout << "hex = {";
-    // util::UTF8ToHex(std::cout, chars);
-    // std::cout << "}, decoded = \"";
-    // util::decodeUTF8(std::cout, chars);
-    // std::cout << "\"" << std::endl;
+    // cout << "hex = {";
+    // util::UTF8ToHex(cout, chars);
+    // cout << "}, decoded = \"";
+    // util::decodeUTF8(cout, chars);
+    // cout << "\"" << endl;
 
     UTF8String str(chars.size(), ' ' /*, allocator()*/);
     for (size_t i = 0; i < chars.size(); i++) {

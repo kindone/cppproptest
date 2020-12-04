@@ -3,7 +3,7 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 #include "Stream.hpp"
-#include <iostream>
+#include "../util/std.hpp"
 
 class StreamTestCase : public ::testing::Test {
 };
@@ -15,13 +15,13 @@ TEST(StreamTestCase, Stream)
     int val = -50;  // 0, -25, ... -49
     // recursive
     auto stream = Stream<int>(0, [val]() {
-        static std::function<Stream<int>(int, int)> genpos = [](int min, int val) {
+        static function<Stream<int>(int, int)> genpos = [](int min, int val) {
             if (val <= 0 || (val - min) <= 1)
                 return Stream<int>::empty();
             else
                 return Stream<int>((val + min) / 2, [min, val]() { return genpos((val + min) / 2, val); });
         };
-        static std::function<Stream<int>(int, int)> genneg = [](int max, int val) {
+        static function<Stream<int>(int, int)> genneg = [](int max, int val) {
             if (val >= 0 || (max - val) <= 1)
                 return Stream<int>::empty();
             else
@@ -34,14 +34,14 @@ TEST(StreamTestCase, Stream)
     });
 
     for (auto itr = stream.iterator(); itr.hasNext();) {
-        std::cout << "stream:" << itr.next() << std::endl;
+        cout << "stream:" << itr.next() << endl;
     }
 
     auto emptyIntStream = Stream<int>::empty();
-    auto emptyStrStream = Stream<std::string>::empty();
+    auto emptyStrStream = Stream<string>::empty();
 
     auto emptyTransformed =
-        emptyIntStream.transform<std::string>([](const int& value) { return std::to_string(value); });
+        emptyIntStream.transform<string>([](const int& value) { return to_string(value); });
 
     EXPECT_TRUE(emptyIntStream.isEmpty());
     EXPECT_TRUE(emptyTransformed.isEmpty());
@@ -49,34 +49,34 @@ TEST(StreamTestCase, Stream)
     EXPECT_TRUE(emptyIntStream.take(5).isEmpty());
 
     // empty transform
-    auto emptystrstream = emptyIntStream.transform<std::string>([](const int& value) { return std::to_string(value); });
+    auto emptystrstream = emptyIntStream.transform<string>([](const int& value) { return to_string(value); });
 
     EXPECT_TRUE(emptystrstream.isEmpty());
 
-    auto strstream = stream.transform<std::string>([](const int& value) { return std::to_string(value); });
+    auto strstream = stream.transform<string>([](const int& value) { return to_string(value); });
 
     for (auto itr = strstream.iterator(); itr.hasNext();) {
-        std::cout << "strstream:" << itr.next() << std::endl;
+        cout << "strstream:" << itr.next() << endl;
     }
 
     auto emptyFiltered = emptyIntStream.filter([](const int& val) { return val == 5; });
 
     EXPECT_TRUE(emptyFiltered.isEmpty());
 
-    auto filtered = strstream.filter([](const std::string& str) { return str[1] == '4'; });
+    auto filtered = strstream.filter([](const string& str) { return str[1] == '4'; });
 
     for (auto itr = filtered.iterator(); itr.hasNext();) {
-        std::cout << "filtered:" << itr.next() << std::endl;
+        cout << "filtered:" << itr.next() << endl;
     }
 
     auto concatenated = strstream.concat(filtered);
     for (auto itr = concatenated.iterator(); itr.hasNext();) {
-        std::cout << "concatenated:" << itr.next() << std::endl;
+        cout << "concatenated:" << itr.next() << endl;
     }
 
     auto take = concatenated.take(4);
     for (auto itr = take.iterator(); itr.hasNext();) {
-        std::cout << "take(4):" << itr.next() << std::endl;
+        cout << "take(4):" << itr.next() << endl;
     }
 
     auto emptyConcatEmpty = emptyIntStream.concat(Stream<int>::empty());
@@ -84,11 +84,11 @@ TEST(StreamTestCase, Stream)
 
     auto emptyConcatNonEmpty = emptyStrStream.concat(filtered);
     for (auto itr = emptyConcatNonEmpty.iterator(); itr.hasNext();) {
-        std::cout << "emptyConcatNonEmpty:" << itr.next() << std::endl;
+        cout << "emptyConcatNonEmpty:" << itr.next() << endl;
     }
 
-    auto nonEmptyConcatEmpty = filtered.concat(Stream<std::string>::empty());
+    auto nonEmptyConcatEmpty = filtered.concat(Stream<string>::empty());
     for (auto itr = nonEmptyConcatEmpty.iterator(); itr.hasNext();) {
-        std::cout << "nonEmptyConcatEmpty:" << itr.next() << std::endl;
+        cout << "nonEmptyConcatEmpty:" << itr.next() << endl;
     }
 }

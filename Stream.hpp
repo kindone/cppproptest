@@ -1,7 +1,6 @@
 #pragma once
 
-#include <functional>
-#include <memory>
+#include "util/std.hpp"
 
 namespace proptest {
 
@@ -18,7 +17,7 @@ struct Iterator
     T next()
     {
         if (!hasNext()) {
-            throw std::invalid_argument("iterator has no more next");
+            throw invalid_argument("iterator has no more next");
         }
         T value = stream.head();
         stream = stream.tail();
@@ -34,19 +33,19 @@ struct Stream
     using type = T;
     Stream() {}
     Stream(const Stream& other) : headPtr(other.headPtr), tailGen(other.tailGen) {}
-    Stream(const std::shared_ptr<Stream<T>>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
+    Stream(const shared_ptr<Stream<T>>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
 
-    Stream(const T& h, std::function<Stream<T>()> gen)
-        : headPtr(std::make_shared<T>(h)), tailGen(std::make_shared<std::function<Stream<T>()>>(gen))
+    Stream(const T& h, function<Stream<T>()> gen)
+        : headPtr(make_shared<T>(h)), tailGen(make_shared<function<Stream<T>()>>(gen))
     {
     }
 
-    Stream(const std::shared_ptr<T>& h, std::function<Stream<T>()> gen)
-        : headPtr(h), tailGen(std::make_shared<std::function<Stream<T>()>>(gen))
+    Stream(const shared_ptr<T>& h, function<Stream<T>()> gen)
+        : headPtr(h), tailGen(make_shared<function<Stream<T>()>>(gen))
     {
     }
 
-    Stream(const T& h) : headPtr(std::make_shared<T>(h)), tailGen(std::make_shared<std::function<Stream<T>()>>(done()))
+    Stream(const T& h) : headPtr(make_shared<T>(h)), tailGen(make_shared<function<Stream<T>()>>(done()))
     {
     }
 
@@ -65,14 +64,14 @@ struct Stream
     Iterator<T> iterator() const { return Iterator<T>{Stream<T>{*this}}; }
 
     template <typename U = T>
-    Stream<U> transform(std::function<U(const T&)> transformer)
+    Stream<U> transform(function<U(const T&)> transformer)
     {
-        auto transformerPtr = std::make_shared<decltype(transformer)>(transformer);
+        auto transformerPtr = make_shared<decltype(transformer)>(transformer);
         return transform<U>(transformerPtr);
     }
 
     template <typename U = T>
-    Stream<U> transform(std::shared_ptr<std::function<U(const T&)>> transformerPtr)
+    Stream<U> transform(shared_ptr<function<U(const T&)>> transformerPtr)
     {
         if (isEmpty()) {
             return Stream<U>::empty();
@@ -84,13 +83,13 @@ struct Stream
         }
     }
 
-    Stream<T> filter(std::function<bool(const T&)> criteria) const
+    Stream<T> filter(function<bool(const T&)> criteria) const
     {
-        auto criteriaPtr = std::make_shared<decltype(criteria)>(criteria);
+        auto criteriaPtr = make_shared<decltype(criteria)>(criteria);
         return filter(criteriaPtr);
     }
 
-    Stream<T> filter(std::shared_ptr<std::function<bool(const T&)>> criteriaPtr) const
+    Stream<T> filter(shared_ptr<function<bool(const T&)>> criteriaPtr) const
     {
         if (isEmpty()) {
             return Stream::empty();
@@ -129,12 +128,12 @@ struct Stream
         }
     }
 
-    std::shared_ptr<T> headPtr;
-    std::shared_ptr<std::function<Stream<T>()>> tailGen;
+    shared_ptr<T> headPtr;
+    shared_ptr<function<Stream<T>()>> tailGen;
 
     static Stream<T> empty() { return Stream(); }
 
-    static std::function<Stream<T>()> done()
+    static function<Stream<T>()> done()
     {
         static auto produceEmpty = +[]() -> Stream<T> { return empty(); };
         return produceEmpty;

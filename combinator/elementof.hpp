@@ -1,6 +1,5 @@
 #pragma once
-#include <vector>
-#include <functional>
+#include "../util/std.hpp"
 
 #include "../Random.hpp"
 #include "../assert.hpp"
@@ -23,22 +22,22 @@ namespace util {
 template <typename T>
 struct WeightedValue
 {
-    WeightedValue(std::shared_ptr<T> _valuePtr, double _weight) : valuePtr(_valuePtr), weight(_weight) {}
+    WeightedValue(shared_ptr<T> _valuePtr, double _weight) : valuePtr(_valuePtr), weight(_weight) {}
 
-    std::shared_ptr<T> valuePtr;
+    shared_ptr<T> valuePtr;
     double weight;
 };
 
 template <typename T>
-std::enable_if_t<!std::is_same<std::decay_t<T>, WeightedValue<T>>::value, WeightedValue<T>> ValueToWeighted(T&& value)
+enable_if_t<!is_same<decay_t<T>, WeightedValue<T>>::value, WeightedValue<T>> ValueToWeighted(T&& value)
 {
-    return weightedVal<T>(std::forward<T>(value), 0.0);
+    return weightedVal<T>(forward<T>(value), 0.0);
 }
 
 template <typename T>
 WeightedValue<T> ValueToWeighted(WeightedValue<T>&& weighted)
 {
-    return std::forward<WeightedValue<T>>(weighted);
+    return forward<WeightedValue<T>>(weighted);
 }
 
 template <typename T>
@@ -52,7 +51,7 @@ WeightedValue<T>& ValueToWeighted(WeightedValue<T>& weighted)
 template <typename Impl, typename T>
 util::WeightedValue<T> weightedVal(Impl&& value, double weight)
 {
-    std::shared_ptr<T> valuePtr = std::make_shared<T>(std::forward<Impl>(value));
+    shared_ptr<T> valuePtr = make_shared<T>(forward<Impl>(value));
     return util::WeightedValue<T>(valuePtr, weight);
 }
 
@@ -60,14 +59,14 @@ util::WeightedValue<T> weightedVal(Impl&& value, double weight)
 template <typename T, typename... Impl>
 decltype(auto) elementOf(Impl&&... values)
 {
-    using WeightedValueVec = std::vector<util::WeightedValue<T>>;
-    using WeightedVec = std::vector<util::Weighted<T>>;
-    WeightedValueVec wvaluevec{util::ValueToWeighted<T>(std::forward<Impl>(values))...};
+    using WeightedValueVec = vector<util::WeightedValue<T>>;
+    using WeightedVec = vector<util::Weighted<T>>;
+    WeightedValueVec wvaluevec{util::ValueToWeighted<T>(forward<Impl>(values))...};
 
-    auto genVecPtr = std::make_shared<WeightedVec>();
+    auto genVecPtr = make_shared<WeightedVec>();
 
-    std::transform(
-        wvaluevec.begin(), wvaluevec.end(), std::back_inserter(*genVecPtr),
+    transform(
+        wvaluevec.begin(), wvaluevec.end(), back_inserter(*genVecPtr),
         +[](const util::WeightedValue<T>& wvalue) { return weightedGen<T>(just(wvalue.valuePtr), wvalue.weight); });
 
     return util::oneOfHelper<T>(genVecPtr);

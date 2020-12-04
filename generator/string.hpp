@@ -3,14 +3,14 @@
 #include "../util/utf8string.hpp"
 #include "../util/utf16string.hpp"
 #include "../util/cesu8string.hpp"
-#include <string>
+#include "../util/std.hpp"
 
 namespace proptest {
 
 template <>
-class PROPTEST_API Arbi<std::string> final : public ArbiContainer<std::string> {
-    using ArbiContainer<std::string>::minSize;
-    using ArbiContainer<std::string>::maxSize;
+class PROPTEST_API Arbi<string> final : public ArbiContainer<string> {
+    using ArbiContainer<string>::minSize;
+    using ArbiContainer<string>::maxSize;
 
 public:
     static size_t defaultMinSize;
@@ -20,7 +20,7 @@ public:
     Arbi(Arbi<char>& _elemGen);
     Arbi(GenFunction<char> _elemGen);
 
-    Shrinkable<std::string> operator()(Random& rand) override;
+    Shrinkable<string> operator()(Random& rand) override;
     // FIXME: turn to shared_ptr
     GenFunction<char> elemGen;
 };

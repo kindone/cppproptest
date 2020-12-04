@@ -1,8 +1,7 @@
 #pragma once
 #include "../api.hpp"
-#include <memory>
+#include "../util/std.hpp"
 #include <atomic>
-#include <exception>
 
 namespace proptest {
 namespace util {

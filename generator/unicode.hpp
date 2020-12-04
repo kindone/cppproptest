@@ -3,7 +3,7 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 #include "../api.hpp"
-#include <functional>
+#include "../util/std.hpp"
 
 namespace proptest {
 

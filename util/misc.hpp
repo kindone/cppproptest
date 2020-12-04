@@ -1,14 +1,12 @@
 #pragma once
-#include <iostream>
-#include <ios>
-#include <iomanip>
+#include "std.hpp"
 
 namespace proptest {
 namespace util {
 
 class IosFlagSaver {
 public:
-    explicit IosFlagSaver(std::ostream& _ios);
+    explicit IosFlagSaver(ostream& _ios);
 
     ~IosFlagSaver();
 
@@ -16,8 +14,8 @@ public:
     IosFlagSaver& operator=(const IosFlagSaver& rhs) = delete;
 
 private:
-    std::ostream& ios;
-    std::ios::fmtflags f;
+    ostream& ios;
+    ios::fmtflags f;
 };
 
 }  // namespace util

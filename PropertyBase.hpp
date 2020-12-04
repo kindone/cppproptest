@@ -3,16 +3,16 @@
 #include "api.hpp"
 #include "gen.hpp"
 #include "PropertyContext.hpp"
-#include <sstream>
+#include "util/std.hpp"
 
 #define PROP_EXPECT_STREAM(condition, a, sign, b)                                            \
-    ([&]() -> std::stringstream& {                                                           \
+    ([&]() -> stringstream& {                                                           \
         if (!(condition)) {                                                                  \
-            std::stringstream __prop_expect_stream_str;                                      \
+            stringstream __prop_expect_stream_str;                                      \
             __prop_expect_stream_str << a << sign << b;                                      \
             PropertyBase::fail(__FILE__, __LINE__, #condition, __prop_expect_stream_str);    \
         } else {                                                                             \
-            std::stringstream __prop_expect_stream_str;                                      \
+            stringstream __prop_expect_stream_str;                                      \
             PropertyBase::succeed(__FILE__, __LINE__, #condition, __prop_expect_stream_str); \
         }                                                                                    \
         return PropertyBase::getLastStream();                                                \
@@ -40,20 +40,20 @@
 
 #define PROP_STAT(VALUE)                                                                       \
     do {                                                                                       \
-        std::stringstream __prop_stat_key;                                                     \
+        stringstream __prop_stat_key;                                                     \
         __prop_stat_key << (#VALUE);                                                           \
-        std::stringstream __prop_stat_value;                                                   \
-        __prop_stat_value << std::boolalpha;                                                   \
+        stringstream __prop_stat_value;                                                   \
+        __prop_stat_value << boolalpha;                                                   \
         __prop_stat_value << (VALUE);                                                          \
         PropertyBase::tag(__FILE__, __LINE__, __prop_stat_key.str(), __prop_stat_value.str()); \
     } while (false)
 
 #define PROP_TAG(KEY, VALUE)                                                                   \
     do {                                                                                       \
-        std::stringstream __prop_stat_key;                                                     \
+        stringstream __prop_stat_key;                                                     \
         __prop_stat_key << (KEY);                                                              \
-        std::stringstream __prop_stat_value;                                                   \
-        __prop_stat_value << std::boolalpha;                                                   \
+        stringstream __prop_stat_value;                                                   \
+        __prop_stat_value << boolalpha;                                                   \
         __prop_stat_value << (VALUE);                                                          \
         PropertyBase::tag(__FILE__, __LINE__, __prop_stat_key.str(), __prop_stat_value.str()); \
     } while (false)
@@ -74,10 +74,10 @@ public:
     PropertyBase();
     virtual ~PropertyBase() {}
     static void setDefaultNumRuns(uint32_t);
-    static void tag(const char* filename, int lineno, std::string key, std::string value);
-    static void succeed(const char* filename, int lineno, const char* condition, const std::stringstream& str);
-    static void fail(const char* filename, int lineno, const char* condition, const std::stringstream& str);
-    static std::stringstream& getLastStream();
+    static void tag(const char* filename, int lineno, string key, string value);
+    static void succeed(const char* filename, int lineno, const char* condition, const stringstream& str);
+    static void fail(const char* filename, int lineno, const char* condition, const stringstream& str);
+    static stringstream& getLastStream();
 
 protected:
     static void setContext(PropertyContext* context);

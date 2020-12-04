@@ -2,7 +2,7 @@
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
-#include <iostream>
+#include "../util/std.hpp"
 
 class UtilTestCase : public ::testing::Test {
 };
@@ -10,31 +10,31 @@ class UtilTestCase : public ::testing::Test {
 using namespace proptest;
 using namespace proptest::util;
 
-extern std::ostream& operator<<(std::ostream& os, const std::vector<int>& input);
+extern ostream& operator<<(ostream& os, const vector<int>& input);
 
 TEST(UtilTestCase, invokeTest)
 {
     int arg1 = 5;
-    std::vector<int> arg2;
-    std::string arg3("hello");
+    vector<int> arg2;
+    string arg3("hello");
 
-    auto func = [](int i, std::vector<int> v, std::string s) {
-        std::cout << "i: " << i << " v: " << v << " s: " << s << std::endl;
+    auto func = [](int i, vector<int> v, string s) {
+        cout << "i: " << i << " v: " << v << " s: " << s << endl;
     };
 
-    invokeWithArgTuple(func, std::make_tuple(arg1, arg2, arg3));
-    invokeWithArgs(func, std::make_tuple(arg1, arg2, arg3));
+    invokeWithArgTuple(func, make_tuple(arg1, arg2, arg3));
+    invokeWithArgs(func, make_tuple(arg1, arg2, arg3));
 }
 
 TEST(UtilTestCase, transformTest)
 {
-    transformTuple(transformTuple(std::make_tuple(5, 6, 7),
+    transformTuple(transformTuple(make_tuple(5, 6, 7),
                                   [](int i) {
-                                      std::cout << "n: " << i << std::endl;
-                                      return std::to_string(i);
+                                      cout << "n: " << i << endl;
+                                      return to_string(i);
                                   }),
-                   [](std::string s) {
-                       std::cout << "s: " << s << std::endl;
+                   [](string s) {
+                       cout << "s: " << s << endl;
                        return s.size();
                    });
 }
@@ -45,81 +45,81 @@ struct Transformer;
 template <>
 struct Transformer<int>
 {
-    static std::string transform(int&& v)
+    static string transform(int&& v)
     {
-        std::cout << "Transformer<int> - " << v << std::endl;
-        return std::to_string(v + 1);
+        cout << "Transformer<int> - " << v << endl;
+        return to_string(v + 1);
     }
 };
 
 template <>
-struct Transformer<std::string>
+struct Transformer<string>
 {
-    static int transform(std::string&& v)
+    static int transform(string&& v)
     {
-        std::cout << "Transformer<string> - " << v << std::endl;
+        cout << "Transformer<string> - " << v << endl;
         return v.size();
     }
 };
 
 TEST(UtilTestCase, transformHeteroTest)
 {
-    transformHeteroTuple<Transformer>(std::make_tuple(5, 6, 7));
+    transformHeteroTuple<Transformer>(make_tuple(5, 6, 7));
 }
 
 TEST(UtilTestCase, transformHeteroTest2)
 {
-    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(std::make_tuple(5, 6, 7)));
+    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(make_tuple(5, 6, 7)));
 }
 
 TEST(UtilTestCase, transformHeteroTest3)
 {
     int a = 5;
-    std::string b("a");
-    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(std::make_tuple(a, b, 7)));
+    string b("a");
+    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(make_tuple(a, b, 7)));
 }
 
 template <typename T>
 struct Bind
 {
-    std::string to_string(int a) { return std::to_string(a); }
+    string to_string(int a) { return to_string(a); }
 };
 
 template <template <typename> class T, typename P>
 decltype(auto) callToString(int value)
 {
     T<P> t;
-    std::bind(&T<P>::to_string, &t, value);
+    bind(&T<P>::to_string, &t, value);
 }
 
 TEST(UtilTestCase, stdbind)
 {
     int arg1 = 5;
-    std::vector<int> arg2;
-    std::string arg3("hello");
+    vector<int> arg2;
+    string arg3("hello");
 
-    auto func = [](int i, std::vector<int> v, std::string s) {
-        std::cout << "i: " << i << " v: " << v << " s: " << s << std::endl;
+    auto func = [](int i, vector<int> v, string s) {
+        cout << "i: " << i << " v: " << v << " s: " << s << endl;
     };
 
-    std::bind(func, arg1, arg2, arg3);
+    bind(func, arg1, arg2, arg3);
 
-    Bind<int> bind;
-    std::bind(&Bind<int>::to_string, &bind, 5);
+    Bind<int> b;
+    bind(&Bind<int>::to_string, &b, 5);
 
     callToString<Bind, int>(5);
 }
 
 template <typename... ARGS>
-decltype(auto) doTuple(std::tuple<ARGS...>&)
+decltype(auto) doTuple(tuple<ARGS...>&)
 {
-    util::TypeList<typename std::remove_reference<ARGS>::type...> typeList;
+    util::TypeList<typename remove_reference<ARGS>::type...> typeList;
     return typeList;
 }
 
 TEST(UtilTestCase, TypeList)
 {
-    auto tup = std::make_tuple(1, 2.3, "abc");
+    auto tup = make_tuple(1, 2.3, "abc");
     auto res = doTuple(tup);
     using type_tuple = typename decltype(res)::type_tuple;
     auto tup2 = static_cast<type_tuple>(tup);
@@ -132,8 +132,8 @@ TEST(UtilTestCase, StreamShrink)
     // recursive
     using shrinkable_t = Shrinkable<int>;
     using stream_t = Stream<shrinkable_t>;
-    // using func_t = typename std::function<stream_t()>;
-    using genfunc_t = typename std::function<stream_t(int, int)>;
+    // using func_t = typename function<stream_t()>;
+    using genfunc_t = function<stream_t(int, int)>;
 
     // given min, val, generate stream
     static genfunc_t genpos = [](int min, int val) {
@@ -147,7 +147,7 @@ TEST(UtilTestCase, StreamShrink)
 
     static genfunc_t genneg = [](int max, int val) {
         int mid = val / 2 + max / 2;
-        // std::cout << "      val: " << val << ", mid: " << mid << ", max: " << max << std::endl;
+        // cout << "      val: " << val << ", mid: " << mid << ", max: " << max << endl;
         if (val >= 0 || (max - val) <= 1 || mid == val || mid == max)
             return stream_t::empty();
         else
@@ -155,11 +155,11 @@ TEST(UtilTestCase, StreamShrink)
                             [=]() { return genneg(mid, val); });
     };
 
-    // std::cout << "      val0: " << value << std::endl;
+    // cout << "      val0: " << value << endl;
     auto shr = make_shrinkable<int>(value).with([value]() {
-        // std::cout << "      val1: " << value << std::endl;
+        // cout << "      val1: " << value << endl;
         return stream_t(make_shrinkable<int>(0), [value]() {
-            // std::cout << "      val2: " << value << std::endl;
+            // cout << "      val2: " << value << endl;
             if (value >= 0)
                 return genpos(0, value);
             else
@@ -169,26 +169,26 @@ TEST(UtilTestCase, StreamShrink)
 
     for (auto itr = shr.shrinks().iterator(); itr.hasNext();) {
         auto shrinkable = itr.next();
-        std::cout << "streamshrink:" << shrinkable.get() << std::endl;
+        cout << "streamshrink:" << shrinkable.get() << endl;
         for (auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext();) {
-            std::cout << "  shrink: " << itr2.next().get() << std::endl;
+            cout << "  shrink: " << itr2.next().get() << endl;
         }
     }
 
-    Stream<Shrinkable<std::string>> strstream =
-        shr.shrinks().transform<Shrinkable<std::string>>([](const Shrinkable<int>& value) {
+    Stream<Shrinkable<string>> strstream =
+        shr.shrinks().transform<Shrinkable<string>>([](const Shrinkable<int>& value) {
             auto shrinksPtr = value.shrinksPtr;
-            return make_shrinkable<std::string>(std::to_string(value.get())).with([shrinksPtr]() {
-                return (*shrinksPtr)().transform<Shrinkable<std::string>>(
-                    [](const Shrinkable<int>& v) { return make_shrinkable<std::string>(std::to_string(v.get())); });
+            return make_shrinkable<string>(to_string(value.get())).with([shrinksPtr]() {
+                return (*shrinksPtr)().transform<Shrinkable<string>>(
+                    [](const Shrinkable<int>& v) { return make_shrinkable<string>(to_string(v.get())); });
             });
         });
 
     for (auto itr = strstream.iterator(); itr.hasNext();) {
         auto shrinkable = itr.next();
-        std::cout << "strstreamshrink:" << shrinkable.get() << std::endl;
+        cout << "strstreamshrink:" << shrinkable.get() << endl;
         for (auto itr2 = shrinkable.shrinks().iterator(); itr2.hasNext();) {
-            std::cout << "  shrink: " << itr2.next().get() << std::endl;
+            cout << "  shrink: " << itr2.next().get() << endl;
         }
     }
 }
@@ -199,7 +199,7 @@ TEST(UtilTestCase, Shrinkable)
     int val = 50;
     // recursive
     auto stream = Stream<Shrinkable<int>>(make_shrinkable<int>(val), [val]() {
-        static std::function<Stream<Shrinkable<int>>(int)> gen = [](int val) {
+        static function<Stream<Shrinkable<int>>(int)> gen = [](int val) {
             if (val <= 0)
                 return Stream<Shrinkable<int>>::empty();
             else
@@ -209,14 +209,14 @@ TEST(UtilTestCase, Shrinkable)
     });
 
     for (auto itr = stream.iterator(); itr.hasNext();) {
-        std::cout << "stream:" << itr.next().get() << std::endl;
+        cout << "stream:" << itr.next().get() << endl;
     }
 
     auto shrinkable = make_shrinkable<int>(5).with([=]() { return stream; });
 
     auto stream2 = shrinkable.shrinks();
     for (auto itr = stream.iterator(); itr.hasNext();) {
-        std::cout << "stream2:" << itr.next().get() << std::endl;
+        cout << "stream2:" << itr.next().get() << endl;
     }
 }
 
@@ -230,16 +230,16 @@ TEST(UtilTestCase, ShrinkableNumeric)
 
         for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
             auto shrinkable1 = itr.next();
-            std::cout << "strstreamshrink:" << shrinkable1.get() << std::endl;
+            cout << "strstreamshrink:" << shrinkable1.get() << endl;
             for (auto itr2 = shrinkable1.shrinks().iterator(); itr2.hasNext();) {
                 auto shrinkable2 = itr2.next();
-                std::cout << "  shrink: " << shrinkable2.get() << std::endl;
+                cout << "  shrink: " << shrinkable2.get() << endl;
                 for (auto itr3 = shrinkable2.shrinks().iterator(); itr3.hasNext();) {
                     auto shrinkable3 = itr3.next();
-                    std::cout << "    shrink: " << shrinkable3.get() << std::endl;
+                    cout << "    shrink: " << shrinkable3.get() << endl;
                     for (auto itr4 = shrinkable3.shrinks().iterator(); itr4.hasNext();) {
                         auto shrinkable4 = itr4.next();
-                        std::cout << "      shrink: " << shrinkable4.get() << std::endl;
+                        cout << "      shrink: " << shrinkable4.get() << endl;
                     }
                 }
             }
@@ -249,16 +249,16 @@ TEST(UtilTestCase, ShrinkableNumeric)
 
 TEST(UtilTestCase, ShrinkableString)
 {
-    auto str = std::string("hello world");
+    auto str = string("hello world");
     int len = str.size();
-    auto shrinkable = util::binarySearchShrinkable(len).template map<std::string>(
+    auto shrinkable = util::binarySearchShrinkable(len).template map<string>(
         [str](const int64_t& len) { return str.substr(0, len); });
 
     for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext();) {
         auto shrinkable1 = itr.next();
-        std::cout << "strstreamshrink:" << shrinkable1.get() << std::endl;
+        cout << "strstreamshrink:" << shrinkable1.get() << endl;
         for (auto itr2 = shrinkable1.shrinks().iterator(); itr2.hasNext();) {
-            std::cout << "  shrink: " << itr2.next().get() << std::endl;
+            cout << "  shrink: " << itr2.next().get() << endl;
         }
     }
 }
@@ -271,15 +271,15 @@ struct NoBlank
 
 struct NoCopy
 {
-    NoCopy(int) : id(nextId()) { std::cout << "nocopy create" << id << std::endl; }
+    NoCopy(int) : id(nextId()) { cout << "nocopy create" << id << endl; }
     NoCopy(const NoCopy&) = delete;
     NoCopy& operator=(const NoCopy&) = delete;
     NoCopy(NoCopy&&)
     {
         id = nextId();
-        std::cout << "nocopy move" << id << std::endl;
+        cout << "nocopy move" << id << endl;
     }
-    ~NoCopy() { std::cout << "~nocopy destroy" << id << std::endl; }
+    ~NoCopy() { cout << "~nocopy destroy" << id << endl; }
 
     int id;
     static int maxId;
@@ -290,14 +290,14 @@ int NoCopy::maxId = 1;
 
 struct NoMove
 {
-    NoMove(int) : id(nextId()) { std::cout << "nomove create" << id << std::endl; }
+    NoMove(int) : id(nextId()) { cout << "nomove create" << id << endl; }
     NoMove(const NoMove&)
     {
         id = nextId();
-        std::cout << "nomove copy" << id << std::endl;
+        cout << "nomove copy" << id << endl;
     }
     NoMove(NoMove&& a) = delete;
-    ~NoMove() { std::cout << "~nomove destroy" << id << std::endl; }
+    ~NoMove() { cout << "~nomove destroy" << id << endl; }
 
     int id;
     static int maxId;
@@ -313,26 +313,26 @@ struct NoDelete
 
 TEST(UtilTestCase, ObjectsWithConstraints)
 {
-    // std::tuple<NoBlank> t1(NoBlank(5));
+    // tuple<NoBlank> t1(NoBlank(5));
     {
-        std::tuple<NoCopy> t2(NoCopy(5));
-        std::tuple<NoCopy> t2_2(std::move(std::get<0>(t2)));
-        std::tuple<NoCopy> t2_3(std::move(t2_2));
+        tuple<NoCopy> t2(NoCopy(5));
+        tuple<NoCopy> t2_2(move(get<0>(t2)));
+        tuple<NoCopy> t2_3(move(t2_2));
     }
 
     {
-        std::tuple<NoMove> t3(std::move(NoMove(5)));
-        std::tuple<NoMove> t3_2 = t3;
-        // std::tuple<NoMove> t3_3(std::move(t3));
+        tuple<NoMove> t3(move(NoMove(5)));
+        tuple<NoMove> t3_2 = t3;
+        // tuple<NoMove> t3_3(move(t3));
     }
 
-    // std::tuple<NoBlank> t1_2  = t1;
-    // std::tuple<NoCopy> t2_2  = t2;
-    // std::get<0>(t1) = NoBlank(5);
-    // std::get<0>(t2) = NoCopy(5);
-    // std::get<0>(t3) = NoMove(5);
+    // tuple<NoBlank> t1_2  = t1;
+    // tuple<NoCopy> t2_2  = t2;
+    // get<0>(t1) = NoBlank(5);
+    // get<0>(t2) = NoCopy(5);
+    // get<0>(t3) = NoMove(5);
 
-    // std::tuple<NoDelete>(NoDelete(5));
+    // tuple<NoDelete>(NoDelete(5));
 }
 
 TEST(UtilTestCase, RandomBasic)
@@ -340,7 +340,7 @@ TEST(UtilTestCase, RandomBasic)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 5; i++) {
-        std::cout << "rng: " << rand.getRandomInt32() << std::endl;
+        cout << "rng: " << rand.getRandomInt32() << endl;
     }
 
     // reusuability
@@ -356,7 +356,7 @@ TEST(UtilTestCase, RandomBasic)
 
     for (int i = 0; i < 10; i++) {
         auto r = rand.getRandomSize(0, 2);
-        std::cout << "randomSize(0, 1) : " << r << std::endl;
+        cout << "randomSize(0, 1) : " << r << endl;
     }
 }
 
@@ -373,16 +373,16 @@ TEST(UtilTestCase, Random8)
     {
         int i = 0;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, 0, UINT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, 0, UINT8_MAX)) << endl;
         // UINT8_MAX
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, 0, UINT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, 0, UINT8_MAX)) << endl;
         // UINT8_MAX
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, UINT8_MAX, UINT8_MAX)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, UINT8_MAX, UINT8_MAX))
-                  << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, UINT8_MAX, UINT8_MAX)) << endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, UINT8_MAX, UINT8_MAX))
+                  << endl;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, 0, 0)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, 0, 0)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(0, 0, 0)) << endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt8(UINT8_MAX, 0, 0)) << endl;
     }
 
     static auto getInt8 = [](uint64_t num, int8_t min, int8_t max) -> int8_t {
@@ -394,30 +394,30 @@ TEST(UtilTestCase, Random8)
     {
         int i = 0;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, 0, INT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, 0, INT8_MAX)) << endl;
         // INT8_MAX
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, 0, INT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, 0, INT8_MAX)) << endl;
 
         // INT8_MIN
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MIN, INT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MIN, INT8_MAX)) << endl;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX + 1, INT8_MIN, INT8_MAX))
-                  << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX + 1, INT8_MIN, INT8_MAX))
+                  << endl;
         // INT8_MAX
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MIN, INT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MIN, INT8_MAX)) << endl;
 
         // INT8_MAX
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MAX, INT8_MAX)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, INT8_MAX, INT8_MAX)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MAX, INT8_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MAX, INT8_MAX)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, INT8_MAX, INT8_MAX)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MAX, INT8_MAX)) << endl;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, 0, 0)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, 0, 0)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, 0, 0)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, 0, 0)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, 0, 0)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, 0, 0)) << endl;
         // INT8_MIN
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MIN, INT8_MIN)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, INT8_MIN, INT8_MIN)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MIN, INT8_MIN)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(0, INT8_MIN, INT8_MIN)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(INT8_MAX, INT8_MIN, INT8_MIN)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt8(UINT8_MAX, INT8_MIN, INT8_MIN)) << endl;
     }
 }
 
@@ -436,16 +436,16 @@ TEST(UtilTestCase, Random64)
     {
         int i = 0;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, 0, UINT64_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, 0, UINT64_MAX)) << endl;
         // UINT64_MAX
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, 0, UINT64_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, 0, UINT64_MAX)) << endl;
         // UINT64_MAX
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, UINT64_MAX, UINT64_MAX)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, UINT64_MAX, UINT64_MAX))
-                  << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, UINT64_MAX, UINT64_MAX)) << endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, UINT64_MAX, UINT64_MAX))
+                  << endl;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, 0, 0)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, 0, 0)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(0, 0, 0)) << endl;
+        cout << "num" << i++ << ": " << static_cast<uint64_t>(getUInt64(UINT64_MAX, 0, 0)) << endl;
     }
 
     static auto getInt64 = [](uint64_t num, int64_t min, int64_t max) -> int64_t {
@@ -462,36 +462,36 @@ TEST(UtilTestCase, Random64)
     {
         int i = 0;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, 0, INT64_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, 0, INT64_MAX)) << endl;
         // INT64_MAX
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, 0, INT64_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, 0, INT64_MAX)) << endl;
 
         // INT64_MIN
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MIN, INT64_MAX)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MIN, INT64_MAX)) << endl;
         // 0
-        std::cout << "num" << i++ << ": "
+        cout << "num" << i++ << ": "
                   << static_cast<int64_t>(getInt64(static_cast<uint64_t>(INT64_MAX) + 1, INT64_MIN, INT64_MAX))
-                  << std::endl;
+                  << endl;
         // INT64_MAX
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MIN, INT64_MAX))
-                  << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MIN, INT64_MAX))
+                  << endl;
 
         // INT64_MAX
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MAX, INT64_MAX)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, INT64_MAX, INT64_MAX))
-                  << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MAX, INT64_MAX))
-                  << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MAX, INT64_MAX)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, INT64_MAX, INT64_MAX))
+                  << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MAX, INT64_MAX))
+                  << endl;
         // 0
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, 0, 0)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, 0, 0)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, 0, 0)) << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, 0, 0)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, 0, 0)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, 0, 0)) << endl;
         // INT8_MIN
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MIN, INT64_MIN)) << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, INT64_MIN, INT64_MIN))
-                  << std::endl;
-        std::cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MIN, INT64_MIN))
-                  << std::endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(0, INT64_MIN, INT64_MIN)) << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(INT64_MAX, INT64_MIN, INT64_MIN))
+                  << endl;
+        cout << "num" << i++ << ": " << static_cast<int64_t>(getInt64(UINT64_MAX, INT64_MIN, INT64_MIN))
+                  << endl;
     }
 }
 

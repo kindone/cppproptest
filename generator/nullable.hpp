@@ -1,10 +1,11 @@
 #pragma once
 
-#include <memory>
+
 #include "../gen.hpp"
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 #include "../util/nullable.hpp"
+#include "../util/std.hpp"
 
 namespace proptest {
 

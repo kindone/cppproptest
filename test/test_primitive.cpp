@@ -41,7 +41,7 @@ TYPED_TEST(NumericTest, GenNumericType)
 
     for (int i = 0; i < 20; i++) {
         TypeParam val = gen(rand).get();
-        std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
+        cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << endl;
     }
 }
 
@@ -49,17 +49,17 @@ TYPED_TEST(IntegralTest, GenInRange)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    bool isSigned = std::numeric_limits<TypeParam>::min() < 0;
+    bool isSigned = numeric_limits<TypeParam>::min() < 0;
 
     auto gen0 = isSigned ? interval<TypeParam>(-10, 10) : interval<TypeParam>(0, 20);
     TypeParam min = gen0(rand).get();
     TypeParam max = min + rand.getRandomInt32(0, 10);
     auto gen = interval<TypeParam>(min, max);
-    std::cout << "min: " << min << ", max: " << max << std::endl;
+    cout << "min: " << min << ", max: " << max << endl;
 
     for (int i = 0; i < 20; i++) {
         TypeParam val = gen(rand).getRef();
-        std::cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << std::endl;
+        cout << val << " " << abs<TypeParam>(static_cast<TypeParam>(val)) << endl;
     }
 }
 
@@ -71,7 +71,7 @@ TEST(PropTest, GenerateBool)
 
     for (int i = 0; i < 20; i++) {
         bool val = gen(rand).get();
-        std::cout << val << " " << std::endl;
+        cout << val << " " << endl;
     }
 }
 
@@ -80,11 +80,11 @@ TEST(PropTest, GenString)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto alphabets = interval<char>('A', 'z');
-    Arbi<std::string> gen(alphabets);
+    Arbi<string> gen(alphabets);
     gen.setSize(5);
 
     for (int i = 0; i < 20; i++) {
-        std::cout << "str: \"" << static_cast<std::string>(gen(rand).getRef()) << "\"" << std::endl;
+        cout << "str: \"" << static_cast<string>(gen(rand).getRef()) << "\"" << endl;
     }
 }
 
@@ -93,12 +93,12 @@ TEST(PropTest, GenString2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto alphabets = interval<char>('A', 'z');
-    Arbi<std::string> gen(alphabets);
+    Arbi<string> gen(alphabets);
     gen.setSize(1, 4);
 
     for (int i = 0; i < 3; i++) {
         auto shr = gen(rand);
-        std::cout << "str: \"" << static_cast<std::string>(shr.getRef()) << "\"" << std::endl;
+        cout << "str: \"" << static_cast<string>(shr.getRef()) << "\"" << endl;
         exhaustive(shr, 0);
     }
 }
@@ -111,7 +111,7 @@ void testUTF8(PropertyContext& context, Random rand)
     for (int i = 0; i < 100000; i++) {
         UTF8String str = static_cast<UTF8String>(gen(rand).getRef());
         uint8_t c0 = str[0];
-        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+        context.tag(__FILE__, __LINE__, "charsize", to_string(str.charsize()));
         if (str.size() == 1) {
             if (c0 <= 0x7f)
                 context.tag(__FILE__, __LINE__, "UTF-8 code", "1 byte U+0001..U+007F");
@@ -158,7 +158,7 @@ void testUTF8(PropertyContext& context, Random rand)
             context.tag(__FILE__, __LINE__, "UTF-8 code coarse", "U+10000..U+10FFFF");
         } else
             context.tag(__FILE__, __LINE__, "UTF-8 code", "error");
-        // std::cout << "str: " << static_cast<CESU8String>(gen(rand).getRef()) << std::endl;
+        // cout << "str: " << static_cast<CESU8String>(gen(rand).getRef()) << endl;
     }
 }
 
@@ -172,15 +172,15 @@ void testUTF32(PropertyContext& context, Random rand)
         if (code <= 0xD7FF)
             context.tag(
                 __FILE__, __LINE__, "code",
-                "U+0001..U+D7FF (" + std::to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
+                "U+0001..U+D7FF (" + to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
         else if (0xE000 <= code && code <= 0xFFFF)
             context.tag(
                 __FILE__, __LINE__, "code",
-                "U+E000..U+FFFF (" + std::to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
+                "U+E000..U+FFFF (" + to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
         else
             context.tag(__FILE__, __LINE__, "code",
                         "U+10000..U+10FFFF(" +
-                            std::to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
+                            to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
     }
 }
 
@@ -195,18 +195,18 @@ void testUTF16BE(PropertyContext& context, Random rand)
         UTF16BEString str = static_cast<UTF16BEString>(gen(rand).getRef());
         str.charsize();
         uint8_t c0 = str[0];
-        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+        context.tag(__FILE__, __LINE__, "charsize", to_string(str.charsize()));
         if (str.size() == 1) {
             context.tag(__FILE__, __LINE__, "UTF-16 BE code", "1 byte error");
         } else if (str.size() == 2) {
             if (c0 <= 0xD7)
                 context.tag(__FILE__, __LINE__, "UTF-16 BE code",
                             "2 bytes U+0001..U+D7FF (" +
-                                std::to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
+                                to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
             else if (0xE0 <= c0)
                 context.tag(__FILE__, __LINE__, "UTF-16 BE code",
                             "2 bytes U+E000..U+FFFF (" +
-                                std::to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
+                                to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
             else
                 context.tag(__FILE__, __LINE__, "UTF-16 BE code", "2 byte error");
         } else if (str.size() == 3) {
@@ -216,7 +216,7 @@ void testUTF16BE(PropertyContext& context, Random rand)
             if (0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)
                 context.tag(__FILE__, __LINE__, "UTF-16 BE code",
                             "4 bytes U+10000..U+10FFFF(" +
-                                std::to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
+                                to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
             else
                 context.tag(__FILE__, __LINE__, "UTF-16 BE code", "4 bytes error");
         } else
@@ -235,21 +235,21 @@ void testUTF16LE(PropertyContext& context, Random rand)
         UTF16LEString str = static_cast<UTF16LEString>(gen(rand).getRef());
         str.charsize();
         uint8_t c0 = str[1];
-        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+        context.tag(__FILE__, __LINE__, "charsize", to_string(str.charsize()));
         if (str.size() == 1) {
             context.tag(__FILE__, __LINE__, "UTF-16 LE code", "1 byte error");
         } else if (str.size() == 2) {
             if (c0 <= 0xD7)
                 context.tag(__FILE__, __LINE__, "UTF-16 LE code",
                             "2 bytes U+0001..U+D7FF (" +
-                                std::to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
+                                to_string(static_cast<double>(0xD7FF - 0x0001 + 1) / rangeSize * 100) + "%)");
             else if (0xE0 <= c0)
                 context.tag(__FILE__, __LINE__, "UTF-16 LE code",
                             "2 bytes U+E000..U+FFFF (" +
-                                std::to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
+                                to_string(static_cast<double>(0xFFFF - 0xE000 + 1) / rangeSize * 100) + "%)");
             else
                 context.tag(__FILE__, __LINE__, "UTF-16 LE code",
-                            "2 byte error: " + std::to_string(static_cast<int>(c0)));
+                            "2 byte error: " + to_string(static_cast<int>(c0)));
         } else if (str.size() == 3) {
             context.tag(__FILE__, __LINE__, "UTF-16 LE code", "3 bytes error");
         } else if (str.size() == 4) {
@@ -257,7 +257,7 @@ void testUTF16LE(PropertyContext& context, Random rand)
             if (0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)
                 context.tag(__FILE__, __LINE__, "UTF-16 LE code",
                             "4 bytes U+10000..U+10FFFF(" +
-                                std::to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
+                                to_string(static_cast<double>(0x10FFFF - 0x10000 + 1) / rangeSize * 100) + "%)");
             else
                 context.tag(__FILE__, __LINE__, "UTF-16 LE code", "4 bytes error");
         } else
@@ -274,7 +274,7 @@ void testCESU8(PropertyContext& context, Random rand)
         CESU8String str = static_cast<CESU8String>(gen(rand).getRef());
         uint8_t c0 = str[0];
 
-        context.tag(__FILE__, __LINE__, "charsize", std::to_string(str.charsize()));
+        context.tag(__FILE__, __LINE__, "charsize", to_string(str.charsize()));
 
         if (str.size() == 1) {
             if (c0 <= 0x7f)
@@ -313,7 +313,7 @@ void testCESU8(PropertyContext& context, Random rand)
                 context.tag(__FILE__, __LINE__, "CESU-8 code", "6 bytes error");
         } else
             context.tag(__FILE__, __LINE__, "CESU-8 code", "error");
-        // std::cout << "str: " << static_cast<CESU8String>(gen(rand).getRef()) << std::endl;
+        // cout << "str: " << static_cast<CESU8String>(gen(rand).getRef()) << endl;
     }
 }
 
@@ -350,7 +350,7 @@ TEST(PropTest, GenUTF8String2)
 
     for (int i = 0; i < 3; i++) {
         auto shr = gen(rand);
-        std::cout << "str: \"" << static_cast<UTF8String>(shr.getRef()) << "\"" << std::endl;
+        cout << "str: \"" << static_cast<UTF8String>(shr.getRef()) << "\"" << endl;
         exhaustive(shr, 0);
     }
 }
@@ -374,7 +374,7 @@ TEST(PropTest, GenUTF16BEString2)
 
     for (int i = 0; i < 3; i++) {
         auto shr = gen(rand);
-        std::cout << "str: \"" << static_cast<UTF16BEString>(shr.getRef()) << "\"" << std::endl;
+        cout << "str: \"" << static_cast<UTF16BEString>(shr.getRef()) << "\"" << endl;
         exhaustive(shr, 0);
     }
 }
@@ -398,7 +398,7 @@ TEST(PropTest, GenUTF16LEString2)
 
     for (int i = 0; i < 3; i++) {
         auto shr = gen(rand);
-        std::cout << "str: \"" << static_cast<UTF16LEString>(shr.getRef()) << "\"" << std::endl;
+        cout << "str: \"" << static_cast<UTF16LEString>(shr.getRef()) << "\"" << endl;
         exhaustive(shr, 0);
     }
 }
@@ -422,7 +422,7 @@ TEST(PropTest, GenCESU8String2)
 
     for (int i = 0; i < 3; i++) {
         auto shr = gen(rand);
-        std::cout << "str: \"" << static_cast<CESU8String>(shr.getRef()) << "\"" << std::endl;
+        cout << "str: \"" << static_cast<CESU8String>(shr.getRef()) << "\"" << endl;
         exhaustive(shr, 0);
     }
 }
@@ -431,9 +431,9 @@ TEST(PropTest, GenSharedPtr)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<std::shared_ptr<int>> gen;
+    Arbi<shared_ptr<int>> gen;
     for (int i = 0; i < 20; i++) {
-        std::cout << "int: " << *gen(rand).getRef() << std::endl;
+        cout << "int: " << *gen(rand).getRef() << endl;
     }
 }
 
@@ -441,12 +441,12 @@ TEST(PropTest, GenSet)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<std::set<int>> gen;
+    Arbi<set<int>> gen;
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
     // for (int i = 0; i < 20; i++) {
-    //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    //     cout << "int: " << *gen(rand).getRef() << endl;
     // }
 }
 
@@ -454,12 +454,12 @@ TEST(PropTest, GenMap)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<std::map<int, int>> gen;
+    Arbi<map<int, int>> gen;
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
     // for (int i = 0; i < 20; i++) {
-    //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    //     cout << "int: " << *gen(rand).getRef() << endl;
     // }
 }
 
@@ -467,14 +467,14 @@ TEST(PropTest, GenMap2)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<std::map<int, int>> gen;
+    Arbi<map<int, int>> gen;
     gen.setMaxSize(8);
     gen.setElemGen(integers<int>(0, 100));
     gen.setKeyGen(Arbi<int>());
     auto shr = gen(rand);
     exhaustive(shr, 0);
     // for (int i = 0; i < 20; i++) {
-    //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    //     cout << "int: " << *gen(rand).getRef() << endl;
     // }
 }
 
@@ -482,12 +482,12 @@ TEST(PropTest, GenList)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<std::list<int>> gen(integers<int>(0, 100));
+    Arbi<list<int>> gen(integers<int>(0, 100));
     gen.setMaxSize(8);
     auto shr = gen(rand);
     exhaustive(shr, 0);
     // for (int i = 0; i < 20; i++) {
-    //     std::cout << "int: " << *gen(rand).getRef() << std::endl;
+    //     cout << "int: " << *gen(rand).getRef() << endl;
     // }
 }
 
@@ -497,12 +497,12 @@ TEST(PropTest, DISABLED_GenLargeVector)
     Random rand(seed);
     for(int i = 1 ; i < INT_MAX/16; i*=2) {
         static uint64_t time = getCurrentTime();
-        std::cout << "starting generation: vector of size " << i << std::endl;
-        Arbi<std::vector<int>> gen(integers<int>(0, 100));
+        cout << "starting generation: vector of size " << i << endl;
+        Arbi<vector<int>> gen(integers<int>(0, 100));
         gen.setSize(i);
         gen(rand);
         uint64_t elapsed = (getCurrentTime() - time) / 1000;
-        std::cout << "vector of size " << i << " generated in " << elapsed << " seconds" << std::endl;
+        cout << "vector of size " << i << " generated in " << elapsed << " seconds" << endl;
     }
 }
 
@@ -510,14 +510,14 @@ TEST(PropTest, GenNullable)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<std::list<int>> gen(integers<int>(0, 100));
+    Arbi<list<int>> gen(integers<int>(0, 100));
     gen.setMaxSize(8);
-    Arbi<Nullable<std::list<int>>> nullableGen(gen);
+    Arbi<Nullable<list<int>>> nullableGen(gen);
     auto shr = nullableGen(rand);
     // exhaustive(shr, 0);
 
     for (int i = 0; i < 100; i++) {
-        std::cout << "int: " << nullableGen(rand).getRef() << std::endl;
+        cout << "int: " << nullableGen(rand).getRef() << endl;
     }
 
     // exhaustive(nullableGen(rand), 0);

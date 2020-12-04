@@ -10,20 +10,20 @@ template <typename GEN>
 decltype(auto) generator(GEN&& gen);
 
 template <typename T>
-Shrinkable<T> generateInteger(Random& rand, T min = std::numeric_limits<T>::min(),
-                              T max = std::numeric_limits<T>::max())
+Shrinkable<T> generateInteger(Random& rand, T min = numeric_limits<T>::min(),
+                              T max = numeric_limits<T>::max())
 {
     T value = 0;
-    if (min == std::numeric_limits<T>::min() && max == std::numeric_limits<T>::max() && rand.getRandomBool()) {
+    if (min == numeric_limits<T>::min() && max == numeric_limits<T>::max() && rand.getRandomBool()) {
         uint32_t i = rand.getRandomSize(0, sizeof(Arbi<T>::boundaryValues) / sizeof(Arbi<T>::boundaryValues[0]));
         value = Arbi<T>::boundaryValues[i];
-    } else if (std::numeric_limits<T>::min() < 0)
+    } else if (numeric_limits<T>::min() < 0)
         value = rand.getRandom<T>(min, max);
     else
         value = rand.getRandomU<T>(min, max);
 
     if (value < min || max < value)
-        throw std::runtime_error("invalid range");
+        throw runtime_error("invalid range");
 
     if (min >= 0)  // [3,5] -> [0,2] -> [3,5]
     {
@@ -246,7 +246,7 @@ public:
  * Generates a positive integer, excluding 0
  */
 template <typename T>
-Generator<T> natural(T max = std::numeric_limits<T>::max())
+Generator<T> natural(T max = numeric_limits<T>::max())
 {
     return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
 }
@@ -255,7 +255,7 @@ Generator<T> natural(T max = std::numeric_limits<T>::max())
  * Generates 0 or a positive integer
  */
 template <typename T>
-Generator<T> nonNegative(T max = std::numeric_limits<T>::max())
+Generator<T> nonNegative(T max = numeric_limits<T>::max())
 {
     return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
 }

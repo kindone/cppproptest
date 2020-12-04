@@ -1,14 +1,10 @@
 #include "PropertyContext.hpp"
 #include "PropertyBase.hpp"
-#include <string>
-#include <sstream>
-#include <map>
-#include <stdexcept>
-#include <utility>
+#include "util/std.hpp"
 
 namespace proptest {
 
-std::ostream& operator<<(std::ostream& os, const Failure& f)
+ostream& operator<<(ostream& os, const Failure& f)
 {
     auto detail = f.str.str();
     if (detail.empty())
@@ -28,7 +24,7 @@ PropertyContext::~PropertyContext()
     PropertyBase::setContext(oldContext);
 }
 
-void PropertyContext::tag(const char* file, int lineno, std::string key, std::string value)
+void PropertyContext::tag(const char* file, int lineno, string key, string value)
 {
     auto itr = tags.find(key);
     // key already exists
@@ -40,51 +36,51 @@ void PropertyContext::tag(const char* file, int lineno, std::string key, std::st
             auto& tag = valueItr->second;
             tag.count++;
         } else {
-            valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
+            valueMap.insert(pair<string, Tag>(value, Tag(file, lineno, value)));
         }
     } else {
-        std::map<std::string, Tag> valueMap;
-        valueMap.insert(std::pair<std::string, Tag>(value, Tag(file, lineno, value)));
-        tags.insert(std::pair<std::string, std::map<std::string, Tag>>(key, valueMap));
+        map<string, Tag> valueMap;
+        valueMap.insert(pair<string, Tag>(value, Tag(file, lineno, value)));
+        tags.insert(pair<string, map<string, Tag>>(key, valueMap));
     }
 }
 
-void PropertyContext::succeed(const char*, int, const char*, const std::stringstream&)
+void PropertyContext::succeed(const char*, int, const char*, const stringstream&)
 {
     // DO NOTHING
     lastStreamExists = false;
 }
 
-void PropertyContext::fail(const char* filename, int lineno, const char* condition, const std::stringstream& str)
+void PropertyContext::fail(const char* filename, int lineno, const char* condition, const stringstream& str)
 {
     failures.push_back(Failure(filename, lineno, condition, str));
     lastStreamExists = true;
 }
 
-std::stringstream& PropertyContext::getLastStream()
+stringstream& PropertyContext::getLastStream()
 {
-    static std::stringstream defaultStr;
+    static stringstream defaultStr;
     if (failures.empty() || !lastStreamExists)
         return defaultStr;
 
     return failures.back().str;
 }
 
-std::stringstream PropertyContext::flushFailures(int indent)
+stringstream PropertyContext::flushFailures(int indent)
 {
-    const auto doIndent = +[](std::stringstream& str, int indent) {
+    const auto doIndent = +[](stringstream& str, int indent) {
         for (int i = 0; i < indent; i++)
             str << " ";
     };
 
-    std::stringstream allFailures;
+    stringstream allFailures;
     auto itr = failures.begin();
     if (itr != failures.end()) {
         // doIndent(allFailures, indent);
         allFailures << *itr++;
     }
     for (; itr != failures.end(); ++itr) {
-        allFailures << "," << std::endl;
+        allFailures << "," << endl;
         doIndent(allFailures, indent);
         allFailures << *itr;
     }
@@ -97,7 +93,7 @@ void PropertyContext::printSummary()
     for (auto tagKV : tags) {
         auto& key = tagKV.first;
         auto& valueMap = tagKV.second;
-        std::cout << "  " << key << ": " << std::endl;
+        cout << "  " << key << ": " << endl;
         size_t total = 0;
         for (auto valueKV : valueMap) {
             auto tag = valueKV.second;
@@ -107,8 +103,8 @@ void PropertyContext::printSummary()
         for (auto valueKV : valueMap) {
             auto value = valueKV.first;
             auto tag = valueKV.second;
-            std::cout << "    " << value << ": " << tag.count << "/" << total << " ("
-                      << static_cast<double>(tag.count) / total * 100 << "%)" << std::endl;
+            cout << "    " << value << ": " << tag.count << "/" << total << " ("
+                      << static_cast<double>(tag.count) / total * 100 << "%)" << endl;
         }
     }
 }

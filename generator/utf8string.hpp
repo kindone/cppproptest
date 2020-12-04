@@ -1,7 +1,7 @@
 #pragma once
 #include "../gen.hpp"
 #include "../util/utf8string.hpp"
-#include <string>
+#include "../util/std.hpp"
 
 namespace proptest {
 

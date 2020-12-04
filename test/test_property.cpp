@@ -4,14 +4,14 @@ using namespace proptest;
 
 TEST(PropTest, TestCheckAssert)
 {
-    forAll([](std::string a, int i, std::string b) -> bool {
+    forAll([](string a, int i, string b) -> bool {
         if (i % 2 == 0)
             PROP_DISCARD();
         PROP_EXPECT_STREQ2(a.c_str(), b.c_str(), a.size(), b.size());
         return true;
     });
 
-    forAll([](std::string a, int i, std::string b) -> bool {
+    forAll([](string a, int i, string b) -> bool {
         if (i % 2 == 0)
             PROP_SUCCESS();
 
@@ -23,17 +23,17 @@ TEST(PropTest, TestCheckAssert)
 
 TEST(PropTest, TestPropertyBasic)
 {
-    property([](std::vector<int> a) -> bool {
+    property([](vector<int> a) -> bool {
         PROP_STAT(a.size() > 5);
         return true;
     }).forAll();
 
-    auto func = [](std::vector<int>) -> bool { return true; };
+    auto func = [](vector<int>) -> bool { return true; };
 
     property(func).forAll();
     forAll(func);
 
-    auto prop = property([](std::string, int i, std::string) -> bool {
+    auto prop = property([](string, int i, string) -> bool {
         PROP_STAT(i > 0);
         PROP_ASSERT(false);
         return true;
@@ -42,28 +42,28 @@ TEST(PropTest, TestPropertyBasic)
     // chaining
     prop.setSeed(0).forAll();
     // with specific arguments
-    prop.example(std::string("hello"), 10, std::string("world"));
-    prop.forAll(elementOf<std::string>("", std::string("a")), just(10), elementOf<std::string>(std::string(""), std::string("b")));
+    prop.example(string("hello"), 10, string("world"));
+    prop.forAll(elementOf<string>("", string("a")), just(10), elementOf<string>(string(""), string("b")));
 
     // with specific generators
-    std::string empty("s");
-    prop.forAll(just<std::string>(empty), Arbi<int>(), just<std::string>(std::to_string(1)));
+    string empty("s");
+    prop.forAll(just<string>(empty), Arbi<int>(), just<string>(to_string(1)));
 }
 
 TEST(PropTest, TestPropertyExample)
 {
-    auto func = [](std::string, int i, std::string) -> bool {
+    auto func = [](string, int i, string) -> bool {
         PROP_STAT(i > 0);
         return false;
     };
     auto prop = property(func);
     // with specific arguments
-    EXPECT_FALSE(prop.example(std::string("hello"), 10, std::string("world")));
+    EXPECT_FALSE(prop.example(string("hello"), 10, string("world")));
 }
 
 TYPED_TEST(SignedNumericTest, TestCheckFail)
 {
-    forAll([](TypeParam a, TypeParam b /*,std::string str, std::vector<int> vec*/) -> bool {
+    forAll([](TypeParam a, TypeParam b /*,string str, vector<int> vec*/) -> bool {
         PROP_ASSERT(-10 < a && a < 100 && -20 < b && b < 200);
         return true;
     });
@@ -82,10 +82,10 @@ TEST(PropTest, TestCheckBasic)
         return true;
     });
 
-    std::string a = "Hello";
-    std::string b = "World";
-    forAll([](std::string a, std::string b) -> bool {
-        std::string c /*(allocator())*/, d /*(allocator())*/;
+    string a = "Hello";
+    string b = "World";
+    forAll([](string a, string b) -> bool {
+        string c /*(allocator())*/, d /*(allocator())*/;
         c = a + b;
         d = b + a;
         EXPECT_EQ(c.size(), d.size());
@@ -95,7 +95,7 @@ TEST(PropTest, TestCheckBasic)
     });
 
     forAll([=](UTF8String a, UTF8String b) -> bool {
-        std::string c /*(allocator())*/, d /*(allocator())*/;
+        string c /*(allocator())*/, d /*(allocator())*/;
         c = a + b;
         d = b + a;
         PROP_ASSERT(c.size() == d.size());
@@ -141,8 +141,8 @@ TEST(PropTest, TestCheckBit)
 
 TEST(PropTest, TestCheckWithGen)
 {
-    /*check([](std::vector<int> a) -> bool {
-        std::cout << "a: " << a << std::endl;
+    /*check([](vector<int> a) -> bool {
+        cout << "a: " << a << endl;
         PROP_TAG("a.size() > 0", a.size() > 5);
         return true;
     });*/
@@ -173,7 +173,7 @@ TEST(PropTest, TestCheckWithGen)
         genSmallInt, genSmallInt);
 
     forAll(
-        [](int a, std::string b) {
+        [](int a, string b) {
             PROP_STAT(a > 0);
             PROP_STAT(b.size() > 0);
         },
@@ -182,7 +182,7 @@ TEST(PropTest, TestCheckWithGen)
 
 TEST(PropTest, TestStringCheckFail)
 {
-    forAll([](std::string a) {
+    forAll([](string a) {
         PROP_STAT(a.size() > 3);
         PROP_ASSERT(a.size() < 5);
     });
@@ -213,17 +213,17 @@ TEST(PropTest, TestUnicodeStringCheckFail)
 
 TEST(PropTest, TestStringCheckFail2)
 {
-    forAll([](std::string a) {
+    forAll([](string a) {
         PROP_STAT(a.size() > 3);
         PROP_EXPECT(a.size() < 5);
     });
 
-    forAll([](std::string a) {
+    forAll([](string a) {
         PROP_STAT(a.size() > 3);
         return a.size() < 5;
     });
 
-    forAll([](std::string a) {
+    forAll([](string a) {
         PROP_STAT(a.size() > 3);
         PROP_EXPECT(a.size() < 5);
         PROP_EXPECT_LT(a.size(), 6);
@@ -232,21 +232,21 @@ TEST(PropTest, TestStringCheckFail2)
 
 TEST(PropTest, TestVectorCheckFail)
 {
-    std::vector<int> vec;
+    vector<int> vec;
     vec.push_back(5);
-    auto tup = std::make_tuple(vec);
-    // std::cout << "tuple: ";
-    show(std::cout, tup);
-    std::cout << std::endl;
+    auto tup = make_tuple(vec);
+    // cout << "tuple: ";
+    show(cout, tup);
+    cout << endl;
 
-    auto vecGen = Arbi<std::vector<int>>();
+    auto vecGen = Arbi<vector<int>>();
     vecGen.setMaxSize(32);
 
     forAll(
-        [](std::vector<int> a) {
+        [](vector<int> a) {
             PROP_STAT(a.size() > 3);
-            show(std::cout, a);
-            std::cout << std::endl;
+            show(cout, a);
+            cout << endl;
             PROP_EXPECT_LT(a.size(), 5) << "synthesized failure1";
             PROP_EXPECT_LT(a.size(), 4) << "synthesized failure2";
         },
@@ -255,27 +255,24 @@ TEST(PropTest, TestVectorCheckFail)
 
 TEST(PropTest, TestTupleCheckFail)
 {
-    forAll([](std::tuple<int, std::tuple<int>> tuple) {
-        // std::cout << "tuple: ";
-        // show(std::cout, tuple);
-        // std::cout << std::endl;
-        int a = std::get<0>(tuple);
-        std::tuple<int> subtup = std::get<1>(tuple);
-        int b = std::get<0>(subtup);
+    forAll([](tuple<int, tuple<int>> tup) {
+        int a = get<0>(tup);
+        tuple<int> subtup = get<1>(tup);
+        int b = get<0>(subtup);
         PROP_ASSERT((-10 < a && a < 100) || (-20 < b && b < 200));
     });
 }
 
-bool propertyAsFunc(std::string, int, std::vector<int>)
+bool propertyAsFunc(string, int, vector<int>)
 {
     return true;
 }
 
 class PropertyAsClass {
 public:
-    bool operator()(std::string, int, std::vector<int>) { return true; }
+    bool operator()(string, int, vector<int>) { return true; }
 
-    static bool propertyAsMethod(std::string, int, std::vector<int>) { return true; }
+    static bool propertyAsMethod(string, int, vector<int>) { return true; }
 };
 
 TEST(PropTest, TestPropertyFunctionLambdaMethod)
@@ -297,7 +294,7 @@ namespace util {
 template <>
 struct ShowDefault<Animal>
 {
-    static std::ostream& show(std::ostream& os, const Animal& a)
+    static ostream& show(ostream& os, const Animal& a)
     {
         os << "numFeet: " << a.numFeet << ", name: " << a.name << ", measures: ";
         if (!a.measures.empty()) {
@@ -319,19 +316,19 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto vecGen = Arbi<std::vector<int>>();
+    auto vecGen = Arbi<vector<int>>();
     vecGen.setMaxSize(20);
-    auto animal = construct<Animal, int, std::string, std::vector<int>&>(Arbi<int>(), Arbi<std::string>(), vecGen);
-    auto animalVecGen = Arbi<std::vector<Animal>>(animal);
+    auto animal = construct<Animal, int, string, vector<int>&>(Arbi<int>(), Arbi<string>(), vecGen);
+    auto animalVecGen = Arbi<vector<Animal>>(animal);
     animalVecGen.setMaxSize(20);
 
     EXPECT_FOR_ALL(
-        [](std::vector<Animal> animals) {
-            // std::cout << "animal " << i++ << std::endl;
+        [](vector<Animal> animals) {
+            // cout << "animal " << i++ << endl;
             if (!animals.empty()) {
                 for (auto animal : animals) {
                     if (animal.name.size() < 5 && animal.measures.size() < 5)
-                        show(std::cout, animal);
+                        show(cout, animal);
                 }
                 PROP_STAT(animals.size() > 3);
             }
@@ -341,8 +338,8 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
 
 decltype(auto) dummyProperty()
 {
-    using Type = std::function<int()>;
-    std::shared_ptr<Type> modelPtr = std::make_shared<Type>([]() { return 0; });
+    using Type = function<int()>;
+    shared_ptr<Type> modelPtr = make_shared<Type>([]() { return 0; });
     return property([modelPtr](int) {
         auto model = *modelPtr;
         PROP_STAT(model() > 2);
@@ -357,7 +354,7 @@ TEST(StateTest, PropertyCapture)
 
 TEST(PropTest, DISABLED_TestExpectDeath)
 {
-    forAll([](std::vector<int> vec, uint64_t n) {
+    forAll([](vector<int> vec, uint64_t n) {
         auto dangerous = [&vec, n]() { vec[vec.size() - 1 + n] = 100; };
         dangerous();
         // EXPECT_DEATH(, ".*") << "vector: " << vec.size() << ", n: " << n;

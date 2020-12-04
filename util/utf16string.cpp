@@ -1,8 +1,7 @@
 #include "../api.hpp"
 #include "utf16string.hpp"
 #include "unicode.hpp"
-#include <stdexcept>
-#include <sstream>
+#include "std.hpp"
 
 namespace proptest {
 
@@ -10,12 +9,12 @@ size_t UTF16BEString::charsize() const
 {
     int size = util::UTF16BECharSize(*this);
     if (size < 0) {
-        std::stringstream str;
+        stringstream str;
         str << "Not a valid UTF-16 BE string: ";
         for (size_t i = 0; i < this->size(); i++) {
-            str << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>((*this)[i]) << " ";
+            str << setfill('0') << setw(2) << hex << static_cast<int>((*this)[i]) << " ";
         }
-        throw std::runtime_error(str.str());
+        throw runtime_error(str.str());
     }
 
     return static_cast<size_t>(size);
@@ -25,12 +24,12 @@ size_t UTF16LEString::charsize() const
 {
     int size = util::UTF16LECharSize(*this);
     if (size < 0) {
-        std::stringstream str;
+        stringstream str;
         str << "Not a valid UTF-16 LE string: ";
         for (size_t i = 0; i < this->size(); i++) {
-            str << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>((*this)[i]) << " ";
+            str << setfill('0') << setw(2) << hex << static_cast<int>((*this)[i]) << " ";
         }
-        throw std::runtime_error(str.str());
+        throw runtime_error(str.str());
     }
 
     return static_cast<size_t>(size);
@@ -38,9 +37,9 @@ size_t UTF16LEString::charsize() const
 
 namespace util {
 
-std::ostream& decodeUTF16BE(std::ostream& os, const std::string& str)
+ostream& decodeUTF16BE(ostream& os, const string& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -48,9 +47,9 @@ std::ostream& decodeUTF16BE(std::ostream& os, const std::string& str)
     return decodeUTF16BE(os, chars);
 }
 
-std::ostream& decodeUTF16BE(std::ostream& os, const UTF16BEString& str)
+ostream& decodeUTF16BE(ostream& os, const UTF16BEString& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -58,9 +57,9 @@ std::ostream& decodeUTF16BE(std::ostream& os, const UTF16BEString& str)
     return decodeUTF16BE(os, chars);
 }
 
-std::ostream& decodeUTF16LE(std::ostream& os, const std::string& str)
+ostream& decodeUTF16LE(ostream& os, const string& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -68,9 +67,9 @@ std::ostream& decodeUTF16LE(std::ostream& os, const std::string& str)
     return decodeUTF16BE(os, chars);
 }
 
-std::ostream& decodeUTF16LE(std::ostream& os, const UTF16LEString& str)
+ostream& decodeUTF16LE(ostream& os, const UTF16LEString& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -88,7 +87,7 @@ std::ostream& decodeUTF16LE(std::ostream& os, const UTF16LEString& str)
  * U+E000..U+FFFF     (as code point in LE/BE)
  * U+10000..: 4-byte surrogate pairs (U+D800..U+DBFF + U+DC00..U+DFFF)
  */
-std::ostream& decodeUTF16BE(std::ostream& os, std::vector<uint8_t>& chars)
+ostream& decodeUTF16BE(ostream& os, vector<uint8_t>& chars)
 {
     for (size_t i = 0; i < chars.size(); i++) {
         if (i + 2 > chars.size()) {
@@ -119,7 +118,7 @@ std::ostream& decodeUTF16BE(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
-std::ostream& decodeUTF16LE(std::ostream& os, std::vector<uint8_t>& chars)
+ostream& decodeUTF16LE(ostream& os, vector<uint8_t>& chars)
 {
     for (size_t i = 0; i < chars.size(); i++) {
         if (i + 2 > chars.size()) {
@@ -150,9 +149,9 @@ std::ostream& decodeUTF16LE(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
-int UTF16BECharSize(const std::string& str)
+int UTF16BECharSize(const string& str)
 {
-    std::vector<uint8_t> chars(str.size());
+    vector<uint8_t> chars(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars[i] = str[i];
     }
@@ -163,9 +162,9 @@ int UTF16BECharSize(const std::string& str)
         return -1;
 }
 
-int UTF16LECharSize(const std::string& str)
+int UTF16LECharSize(const string& str)
 {
-    std::vector<uint8_t> chars(str.size());
+    vector<uint8_t> chars(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars[i] = str[i];
     }
@@ -176,13 +175,13 @@ int UTF16LECharSize(const std::string& str)
         return -1;
 }
 
-bool isValidUTF16BE(std::vector<uint8_t>& chars)
+bool isValidUTF16BE(vector<uint8_t>& chars)
 {
     int numChars = 0;
     return isValidUTF16BE(chars, numChars);
 }
 
-bool isValidUTF16BE(std::vector<uint8_t>& chars, int& numChars)
+bool isValidUTF16BE(vector<uint8_t>& chars, int& numChars)
 {
     numChars = 0;
     for (size_t i = 0; i < chars.size(); i++, numChars++) {
@@ -202,13 +201,13 @@ bool isValidUTF16BE(std::vector<uint8_t>& chars, int& numChars)
     return true;
 }
 
-bool isValidUTF16LE(std::vector<uint8_t>& chars)
+bool isValidUTF16LE(vector<uint8_t>& chars)
 {
     int numChars = 0;
     return isValidUTF16LE(chars, numChars);
 }
 
-bool isValidUTF16LE(std::vector<uint8_t>& chars, int& numChars)
+bool isValidUTF16LE(vector<uint8_t>& chars, int& numChars)
 {
     numChars = 0;
     for (size_t i = 0; i < chars.size(); i++, numChars++) {

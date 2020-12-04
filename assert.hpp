@@ -1,16 +1,12 @@
 #pragma once
 #include "api.hpp"
-#include <exception>
-#include <system_error>
-#include <memory>
-#include <iostream>
-#include <sstream>
+#include "util/std.hpp"
 
 namespace proptest {
 
-struct PROPTEST_API AssertFailed : public std::logic_error
+struct PROPTEST_API AssertFailed : public logic_error
 {
-    AssertFailed(const char* fname, int line, const std::error_code& /*error*/, const char* condition,
+    AssertFailed(const char* fname, int line, const error_code& /*error*/, const char* condition,
                  const void* /*caller*/)
         : logic_error(condition), filename(fname), lineno(line)
     {
@@ -22,7 +18,7 @@ struct PROPTEST_API AssertFailed : public std::logic_error
     int lineno;
 };
 
-struct PROPTEST_API PropertyFailedBase : public std::logic_error
+struct PROPTEST_API PropertyFailedBase : public logic_error
 {
     PropertyFailedBase(const AssertFailed& e) : logic_error(e), filename(e.filename), lineno(e.lineno) {}
     virtual ~PropertyFailedBase();
@@ -43,9 +39,9 @@ PropertyFailed<ValueTuple>::~PropertyFailed()
 {
 }
 
-struct PROPTEST_API Discard : public std::logic_error
+struct PROPTEST_API Discard : public logic_error
 {
-    Discard(const char* /*fname*/, int /*line*/, const std::error_code& /*error*/, const char* /*condition*/,
+    Discard(const char* /*fname*/, int /*line*/, const error_code& /*error*/, const char* /*condition*/,
             const void* /*caller*/)
         : logic_error("Discard")
     {
@@ -53,9 +49,9 @@ struct PROPTEST_API Discard : public std::logic_error
     virtual ~Discard();
 };
 
-struct PROPTEST_API Success : public std::logic_error
+struct PROPTEST_API Success : public logic_error
 {
-    Success(const char* /*fname*/, int /*line*/, const std::error_code& /*error*/, const char* /*condition*/,
+    Success(const char* /*fname*/, int /*line*/, const error_code& /*error*/, const char* /*condition*/,
             const void* /*caller*/)
         : logic_error("Success")
     {
@@ -64,7 +60,7 @@ struct PROPTEST_API Success : public std::logic_error
 };
 
 namespace util {
-std::ostream& errorOrEmpty(bool condition);
+ostream& errorOrEmpty(bool condition);
 }
 
 }  // namespace proptest
@@ -80,7 +76,7 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STREAM(condition, a, sign, b)                                                                  \
     do {                                                                                                           \
         if (!(condition)) {                                                                                        \
-            std::stringstream __prop_assert_stream_str;                                                            \
+            stringstream __prop_assert_stream_str;                                                            \
             __prop_assert_stream_str << #condition << " with " << a << sign << b;                                  \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {}, __prop_assert_stream_str.str(), \
                                                            nullptr);                                               \
@@ -102,7 +98,7 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STREQ(a, b, n)                                                                            \
     do {                                                                                                      \
         if (!(memcmp(a, b, n) == 0)) {                                                                        \
-            std::stringstream __prop_assert_stream_str;                                                       \
+            stringstream __prop_assert_stream_str;                                                       \
             __prop_assert_stream_str << #a << " not equals " << #b << " with " << proptest::Show<char*>(a, n) \
                                      << " not equals " << proptest::Show<char*>(b, n);                        \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                            \
@@ -114,7 +110,7 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STREQ2(a, b, n1, n2)                                                                       \
     do {                                                                                                       \
         if (!(memcmp(a, b, (n1 <= n2 ? n1 : n2)) == 0)) {                                                      \
-            std::stringstream __prop_assert_stream_str;                                                        \
+            stringstream __prop_assert_stream_str;                                                        \
             __prop_assert_stream_str << #a << " not equals " << #b << " with " << proptest::Show<char*>(a, n1) \
                                      << " not equals " << proptest::Show<char*>(b, n2);                        \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                             \
@@ -126,7 +122,7 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STRNE(a, b, n)                                                                           \
     do {                                                                                                     \
         if (!(memcmp(a, b, n) != 0)) {                                                                       \
-            std::stringstream __prop_assert_stream_str;                                                      \
+            stringstream __prop_assert_stream_str;                                                      \
             __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n)    \
                                      << " equals " << proptest::Show<char*>(b, n);                           \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \
@@ -138,7 +134,7 @@ std::ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STRNE2(a, b, n1, n2)                                                                     \
     do {                                                                                                     \
         if (!(memcmp(a, b, (n1 <= n2 ? n1 : n2)) != 0)) {                                                    \
-            std::stringstream __prop_assert_stream_str;                                                      \
+            stringstream __prop_assert_stream_str;                                                      \
             __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n1)   \
                                      << " equals " << proptest::Show<char*>(b, n2);                          \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \

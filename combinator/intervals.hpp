@@ -3,7 +3,7 @@
 #include "oneof.hpp"
 #include "../generator/integral.hpp"
 #include "../api.hpp"
-#include <initializer_list>
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -25,7 +25,7 @@ struct UInterval
     uint64_t max;
 };
 
-PROPTEST_API Generator<int64_t> intervals(std::initializer_list<Interval> interval_list);
-PROPTEST_API Generator<uint64_t> uintervals(std::initializer_list<UInterval> interval_list);
+PROPTEST_API Generator<int64_t> intervals(initializer_list<Interval> interval_list);
+PROPTEST_API Generator<uint64_t> uintervals(initializer_list<UInterval> interval_list);
 
 }  // namespace proptest

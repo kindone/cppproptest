@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include "../util/std.hpp"
 #include "../gen.hpp"
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
@@ -8,7 +8,7 @@
 namespace proptest {
 
 template <typename T>
-class Arbi<std::shared_ptr<T>> final : public ArbiBase<std::shared_ptr<T>> {
+class Arbi<shared_ptr<T>> final : public ArbiBase<shared_ptr<T>> {
 public:
     Arbi() : elemGen(Arbi<T>()) {}
 
@@ -16,11 +16,11 @@ public:
 
     Arbi(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
 
-    Shrinkable<std::shared_ptr<T>> operator()(Random& rand) override
+    Shrinkable<shared_ptr<T>> operator()(Random& rand) override
     {
         auto gen = Arbi<T>();
         Shrinkable<T> shrinkable = gen(rand);
-        return shrinkable.template map<std::shared_ptr<T>>(+[](const T& obj) { return std::make_shared<T>(obj); });
+        return shrinkable.template map<shared_ptr<T>>(+[](const T& obj) { return make_shared<T>(obj); });
     }
 
     GenFunction<T> elemGen;

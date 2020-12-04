@@ -10,19 +10,19 @@ TEST(PropTest, CompilePropInts)
         return true;
     });
 
-    forAll([](std::vector<int> a, std::set<int> b) -> bool {
+    forAll([](vector<int> a, set<int> b) -> bool {
         if (a.size() % 2 == 0 && b.size() % 2 == 0)
             PROP_DISCARD();
         return true;
     });
 
-    forAll([](std::vector<int> a, std::list<int> b) -> bool {
+    forAll([](vector<int> a, list<int> b) -> bool {
         if (a.size() % 2 == 0 && b.size() % 2 == 0)
             PROP_DISCARD();
         return true;
     });
 
-    // forAll([](std::vector<int> a, std::shared_ptr<int> b) -> bool {
+    // forAll([](vector<int> a, shared_ptr<int> b) -> bool {
     //     if (a.size() % 2 == 0 && *b % 2 == 0)
     //         PROP_DISCARD();
     //     return true;

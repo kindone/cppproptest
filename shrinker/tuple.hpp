@@ -9,8 +9,8 @@ namespace util {
 
 template <typename... ARGS>
 class TupleShrinker {
-    using out_tuple_t = std::tuple<ARGS...>;
-    using tuple_t = std::tuple<Shrinkable<ARGS>...>;
+    using out_tuple_t = tuple<ARGS...>;
+    using tuple_t = tuple<Shrinkable<ARGS>...>;
     using shrinkable_t = Shrinkable<tuple_t>;
     using stream_t = Stream<shrinkable_t>;
 
@@ -18,34 +18,34 @@ class TupleShrinker {
 
 private:
     template <size_t N>
-        static std::enable_if_t < N<sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
+        static enable_if_t < N<sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
     {
         return ConcatHelper<N + 1>(aggr.concat(genStream<N>()));
     }
 
     template <size_t N>
-    static std::enable_if_t<N >= sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
+    static enable_if_t<N >= sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
     {
         return aggr;
     }
 
     template <size_t N>
-    static std::function<stream_t(const shrinkable_t&)> genStream()
+    static function<stream_t(const shrinkable_t&)> genStream()
     {
-        using e_shrinkable_t = typename std::tuple_element<N, tuple_t>::type;
+        using e_shrinkable_t = typename tuple_element<N, tuple_t>::type;
         using element_t = typename e_shrinkable_t::type;
 
         return +[](const shrinkable_t& parent) -> stream_t {
             if (Size == 0 || N > Size - 1)
                 return stream_t::empty();
 
-            std::shared_ptr<tuple_t> parentRef = std::make_shared<tuple_t>(parent.getRef());
+            shared_ptr<tuple_t> parentRef = make_shared<tuple_t>(parent.getRef());
 
-            e_shrinkable_t& elem = std::get<N>(*parentRef);
+            e_shrinkable_t& elem = get<N>(*parentRef);
             // {0,2,3} to {[x,x,x,0], ...,[x,x,x,3]}
             // make sure {1} shrinked from 2 is also transformed to [x,x,x,1]
             shrinkable_t tupWithElems = elem.template flatMap<tuple_t>([parentRef](const element_t& val) {
-                std::get<N>(*parentRef) = make_shrinkable<element_t>(val);
+                get<N>(*parentRef) = make_shrinkable<element_t>(val);
                 return make_shrinkable<tuple_t>(*parentRef);
             });
             return tupWithElems.shrinks();
@@ -62,7 +62,7 @@ public:
     static Shrinkable<out_tuple_t> shrink(const shrinkable_t& shrinkable)
     {
         return ConcatHelper<0>(shrinkable).template flatMap<out_tuple_t>(+[](const tuple_t& tuple) {
-            return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(std::move(tuple)));
+            return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(move(tuple)));
         });
     }
 };
@@ -70,7 +70,7 @@ public:
 } // namespace util
 
 template <typename... ARGS>
-Shrinkable<std::tuple<ARGS...>> shrinkTuple(const Shrinkable<std::tuple<Shrinkable<ARGS>...>>& shrinkable)
+Shrinkable<tuple<ARGS...>> shrinkTuple(const Shrinkable<tuple<Shrinkable<ARGS>...>>& shrinkable)
 {
     return util::TupleShrinker<ARGS...>::shrink(shrinkable);
 }

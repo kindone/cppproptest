@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include "std.hpp"
 
 namespace proptest {
 
@@ -8,11 +8,11 @@ template <typename T>
 struct Nullable
 {
     Nullable() {}
-    Nullable(std::shared_ptr<T> _ptr) : ptr(_ptr) {}
+    Nullable(shared_ptr<T> _ptr) : ptr(_ptr) {}
 
     bool isNull() const { return !static_cast<bool>(ptr); }
 
-    std::shared_ptr<T> ptr;
+    shared_ptr<T> ptr;
 };
 
 }  // namespace proptest

@@ -1,6 +1,5 @@
 #pragma once
-#include <functional>
-#include <memory>
+#include "../util/std.hpp"
 #include "../Random.hpp"
 #include "../Shrinkable.hpp"
 #include "../GenBase.hpp"
@@ -13,10 +12,10 @@ template <typename T>
 struct Generator;
 
 template <typename T, typename U>
-Generator<U> transform(GenFunction<T> gen, std::function<U(T&)> transformer)
+Generator<U> transform(GenFunction<T> gen, function<U(T&)> transformer)
 {
-    auto genPtr = std::make_shared<decltype(gen)>(gen);
-    auto transformerPtr = std::make_shared<std::function<U(const T&)>>(
+    auto genPtr = make_shared<decltype(gen)>(gen);
+    auto transformerPtr = make_shared<function<U(const T&)>>(
         [transformer](const T& t) { return transformer(const_cast<T&>(t)); });
     return generator([genPtr, transformerPtr](Random& rand) {
         Shrinkable<T> shrinkable = (*genPtr)(rand);

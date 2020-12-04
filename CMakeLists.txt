@@ -102,6 +102,7 @@ ADD_TEST(NAME proptest_gtest COMMAND test_proptest)
 
 ### compile
 SET(compile_sources
+    test/compile/property.cpp
     test/compile/printing.cpp
     test/compile/derive.cpp
     test/compile/oneof.cpp
@@ -115,7 +116,6 @@ SET(compile_sources
     test/compile/tuple.cpp
     test/compile/shrinkable.cpp
     test/compile/stream.cpp
-    test/compile/property.cpp
 )
 
 ADD_EXECUTABLE(compile_proptest

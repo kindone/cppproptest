@@ -3,24 +3,24 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 #include "../combinator/concurrency_class.hpp"
-#include <chrono>
-#include <iostream>
-#include <memory>
-#include <mutex>
+#include "../util/std.hpp"
 
 using namespace proptest;
 using namespace proptest::concurrent::alt;
 
+using std::mutex;
+using std::lock_guard;
+
 class ConcurrencyAltTest : public ::testing::Test {
 };
 
-struct VectorAction3 : public SimpleAction<std::vector<int>>
+struct VectorAction3 : public SimpleAction<vector<int>>
 {
 };
 
-std::mutex& getMutex()
+mutex& getMutex()
 {
-    static std::mutex mtx;
+    static mutex mtx;
     return mtx;
 }
 
@@ -28,10 +28,10 @@ struct PushBack3 : public VectorAction3
 {
     PushBack3(int value) : value(value) {}
 
-    virtual bool run(std::vector<int>& system)
+    virtual bool run(vector<int>& system)
     {
-        // std::cout << "PushBack(" << value << ")" << std::endl;
-        std::lock_guard<std::mutex> guard(getMutex());
+        // cout << "PushBack(" << value << ")" << endl;
+        lock_guard<mutex> guard(getMutex());
         system.push_back(value);
         return true;
     }
@@ -41,10 +41,10 @@ struct PushBack3 : public VectorAction3
 
 struct Clear3 : public VectorAction3
 {
-    virtual bool run(std::vector<int>& system)
+    virtual bool run(vector<int>& system)
     {
-        // std::cout << "Clear" << std::endl;
-        std::lock_guard<std::mutex> guard(getMutex());
+        // cout << "Clear" << endl;
+        lock_guard<mutex> guard(getMutex());
         system.clear();
         return true;
     }
@@ -52,10 +52,10 @@ struct Clear3 : public VectorAction3
 
 struct PopBack3 : public VectorAction3
 {
-    virtual bool run(std::vector<int>& system)
+    virtual bool run(vector<int>& system)
     {
-        // std::cout << "PopBack" << std::endl;
-        std::lock_guard<std::mutex> guard(getMutex());
+        // cout << "PopBack" << endl;
+        lock_guard<mutex> guard(getMutex());
         if (system.empty())
             return true;
 
@@ -67,12 +67,12 @@ struct PopBack3 : public VectorAction3
 TEST(ConcurrencyAltTest, States)
 {
     auto pushBackActionGen =
-        Arbi<int>().map<std::shared_ptr<VectorAction3>>([](int& value) { return std::make_shared<PushBack3>(value); });
-    auto popBackActionGen = lazy<std::shared_ptr<VectorAction3>>([]() { return std::make_shared<PopBack3>(); });
-    auto clearActionGen = lazy<std::shared_ptr<VectorAction3>>([]() { return std::make_shared<Clear3>(); });
+        Arbi<int>().map<shared_ptr<VectorAction3>>([](int& value) { return make_shared<PushBack3>(value); });
+    auto popBackActionGen = lazy<shared_ptr<VectorAction3>>([]() { return make_shared<PopBack3>(); });
+    auto clearActionGen = lazy<shared_ptr<VectorAction3>>([]() { return make_shared<Clear3>(); });
 
     auto actionListGen = actionListGenOf<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
 
-    auto prop = concurrency<VectorAction3>(Arbi<std::vector<int>>(), actionListGen);
+    auto prop = concurrency<VectorAction3>(Arbi<vector<int>>(), actionListGen);
     prop.go();
 }

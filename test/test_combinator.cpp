@@ -9,7 +9,7 @@ TEST(PropTest, TestJust)
 
     auto gen = just(0);
 
-    std::cout << "just: " << gen(rand).get() << std::endl;
+    cout << "just: " << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TestJust2)
@@ -17,13 +17,13 @@ TEST(PropTest, TestJust2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto ptrGen = just<std::shared_ptr<int>>(std::make_shared<int>(0));
-    auto vecGen = Arbi<std::vector<std::shared_ptr<int>>>(ptrGen);
+    auto ptrGen = just<shared_ptr<int>>(make_shared<int>(0));
+    auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen);
 
-    std::cout << "just: " << ptrGen(rand).get() << std::endl;
+    cout << "just: " << ptrGen(rand).get() << endl;
     auto shr = vecGen(rand);
     exhaustive(shr, 0);
-    // std::cout << "vector: " << vecGen(rand).get() << std::endl;
+    // cout << "vector: " << vecGen(rand).get() << endl;
 }
 
 TEST(PropTest, TestLazy)
@@ -31,15 +31,15 @@ TEST(PropTest, TestLazy)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto ptrGen = lazy([]() { return std::make_shared<int>(1); });
-    auto vecGen = Arbi<std::vector<std::shared_ptr<int>>>(ptrGen);
+    auto ptrGen = lazy([]() { return make_shared<int>(1); });
+    auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen);
 
     auto vec = ptrGen(rand).get();
 
-    std::cout << "lazy: " << vec << std::endl;
+    cout << "lazy: " << vec << endl;
     auto shr = vecGen(rand);
     exhaustive(shr, 0);
-    // std::cout << "vector: " << vecGen(rand).get() << std::endl;
+    // cout << "vector: " << vecGen(rand).get() << endl;
 }
 
 TEST(PropTest, TestConstruct)
@@ -47,9 +47,9 @@ TEST(PropTest, TestConstruct)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>();
+    auto gen = construct<Animal, int, string, vector<int>&>();
     Animal animal = gen(rand).get();
-    std::cout << "Gen animal: " << animal << std::endl;
+    cout << "Gen animal: " << animal << endl;
 
     forAll(
         +[](Animal animal) -> bool {
@@ -64,10 +64,10 @@ TEST(PropTest, TestConstruct2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbi<std::string>(),
-                                                                      Arbi<std::vector<int>>());
+    auto gen = construct<Animal, int, string, vector<int>&>(interval<int>(0, 10), Arbi<string>(),
+                                                                      Arbi<vector<int>>());
     Animal animal = gen(rand).get();
-    std::cout << "Gen animal: " << animal << std::endl;
+    cout << "Gen animal: " << animal << endl;
 
     forAll(
         +[](Animal animal) -> bool {
@@ -82,9 +82,9 @@ TEST(PropTest, TestConstruct3)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10));
+    auto gen = construct<Animal, int, string, vector<int>&>(interval<int>(0, 10));
     Animal animal = gen(rand).get();
-    std::cout << "Gen animal: " << animal << std::endl;
+    cout << "Gen animal: " << animal << endl;
 
     forAll(
         [](Animal animal) -> bool {
@@ -99,9 +99,9 @@ TEST(PropTest, TestConstruct4)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto gen = construct<Animal, int, std::string, std::vector<int>&>(interval<int>(0, 10), Arbi<std::string>());
+    auto gen = construct<Animal, int, string, vector<int>&>(interval<int>(0, 10), Arbi<string>());
     Animal animal = gen(rand).get();
-    std::cout << "Gen animal: " << animal << std::endl;
+    cout << "Gen animal: " << animal << endl;
 
     forAll(
         +[](Animal animal) -> bool {
@@ -111,7 +111,7 @@ TEST(PropTest, TestConstruct4)
         gen);
 
     auto gen2 = gen.map<int>(+[](Animal& animal) { return animal.numFeet; });
-    std::cout << "Gen animal's feet: " << gen2(rand).get() << std::endl;
+    cout << "Gen animal's feet: " << gen2(rand).get() << endl;
 }
 
 TEST(PropTest, Tests)
@@ -123,7 +123,7 @@ TEST(PropTest, Tests)
         return a.numFeet >= 0 && a.numFeet < 100 && a.name.size() < 10 && a.measures.size() < 10;
     });
 
-    std::cout << "filtered animal: " << filteredGen(rand).get() << std::endl;
+    cout << "filtered animal: " << filteredGen(rand).get() << endl;
 }
 
 TEST(PropTest, TestFilter2)
@@ -136,7 +136,7 @@ TEST(PropTest, TestFilter2)
         gen, +[](int& value) { return value % 2 == 0; });
 
     for (int i = 0; i < 10; i++) {
-        std::cout << "even: " << evenGen(rand).get() << std::endl;
+        cout << "even: " << evenGen(rand).get() << endl;
     }
 
     auto fours = filter<int>(
@@ -146,7 +146,7 @@ TEST(PropTest, TestFilter2)
         });
 
     for (int i = 0; i < 10; i++) {
-        std::cout << "four: " << fours(rand).get() << std::endl;
+        cout << "four: " << fours(rand).get() << endl;
     }
 }
 
@@ -162,10 +162,10 @@ TEST(PropTest, TestFilter3)
             intGen, +[](int& val) -> bool { return val % 2 == 0; });
 
         auto shrinkable = evenGen(rand);
-        std::cout << "GenShrinks: " << shrinkable.get() << std::endl;
+        cout << "GenShrinks: " << shrinkable.get() << endl;
         auto shrinks = shrinkable.shrinks();
         for (auto itr = shrinks.iterator(); itr.hasNext();) {
-            std::cout << "  shrinks: " << itr.next().get() << std::endl;
+            cout << "  shrinks: " << itr.next().get() << endl;
         }
     }
 
@@ -173,10 +173,10 @@ TEST(PropTest, TestFilter3)
         auto evenGen = Arbi<int>().filter(+[](int& val) -> bool { return val % 2 == 0; });
 
         auto shrinkable = evenGen(savedRand);
-        std::cout << "GenShrinks2: " << shrinkable.get() << std::endl;
+        cout << "GenShrinks2: " << shrinkable.get() << endl;
         auto shrinks = shrinkable.shrinks();
         for (auto itr = shrinks.iterator(); itr.hasNext();) {
-            std::cout << "  shrinks2: " << itr.next().get() << std::endl;
+            cout << "  shrinks2: " << itr.next().get() << endl;
         }
     }
 }
@@ -190,7 +190,7 @@ TEST(PropTest, TestOneOf)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TestOneOfWeighted)
@@ -202,7 +202,7 @@ TEST(PropTest, TestOneOfWeighted)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TestElementOf)
@@ -211,7 +211,7 @@ TEST(PropTest, TestElementOf)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TestElementOfWeighted)
@@ -220,7 +220,7 @@ TEST(PropTest, TestElementOfWeighted)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TestRanges)
@@ -230,7 +230,7 @@ TEST(PropTest, TestRanges)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << intGen(rand).get() << std::endl;
+        cout << intGen(rand).get() << endl;
     for (int i = 0; i < 10; i++)
-        std::cout << uintGen(rand).get() << std::endl;
+        cout << uintGen(rand).get() << endl;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tuple>
+#include "std.hpp"
 
 namespace proptest {
 namespace util {
@@ -14,13 +14,13 @@ struct TypeHolder
 template <class... Ts>
 struct TypeList
 {
-    using type_tuple = typename std::tuple<Ts...>;
+    using type_tuple = tuple<Ts...>;
 };
 
 template <class First, class... Ts>
 struct TypeList<First, Ts...>
 {
-    using type_tuple = typename std::tuple<First, Ts...>;
+    using type_tuple = tuple<First, Ts...>;
     using Tail = TypeList<Ts...>;
 };
 

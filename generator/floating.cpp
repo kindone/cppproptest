@@ -4,9 +4,7 @@
 #include "bool.hpp"
 #include "util.hpp"
 #include "tuple.hpp"
-#include <string>
-#include <functional>
-#include <cmath>
+#include "../util/std.hpp"
 
 namespace proptest {
 

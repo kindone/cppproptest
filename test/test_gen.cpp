@@ -1,5 +1,5 @@
 #include "testbase.hpp"
-#include <iostream>
+#include "../util/std.hpp"
 
 using namespace proptest;
 
@@ -15,14 +15,14 @@ TEST(PropTest, FilterWithTolerance)
             return v % 4 == 1;
         };
         auto criteriaPtr =
-            std::make_shared<std::function<bool(const int&)>>([criteria](const int& t) { return criteria(const_cast<int&>(t)); });
+            make_shared<function<bool(const int&)>>([criteria](const int& t) { return criteria(const_cast<int&>(t)); });
         if(!criteria(shr.getRef()))
             continue;
-        std::cout << "filter with tolerance:" << std::endl;
+        cout << "filter with tolerance:" << endl;
         exhaustive(shr.filter(criteriaPtr, 1), 0);
-        std::cout << "filter without tolerance:" << std::endl;
+        cout << "filter without tolerance:" << endl;
         exhaustive(shr.filter(criteriaPtr), 0);
-        std::cout << "full" << std::endl;
+        cout << "full" << endl;
         exhaustive(shr, 0);
     }
 }
@@ -32,17 +32,17 @@ TEST(PropTest, GenVectorOfInt)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto smallIntGen = interval<int>(0, 4);
-    Arbi<std::vector<int>> gen(smallIntGen);
+    Arbi<vector<int>> gen(smallIntGen);
     gen.setSize(3);
 
     // for(int i = 0; i < 20; i++) {
-    //     std::vector<int> val(gen(rand).get());
-    //     std::cout << "vec: ";
+    //     vector<int> val(gen(rand).get());
+    //     cout << "vec: ";
     //     for(size_t j = 0; j < val.size(); j++)
     //     {
-    //         std::cout << val[j] << ", ";
+    //         cout << val[j] << ", ";
     //     }
-    //     std::cout << std::endl;
+    //     cout << endl;
     // }
     for (int i = 0; i < 1; i++)
         exhaustive(gen(rand), 0);
@@ -53,7 +53,7 @@ TEST(PropTest, GenVectorWithNoArbitrary)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto fooGen = construct<Foo, int>(interval<int>(0, 4));
-    Arbi<std::vector<Foo>> gen(fooGen);
+    Arbi<vector<Foo>> gen(fooGen);
     gen.setSize(3);
 
     for (int i = 0; i < 1; i++)
@@ -68,7 +68,7 @@ TEST(PropTest, ShrinkableAndThen)
     auto evenGen = filter<int>(intGen, [](int& val) -> bool { return val % 2 == 0; });
 
     auto evenShrinkable = evenGen(rand);
-    std::cout << "evenShrinkable: " << evenShrinkable.get() << std::endl;
+    cout << "evenShrinkable: " << evenShrinkable.get() << endl;
     {
         exhaustive(evenShrinkable, 0);
     }
@@ -76,7 +76,7 @@ TEST(PropTest, ShrinkableAndThen)
     auto andThen = evenShrinkable.andThenStatic(
         [evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
 
-    std::cout << "even.andThenStatic([1000]): " << andThen.get() << std::endl;
+    cout << "even.andThenStatic([1000]): " << andThen.get() << endl;
     {
         exhaustive(andThen, 0);
     }
@@ -85,7 +85,7 @@ TEST(PropTest, ShrinkableAndThen)
         return Stream<Shrinkable<int>>::one(make_shrinkable<int>(parent.get() / 2));
     });
 
-    std::cout << "even.andThen([n/2]): " << andThen2.get() << std::endl;
+    cout << "even.andThen([n/2]): " << andThen2.get() << endl;
     {
         exhaustive(andThen2, 0);
     }
@@ -93,7 +93,7 @@ TEST(PropTest, ShrinkableAndThen)
     auto concat = evenShrinkable.concatStatic(
         [evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
 
-    std::cout << "even.concatStatic(1000): " << concat.get() << std::endl;
+    cout << "even.concatStatic(1000): " << concat.get() << endl;
     {
         exhaustive(concat, 0);
     }
@@ -102,7 +102,7 @@ TEST(PropTest, ShrinkableAndThen)
         return Stream<Shrinkable<int>>::one(make_shrinkable<int>(parent.get() / 2));
     });
 
-    std::cout << "even.concat(n/2): " << concat2.get() << std::endl;
+    cout << "even.concat(n/2): " << concat2.get() << endl;
     {
         exhaustive(concat2, 0);
     }
@@ -114,7 +114,7 @@ TEST(PropTest, FloatShrinkable)
     Random rand(seed);
     auto floatGen = Arbi<float>();
     auto shrinkable = floatGen(rand);
-    std::cout << "float generated: " << std::endl;
+    cout << "float generated: " << endl;
     exhaustive(shrinkable, 0);
 }
 
@@ -123,57 +123,57 @@ TEST(PropTest, ShrinkableBinary)
     using namespace util;
     {
         auto shrinkable = binarySearchShrinkable(0);
-        std::cout << "# binary of 0" << std::endl;
+        cout << "# binary of 0" << endl;
         exhaustive(shrinkable, 0);
     }
     {
         auto shrinkable = binarySearchShrinkable(1);
-        std::cout << "# binary of 1" << std::endl;
+        cout << "# binary of 1" << endl;
         exhaustive(shrinkable, 0);
     }
     {
         auto shrinkable = binarySearchShrinkable(8);
-        std::cout << "# binary of 8" << std::endl;
+        cout << "# binary of 8" << endl;
         exhaustive(shrinkable, 0);
     }
 
     {
         auto shrinkable = binarySearchShrinkable(7);
-        std::cout << "# binary of 7" << std::endl;
+        cout << "# binary of 7" << endl;
         exhaustive(shrinkable, 0);
     }
 
     {
         auto shrinkable = binarySearchShrinkable(9);
-        std::cout << "# binary of 9" << std::endl;
+        cout << "# binary of 9" << endl;
         exhaustive(shrinkable, 0);
     }
 
     {
         auto shrinkable = binarySearchShrinkable(-1);
-        std::cout << "# binary of -1" << std::endl;
+        cout << "# binary of -1" << endl;
         exhaustive(shrinkable, 0);
     }
     {
         auto shrinkable = binarySearchShrinkable(-3);
-        std::cout << "# binary of -3" << std::endl;
+        cout << "# binary of -3" << endl;
         exhaustive(shrinkable, 0);
     }
     {
         auto shrinkable = binarySearchShrinkable(-8);
-        std::cout << "# binary of -8" << std::endl;
+        cout << "# binary of -8" << endl;
         exhaustive(shrinkable, 0);
     }
 
     {
         auto shrinkable = binarySearchShrinkable(-7);
-        std::cout << "# binary of -7" << std::endl;
+        cout << "# binary of -7" << endl;
         exhaustive(shrinkable, 0);
     }
 
     {
         auto shrinkable = binarySearchShrinkable(-9);
-        std::cout << "# binary of -9" << std::endl;
+        cout << "# binary of -9" << endl;
         exhaustive(shrinkable, 0);
     }
 }
@@ -193,27 +193,27 @@ TEST(PropTest, ShrinkVector)
     Random rand(seed);
     using T = int;
     int len = 8;
-    std::vector<T> vec;
+    vector<T> vec;
     vec.reserve(len);
     for (int i = 0; i < len; i++)
         vec.push_back(8);
 
-    // return make_shrinkable<std::vector<T>>(std::move(vec));
+    // return make_shrinkable<vector<T>>(move(vec));
 
-    auto shrinkableVector = util::binarySearchShrinkable(len).map<std::vector<T>>([vec](const int64_t& len) {
+    auto shrinkableVector = util::binarySearchShrinkable(len).map<vector<T>>([vec](const int64_t& len) {
         if (len <= 0)
-            return std::vector<T>();
+            return vector<T>();
 
         auto begin = vec.begin();
         auto last = vec.begin() + len;
-        return std::vector<T>(begin, last);
+        return vector<T>(begin, last);
     });
 
-    auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<std::vector<T>>& shr) {
-        std::vector<T> copy = shr.get();
+    auto shrinkableVector2 = shrinkableVector.concat([](const Shrinkable<vector<T>>& shr) {
+        vector<T> copy = shr.get();
         if (!copy.empty())
             copy[0] /= 2;
-        return Stream<Shrinkable<std::vector<T>>>(make_shrinkable<std::vector<T>>(copy));
+        return Stream<Shrinkable<vector<T>>>(make_shrinkable<vector<T>>(copy));
     });
 
     exhaustive(shrinkableVector, 0);
@@ -225,11 +225,11 @@ TEST(PropTest, ShrinkVectorFromGen)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     using T = int8_t;
-    auto genVec = Arbi<std::vector<T>>(interval<T>(-8, 8));
+    auto genVec = Arbi<vector<T>>(interval<T>(-8, 8));
     genVec.setMaxSize(8);
     genVec.setMinSize(0);
     auto vecShrinkable = genVec(rand);
-    // return make_shrinkable<std::vector<T>>(std::move(vec));
+    // return make_shrinkable<vector<T>>(move(vec));
     exhaustive(vecShrinkable, 0);
 }
 TEST(PropTest, TuplePair1)
@@ -241,7 +241,7 @@ TEST(PropTest, TuplePair1)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TupleGen1)
@@ -253,7 +253,7 @@ TEST(PropTest, TupleGen1)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TupleGen2)
@@ -275,9 +275,9 @@ TEST(PropTest, TupleGen2)
     while (true) {
         auto shrinkable = tupleGen(rand);
         auto valueTup = shrinkable.get();
-        auto arg1 = std::get<0>(valueTup);
-        auto arg2 = std::get<1>(valueTup);
-        auto arg3 = std::get<2>(valueTup);
+        auto arg1 = get<0>(valueTup);
+        auto arg2 = get<1>(valueTup);
+        auto arg3 = get<2>(valueTup);
         if (arg1 > -20 && arg1 < 20 && arg2 > -20 && arg2 < 20 && arg3 > -20 && arg3 < 20) {
             exhaustive(shrinkable, 0);
             break;
@@ -312,28 +312,28 @@ TEST(PropTest, GenVectorPerf)
     {
         Log()
         {
-            std::cout << "construct" << std::endl;
+            cout << "construct" << endl;
             breaker();
         }
         Log(const Log&)
         {
-            std::cout << "copy construct" << std::endl;
+            cout << "copy construct" << endl;
             breaker();
         }
 
-        Log(Log&&) { std::cout << "move construct" << std::endl; }
+        Log(Log&&) { cout << "move construct" << endl; }
 
         Log& operator=(const Log&)
         {
-            std::cout << "operator=()" << std::endl;
+            cout << "operator=()" << endl;
             return *this;
         }
 
-        void breaker() { std::cout << "  break()" << std::endl; }
+        void breaker() { cout << "  break()" << endl; }
 
         ~Log()
         {
-            std::cout << "destruct" << std::endl;
+            cout << "destruct" << endl;
             breaker();
         }
     };
@@ -341,7 +341,7 @@ TEST(PropTest, GenVectorPerf)
     int64_t seed = getCurrentTime();
     Random rand(seed);
     auto logGen = Construct<Log>();
-    auto vecGen = Arbi<std::vector<Log>>(logGen);
+    auto vecGen = Arbi<vector<Log>>(logGen);
     vecGen.setSize(1);
     auto shrinkable = vecGen(rand);
 
@@ -350,7 +350,7 @@ TEST(PropTest, GenVectorPerf)
 
 TEST(PropTest, GenTupleVector)
 {
-    using IndexVector = std::vector<std::tuple<uint16_t, bool>>;
+    using IndexVector = vector<tuple<uint16_t, bool>>;
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
@@ -372,14 +372,14 @@ TEST(PropTest, GenVectorAndShrink)
     Random rand(seed);
 
     auto smallIntGen = interval<int>(-8, 8);
-    auto vectorGen = Arbi<std::vector<int>>(smallIntGen);
+    auto vectorGen = Arbi<vector<int>>(smallIntGen);
     for (size_t maxLen = 1; maxLen < 4; maxLen++) {
         while (true) {
             vectorGen.setMaxSize(maxLen);
             auto vec = vectorGen(rand);
             if (vec.getRef().size() > (maxLen > 3 ? maxLen - 3 : 0)) {
                 exhaustive(vec, 0);
-                std::cout << "printed: " << maxLen << std::endl;
+                cout << "printed: " << maxLen << endl;
                 break;
             }
         }
@@ -426,28 +426,28 @@ TEST(PropTest, Polymorphic)
         auto carGen = Arbi<int>().map<Vehicle>([](int&) { return Car(); });
         auto carShrinkable = carGen(rand);
         // polymorphism doesn't work!
-        std::cout << "car.get(): " << carShrinkable.getRef().get() << std::endl;
+        cout << "car.get(): " << carShrinkable.getRef().get() << endl;
     }
 
     {
-        auto carGen = Arbi<int>().map<std::shared_ptr<Vehicle>>([](int&) { return std::make_shared<Car>(); });
+        auto carGen = Arbi<int>().map<shared_ptr<Vehicle>>([](int&) { return make_shared<Car>(); });
         auto carShrinkable = carGen(rand);
         // polymorphism works
-        std::cout << "car.get(): " << carShrinkable.getRef()->get() << std::endl;
+        cout << "car.get(): " << carShrinkable.getRef()->get() << endl;
     }
 }
 
 struct Constraint
 {
-    Constraint(int) : id(nextId()) { std::cout << "Constraint create" << id << std::endl; }
+    Constraint(int) : id(nextId()) { cout << "Constraint create" << id << endl; }
     Constraint(const Constraint&) = delete;
     Constraint& operator=(const Constraint&) = delete;
     Constraint(Constraint&&)
     {
         id = nextId();
-        std::cout << "Constraint move" << id << std::endl;
+        cout << "Constraint move" << id << endl;
     }
-    ~Constraint() { std::cout << "~Constraint destroy" << id << std::endl; }
+    ~Constraint() { cout << "~Constraint destroy" << id << endl; }
 
     int id;
     static int maxId;
@@ -461,7 +461,7 @@ TEST(PropTest, ConstraintObject)
     Random rand(seed);
     // You cannot directly generate Constraint object, as it's a non-copyable object.
     // But you can create a shared_ptr of Constraint
-    auto gen = lazy<std::shared_ptr<Constraint>>([]() { return std::make_shared<Constraint>(5);});
+    auto gen = lazy<shared_ptr<Constraint>>([]() { return make_shared<Constraint>(5);});
 
     gen(rand);
 }

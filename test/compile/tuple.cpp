@@ -8,6 +8,6 @@ using namespace proptest;
 TEST(Compile, tuple)
 {
     Random rand(1);
-    auto gen = Arbi<std::tuple<int8_t, uint8_t, float>>();
+    auto gen = Arbi<tuple<int8_t, uint8_t, float>>();
     gen(rand);
 }

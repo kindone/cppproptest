@@ -4,11 +4,13 @@
 #include "Random.hpp"
 #include "../combinator/concurrency_class.hpp"
 #include "../util/bitmap.hpp"
-#include <chrono>
-#include <iostream>
+#include "../util/std.hpp"
 
 using namespace proptest;
 using namespace proptest::concurrent::alt;
+
+using std::mutex;
+using std::lock_guard;
 
 class ConcurrencyTestAlt2 : public ::testing::Test {
 };
@@ -24,11 +26,11 @@ TEST_F(ConcurrencyTestAlt2, bitmap_internal)
     for (int i = 0; i < util::Bitmap::size; i++) {
         EXPECT_NE(copy.occupyAvailable(0), -1);
     }
-    std::cout << bitmap.occupyAvailable(0) << std::endl;
-    std::cout << bitmap.states[0] << ", " << bitmap.states[1] << std::endl;
-    std::cout << bitmap.occupyAvailable(0) << std::endl;
-    std::cout << bitmap.states[0] << ", " << bitmap.states[1] << ", " << bitmap.states[2] << std::endl;
-    std::cout << bitmap.occupyUnavailable(2) << std::endl;
+    cout << bitmap.occupyAvailable(0) << endl;
+    cout << bitmap.states[0] << ", " << bitmap.states[1] << endl;
+    cout << bitmap.occupyAvailable(0) << endl;
+    cout << bitmap.states[0] << ", " << bitmap.states[1] << ", " << bitmap.states[2] << endl;
+    cout << bitmap.occupyUnavailable(2) << endl;
 }
 
 TEST_F(ConcurrencyTestAlt2, bitmap)
@@ -51,21 +53,21 @@ TEST_F(ConcurrencyTestAlt2, bitmap)
 
 TEST_F(ConcurrencyTestAlt2, Container) {}
 
-struct VectorAction4 : public Action<std::vector<int>, util::Bitmap>
+struct VectorAction4 : public Action<vector<int>, util::Bitmap>
 {
 };
 
-extern std::mutex& getMutex();
+extern mutex& getMutex();
 
 struct PushBack4 : public VectorAction4
 {
     PushBack4(int value) : value(value) {}
 
-    virtual bool run(std::vector<int>& system, util::Bitmap& bitmap)
+    virtual bool run(vector<int>& system, util::Bitmap& bitmap)
     {
 
-        // std::cout << "PushBack(" << value << ")" << std::endl;
-        std::lock_guard<std::mutex> guard(getMutex());
+        // cout << "PushBack(" << value << ")" << endl;
+        lock_guard<mutex> guard(getMutex());
         int pos = bitmap.acquire();
         system.push_back(value);
         bitmap.unacquire(pos);
@@ -77,10 +79,10 @@ struct PushBack4 : public VectorAction4
 
 struct Clear4 : public VectorAction4
 {
-    virtual bool run(std::vector<int>& system, util::Bitmap& bitmap)
+    virtual bool run(vector<int>& system, util::Bitmap& bitmap)
     {
-        // std::cout << "Clear" << std::endl;
-        std::lock_guard<std::mutex> guard(getMutex());
+        // cout << "Clear" << endl;
+        lock_guard<mutex> guard(getMutex());
         int pos = bitmap.acquire();
         system.clear();
         bitmap.unacquire(pos);
@@ -90,10 +92,10 @@ struct Clear4 : public VectorAction4
 
 struct PopBack4 : public VectorAction4
 {
-    virtual bool run(std::vector<int>& system, util::Bitmap& bitmap)
+    virtual bool run(vector<int>& system, util::Bitmap& bitmap)
     {
-        // std::cout << "PopBack" << std::endl;
-        std::lock_guard<std::mutex> guard(getMutex());
+        // cout << "PopBack" << endl;
+        lock_guard<mutex> guard(getMutex());
         if (system.empty())
             return true;
 
@@ -107,12 +109,12 @@ struct PopBack4 : public VectorAction4
 TEST_F(ConcurrencyTestAlt2, WithModel)
 {
     auto pushBackActionGen =
-        Arbi<int>().map<std::shared_ptr<VectorAction4>>([](int& value) { return std::make_shared<PushBack4>(value); });
-    auto popBackActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<PopBack4>(); });
-    auto clearActionGen = lazy<std::shared_ptr<VectorAction4>>([]() { return std::make_shared<Clear4>(); });
+        Arbi<int>().map<shared_ptr<VectorAction4>>([](int& value) { return make_shared<PushBack4>(value); });
+    auto popBackActionGen = lazy<shared_ptr<VectorAction4>>([]() { return make_shared<PopBack4>(); });
+    auto clearActionGen = lazy<shared_ptr<VectorAction4>>([]() { return make_shared<Clear4>(); });
 
     auto actionListGen = actionListGenOf<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
 
-    auto prop = concurrency<VectorAction4>(Arbi<std::vector<int>>(), actionListGen);
+    auto prop = concurrency<VectorAction4>(Arbi<vector<int>>(), actionListGen);
     prop.go();
 }

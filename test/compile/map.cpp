@@ -8,12 +8,12 @@ using namespace proptest;
 TEST(Compile, map)
 {
     Random rand(3);
-    auto gen = Arbi<std::map<std::string, std::string>>();
+    auto gen = Arbi<map<string, string>>();
     gen(rand);
-    gen.map([](std::map<std::string,std::string>&) {
+    gen.map([](map<string,string>&) {
         return 0;
     });
-    gen.map<int>([](std::map<std::string,std::string>&) {
+    gen.map<int>([](map<string,string>&) {
         return 0;
     });
 }

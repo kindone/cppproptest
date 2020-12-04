@@ -1,8 +1,5 @@
 #pragma once
-#include <memory>
-#include <utility>
-#include <type_traits>
-#include <functional>
+#include "std.hpp"
 #include "typelist.hpp"
 
 namespace proptest {
@@ -26,7 +23,7 @@ struct function_traits<R(Args...)>
     struct argument
     {
         static_assert(N < arity, "error: invalid parameter index.");
-        using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
+        using type = typename tuple_element<N, tuple<Args...>>::type;
     };
 };
 

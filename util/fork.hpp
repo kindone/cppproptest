@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <stdexcept>
-#include <functional>
-#include <iostream>
+#include "std.hpp"
 
 #include "../api.hpp"
 
@@ -18,7 +16,7 @@ struct PipeResult
 {
     PipeResult() : success(false), size(0) {}
     PipeResult(const RET& _ret) : success(true), size(sizeof(_ret)), ret(_ret) {}
-    PipeResult(const std::string& error) : success(false), size(error.size()), msg(error) {}
+    PipeResult(const string& error) : success(false), size(error.size()), msg(error) {}
 
     void* data()
     {
@@ -33,7 +31,7 @@ struct PipeResult
     bool success;
     size_t size;
     RET ret;
-    std::string msg;
+    string msg;
 };
 
 struct PROPTEST_API Pipe
@@ -53,7 +51,7 @@ struct PROPTEST_API Pipe
         } else {
             char buf[100];
             read(buf, result.size);
-            result.msg = std::string(buf, result.size);
+            result.msg = string(buf, result.size);
         }
 
         return sizeof(result.success) + result.size;
@@ -93,7 +91,7 @@ private:
 };
 
 template <typename RET>
-RET safeCall(std::function<RET()> func)
+RET safeCall(function<RET()> func)
 {
     // prepare pipe for communication
     Pipe pipe;
@@ -109,8 +107,8 @@ RET safeCall(std::function<RET()> func)
             pipe.close();
             forked.exitNormal();
             return result;  // unreachable
-        } catch (std::exception& e) {
-            PipeResult<RET> pipeResult(std::string(e.what()));
+        } catch (exception& e) {
+            PipeResult<RET> pipeResult(string(e.what()));
             pipe.write<RET>(pipeResult);
             pipe.close();
             forked.exitAbnormal();
@@ -122,19 +120,19 @@ RET safeCall(std::function<RET()> func)
         int state = 0;
         pid_t got_pid = waitpid(forked.getPid(), &state, 0);
         // RET result;
-        std::cout << "got pid: " << got_pid << ", exited: " << WIFEXITED(state)
+        cout << "got pid: " << got_pid << ", exited: " << WIFEXITED(state)
                   << ", exitstatus: " << WEXITSTATUS(state) << ", signaled: " << WIFSIGNALED(state)
-                  << ", stopped: " << WIFSTOPPED(state) << ", termsig: " << WTERMSIG(state) << std::endl;
+                  << ", stopped: " << WIFSTOPPED(state) << ", termsig: " << WTERMSIG(state) << endl;
         if (WIFEXITED(state) == 0 /* || WEXITSTATUS(state) != 0*/) {
-            // std::cerr << "forked process ended with error: state = " << state << std::endl;
-            throw std::runtime_error("forked process ended with error: state = " + std::to_string(state));
+            // cerr << "forked process ended with error: state = " << state << endl;
+            throw runtime_error("forked process ended with error: state = " + to_string(state));
         } else {
             PipeResult<RET> pipeResult;
             pipe.read(pipeResult);
             if (pipeResult.success)
                 return pipeResult.ret;
             else
-                throw std::runtime_error("forked process has thrown an exception: " + pipeResult.msg);
+                throw runtime_error("forked process has thrown an exception: " + pipeResult.msg);
         }
     }
 }

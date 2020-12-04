@@ -1,7 +1,7 @@
 #include "../api.hpp"
 #include "cesu8string.hpp"
 #include "unicode.hpp"
-#include <stdexcept>
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -9,99 +9,99 @@ size_t CESU8String::charsize() const
 {
     int size = util::CESU8CharSize(*this);
     if (size < 0)
-        throw std::runtime_error("Not a valid CESU-8 string");
+        throw runtime_error("Not a valid CESU-8 string");
 
     return static_cast<size_t>(size);
 }
 
 namespace util {
 
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c)
+ostream& validCESU8Char(ostream& os, uint8_t c)
 {
     if (static_cast<char>(c) == '\\')
         os << "\\\\";
     else if (c < 0x20 || c == 0x7f) {
         util::IosFlagSaver iosFlagSaver(os);
-        os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c);
+        os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c);
     } else
         os << static_cast<char>(c);
 
     return os;
 }
 
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c1, uint8_t c2)
+ostream& validCESU8Char(ostream& os, uint8_t c1, uint8_t c2)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\u" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2);
+    os << "\\u" << setfill('0') << setw(2) << hex << static_cast<int>(c1) << static_cast<int>(c2);
     return os;
 }
 
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3)
+ostream& validCESU8Char(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(0) << static_cast<int>(c1)
+    os << "\\U" << setfill('0') << setw(2) << hex << static_cast<int>(0) << static_cast<int>(c1)
        << static_cast<int>(c2) << static_cast<int>(c3);
     return os;
 }
 
-std::ostream& validCESU8Char(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
+ostream& validCESU8Char(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\U" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1) << static_cast<int>(c2)
+    os << "\\U" << setfill('0') << setw(2) << hex << static_cast<int>(c1) << static_cast<int>(c2)
        << static_cast<int>(c3) << static_cast<int>(c4);
     return os;
 }
 
-std::ostream& cesu8AsHex(std::ostream& os, uint8_t c)
+ostream& cesu8AsHex(ostream& os, uint8_t c)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c);
     return os;
 }
 
-std::ostream& cesu8AsHex(std::ostream& os, uint8_t c1, uint8_t c2)
+ostream& cesu8AsHex(ostream& os, uint8_t c1, uint8_t c2)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c1);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c2);
     return os;
 }
 
-std::ostream& cesu8AsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3)
+ostream& cesu8AsHex(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c3);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c1);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c2);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c3);
     return os;
 }
 
-std::ostream& cesu8AsHex(std::ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
+ostream& cesu8AsHex(ostream& os, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
 {
     util::IosFlagSaver iosFlagSaver(os);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c1);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c2);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c3);
-    os << "\\x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(c4);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c1);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c2);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c3);
+    os << "\\x" << setfill('0') << setw(2) << hex << static_cast<int>(c4);
     return os;
 }
 
-std::ostream& CESU8ToHex(std::ostream& os, std::vector<uint8_t>& chars)
+ostream& CESU8ToHex(ostream& os, vector<uint8_t>& chars)
 {
     util::IosFlagSaver iosFlagSaver(os);
 
     if (chars.size() > 0)
-        os << /*"\\x" <<*/ std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[0]);
+        os << /*"\\x" <<*/ setfill('0') << setw(2) << hex << static_cast<int>(chars[0]);
     for (size_t i = 1; i < chars.size(); i++) {
-        os << " " << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(chars[i]);
+        os << " " << setfill('0') << setw(2) << hex << static_cast<int>(chars[i]);
     }
 
     return os;
 }
 
-std::ostream& decodeCESU8(std::ostream& os, const std::string& str)
+ostream& decodeCESU8(ostream& os, const string& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -109,9 +109,9 @@ std::ostream& decodeCESU8(std::ostream& os, const std::string& str)
     return decodeCESU8(os, chars);
 }
 
-std::ostream& decodeCESU8(std::ostream& os, const CESU8String& str)
+ostream& decodeCESU8(ostream& os, const CESU8String& str)
 {
-    std::vector<uint8_t> chars;
+    vector<uint8_t> chars;
     chars.reserve(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars.push_back(str[i]);
@@ -133,7 +133,7 @@ std::ostream& decodeCESU8(std::ostream& os, const CESU8String& str)
  * U+E000..U+FFFF     EE..EF   80..BF   80..BF
  * U+10000..: 6-byte surrogate pairs (U+D800..U+DBFF + U+DC00..U+DFFF)
  */
-std::ostream& decodeCESU8(std::ostream& os, std::vector<uint8_t>& chars)
+ostream& decodeCESU8(ostream& os, vector<uint8_t>& chars)
 {
     for (size_t i = 0; i < chars.size(); i++) {
         // U+0000..U+007F
@@ -216,9 +216,9 @@ std::ostream& decodeCESU8(std::ostream& os, std::vector<uint8_t>& chars)
     return os;
 }
 
-int CESU8CharSize(const std::string& str)
+int CESU8CharSize(const string& str)
 {
-    std::vector<uint8_t> chars(str.size());
+    vector<uint8_t> chars(str.size());
     for (size_t i = 0; i < str.size(); i++) {
         chars[i] = str[i];
     }
@@ -229,13 +229,13 @@ int CESU8CharSize(const std::string& str)
         return -1;
 }
 
-bool isValidCESU8(std::vector<uint8_t>& chars)
+bool isValidCESU8(vector<uint8_t>& chars)
 {
     int numChars = 0;
     return isValidCESU8(chars, numChars);
 }
 
-bool isValidCESU8(std::vector<uint8_t>& chars, int& numChars)
+bool isValidCESU8(vector<uint8_t>& chars, int& numChars)
 {
     numChars = 0;
     for (size_t i = 0; i < chars.size(); i++, numChars++) {

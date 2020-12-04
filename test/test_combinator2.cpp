@@ -11,60 +11,60 @@ TEST(PropTest, TestTransform)
     Arbi<int> gen;
 
     {
-        auto stringGen = transform<int, std::string>(
-            gen, +[](int& value) { return "(" + std::to_string(value) + ")"; });
+        auto stringGen = transform<int, string>(
+            gen, +[](int& value) { return "(" + to_string(value) + ")"; });
 
         for (int i = 0; i < 10; i++) {
             auto shrinkable = stringGen(rand);
-            std::cout << "string: " << shrinkable.get() << std::endl;
+            cout << "string: " << shrinkable.get() << endl;
             int j = 0;
             for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
                 auto shrinkable2 = itr.next();
-                std::cout << "  shrink: " << shrinkable2.get() << std::endl;
+                cout << "  shrink: " << shrinkable2.get() << endl;
                 int k = 0;
                 for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
-                    std::cout << "    shrink: " << itr2.next().get() << std::endl;
+                    cout << "    shrink: " << itr2.next().get() << endl;
                 }
             }
         }
 
-        auto vectorGen = transform<std::string, std::vector<std::string>>(
-            stringGen, +[](std::string& value) {
-                std::vector<std::string> vec;
+        auto vectorGen = transform<string, vector<string>>(
+            stringGen, +[](string& value) {
+                vector<string> vec;
                 vec.push_back(value);
                 return vec;
             });
 
         for (int i = 0; i < 10; i++) {
-            std::cout << "vector " << vectorGen(rand).get()[0] << std::endl;
+            cout << "vector " << vectorGen(rand).get()[0] << endl;
         }
     }
 
     {
-        auto stringGen = Arbi<int>().map<std::string>(+[](int& value) { return "(" + std::to_string(value) + ")"; });
+        auto stringGen = Arbi<int>().map<string>(+[](int& value) { return "(" + to_string(value) + ")"; });
 
         for (int i = 0; i < 10; i++) {
             auto shrinkable = stringGen(savedRand);
-            std::cout << "string2: " << shrinkable.get() << std::endl;
+            cout << "string2: " << shrinkable.get() << endl;
             int j = 0;
             for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
                 auto shrinkable2 = itr.next();
-                std::cout << "  shrink2: " << shrinkable2.get() << std::endl;
+                cout << "  shrink2: " << shrinkable2.get() << endl;
                 int k = 0;
                 for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
-                    std::cout << "    shrink2: " << itr2.next().get() << std::endl;
+                    cout << "    shrink2: " << itr2.next().get() << endl;
                 }
             }
         }
 
-        auto vectorGen = stringGen.map<std::vector<std::string>>(+[](std::string& value) {
-            std::vector<std::string> vec;
+        auto vectorGen = stringGen.map<vector<string>>(+[](string& value) {
+            vector<string> vec;
             vec.push_back(value);
             return vec;
         });
 
         for (int i = 0; i < 10; i++) {
-            std::cout << "vector2 " << vectorGen(savedRand).get()[0] << std::endl;
+            cout << "vector2 " << vectorGen(savedRand).get()[0] << endl;
         }
     }
 }
@@ -77,16 +77,16 @@ TEST(PropTest, TestTranform2)
         Arbi<uint8_t>(), +[](uint8_t& vbit) { return (1 << 0) & vbit; });
 
     for (int i = 0; i < 10; i++)
-        std::cout << gen(rand).get() << std::endl;
+        cout << gen(rand).get() << endl;
 }
 
 TEST(PropTest, TestDependency)
 {
     auto intGen = interval(0, 2);
-    auto pairGen = dependency<int, std::vector<int>>(
+    auto pairGen = dependency<int, vector<int>>(
         intGen, +[](int& in) {
             auto intGen = interval<int>(0, 8);
-            auto vecGen = Arbi<std::vector<int>>(intGen);
+            auto vecGen = Arbi<vector<int>>(intGen);
             vecGen.maxSize = in;
             vecGen.minSize = in;
             return vecGen;
@@ -96,9 +96,9 @@ TEST(PropTest, TestDependency)
     Random rand(seed);
     for (int i = 0; i < 10; i++) {
         auto pair = pairGen(rand).get();
-        std::cout << "(" << pair.first << ", " << pair.second << ")" << std::endl;
+        cout << "(" << pair.first << ", " << pair.second << ")" << endl;
     }
-    std::cout << "exhaustive: " << std::endl;
+    cout << "exhaustive: " << endl;
 
     for (int i = 0; i < 3; i++) {
         auto pairShr = pairGen(rand);
@@ -108,9 +108,9 @@ TEST(PropTest, TestDependency)
 
 TEST(PropTest, TestDependency2)
 {
-    using Dimension = std::pair<int, uint16_t>;
-    using IndexVector = std::vector<std::pair<uint16_t, bool>>;
-    using RawData = std::pair<Dimension, IndexVector>;
+    using Dimension = pair<int, uint16_t>;
+    using IndexVector = vector<pair<uint16_t, bool>>;
+    using RawData = pair<Dimension, IndexVector>;
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
@@ -130,13 +130,13 @@ TEST(PropTest, TestDependency2)
             return indexVecGen;
         });
 
-    std::cout << "raw." << std::endl;
+    cout << "raw." << endl;
     double t0 = getTime();
     for (int i = 0; i < 10; i++) {
-        // std::cout << "rawGen: " << rawGen(rand).get() << " / raw " << i << std::endl;
+        // cout << "rawGen: " << rawGen(rand).get() << " / raw " << i << endl;
         rawGen(rand).get();
         double time = getTime();
-        std::cout << "rawGen: " << i << " time: " << time - t0 << std::endl;
+        cout << "rawGen: " << i << " time: " << time - t0 << endl;
         t0 = time;
     }
 
@@ -151,16 +151,16 @@ TEST(PropTest, TestDependency2)
             tableData.indexes = raw.second;
             return tableData;
         });
-    std::cout << "transformed." << std::endl;
+    cout << "transformed." << endl;
 
     for (int i = 0; i < 10; i++) {
-        std::cout << "table: " << tableDataGen(rand).get() << " / table " << i << std::endl;
+        cout << "table: " << tableDataGen(rand).get() << " / table " << i << endl;
     }
 
-    auto tableDataWithValueGen = dependency<TableData, std::vector<bool>>(
+    auto tableDataWithValueGen = dependency<TableData, vector<bool>>(
         tableDataGen, +[](TableData& td) {
-            std::vector<bool> values;
-            auto vectorGen = Arbi<std::vector<bool>>();
+            vector<bool> values;
+            auto vectorGen = Arbi<vector<bool>>();
             vectorGen.setSize(td.num_elements);
             return vectorGen;
         });
@@ -169,7 +169,7 @@ TEST(PropTest, TestDependency2)
 
     // DictionaryCompression::IQTypeInfo ti;
     forAll(
-        +[](std::pair<TableData, std::vector<bool>>) {
+        +[](pair<TableData, vector<bool>>) {
             // column->set(&index[i].first, index[i].second);
             return true;
         },
@@ -208,13 +208,13 @@ TEST(PropTest, TestDependency4)
     Random rand(seed);
 
     auto intGen = elementOf<int>(0, 1, 2, 3);
-    auto intStringGen = dependency<int, std::string>(intGen, [](int& value) {
-        auto gen = Arbi<std::string>();
+    auto intStringGen = dependency<int, string>(intGen, [](int& value) {
+        auto gen = Arbi<string>();
         gen.setMaxSize(value);
         return gen;
     });
 
-    auto stringGen = intStringGen.map<std::string>([](std::pair<int, std::string>& pair) { return pair.second; });
+    auto stringGen = intStringGen.map<string>([](pair<int, string>& pair) { return pair.second; });
 
     Random saveRand = rand;
 
@@ -242,8 +242,8 @@ TEST(PropTest, TestChain)
     });
 
     auto tupleGen = nullableIntegers.tupleWith<int>(+[](Chain<bool, int>& chain) {
-        bool isNull = std::get<0>(chain);
-        int value = std::get<1>(chain);
+        bool isNull = get<0>(chain);
+        int value = get<1>(chain);
         if (isNull)
             return interval(0, value);
         else
@@ -267,21 +267,21 @@ TEST(PropTest, TestChain2)
         else
             return interval(10, 20);
     });
-    auto tuple3Gen = tuple2Gen.tupleWith<std::string>(+[](std::tuple<bool, int>& tup) {
-        std::cout << tup << std::endl;
-        if (std::get<0>(tup)) {
-            auto gen = Arbi<std::string>(interval<char>('A', 'M'));
+    auto tuple3Gen = tuple2Gen.tupleWith<string>(+[](tuple<bool, int>& tup) {
+        cout << tup << endl;
+        if (get<0>(tup)) {
+            auto gen = Arbi<string>(interval<char>('A', 'M'));
             gen.setSize(1, 3);
             return gen;
         } else {
-            auto gen = Arbi<std::string>(interval<char>('N', 'Z'));
+            auto gen = Arbi<string>(interval<char>('N', 'Z'));
             gen.setSize(1, 3);
             return gen;
         }
     });
 
-    auto tuple3Gen2 = tuple2Gen.tupleWith<int>(+[](std::tuple<bool, int>& tup) {
-        if (std::get<0>(tup)) {
+    auto tuple3Gen2 = tuple2Gen.tupleWith<int>(+[](tuple<bool, int>& tup) {
+        if (get<0>(tup)) {
             return interval(10, 20);
         } else {
             return interval(20, 30);
@@ -310,8 +310,8 @@ TEST(PropTest, TestDerive)
     Random rand(seed);
 
     auto intGen = elementOf<int>(2, 4, 6);
-    auto stringGen = derive<int, std::string>(intGen, [](int& value) {
-        auto gen = Arbi<std::string>();
+    auto stringGen = derive<int, string>(intGen, [](int& value) {
+        auto gen = Arbi<string>();
         gen.setMaxSize(value);
         return gen;
     });
@@ -328,8 +328,8 @@ TEST(PropTest, TestDerive2)
     Random rand(seed);
 
     auto intGen = elementOf<int>(2, 4, 6);
-    auto stringGen = intGen.flatMap<std::string>([](int& value) {
-        auto gen = Arbi<std::string>();
+    auto stringGen = intGen.flatMap<string>([](int& value) {
+        auto gen = Arbi<string>();
         gen.setMaxSize(value);
         return gen;
     });

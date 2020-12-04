@@ -3,38 +3,34 @@
 #include "util.hpp"
 #include "integral.hpp"
 #include "../shrinker/string.hpp"
-#include <vector>
-#include <iostream>
-#include <ios>
-#include <iomanip>
-#include <sstream>
+#include "../util/std.hpp"
 
 namespace proptest {
 
-size_t Arbi<std::string>::defaultMinSize = 0;
-size_t Arbi<std::string>::defaultMaxSize = 200;
+size_t Arbi<string>::defaultMinSize = 0;
+size_t Arbi<string>::defaultMaxSize = 200;
 
 // defaults to ascii characters
-Arbi<std::string>::Arbi()
-    : ArbiContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(interval<char>(0x1, 0x7f))
+Arbi<string>::Arbi()
+    : ArbiContainer<string>(defaultMinSize, defaultMaxSize), elemGen(interval<char>(0x1, 0x7f))
 {
 }
 
-Arbi<std::string>::Arbi(Arbi<char>& _elemGen)
-    : ArbiContainer<std::string>(defaultMinSize, defaultMaxSize),
+Arbi<string>::Arbi(Arbi<char>& _elemGen)
+    : ArbiContainer<string>(defaultMinSize, defaultMaxSize),
       elemGen([_elemGen](Random& rand) mutable { return _elemGen(rand); })
 {
 }
 
-Arbi<std::string>::Arbi(GenFunction<char> _elemGen)
-    : ArbiContainer<std::string>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
+Arbi<string>::Arbi(GenFunction<char> _elemGen)
+    : ArbiContainer<string>(defaultMinSize, defaultMaxSize), elemGen(_elemGen)
 {
 }
 
-Shrinkable<std::string> Arbi<std::string>::operator()(Random& rand)
+Shrinkable<string> Arbi<string>::operator()(Random& rand)
 {
     size_t size = rand.getRandomSize(minSize, maxSize + 1);
-    std::string str(size, ' ' /*, allocator()*/);
+    string str(size, ' ' /*, allocator()*/);
     for (size_t i = 0; i < size; i++)
         str[i] = elemGen(rand).get();
 
