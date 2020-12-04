@@ -20,24 +20,24 @@
 
 namespace proptest {
 
-template <typename... ARGS>
+namespace util {
 struct Matrix {
-    template <size_t N>
-    static decltype(auto) pickN(std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices) {
+    template <size_t N, typename Lists>
+    static decltype(auto) pickN(Lists&& lists, std::vector<int>& indices) {
         auto& vec = std::get<N>(lists);
         auto& index = indices[N];
         return vec[index];
     }
 
-    template <size_t... index>
-    static decltype(auto) pickEach(std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices, std::index_sequence<index...>)
+    template <size_t... index, typename Lists>
+    static decltype(auto) pickEach(Lists&& lists, std::vector<int>& indices, std::index_sequence<index...>)
     {
         return std::make_tuple(
-            pickN<index>(std::forward<std::tuple<std::vector<ARGS>...>>(lists), indices)...);
+            pickN<index>(std::forward<Lists>(lists), indices)...);
     }
 
-    template <size_t N>
-    static decltype(auto) progressN(bool& incremented, std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices) {
+    template <size_t N, typename Lists>
+    static decltype(auto) progressN(bool& incremented, Lists&& lists, std::vector<int>& indices) {
         auto& list = std::get<N>(lists);
         // already incremented
         if(incremented)
@@ -53,15 +53,16 @@ struct Matrix {
         return incremented;
     }
 
-    template <size_t... index>
-    static bool progress(std::tuple<std::vector<ARGS>...>&& lists, std::vector<int>& indices, std::index_sequence<index...>)
+    template <size_t... index, typename Lists>
+    static bool progress(Lists&& lists, std::vector<int>& indices, std::index_sequence<index...>)
     {
-        constexpr auto Size = sizeof...(ARGS);
+        constexpr auto Size = std::tuple_size<Lists>::value;
         bool incremented = false;
-        std::make_tuple(progressN<Size-index-1>(incremented, std::forward<decltype(lists)>(lists), indices)...);
+        std::make_tuple(progressN<Size-index-1>(incremented, std::forward<Lists>(lists), indices)...);
         return incremented;
     }
 };
+} // namespace util
 
 template <typename... ARGS>
 class Property final : public PropertyBase {
@@ -216,9 +217,9 @@ public:
             indices.push_back(0);
 
         do {
-            [[maybe_unused]] auto valueTup = Matrix<ARGS...>::pickEach(std::forward<decltype(vecTuple)>(vecTuple), indices, std::make_index_sequence<Size>{});
+            auto valueTup = util::Matrix::pickEach(std::forward<decltype(vecTuple)>(vecTuple), indices, std::make_index_sequence<Size>{});
             example(valueTup);
-        } while((Matrix<ARGS...>::progress(std::forward<decltype(vecTuple)>(vecTuple), indices, std::make_index_sequence<Size>{})));
+        } while(util::Matrix::progress(std::forward<decltype(vecTuple)>(vecTuple), indices, std::make_index_sequence<Size>{}));
 
         return true;
     }
@@ -257,7 +258,7 @@ private:
         }
     }
 
-    template <size_t N>
+    template <size_t N, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple)
     {
         auto shrinks = std::get<N>(shrinksTuple);
@@ -291,7 +292,7 @@ private:
         return std::get<N>(valueTup);
     }
 
-    template <size_t... index>
+    template <size_t... index, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkEach(ValueTuple&& valueTup, ShrinksTuple&& shrinksTup, std::index_sequence<index...>)
     {
         return std::make_tuple(
