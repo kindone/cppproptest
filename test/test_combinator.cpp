@@ -17,7 +17,7 @@ TEST(PropTest, TestJust2)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto ptrGen = just<shared_ptr<int>>(make_shared<int>(0));
+    auto ptrGen = just<shared_ptr<int>>(util::make_shared<int>(0));
     auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen);
 
     cout << "just: " << ptrGen(rand).get() << endl;
@@ -31,7 +31,7 @@ TEST(PropTest, TestLazy)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto ptrGen = lazy([]() { return make_shared<int>(1); });
+    auto ptrGen = lazy([]() { return util::make_shared<int>(1); });
     auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen);
 
     auto vec = ptrGen(rand).get();

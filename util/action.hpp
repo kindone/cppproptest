@@ -13,9 +13,9 @@ struct EmptyModel
 template <typename ObjectType>
 struct SimpleAction {
     using Function = function<void(ObjectType&)>;
-    explicit SimpleAction(Function f) : name("Action<?>"), func(make_shared<Function>(f)) {}
+    explicit SimpleAction(Function f) : name("Action<?>"), func(util::make_shared<Function>(f)) {}
 
-    SimpleAction(const string& _name, Function f) : name(_name), func(make_shared<Function>(f)) {}
+    SimpleAction(const string& _name, Function f) : name(_name), func(util::make_shared<Function>(f)) {}
 
     void operator()(ObjectType& obj) const {
         (*func)(obj);
@@ -33,12 +33,12 @@ struct SimpleAction {
 template <typename ObjectType, typename ModelType>
 struct Action {
     using Function = function<void(ObjectType&, ModelType&)>;
-    explicit Action(Function f) : name("Action<?>"), func(make_shared<Function>(f)) {}
+    explicit Action(Function f) : name("Action<?>"), func(util::make_shared<Function>(f)) {}
 
-    Action(const string& _name, Function f) : name(_name), func(make_shared<Function>(f)) {}
+    Action(const string& _name, Function f) : name(_name), func(util::make_shared<Function>(f)) {}
 
     Action(const SimpleAction<ObjectType>& simpleAction) : name(simpleAction.name) {
-        func = make_shared<Function>([simpleAction](ObjectType& obj, ModelType&) {
+        func = util::make_shared<Function>([simpleAction](ObjectType& obj, ModelType&) {
             return simpleAction(obj);
         });
     }

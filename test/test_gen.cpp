@@ -15,7 +15,7 @@ TEST(PropTest, FilterWithTolerance)
             return v % 4 == 1;
         };
         auto criteriaPtr =
-            make_shared<function<bool(const int&)>>([criteria](const int& t) { return criteria(const_cast<int&>(t)); });
+            util::make_shared<function<bool(const int&)>>([criteria](const int& t) { return criteria(const_cast<int&>(t)); });
         if(!criteria(shr.getRef()))
             continue;
         cout << "filter with tolerance:" << endl;
@@ -198,7 +198,7 @@ TEST(PropTest, ShrinkVector)
     for (int i = 0; i < len; i++)
         vec.push_back(8);
 
-    // return make_shrinkable<vector<T>>(move(vec));
+    // return make_shrinkable<vector<T>>(util::move(vec));
 
     auto shrinkableVector = util::binarySearchShrinkable(len).map<vector<T>>([vec](const int64_t& len) {
         if (len <= 0)
@@ -229,7 +229,7 @@ TEST(PropTest, ShrinkVectorFromGen)
     genVec.setMaxSize(8);
     genVec.setMinSize(0);
     auto vecShrinkable = genVec(rand);
-    // return make_shrinkable<vector<T>>(move(vec));
+    // return make_shrinkable<vector<T>>(util::move(vec));
     exhaustive(vecShrinkable, 0);
 }
 TEST(PropTest, TuplePair1)
@@ -430,7 +430,7 @@ TEST(PropTest, Polymorphic)
     }
 
     {
-        auto carGen = Arbi<int>().map<shared_ptr<Vehicle>>([](int&) { return make_shared<Car>(); });
+        auto carGen = Arbi<int>().map<shared_ptr<Vehicle>>([](int&) { return util::make_shared<Car>(); });
         auto carShrinkable = carGen(rand);
         // polymorphism works
         cout << "car.get(): " << carShrinkable.getRef()->get() << endl;
@@ -461,7 +461,7 @@ TEST(PropTest, ConstraintObject)
     Random rand(seed);
     // You cannot directly generate Constraint object, as it's a non-copyable object.
     // But you can create a shared_ptr of Constraint
-    auto gen = lazy<shared_ptr<Constraint>>([]() { return make_shared<Constraint>(5);});
+    auto gen = lazy<shared_ptr<Constraint>>([]() { return util::make_shared<Constraint>(5);});
 
     gen(rand);
 }

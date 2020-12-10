@@ -67,9 +67,9 @@ struct PopBack3 : public VectorAction3
 TEST(ConcurrencyAltTest, States)
 {
     auto pushBackActionGen =
-        Arbi<int>().map<shared_ptr<VectorAction3>>([](int& value) { return make_shared<PushBack3>(value); });
-    auto popBackActionGen = lazy<shared_ptr<VectorAction3>>([]() { return make_shared<PopBack3>(); });
-    auto clearActionGen = lazy<shared_ptr<VectorAction3>>([]() { return make_shared<Clear3>(); });
+        Arbi<int>().map<shared_ptr<VectorAction3>>([](int& value) { return util::make_shared<PushBack3>(value); });
+    auto popBackActionGen = lazy<shared_ptr<VectorAction3>>([]() { return util::make_shared<PopBack3>(); });
+    auto clearActionGen = lazy<shared_ptr<VectorAction3>>([]() { return util::make_shared<Clear3>(); });
 
     auto actionListGen = actionListGenOf<VectorAction3>(pushBackActionGen, popBackActionGen, clearActionGen);
 

@@ -31,13 +31,13 @@ struct Weighted
 template <typename T, typename GEN>
 enable_if_t<!is_same<decay_t<GEN>, Weighted<T>>::value, Weighted<T>> GenToWeighted(GEN&& gen)
 {
-    return weightedGen<T>(forward<GEN>(gen), 0.0);
+    return weightedGen<T>(util::forward<GEN>(gen), 0.0);
 }
 
 template <typename T>
 Weighted<T> GenToWeighted(Weighted<T>&& weighted)
 {
-    return forward<Weighted<T>>(weighted);
+    return util::forward<Weighted<T>>(weighted);
 }
 
 template <typename T>
@@ -95,7 +95,7 @@ template <typename T, typename GEN>
 util::Weighted<T> weightedGen(GEN&& gen, double weight)
 {
     using FuncType = GenFunction<T>;
-    shared_ptr<FuncType> funcPtr = make_shared<FuncType>(forward<GEN>(gen));
+    shared_ptr<FuncType> funcPtr = util::make_shared<FuncType>(util::forward<GEN>(gen));
     return util::Weighted<T>(funcPtr, weight);
 }
 
@@ -104,7 +104,7 @@ template <typename T, typename... GENS>
 decltype(auto) oneOf(GENS&&... gens)
 {
     using WeightedVec = vector<util::Weighted<T>>;
-    shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(forward<GENS>(gens))...});
+    shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(util::forward<GENS>(gens))...});
 
     return util::oneOfHelper<T>(genVecPtr);
 }
@@ -112,7 +112,7 @@ decltype(auto) oneOf(GENS&&... gens)
 /* Alias */
 template <typename T, typename... GENS>
 decltype(auto) unionOf(GENS&&... gens) {
-    return oneOf(forward<GENS>(gens)...);
+    return oneOf(util::forward<GENS>(gens)...);
 }
 
 }  // namespace proptest

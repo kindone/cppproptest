@@ -28,8 +28,8 @@ struct Matrix {
     template <size_t... index, typename Lists>
     static decltype(auto) pickEach(Lists&& lists, vector<int>& indices, index_sequence<index...>)
     {
-        return make_tuple(
-            pickN<index>(forward<Lists>(lists), indices)...);
+        return util::make_tuple(
+            pickN<index>(util::forward<Lists>(lists), indices)...);
     }
 
     template <size_t N, typename Lists>
@@ -54,7 +54,7 @@ struct Matrix {
     {
         constexpr auto Size = tuple_size<Lists>::value;
         bool incremented = false;
-        make_tuple(progressN<Size-index-1>(incremented, forward<Lists>(lists), indices)...);
+        util::make_tuple(progressN<Size-index-1>(incremented, util::forward<Lists>(lists), indices)...);
         return incremented;
     }
 };
@@ -85,12 +85,12 @@ public:
     }
 
     Property& setOnStartup(function<void()> onStartup) {
-        onStartupPtr = make_shared<function<void()>>(onStartup);
+        onStartupPtr = util::make_shared<function<void()>>(onStartup);
         return *this;
     }
 
     Property& setOnCleanup(function<void()> onCleanup) {
-        onCleanupPtr = make_shared<function<void()>>(onCleanup);
+        onCleanupPtr = util::make_shared<function<void()>>(onCleanup);
         return *this;
     }
 
@@ -121,11 +121,11 @@ public:
                         if (failures.rdbuf()->in_avail()) {
                             cerr << "Falsifiable, after " << (i + 1) << " tests: ";
                             cerr << failures.str();
-                            shrink(savedRand, forward<GenTuple>(curGenTup));
+                            shrink(savedRand, util::forward<GenTuple>(curGenTup));
                             return false;
                         } else if (!result) {
                             cerr << "Falsifiable, after " << (i + 1) << " tests" << endl;
-                            shrink(savedRand, forward<GenTuple>(curGenTup));
+                            shrink(savedRand, util::forward<GenTuple>(curGenTup));
                             return false;
                         }
                         pass = true;
@@ -141,19 +141,19 @@ public:
             cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
                       << e.lineno << ")" << endl;
             // shrink
-            shrink(savedRand, forward<GenTuple>(curGenTup));
+            shrink(savedRand, util::forward<GenTuple>(curGenTup));
             return false;
         } catch (const PropertyFailedBase& e) {
             cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
                       << e.lineno << ")" << endl;
             // shrink
-            shrink(savedRand, forward<GenTuple>(curGenTup));
+            shrink(savedRand, util::forward<GenTuple>(curGenTup));
             return false;
         } catch (const exception& e) {
             cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
                       << endl;
             // shrink
-            shrink(savedRand, forward<GenTuple>(curGenTup));
+            shrink(savedRand, util::forward<GenTuple>(curGenTup));
             return false;
         }
 
@@ -164,7 +164,7 @@ public:
 
     bool example(ARGS&&... args)
     {
-        auto valueTup = make_tuple(args...);
+        auto valueTup = util::make_tuple(args...);
         return example(valueTup);
     }
 
@@ -207,15 +207,15 @@ public:
     bool matrix(initializer_list<ARGS>&&...lists)
     {
         constexpr auto Size = sizeof...(ARGS);
-        auto vecTuple = make_tuple(vector<ARGS>(lists)...);
+        auto vecTuple = util::make_tuple(vector<ARGS>(lists)...);
         vector<int> indices;
         for(size_t i = 0; i < Size; i++)
             indices.push_back(0);
 
         do {
-            auto valueTup = util::Matrix::pickEach(forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{});
+            auto valueTup = util::Matrix::pickEach(util::forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{});
             example(valueTup);
-        } while(util::Matrix::progress(forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{}));
+        } while(util::Matrix::progress(util::forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{}));
 
         return true;
     }
@@ -225,12 +225,12 @@ private:
     bool test(ValueTuple&& valueTup, Replace&& replace)
     {
         bool result = false;
-        auto values = util::transformHeteroTuple<util::ShrinkableGet>(forward<ValueTuple>(valueTup));
+        auto values = util::transformHeteroTuple<util::ShrinkableGet>(util::forward<ValueTuple>(valueTup));
         try {
             if(onStartupPtr)
                 (*onStartupPtr)();
             result =
-                util::invokeWithArgTupleWithReplace<N>(func, forward<decltype(values)>(values), replace.get());
+                util::invokeWithArgTupleWithReplace<N>(func, util::forward<decltype(values)>(values), replace.get());
             if(onCleanupPtr)
                 (*onCleanupPtr)();
         } catch (const AssertFailed&) {
@@ -268,7 +268,7 @@ private:
             while (iter.hasNext()) {
                 // get shrinkable
                 auto next = iter.next();
-                if (!test<N>(forward<ValueTuple>(valueTup), next) || context.hasFailures()) {
+                if (!test<N>(util::forward<ValueTuple>(valueTup), next) || context.hasFailures()) {
                     shrinks = next.shrinks();
                     get<N>(valueTup) = next;
                     shrinkFound = true;
@@ -291,23 +291,23 @@ private:
     template <size_t... index, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkEach(ValueTuple&& valueTup, ShrinksTuple&& shrinksTup, index_sequence<index...>)
     {
-        return make_tuple(
-            shrinkN<index>(forward<ValueTuple>(valueTup), forward<ShrinksTuple>(shrinksTup))...);
+        return util::make_tuple(
+            shrinkN<index>(util::forward<ValueTuple>(valueTup), util::forward<ShrinksTuple>(shrinksTup))...);
     }
 
     void shrink(Random& savedRand, GenTuple&& curGenTup)
     {
         // regenerate failed value tuple
         auto generatedValueTup =
-            util::transformHeteroTupleWithArg<util::Generate>(forward<GenTuple>(curGenTup), savedRand);
+            util::transformHeteroTupleWithArg<util::Generate>(util::forward<GenTuple>(curGenTup), savedRand);
 
         cout << "  with args: " << Show<decltype(generatedValueTup)>(generatedValueTup) << endl;
         // cout << (valueTup == valueTup2 ? "gen equals original" : "gen not equals original") << endl;
         static constexpr auto Size = tuple_size<GenTuple>::value;
         auto shrinksTuple =
-            util::transformHeteroTuple<util::GetShrinks>(forward<decltype(generatedValueTup)>(generatedValueTup));
-        auto shrunk = shrinkEach(forward<decltype(generatedValueTup)>(generatedValueTup),
-                                 forward<decltype(shrinksTuple)>(shrinksTuple), make_index_sequence<Size>{});
+            util::transformHeteroTuple<util::GetShrinks>(util::forward<decltype(generatedValueTup)>(generatedValueTup));
+        auto shrunk = shrinkEach(util::forward<decltype(generatedValueTup)>(generatedValueTup),
+                                 util::forward<decltype(shrinksTuple)>(shrinksTuple), make_index_sequence<Size>{});
         cout << "  simplest args found by shrinking: " << Show<decltype(shrunk)>(shrunk) << endl;
     }
 
@@ -332,7 +332,7 @@ enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWith
     util::TypeList<ARGS...>, Callable&& callable)
 {
     return function<bool(ARGS...)>([callable](ARGS&&... args) {
-        callable(forward<ARGS>(args)...);
+        callable(util::forward<ARGS>(args)...);
         return true;
     });
 }
@@ -342,7 +342,7 @@ decltype(auto) functionWithBoolResult(Callable&& callable)
 {
     using RetType = typename function_traits<Callable>::return_type;
     typename function_traits<Callable>::argument_type_list argument_type_list;
-    return functionWithBoolResultHelper<RetType>(argument_type_list, forward<Callable>(callable));
+    return functionWithBoolResultHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
 template <typename RetType, typename Callable, typename... ARGS>
@@ -356,7 +356,7 @@ decltype(auto) asFunction(Callable&& callable)
 {
     using RetType = typename function_traits<Callable>::return_type;
     typename function_traits<Callable>::argument_type_list argument_type_list;
-    return asFunctionHelper<RetType>(argument_type_list, forward<Callable>(callable));
+    return asFunctionHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
 template <typename... ARGS>
@@ -374,8 +374,8 @@ auto property(Callable&& callable, EXPGENS&&... gens)
     // acquire full tuple of generators
     typename function_traits<Callable>::argument_type_list argument_type_list;
     auto func = util::functionWithBoolResult(callable);
-    auto genTup = util::createGenTuple(argument_type_list, util::asFunction(forward<decltype(gens)>(gens))...);
-    return util::createProperty(func, forward<decltype(genTup)>(genTup));
+    auto genTup = util::createGenTuple(argument_type_list, util::asFunction(util::forward<decltype(gens)>(gens))...);
+    return util::createProperty(func, util::forward<decltype(genTup)>(genTup));
 }
 
 template <typename Callable, typename... EXPGENS>

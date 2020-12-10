@@ -14,8 +14,8 @@ namespace proptest {
 template <typename GEN1, typename GEN2>
 decltype(auto) pairOf(GEN1&& gen1, GEN2&& gen2)
 {
-    auto genPairPtr = make_shared<pair<decay_t<GEN1>, decay_t<GEN2>>>(forward<GEN1>(gen1),
-                                                                                          forward<GEN2>(gen2));
+    auto genPairPtr = util::make_shared<pair<decay_t<GEN1>, decay_t<GEN2>>>(util::forward<GEN1>(gen1),
+                                                                                          util::forward<GEN2>(gen2));
     // generator
     return generator([genPairPtr](Random& rand) mutable {
         return shrinkPair(genPairPtr->first(rand), genPairPtr->second(rand));

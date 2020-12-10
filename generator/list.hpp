@@ -36,7 +36,7 @@ public:
     Shrinkable<list<T>> operator()(Random& rand) override
     {
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
-        shared_ptr<vector_t> shrinkVec = make_shared<vector_t>();
+        shared_ptr<vector_t> shrinkVec = util::make_shared<vector_t>();
         shrinkVec->reserve(size);
         for (size_t i = 0; i < size; i++)
             shrinkVec->push_back(elemGen(rand));

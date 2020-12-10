@@ -42,7 +42,7 @@ TEST(Compile, printing_container)
 
 TEST(Compile, printing_shared_ptr)
 {
-    auto ptr = make_shared<int>(5);
+    auto ptr = util::make_shared<int>(5);
     show(cout, ptr);
     cout << endl;
 }
@@ -95,7 +95,7 @@ TEST(Compile, printing_container_custom_defined)
 TEST(Compile, printing_container_custom_element)
 {
     vector<shared_ptr<Cat>> vec;
-    auto ptr = make_shared<Cat>();
+    auto ptr = util::make_shared<Cat>();
     vec.push_back(ptr);
     show(cout, vec);
     cout << endl;
@@ -130,7 +130,7 @@ struct ShowDefault<CarLike<T>>
 TEST(Compile, printing_container_custom_element_defined)
 {
     vector<shared_ptr<Car>> vec;
-    auto ptr = make_shared<Car>();
+    auto ptr = util::make_shared<Car>();
     vec.push_back(ptr);
     show(cout, vec);
     cout << endl;
@@ -139,7 +139,7 @@ TEST(Compile, printing_container_custom_element_defined)
 TEST(Compile, printing_custom_templated_defined)
 {
     vector<shared_ptr<CarLike<Car>>> vec;
-    auto ptr = make_shared<CarLike<Car>>(Car());
+    auto ptr = util::make_shared<CarLike<Car>>(Car());
     vec.push_back(ptr);
     show(cout, vec);
     cout << endl;

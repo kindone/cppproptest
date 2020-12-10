@@ -339,3 +339,53 @@ TEST(PropTest, TestDerive2)
         exhaustive(shr, 0);
     }
 }
+
+struct Node {
+    Node(int _value) : value(_value) {}
+    Node(int _value, std::vector<Node>& _children) : value(_value), children(_children) {}
+
+    int value;
+    std::vector<Node> children;
+};
+
+
+namespace proptest {
+namespace util {
+
+template <>
+struct ShowDefault<Node>
+{
+    static ostream& show(ostream& os, const Node& n)
+    {
+        os << "N(";
+        os << "value: " << n.value;
+        if (!n.children.empty()) {
+            os << "children: " << "[ " << Show<Node>(*n.children.begin());
+            for (auto itr = n.children.begin() + 1; itr != n.children.end(); ++itr) {
+                os << ", " << Show<Node>(*itr);
+            }
+            os << " ]";
+        }
+        os << ")";
+        return os;
+    }
+};
+
+}  // namespace util
+
+}  // na
+
+TEST(PropTest, TestRecursive)
+{
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto intGen = Arbi<int>();
+    auto leafGen = construct<Node, int>(intGen);
+    auto leafVecGen = Arbi<std::vector<Node>>(leafGen).setSize(1,2);
+    auto branch1Gen = construct<Node, int, std::vector<Node>>(intGen, leafVecGen);
+    static GenFunction<Node> branchNGen = construct<Node, int, std::vector<Node>>(intGen, Arbi<std::vector<Node>>(oneOf<Node>(branch1Gen, branchNGen)).setSize(1,2));
+    auto tree = branchNGen(rand).get();
+    cout << "tree: " << proptest::Show<Node>(tree) << endl;
+}

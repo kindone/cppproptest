@@ -41,9 +41,9 @@ TEST(ConcurrencyTest, WithoutModel)
         obj.clear();
     }));
 
-    auto actionListGen = oneOf<SimpleAction<vector<int>>>(pushBackGen, popBackGen, clearGen);
+    auto actionGen = oneOf<SimpleAction<vector<int>>>(pushBackGen, popBackGen, clearGen);
 
-    auto prop = concurrency<vector<int>>(Arbi<vector<int>>(), actionListGen);
+    auto prop = concurrency<vector<int>>(Arbi<vector<int>>(), actionGen);
     prop.go();
 }
 
@@ -73,10 +73,10 @@ TEST(ConcurrencyTest, WithModel)
         obj.clear();
     }));
 
-    auto actionListGen = oneOf<Action<vector<int>, Model>>(pushBackGen, popBackGen, clearGen);
+    auto actionGen = oneOf<Action<vector<int>, Model>>(pushBackGen, popBackGen, clearGen);
 
     auto prop = concurrency<vector<int>, Model>(
-        Arbi<vector<int>>(), [](vector<int>&) { return Model(); }, actionListGen);
+        Arbi<vector<int>>(), [](vector<int>&) { return Model(); }, actionGen);
     prop.setMaxConcurrency(2);
     prop.go();
 }

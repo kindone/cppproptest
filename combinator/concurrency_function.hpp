@@ -7,7 +7,7 @@
 #include "../api.hpp"
 #include "../PropertyContext.hpp"
 #include "../GenBase.hpp"
-#include "util/std.hpp"
+#include "../util/std.hpp"
 #include <thread>
 #include <atomic>
 
@@ -59,23 +59,23 @@ public:
     }
 
     Concurrency& setOnStartup(function<void()> onStartup) {
-        onStartupPtr = make_shared<function<void()>>(onStartup);
+        onStartupPtr = util::make_shared<function<void()>>(onStartup);
         return *this;
     }
 
     Concurrency& setOnCleanup(function<void()> onCleanup) {
-        onCleanupPtr = make_shared<function<void()>>(onCleanup);
+        onCleanupPtr = util::make_shared<function<void()>>(onCleanup);
         return *this;
     }
 
     Concurrency& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)  {
-        postCheckPtr = make_shared<function<void(ObjectType&, ModelType&)>>(postCheck);
+        postCheckPtr = util::make_shared<function<void(ObjectType&, ModelType&)>>(postCheck);
         return *this;
     }
 
     Concurrency& setPostCheck(function<void(ObjectType&)> postCheck)  {
         function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
-        postCheckPtr = make_shared(fullPostCheck);
+        postCheckPtr = util::make_shared(fullPostCheck);
         return *this;
     }
 
@@ -327,8 +327,8 @@ decltype(auto) concurrency(InitialGen&& initialGen, SimpleActionGen<ObjectType>&
             return Action<ObjectType,EmptyModel>(simpleAction);
         });
 
-    auto initialGenPtr = make_shared<ObjectTypeGen>(forward<InitialGen>(initialGen));
-    auto actionGenPtr = make_shared<GenFunction<ActionType>>(actionGen2);
+    auto initialGenPtr = util::make_shared<ObjectTypeGen>(util::forward<InitialGen>(initialGen));
+    auto actionGenPtr = util::make_shared<GenFunction<ActionType>>(actionGen2);
     return Concurrency<ObjectType, EmptyModel>(initialGenPtr, actionGenPtr);
 }
 
@@ -341,10 +341,10 @@ decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory,
     using ActionType = Action<ObjectType, ModelType>;
 
     shared_ptr<ModelFactoryFunction> modelFactoryPtr =
-        make_shared<ModelFactoryFunction>(forward<ModelFactory>(modelFactory));
+        util::make_shared<ModelFactoryFunction>(util::forward<ModelFactory>(modelFactory));
 
-    auto initialGenPtr = make_shared<ObjectTypeGen>(forward<InitialGen>(initialGen));
-    auto actionGenPtr = make_shared<GenFunction<ActionType>>(forward<ActionGen<ObjectType, ModelType>>(actionGen));
+    auto initialGenPtr = util::make_shared<ObjectTypeGen>(util::forward<InitialGen>(initialGen));
+    auto actionGenPtr = util::make_shared<GenFunction<ActionType>>(util::forward<ActionGen<ObjectType, ModelType>>(actionGen));
     return Concurrency<ObjectType, ModelType>(initialGenPtr, modelFactoryPtr, actionGenPtr);
 }
 

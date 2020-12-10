@@ -20,7 +20,7 @@ public:
     {
         auto gen = Arbi<T>();
         Shrinkable<T> shrinkable = gen(rand);
-        return shrinkable.template map<shared_ptr<T>>(+[](const T& obj) { return make_shared<T>(obj); });
+        return shrinkable.template map<shared_ptr<T>>(+[](const T& obj) { return util::make_shared<T>(obj); });
     }
 
     GenFunction<T> elemGen;

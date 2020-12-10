@@ -51,32 +51,32 @@ public:
     }
 
     StatefulProperty& setOnStartup(function<void()> onStartup) {
-        onStartupPtr = make_shared<function<void()>>(onStartup);
+        onStartupPtr = util::make_shared<function<void()>>(onStartup);
         return *this;
     }
 
     StatefulProperty& setOnCleanup(function<void()> onCleanup) {
-        onCleanupPtr = make_shared<function<void()>>(onCleanup);
+        onCleanupPtr = util::make_shared<function<void()>>(onCleanup);
         return *this;
     }
 
     StatefulProperty& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)  {
-        postCheckPtr = make_shared(postCheck);
+        postCheckPtr = util::make_shared(postCheck);
         return *this;
     }
 
     StatefulProperty& setPostCheck(function<void(ObjectType&)> postCheck)  {
         function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
-        postCheckPtr = make_shared(fullPostCheck);
+        postCheckPtr = util::make_shared(fullPostCheck);
         return *this;
     }
 
     bool go() {
         // TODO add interface to adjust list min max sizes
         auto actionListGen = Arbi<list<Action<ObjectType,ModelType>>>(actionGen);
-        auto genTup = make_tuple(forward<InitialGen>(initialGen), actionListGen);
+        auto genTup = util::make_tuple(util::forward<InitialGen>(initialGen), actionListGen);
         shared_ptr<ModelFactoryFunction> modelFactoryPtr =
-            make_shared<ModelFactoryFunction>(forward<ModelFactoryFunction>(modelFactory));
+            util::make_shared<ModelFactoryFunction>(util::forward<ModelFactoryFunction>(modelFactory));
 
         auto func = [modelFactoryPtr](ObjectType obj, list<Action<ObjectType,ModelType>> actions) {
             auto model = (*modelFactoryPtr)(obj);
@@ -86,7 +86,7 @@ public:
             return true;
         };
 
-        auto prop = make_shared<PropertyType>(func, genTup);
+        auto prop = util::make_shared<PropertyType>(func, genTup);
         if(onStartupPtr)
             prop->setOnStartup(*onStartupPtr);
         if(onCleanupPtr)
@@ -120,7 +120,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, SimpleActionGen<ObjectT
         });
 
     auto modelFactory = +[](ObjectType&) { return emptyModel; };
-    return StatefulProperty<ObjectType, EmptyModel>(forward<InitialGen>(initialGen), modelFactory, actionGen2);
+    return StatefulProperty<ObjectType, EmptyModel>(util::forward<InitialGen>(initialGen), modelFactory, actionGen2);
 }
 
 template <typename ObjectType, typename ModelType, typename InitialGen>
@@ -128,7 +128,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, function<ModelType(Obje
                                 ActionGen<ObjectType, ModelType>& actionGen)
 {
     return StatefulProperty<ObjectType, ModelType>(
-        forward<InitialGen>(initialGen), modelFactory, actionGen);
+        util::forward<InitialGen>(initialGen), modelFactory, actionGen);
 }
 
 }  // namespace stateful

@@ -7,7 +7,7 @@
 #include "../api.hpp"
 #include "../PropertyContext.hpp"
 #include "../GenBase.hpp"
-#include "util/std.hpp"
+#include "../util/std.hpp"
 #include <thread>
 #include <mutex>
 #include <atomic>
@@ -247,8 +247,8 @@ decltype(auto) concurrency(InitialGen&& initialGen, ActionListGen&& actionListGe
     using ObjectType = typename ActionType::ObjectType;
     using ObjectTypeGen = GenFunction<ObjectType>;
     using ActionList = list<shared_ptr<ActionType>>;
-    auto initialGenPtr = make_shared<ObjectTypeGen>(forward<InitialGen>(initialGen));
-    auto actionListGenPtr = make_shared<GenFunction<ActionList>>(forward<ActionListGen>(actionListGen));
+    auto initialGenPtr = util::make_shared<ObjectTypeGen>(util::forward<InitialGen>(initialGen));
+    auto actionListGenPtr = util::make_shared<GenFunction<ActionList>>(util::forward<ActionListGen>(actionListGen));
     return Concurrency<ActionType>(initialGenPtr, actionListGenPtr);
 }
 
@@ -262,10 +262,10 @@ decltype(auto) concurrency(InitialGen&& initialGen, ModelFactory&& modelFactory,
     using ActionList = list<shared_ptr<ActionType>>;
 
     shared_ptr<ModelFactoryFunction> modelFactoryPtr =
-        make_shared<ModelFactoryFunction>(forward<ModelFactory>(modelFactory));
+        util::make_shared<ModelFactoryFunction>(util::forward<ModelFactory>(modelFactory));
 
-    auto initialGenPtr = make_shared<ObjectTypeGen>(forward<InitialGen>(initialGen));
-    auto actionListGenPtr = make_shared<GenFunction<ActionList>>(forward<ActionListGen>(actionListGen));
+    auto initialGenPtr = util::make_shared<ObjectTypeGen>(util::forward<InitialGen>(initialGen));
+    auto actionListGenPtr = util::make_shared<GenFunction<ActionList>>(util::forward<ActionListGen>(actionListGen));
     return Concurrency<ActionType>(initialGenPtr, modelFactoryPtr, actionListGenPtr);
 }
 

@@ -9,14 +9,14 @@ namespace proptest {
 template <typename T, typename LazyEval>
 Generator<T> lazy(LazyEval&& lazyEval)
 {
-    auto lazyEvalPtr = make_shared<function<T()>>(forward<LazyEval>(lazyEval));
+    auto lazyEvalPtr = util::make_shared<function<T()>>(util::forward<LazyEval>(lazyEval));
     return generator([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
 }
 
 template <typename LazyEval, typename T = typename result_of<LazyEval()>::type>
 auto lazy(LazyEval&& lazyEval) -> Generator<T>
 {
-    return lazy<T>(forward<LazyEval>(lazyEval));
+    return lazy<T>(util::forward<LazyEval>(lazyEval));
 }
 
 template <typename T, typename U = T>
@@ -41,7 +41,7 @@ enable_if_t<is_trivial<T>::value, Generator<T>> just(T&& value)
 template <typename T>
 enable_if_t<!is_trivial<T>::value, Generator<T>> just(const T& value)
 {
-    auto ptr = make_shared<T>(value);  // requires copy constructor
+    auto ptr = util::make_shared<T>(value);  // requires copy constructor
     return generator([ptr](Random&) { return Shrinkable<T>(ptr); });
 }
 

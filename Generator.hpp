@@ -20,7 +20,7 @@ class Random;
 template <typename T>
 struct Generator : public GenBase<T>
 {
-    Generator(GenFunction<T> gen) : genPtr(make_shared<GenFunction<T>>(gen)) {}
+    Generator(GenFunction<T> gen) : genPtr(util::make_shared<GenFunction<T>>(gen)) {}
 
     virtual Shrinkable<T> operator()(Random& rand) override { return (*genPtr)(rand); }
 
@@ -35,7 +35,7 @@ struct Generator : public GenBase<T>
     template <typename F, typename U = typename result_of<F(T&)>::type>
     auto map(F&& mapper) -> Generator<U>
     {
-        return map<U>(forward<F>(mapper));
+        return map<U>(util::forward<F>(mapper));
     }
 
     Generator<T> filter(function<bool(T&)> criteria)
@@ -66,7 +66,7 @@ struct Generator : public GenBase<T>
         return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
     }
 
-    shared_ptr<Generator<T>> clone() { return make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
+    shared_ptr<Generator<T>> clone() { return util::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }
 
     shared_ptr<GenFunction<T>> genPtr;
 };

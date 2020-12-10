@@ -1,8 +1,9 @@
 #pragma once
 #include "../Shrinkable.hpp"
+#include "../api.hpp"
 
 namespace proptest {
 
-Shrinkable<bool> shrinkBool(bool value);
+PROPTEST_API Shrinkable<bool> shrinkBool(bool value);
 
 }

@@ -22,13 +22,13 @@ TEST(UtilTestCase, invokeTest)
         cout << "i: " << i << " v: " << v << " s: " << s << endl;
     };
 
-    invokeWithArgTuple(func, make_tuple(arg1, arg2, arg3));
-    invokeWithArgs(func, make_tuple(arg1, arg2, arg3));
+    invokeWithArgTuple(func, util::make_tuple(arg1, arg2, arg3));
+    invokeWithArgs(func, util::make_tuple(arg1, arg2, arg3));
 }
 
 TEST(UtilTestCase, transformTest)
 {
-    transformTuple(transformTuple(make_tuple(5, 6, 7),
+    transformTuple(transformTuple(util::make_tuple(5, 6, 7),
                                   [](int i) {
                                       cout << "n: " << i << endl;
                                       return to_string(i);
@@ -64,19 +64,19 @@ struct Transformer<string>
 
 TEST(UtilTestCase, transformHeteroTest)
 {
-    transformHeteroTuple<Transformer>(make_tuple(5, 6, 7));
+    transformHeteroTuple<Transformer>(util::make_tuple(5, 6, 7));
 }
 
 TEST(UtilTestCase, transformHeteroTest2)
 {
-    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(make_tuple(5, 6, 7)));
+    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(util::make_tuple(5, 6, 7)));
 }
 
 TEST(UtilTestCase, transformHeteroTest3)
 {
     int a = 5;
     string b("a");
-    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(make_tuple(a, b, 7)));
+    transformHeteroTuple<Transformer>(transformHeteroTuple<Transformer>(util::make_tuple(a, b, 7)));
 }
 
 template <typename T>
@@ -119,7 +119,7 @@ decltype(auto) doTuple(tuple<ARGS...>&)
 
 TEST(UtilTestCase, TypeList)
 {
-    auto tup = make_tuple(1, 2.3, "abc");
+    auto tup = util::make_tuple(1, 2.3, "abc");
     auto res = doTuple(tup);
     using type_tuple = typename decltype(res)::type_tuple;
     auto tup2 = static_cast<type_tuple>(tup);
@@ -316,14 +316,14 @@ TEST(UtilTestCase, ObjectsWithConstraints)
     // tuple<NoBlank> t1(NoBlank(5));
     {
         tuple<NoCopy> t2(NoCopy(5));
-        tuple<NoCopy> t2_2(move(get<0>(t2)));
-        tuple<NoCopy> t2_3(move(t2_2));
+        tuple<NoCopy> t2_2(util::move(get<0>(t2)));
+        tuple<NoCopy> t2_3(util::move(t2_2));
     }
 
     {
-        tuple<NoMove> t3(move(NoMove(5)));
+        tuple<NoMove> t3(util::move(NoMove(5)));
         tuple<NoMove> t3_2 = t3;
-        // tuple<NoMove> t3_3(move(t3));
+        // tuple<NoMove> t3_3(util::move(t3));
     }
 
     // tuple<NoBlank> t1_2  = t1;

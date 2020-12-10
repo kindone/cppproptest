@@ -27,7 +27,7 @@ struct Shrinkable
 
     Shrinkable with(function<Stream<Shrinkable<T>>()> _shrinks) const
     {
-        return Shrinkable(ptr, make_shared<decltype(_shrinks)>(_shrinks));
+        return Shrinkable(ptr, util::make_shared<decltype(_shrinks)>(_shrinks));
     }
 
     Shrinkable with(shared_ptr<function<Stream<Shrinkable<T>>()>> newShrinksPtr) const
@@ -44,7 +44,7 @@ struct Shrinkable
     template <typename U = T>
     Shrinkable<U> map(function<U(const T&)> transformer) const
     {
-        auto transformerPtr = make_shared<decltype(transformer)>(transformer);
+        auto transformerPtr = util::make_shared<decltype(transformer)>(transformer);
         return map<U>(transformerPtr);
     }
 
@@ -52,7 +52,7 @@ struct Shrinkable
     Shrinkable<U> map(shared_ptr<function<U(const T&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
-        auto shrinkable = make_shrinkable<U>(move((*transformerPtr)(getRef())));
+        auto shrinkable = make_shrinkable<U>(util::move((*transformerPtr)(getRef())));
         return shrinkable.with([thisShrinksPtr, transformerPtr]() {
             return (*thisShrinksPtr)().template transform<Shrinkable<U>>(
                 [transformerPtr](const Shrinkable<T>& shr) { return shr.map(transformerPtr); });
@@ -62,7 +62,7 @@ struct Shrinkable
     template <typename U = T>
     Shrinkable<U> flatMap(function<Shrinkable<U>(const T&)> transformer) const
     {
-        auto transformerPtr = make_shared<function<Shrinkable<U>(const T&)>>(transformer);
+        auto transformerPtr = util::make_shared<function<Shrinkable<U>(const T&)>>(transformer);
         return flatMap<U>(transformerPtr);
     }
 
@@ -80,7 +80,7 @@ struct Shrinkable
     template <typename U = T>
     Shrinkable<U> mapShrinkable(function<Shrinkable<U>(const Shrinkable<T>&)> transformer) const
     {
-        auto transformerPtr = make_shared<function<Shrinkable<U>(const Shrinkable<T>&)>>(transformer);
+        auto transformerPtr = util::make_shared<function<Shrinkable<U>(const Shrinkable<T>&)>>(transformer);
         return mapShrinkable<U>(transformerPtr);
     }
 
@@ -99,7 +99,7 @@ struct Shrinkable
     // provide filtered generation, shrinking
     Shrinkable<T> filter(function<bool(const T&)> criteria) const
     {
-        auto criteriaPtr = make_shared<function<bool(const T&)>>(criteria);
+        auto criteriaPtr = util::make_shared<function<bool(const T&)>>(criteria);
         return filter(criteriaPtr);
     }
 
@@ -111,7 +111,7 @@ struct Shrinkable
         auto thisShrinksPtr = shrinksPtr;
 
         return with([thisShrinksPtr, criteriaPtr]() {
-            auto criteriaForStream = make_shared<function<bool(const Shrinkable<T>&)>>(
+            auto criteriaForStream = util::make_shared<function<bool(const Shrinkable<T>&)>>(
                 [criteriaPtr](const Shrinkable<T>& shr) -> bool { return (*criteriaPtr)(shr.getRef()); });
             // filter stream's value, and then transform each shrinkable to call filter recursively
             return (*thisShrinksPtr)()
@@ -124,7 +124,7 @@ struct Shrinkable
     // provide filtered generation, shrinking
     Shrinkable<T> filter(function<bool(const T&)> criteria, int tolerance) const
     {
-        auto criteriaPtr = make_shared<function<bool(const T&)>>(criteria);
+        auto criteriaPtr = util::make_shared<function<bool(const T&)>>(criteria);
         return filter(criteriaPtr, tolerance);
     }
 
@@ -158,7 +158,7 @@ struct Shrinkable
         };
 
         return with([thisShrinksPtr, criteriaPtr, tolerance]() {
-            auto criteriaForStream = make_shared<function<bool(const Shrinkable<T>&)>>(
+            auto criteriaForStream = util::make_shared<function<bool(const Shrinkable<T>&)>>(
                 [criteriaPtr](const Shrinkable<T>& shr) -> bool { return (*criteriaPtr)(shr.getRef()); });
             // filter stream's value, and then transform each shrinkable to call filter recursively
             return filterStream((*thisShrinksPtr)(), criteriaForStream)
@@ -170,7 +170,7 @@ struct Shrinkable
     // concat: continues with then after horizontal dead end
     Shrinkable<T> concatStatic(function<Stream<Shrinkable<T>>()> then) const
     {
-        auto thenPtr = make_shared<decltype(then)>(then);
+        auto thenPtr = util::make_shared<decltype(then)>(then);
         return concatStatic(thenPtr);
     }
 
@@ -187,7 +187,7 @@ struct Shrinkable
     // concat: extend shrinks stream with function taking parent as argument
     Shrinkable<T> concat(function<Stream<Shrinkable<T>>(const Shrinkable<T>&)> then) const
     {
-        auto thenPtr = make_shared<decltype(then)>(then);
+        auto thenPtr = util::make_shared<decltype(then)>(then);
         return concat(thenPtr);
     }
 
@@ -205,7 +205,7 @@ struct Shrinkable
     Shrinkable<T> andThenStatic(function<Stream<Shrinkable<T>>()> then) const
     {
         auto thisShrinksPtr = shrinksPtr;
-        auto thenPtr = make_shared<decltype(then)>(then);
+        auto thenPtr = util::make_shared<decltype(then)>(then);
         return andThenStatic(thenPtr);
     }
 
@@ -224,14 +224,14 @@ struct Shrinkable
 
     Shrinkable<T> andThen(function<Stream<Shrinkable<T>>(const Shrinkable<T>&)> then) const
     {
-        auto thenPtr = make_shared<decltype(then)>(then);
+        auto thenPtr = util::make_shared<decltype(then)>(then);
         return andThen(thenPtr);
     }
 
     Shrinkable<T> andThen(shared_ptr<function<Stream<Shrinkable<T>>(const Shrinkable<T>&)>> thenPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
-        auto selfSharedPtr = make_shared<Shrinkable<T>>(*this);
+        auto selfSharedPtr = util::make_shared<Shrinkable<T>>(*this);
         if (shrinksPtr->operator()().isEmpty()) {
             return with([selfSharedPtr, thenPtr]() { return (*thenPtr)(*selfSharedPtr); });
         } else {
@@ -261,7 +261,7 @@ private:
     shared_ptr<function<Stream<Shrinkable<T>>()>> emptyPtr()
     {
         static const auto empty =
-            make_shared<function<Stream<Shrinkable<T>>()>>(+[]() { return Stream<Shrinkable<T>>::empty(); });
+            util::make_shared<function<Stream<Shrinkable<T>>()>>(+[]() { return Stream<Shrinkable<T>>::empty(); });
         return empty;
     }
 
@@ -279,7 +279,7 @@ public:
 template <typename T, typename... Args>
 Shrinkable<T> make_shrinkable(Args&&... args)
 {
-    Shrinkable<T> shrinkable(make_shared<T>(args...));
+    Shrinkable<T> shrinkable(util::make_shared<T>(args...));
     return shrinkable;
 }
 

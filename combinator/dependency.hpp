@@ -15,8 +15,8 @@ struct Generator;
 template <typename T, typename U>
 Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
 {
-    auto gen1Ptr = make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = make_shared<function<GenFunction<U>(const T&)>>(
+    auto gen1Ptr = util::make_shared<decltype(gen1)>(gen1);
+    auto gen2genPtr = util::make_shared<function<GenFunction<U>(const T&)>>(
         [gen2gen](const T& t) { return gen2gen(const_cast<T&>(t)); });
 
     auto genPair = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<pair<T, U>> {
@@ -30,7 +30,7 @@ Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&
                 // generate U
                 auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
-                return make_shrinkable<pair<T, Shrinkable<U>>>(make_pair(t, shrinkableU));
+                return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, shrinkableU));
             });
 
         // shrink strategy 2: expand Shrinkable<U>
@@ -42,7 +42,7 @@ Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&
                 Shrinkable<Intermediate> newShrinkableU =
                     shrinkableU.template flatMap<Intermediate>([interpair](const U& u) mutable {
                         return make_shrinkable<pair<T, Shrinkable<U>>>(
-                            make_pair(interpair->first, make_shrinkable<U>(u)));
+                            util::make_pair(interpair->first, make_shrinkable<U>(u)));
                     });
                 return newShrinkableU.shrinks();
             });
@@ -50,7 +50,7 @@ Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&
         // reformat pair<T, Shrinkable<U>> to pair<T, U>
         return intermediate.template flatMap<pair<T, U>>(
             +[](const Intermediate& interpair) -> Shrinkable<pair<T, U>> {
-                return make_shrinkable<pair<T, U>>(make_pair(interpair.first, interpair.second.getRef()));
+                return make_shrinkable<pair<T, U>>(util::make_pair(interpair.first, interpair.second.getRef()));
             });
     };
 

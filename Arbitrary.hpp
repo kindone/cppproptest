@@ -32,7 +32,7 @@ struct ArbiBase : public GenBase<T>
     template <typename F, typename U = typename result_of<F(T&)>::type>
     auto map(F&& mapper) -> Generator<U>
     {
-        return map<U>(forward<F>(mapper));
+        return map<U>(util::forward<F>(mapper));
     }
 
     Generator<T> filter(function<bool(T&)> criteria)
@@ -63,28 +63,38 @@ struct ArbiBase : public GenBase<T>
         return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
     }
 
-    shared_ptr<Arbi<T>> clone() { return make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
+    shared_ptr<Arbi<T>> clone() { return util::make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
 };
+
+template <typename T> struct Arbi;
 
 template <typename T>
 struct ArbiContainer : public ArbiBase<T>
 {
     ArbiContainer(size_t _minSize, size_t _maxSize) : minSize(_minSize), maxSize(_maxSize) {}
 
-    void setMinSize(size_t size) { minSize = size; }
+    Arbi<T>& setMinSize(size_t size) {
+        minSize = size;
+        return static_cast<Arbi<T>&>(*this);
+    }
 
-    void setMaxSize(size_t size) { maxSize = size; }
+    Arbi<T>& setMaxSize(size_t size) {
+        maxSize = size;
+        return static_cast<Arbi<T>&>(*this);
+    }
 
-    void setSize(size_t size)
+    Arbi<T>& setSize(size_t size)
     {
         minSize = size;
         maxSize = size;
+        return static_cast<Arbi<T>&>(*this);
     }
 
-    void setSize(size_t min, size_t max)
+    Arbi<T>& setSize(size_t min, size_t max)
     {
         minSize = min;
         maxSize = max;
+        return static_cast<Arbi<T>&>(*this);
     }
 
     size_t minSize;

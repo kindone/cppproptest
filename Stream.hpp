@@ -36,16 +36,16 @@ struct Stream
     Stream(const shared_ptr<Stream<T>>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
 
     Stream(const T& h, function<Stream<T>()> gen)
-        : headPtr(make_shared<T>(h)), tailGen(make_shared<function<Stream<T>()>>(gen))
+        : headPtr(util::make_shared<T>(h)), tailGen(util::make_shared<function<Stream<T>()>>(gen))
     {
     }
 
     Stream(const shared_ptr<T>& h, function<Stream<T>()> gen)
-        : headPtr(h), tailGen(make_shared<function<Stream<T>()>>(gen))
+        : headPtr(h), tailGen(util::make_shared<function<Stream<T>()>>(gen))
     {
     }
 
-    Stream(const T& h) : headPtr(make_shared<T>(h)), tailGen(make_shared<function<Stream<T>()>>(done()))
+    Stream(const T& h) : headPtr(util::make_shared<T>(h)), tailGen(util::make_shared<function<Stream<T>()>>(done()))
     {
     }
 
@@ -66,7 +66,7 @@ struct Stream
     template <typename U = T>
     Stream<U> transform(function<U(const T&)> transformer)
     {
-        auto transformerPtr = make_shared<decltype(transformer)>(transformer);
+        auto transformerPtr = util::make_shared<decltype(transformer)>(transformer);
         return transform<U>(transformerPtr);
     }
 
@@ -85,7 +85,7 @@ struct Stream
 
     Stream<T> filter(function<bool(const T&)> criteria) const
     {
-        auto criteriaPtr = make_shared<decltype(criteria)>(criteria);
+        auto criteriaPtr = util::make_shared<decltype(criteria)>(criteria);
         return filter(criteriaPtr);
     }
 

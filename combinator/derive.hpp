@@ -15,8 +15,8 @@ struct Generator;
 template <typename T, typename U>
 Generator<U> derive(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
 {
-    auto gen1Ptr = make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = make_shared<function<Generator<U>(const T&)>>(
+    auto gen1Ptr = util::make_shared<decltype(gen1)>(gen1);
+    auto gen2genPtr = util::make_shared<function<Generator<U>(const T&)>>(
         [gen2gen](const T& t) { return gen2gen(const_cast<T&>(t)); });
 
     auto genU = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<U> {
@@ -30,7 +30,7 @@ Generator<U> derive(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
                 // generate U
                 auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
-                return make_shrinkable<pair<T, Shrinkable<U>>>(make_pair(t, shrinkableU));
+                return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, shrinkableU));
             });
 
         // shrink strategy 2: expand Shrinkable<U>
@@ -42,7 +42,7 @@ Generator<U> derive(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
                 Shrinkable<U>& shrinkableU = interpair.second;
                 Shrinkable<Intermediate> newShrinkableU =
                     shrinkableU.template flatMap<Intermediate>([t](const U& u) mutable {
-                        return make_shrinkable<pair<T, Shrinkable<U>>>(make_pair(t, make_shrinkable<U>(u)));
+                        return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, make_shrinkable<U>(u)));
                     });
                 return newShrinkableU.shrinks();
             });

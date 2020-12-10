@@ -39,7 +39,7 @@ private:
             if (Size == 0 || N > Size - 1)
                 return stream_t::empty();
 
-            shared_ptr<tuple_t> parentRef = make_shared<tuple_t>(parent.getRef());
+            shared_ptr<tuple_t> parentRef = util::make_shared<tuple_t>(parent.getRef());
 
             e_shrinkable_t& elem = get<N>(*parentRef);
             // {0,2,3} to {[x,x,x,0], ...,[x,x,x,3]}
@@ -62,7 +62,7 @@ public:
     static Shrinkable<out_tuple_t> shrink(const shrinkable_t& shrinkable)
     {
         return ConcatHelper<0>(shrinkable).template flatMap<out_tuple_t>(+[](const tuple_t& tuple) {
-            return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(move(tuple)));
+            return make_shrinkable<out_tuple_t>(transformHeteroTuple<GetValueFromShrinkable>(util::move(tuple)));
         });
     }
 };

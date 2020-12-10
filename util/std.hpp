@@ -42,12 +42,15 @@ using std::remove_reference_t;
 using std::is_trivial;
 using std::declval;
 
+namespace util {
 using std::forward;
 using std::move;
-using std::transform;
-
 using std::make_pair;
 using std::make_tuple;
+using std::make_shared;
+using std::transform;
+using std::back_inserter;
+}
 
 using std::make_index_sequence;
 using std::get;
@@ -60,9 +63,7 @@ using std::result_of;
 using std::enable_if;
 using std::enable_if_t;
 
-
 using std::shared_ptr;
-using std::make_shared;
 using std::to_string;
 
 using std::numeric_limits;

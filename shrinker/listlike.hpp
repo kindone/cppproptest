@@ -27,7 +27,7 @@ struct VectorShrinker {
             if (elemStreams->size() != size)
                 throw runtime_error("element streams size error");
 
-            shared_ptr<vector<e_stream_t>> newElemStreams = make_shared<vector<e_stream_t>>();
+            shared_ptr<vector<e_stream_t>> newElemStreams = util::make_shared<vector<e_stream_t>>();
             newElemStreams->reserve(size);
 
             shrinkable_vector_t newVec = parent.getRef();
@@ -79,7 +79,7 @@ struct VectorShrinker {
 
         const size_t size = topos - frompos;
         shrinkable_vector_t& parentVec = ancestor.getRef();
-        shared_ptr<vector<e_stream_t>> elemStreams = make_shared<vector<e_stream_t>>();
+        shared_ptr<vector<e_stream_t>> elemStreams = util::make_shared<vector<e_stream_t>>();
         elemStreams->reserve(size);
 
         bool nothingToDo = true;

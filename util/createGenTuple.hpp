@@ -25,7 +25,7 @@ decltype(auto) genToFunc(GEN&& gen)
 template <typename Tuple, size_t... index>
 decltype(auto) createGenHelperListed(index_sequence<index...>)
 {
-    return make_tuple(genToFunc(Arbi<tuple_element_t<index, Tuple>>())...);
+    return util::make_tuple(genToFunc(Arbi<tuple_element_t<index, Tuple>>())...);
 }
 
 // returns a Tuple<Arbi<ARGS...>>
@@ -43,7 +43,7 @@ enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGS)),
 createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     // constexpr auto ExplicitSize = sizeof...(EXPGENS);
-    tuple<decay_t<EXPGENS>...> explicits = make_tuple(gens...);
+    tuple<decay_t<EXPGENS>...> explicits = util::make_tuple(gens...);
     return explicits;
 }
 
@@ -54,7 +54,7 @@ createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     constexpr auto ExplicitSize = sizeof...(EXPGENS);
     constexpr auto ImplicitSize = sizeof...(ARGS) - ExplicitSize;
-    auto explicits = make_tuple(gens...);
+    auto explicits = util::make_tuple(gens...);
     using ArgsAsTuple = tuple<decay_t<ARGS>...>;
     auto implicits =
         createGenHelperListed<ArgsAsTuple>(addOffset<ExplicitSize>(make_index_sequence<ImplicitSize>{}));

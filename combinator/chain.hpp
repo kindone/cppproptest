@@ -1,9 +1,10 @@
 #pragma once
-#include "util/std.hpp"
+
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 #include "../GenBase.hpp"
 #include "../util/function_traits.hpp"
+#include "../util/std.hpp"
 
 namespace proptest {
 
@@ -20,8 +21,8 @@ namespace util {
 template <typename U, typename T>
 Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
 {
-    auto gen1Ptr = make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = make_shared<function<GenFunction<U>(const T&)>>(
+    auto gen1Ptr = util::make_shared<decltype(gen1)>(gen1);
+    auto gen2genPtr = util::make_shared<function<GenFunction<U>(const T&)>>(
         [gen2gen](const T& t) { return gen2gen(const_cast<T&>(t)); });
 
     auto genTuple = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<Chain<T, U>> {
@@ -35,7 +36,7 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&
                 // generate U
                 auto gen2 = (*gen2genPtr)(t);
                 Shrinkable<U> shrinkableU = gen2(rand);
-                return make_shrinkable<pair<T, Shrinkable<U>>>(make_pair(t, shrinkableU));
+                return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, shrinkableU));
             });
 
         // shrink strategy 2: expand Shrinkable<U>
@@ -47,7 +48,7 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&
                 Shrinkable<U>& shrinkableU = interpair.second;
                 Shrinkable<Intermediate> newShrinkableU =
                     shrinkableU.template flatMap<Intermediate>([t](const U& u) mutable {
-                        return make_shrinkable<pair<T, Shrinkable<U>>>(make_pair(t, make_shrinkable<U>(u)));
+                        return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, make_shrinkable<U>(u)));
                     });
                 return newShrinkableU.shrinks();
             });
@@ -57,7 +58,7 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&
             +[](const Intermediate& interpair) -> Shrinkable<tuple<T, U>> {
                 const T& t = interpair.first;
                 return make_shrinkable<Chain<T, U>>(
-                    tuple_cat(tuple<T>(t), make_tuple(interpair.second.getRef())));
+                    tuple_cat(tuple<T>(t), util::make_tuple(interpair.second.getRef())));
             });
     };
 
@@ -68,8 +69,8 @@ template <typename U, typename T0, typename T1, typename... Ts>
 Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> gen1,
                                              function<GenFunction<U>(Chain<T0, T1, Ts...>&)> gen2gen)
 {
-    auto gen1Ptr = make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = make_shared<function<GenFunction<U>(const Chain<T0, T1, Ts...>&)>>(
+    auto gen1Ptr = util::make_shared<decltype(gen1)>(gen1);
+    auto gen2genPtr = util::make_shared<function<GenFunction<U>(const Chain<T0, T1, Ts...>&)>>(
         [gen2gen](const Chain<T0, T1, Ts...>& ts) { return gen2gen(const_cast<Chain<T0, T1, Ts...>&>(ts)); });
 
     auto genTuple = [gen1Ptr, gen2genPtr](Random & rand) -> Shrinkable<Chain<T0, T1, Ts..., U>>
@@ -86,7 +87,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
                     auto gen2 = (*gen2genPtr)(ts);
                     Shrinkable<U> shrinkableU = gen2(rand);
                     return make_shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
-                        make_pair(ts, shrinkableU));
+                        util::make_pair(ts, shrinkableU));
                 });
 
         // shrink strategy 2: expand Shrinkable<U>
@@ -99,7 +100,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
                 Shrinkable<Intermediate> newShrinkableU =
                     shrinkableU.template flatMap<Intermediate>([ts](const U& u) mutable {
                         return make_shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
-                            make_pair(ts, make_shrinkable<U>(u)));
+                            util::make_pair(ts, make_shrinkable<U>(u)));
                     });
                 return newShrinkableU.shrinks();
             });

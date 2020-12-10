@@ -58,9 +58,9 @@ struct PopBack : public VectorAction
 TEST(StateTest, States)
 {
     auto actionListGen = actionListGenOf<VectorAction>(
-        Arbi<int>().map<shared_ptr<VectorAction>>([](int& value) { return make_shared<PushBack>(value); }),
-        just<shared_ptr<VectorAction>>(make_shared<PopBack>()),
-        just<shared_ptr<VectorAction>>(make_shared<Clear>()));
+        Arbi<int>().map<shared_ptr<VectorAction>>([](int& value) { return util::make_shared<PushBack>(value); }),
+        just<shared_ptr<VectorAction>>(util::make_shared<PopBack>()),
+        just<shared_ptr<VectorAction>>(util::make_shared<Clear>()));
 
     auto prop = statefulProperty<VectorAction>(Arbi<vector<int>>(), actionListGen);
     prop.go();
@@ -123,9 +123,9 @@ struct PopBack2 : public VectorAction2
 TEST(StateTest, StatesWithModel)
 {
     auto actionListGen = actionListGenOf<VectorAction2>(
-        Arbi<int>().map<shared_ptr<VectorAction2>>([](int& value) { return make_shared<PushBack2>(value); }),
-        just<shared_ptr<VectorAction2>>(make_shared<PopBack2>()),
-        just<shared_ptr<VectorAction2>>(make_shared<Clear2>()));
+        Arbi<int>().map<shared_ptr<VectorAction2>>([](int& value) { return util::make_shared<PushBack2>(value); }),
+        just<shared_ptr<VectorAction2>>(util::make_shared<PopBack2>()),
+        just<shared_ptr<VectorAction2>>(util::make_shared<Clear2>()));
 
     auto prop = statefulProperty<VectorAction2>(
         Arbi<vector<int>>(), [](vector<int>& sys) { return VectorModel(sys.size()); }, actionListGen);
@@ -135,7 +135,7 @@ TEST(StateTest, StatesWithModel)
 TEST(StateTest, StatesWithModel2)
 {
     auto actionListGen = actionListGenOf<VectorAction2>(
-        Arbi<int>().map<shared_ptr<VectorAction2>>([](int& value) { return make_shared<PushBack2>(value); }),
+        Arbi<int>().map<shared_ptr<VectorAction2>>([](int& value) { return util::make_shared<PushBack2>(value); }),
         Arbi<int>().map<VectorAction2*>([](int& value) { return new PushBack2(value); }),
         lazy<VectorAction2*>([]() { return new PopBack2(); }), lazy<VectorAction2*>([]() { return new Clear2(); }));
 

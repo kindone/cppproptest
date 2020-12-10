@@ -62,7 +62,7 @@ public:
     {
         auto thisPtr = clone();
         return Generator<CLASS>(proptest::filter<CLASS>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
-                                                        forward<Criteria>(criteria)));
+                                                        util::forward<Criteria>(criteria)));
     }
 
     template <typename U>
@@ -89,14 +89,14 @@ public:
 
     shared_ptr<Construct<CLASS, ARGTYPES...>> clone()
     {
-        return make_shared<Construct<CLASS, ARGTYPES...>>(*dynamic_cast<Construct<CLASS, ARGTYPES...>*>(this));
+        return util::make_shared<Construct<CLASS, ARGTYPES...>>(*dynamic_cast<Construct<CLASS, ARGTYPES...>*>(this));
     }
 
 private:
     template <size_t... index>
     decltype(auto) generateArgsHelper(Random& rand, index_sequence<index...>)
     {
-        return make_tuple(get<index>(genTup)(rand)...);
+        return util::make_tuple(get<index>(genTup)(rand)...);
     }
 
     decltype(auto) generateArgs(Random& rand) { return generateArgsHelper(rand, make_index_sequence<Size>{}); }
@@ -104,7 +104,7 @@ private:
     template <typename CastTuple, typename ValueTuple, size_t... index>
     static Shrinkable<CLASS> constructByTupleType(ValueTuple&& valueTuple, index_sequence<index...>)
     {
-        return make_shrinkable<CLASS>(util::autoCastTuple<CastTuple, index>(forward<ValueTuple>(valueTuple))...);
+        return make_shrinkable<CLASS>(util::autoCastTuple<CastTuple, index>(util::forward<ValueTuple>(valueTuple))...);
     }
 
     template <typename ValueTuple>
@@ -113,7 +113,7 @@ private:
         using ArgsAsTuple = tuple<ARGTYPES...>;
         constexpr auto arity = sizeof...(ARGTYPES);
         return constructByTupleType<ArgsAsTuple>(
-            forward<ValueTuple>(valueTuple), make_index_sequence<arity>{}  // {0,1,2,3,...,N-1}
+            util::forward<ValueTuple>(valueTuple), make_index_sequence<arity>{}  // {0,1,2,3,...,N-1}
         );
     }
 
@@ -149,7 +149,7 @@ Construct<CLASS, ARGTYPES...> construct(EXPGEN0&& gen0, EXPGENS&&... gens)
     constexpr auto ImplicitSize = sizeof...(ARGTYPES) - ExplicitSize;
     using ArgsAsTuple = tuple<decay_t<ARGTYPES>...>;
 
-    auto explicits = make_tuple(util::genToFunc(gen0), util::genToFunc(gens)...);
+    auto explicits = util::make_tuple(util::genToFunc(gen0), util::genToFunc(gens)...);
     auto implicits = util::createGenHelperListed<ArgsAsTuple>(
         util::addOffset<ExplicitSize>(make_index_sequence<ImplicitSize>{}));
 

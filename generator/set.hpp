@@ -45,7 +45,7 @@ public:
     {
         // generate random Ts using elemGen
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
-        shared_ptr<set<Shrinkable<T>>> shrinkableSet = make_shared<set<Shrinkable<T>>>();
+        shared_ptr<set<Shrinkable<T>>> shrinkableSet = util::make_shared<set<Shrinkable<T>>>();
 
         while (shrinkableSet->size() < size) {
             auto elem = elemGen(rand);

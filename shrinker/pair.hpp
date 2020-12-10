@@ -56,7 +56,7 @@ public:
     {
         auto concatenated = shrinkable.concat(shrinkFirst()).concat(shrinkSecond());
         return concatenated.template flatMap<out_pair_t>(+[](const pair_t& pair) {
-            return make_shrinkable<out_pair_t>(make_pair(pair.first.get(), pair.second.get()));
+            return make_shrinkable<out_pair_t>(util::make_pair(pair.first.get(), pair.second.get()));
         });
     }
 };
@@ -67,7 +67,7 @@ template <typename ARG1, typename ARG2>
 Shrinkable<pair<ARG1, ARG2>> shrinkPair(
     const Shrinkable<ARG1>& firstShr, const Shrinkable<ARG2>& secondShr)
 {
-    auto elemPair = make_pair(firstShr, secondShr);
+    auto elemPair = util::make_pair(firstShr, secondShr);
     auto shrinkable = make_shrinkable<decltype(elemPair)>(elemPair);
     return util::PairShrinker<ARG1, ARG2>::shrink(shrinkable);
 }

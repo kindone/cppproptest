@@ -17,10 +17,10 @@ template <typename GEN0, typename... GENS>
 decltype(auto) tupleOf(GEN0&& gen0, GENS&&... gens)
 {
     // constexpr auto Size = sizeof...(GENS);
-    tuple<decay_t<GEN0>, decay_t<GENS>...> genTup = make_tuple(gen0, gens...);
+    tuple<decay_t<GEN0>, decay_t<GENS>...> genTup = util::make_tuple(gen0, gens...);
     // generator
     return generator([genTup](Random& rand) mutable {
-        auto elemTup = util::transformHeteroTupleWithArg<util::Generate>(forward<decltype(genTup)>(genTup), rand);
+        auto elemTup = util::transformHeteroTupleWithArg<util::Generate>(util::forward<decltype(genTup)>(genTup), rand);
         auto shrinkable = make_shrinkable<decltype(elemTup)>(elemTup);
         return shrinkTuple(shrinkable);
     });

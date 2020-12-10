@@ -29,7 +29,7 @@ Shrinkable<set<T>> shrinkSet(const shared_ptr<set<Shrinkable<T>>>& shrinkableSet
         set<T>& valueSet = value.getRef();
 
         for (auto itr = shr.begin(); itr != shr.end(); ++itr) {
-            valueSet.insert(move(itr->getRef()));
+            valueSet.insert(util::move(itr->getRef()));
         }
 
         return value;

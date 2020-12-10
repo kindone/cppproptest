@@ -32,7 +32,7 @@ template <typename ActionType, typename GEN>
 enable_if_t<!is_pointer<typename function_traits<GEN>::return_type::type>::value, GEN&&> toSharedPtrGen(
     GEN&& gen)
 {
-    return forward<GEN>(gen);
+    return util::forward<GEN>(gen);
 }
 
 }  // namespace util
@@ -78,8 +78,8 @@ class StatefulProperty {
 public:
     StatefulProperty(Func func, InitialGen&& initialGen, ActionListGen& actionListGen)
     {
-        auto genTup = make_tuple(forward<InitialGen>(initialGen), actionListGen);
-        prop = make_shared<PropertyType>(func, genTup);
+        auto genTup = util::make_tuple(util::forward<InitialGen>(initialGen), actionListGen);
+        prop = util::make_shared<PropertyType>(func, genTup);
     }
 
     StatefulProperty& setSeed(uint64_t s)
@@ -103,7 +103,7 @@ private:
 template <typename ActionType, typename... GENS>
 GenFunction<list<shared_ptr<ActionType>>> actionListGenOf(GENS&&... gens)
 {
-    auto actionGen = oneOf<shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(forward<GENS>(gens))...);
+    auto actionGen = oneOf<shared_ptr<ActionType>>(util::toSharedPtrGen<ActionType>(util::forward<GENS>(gens))...);
     auto actionVecGen = Arbi<list<shared_ptr<ActionType>>>(actionGen);
     return actionVecGen;
 }
@@ -121,7 +121,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ActionListGen&& actionL
             }
             return true;
         },
-        forward<InitialGen>(initialGen), forward<ActionListGen>(actionListGen));
+        util::forward<InitialGen>(initialGen), util::forward<ActionListGen>(actionListGen));
 }
 
 template <typename ActionType, typename InitialGen, typename ModelFactory, typename ActionListGen>
@@ -131,7 +131,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
     using ObjectType = typename ActionType::ObjectType;
     using ModelFactoryFunction = function<ModelType(ObjectType&)>;
     shared_ptr<ModelFactoryFunction> modelFactoryPtr =
-        make_shared<ModelFactoryFunction>(forward<ModelFactory>(modelFactory));
+        util::make_shared<ModelFactoryFunction>(util::forward<ModelFactory>(modelFactory));
 
     return StatefulProperty<ActionType>(
         [modelFactoryPtr](ObjectType obj, list<shared_ptr<ActionType>> actions) {
@@ -142,7 +142,7 @@ decltype(auto) statefulProperty(InitialGen&& initialGen, ModelFactory&& modelFac
             }
             return true;
         },
-        forward<InitialGen>(initialGen), actionListGen);
+        util::forward<InitialGen>(initialGen), actionListGen);
 }
 
 }  // namespace alt

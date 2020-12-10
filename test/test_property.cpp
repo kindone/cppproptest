@@ -234,7 +234,7 @@ TEST(PropTest, TestVectorCheckFail)
 {
     vector<int> vec;
     vec.push_back(5);
-    auto tup = make_tuple(vec);
+    auto tup = util::make_tuple(vec);
     // cout << "tuple: ";
     show(cout, tup);
     cout << endl;
@@ -339,7 +339,7 @@ TEST(PropTest, TestCheckArbitraryWithConstruct)
 decltype(auto) dummyProperty()
 {
     using Type = function<int()>;
-    shared_ptr<Type> modelPtr = make_shared<Type>([]() { return 0; });
+    shared_ptr<Type> modelPtr = util::make_shared<Type>([]() { return 0; });
     return property([modelPtr](int) {
         auto model = *modelPtr;
         PROP_STAT(model() > 2);

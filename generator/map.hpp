@@ -23,7 +23,7 @@ public:
     {
         // generate random Ts using elemGen
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
-        shared_ptr<set<Shrinkable<Key>>> shrinkSet = make_shared<set<Shrinkable<Key>>>();
+        shared_ptr<set<Shrinkable<Key>>> shrinkSet = util::make_shared<set<Shrinkable<Key>>>();
 
         while (shrinkSet->size() < size) {
             auto elem = elemGen(rand);
@@ -31,7 +31,7 @@ public:
         }
 
         shared_ptr<map<Shrinkable<Key>, Shrinkable<T>>> shrinkableMap =
-            make_shared<map<Shrinkable<Key>, Shrinkable<T>>>();
+            util::make_shared<map<Shrinkable<Key>, Shrinkable<T>>>();
 
         for (auto itr = shrinkSet->begin(); itr != shrinkSet->end(); ++itr) {
             auto key = keyGen(rand);

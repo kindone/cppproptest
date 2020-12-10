@@ -109,9 +109,9 @@ struct PopBack4 : public VectorAction4
 TEST_F(ConcurrencyTestAlt2, WithModel)
 {
     auto pushBackActionGen =
-        Arbi<int>().map<shared_ptr<VectorAction4>>([](int& value) { return make_shared<PushBack4>(value); });
-    auto popBackActionGen = lazy<shared_ptr<VectorAction4>>([]() { return make_shared<PopBack4>(); });
-    auto clearActionGen = lazy<shared_ptr<VectorAction4>>([]() { return make_shared<Clear4>(); });
+        Arbi<int>().map<shared_ptr<VectorAction4>>([](int& value) { return util::make_shared<PushBack4>(value); });
+    auto popBackActionGen = lazy<shared_ptr<VectorAction4>>([]() { return util::make_shared<PopBack4>(); });
+    auto clearActionGen = lazy<shared_ptr<VectorAction4>>([]() { return util::make_shared<Clear4>(); });
 
     auto actionListGen = actionListGenOf<VectorAction4>(pushBackActionGen, popBackActionGen, clearActionGen);
 
