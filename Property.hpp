@@ -54,7 +54,7 @@ struct Matrix {
     {
         constexpr auto Size = tuple_size<Lists>::value;
         bool incremented = false;
-        util::make_tuple(progressN<Size-index-1>(incremented, util::forward<Lists>(lists), indices)...);
+        std::initializer_list<int>{(progressN<Size-index-1>(incremented, util::forward<Lists>(lists), indices), 0)...};
         return incremented;
     }
 };
@@ -68,9 +68,9 @@ public:
     using ValueTuple = tuple<Shrinkable<decay_t<ARGS>>...>;
     using ShrinksTuple = tuple<Stream<Shrinkable<decay_t<ARGS>>>...>;
 
-    Property(const Func& f, const GenTuple& g) : func(f), genTup(g) {}
+    Property(const Func& f, const GenTuple& g) : PropertyBase(new Func(f), new GenTuple(g)) {}
 
-    virtual bool invoke(Random& rand) override { return util::invokeWithGenTuple(rand, func, genTup); }
+    bool invoke(Random& rand) { return util::invokeWithGenTuple(rand, getFunc(), getGenTup()); }
 
     Property& setSeed(uint64_t s)
     {
@@ -101,7 +101,7 @@ public:
         Random savedRand(seed);
         cout << "random seed: " << seed << endl;
         PropertyContext ctx;
-        auto curGenTup = util::overrideTuple(genTup, gens...);
+        auto curGenTup = util::overrideTuple(getGenTup(), gens...);
 
         int i = 0;
         try {
@@ -113,7 +113,7 @@ public:
                         savedRand = rand;
                         if(onStartupPtr)
                             (*onStartupPtr)();
-                        bool result = util::invokeWithGenTuple(rand, func, curGenTup);
+                        bool result = util::invokeWithGenTuple(rand, getFunc(), curGenTup);
                         if(onCleanupPtr)
                             (*onCleanupPtr)();
                         stringstream failures = ctx.flushFailures();
@@ -176,7 +176,7 @@ public:
                 try {
                     if(onStartupPtr)
                         (*onStartupPtr)();
-                    bool result = util::invokeWithArgs(func, valueTup);
+                    bool result = util::invokeWithArgs(getFunc(), valueTup);
                     if(onCleanupPtr)
                         (*onCleanupPtr)();
                     return result;
@@ -230,7 +230,7 @@ private:
             if(onStartupPtr)
                 (*onStartupPtr)();
             result =
-                util::invokeWithArgTupleWithReplace<N>(func, util::forward<decltype(values)>(values), replace.get());
+                util::invokeWithArgTupleWithReplace<N>(getFunc(), util::forward<decltype(values)>(values), replace.get());
             if(onCleanupPtr)
                 (*onCleanupPtr)();
         } catch (const AssertFailed&) {
@@ -311,11 +311,17 @@ private:
         cout << "  simplest args found by shrinking: " << Show<decltype(shrunk)>(shrunk) << endl;
     }
 
+
+
 private:
-    Func func;
-    GenTuple genTup;
-    shared_ptr<function<void()>> onStartupPtr;
-    shared_ptr<function<void()>> onCleanupPtr;
+
+    Func& getFunc() {
+        return *std::static_pointer_cast<Func>(funcPtr);
+    }
+
+    GenTuple& getGenTup() {
+        return *std::static_pointer_cast<GenTuple>(genTupPtr);
+    }
 };
 
 namespace util {

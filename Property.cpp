@@ -23,8 +23,6 @@ uint64_t getGlobalSeed()
 PropertyContext* PropertyBase::context = nullptr;
 uint32_t PropertyBase::defaultNumRuns = 1000;
 
-PropertyBase::PropertyBase() : seed(util::getGlobalSeed()), numRuns(defaultNumRuns) {}
-
 void PropertyBase::setContext(PropertyContext* ctx)
 {
     context = ctx;

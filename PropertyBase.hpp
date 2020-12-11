@@ -68,11 +68,16 @@
 namespace proptest {
 
 class Random;
+namespace util {
+uint64_t getGlobalSeed();
+}
 
 class PROPTEST_API PropertyBase {
 public:
-    PropertyBase();
-    virtual ~PropertyBase() {}
+    template <typename Func, typename GenTuple>
+    PropertyBase(Func* _funcPtr, GenTuple* _genTupPtr)
+ : seed(util::getGlobalSeed()), numRuns(defaultNumRuns), funcPtr(_funcPtr), genTupPtr(_genTupPtr)  {}
+
     static void setDefaultNumRuns(uint32_t);
     static void tag(const char* filename, int lineno, string key, string value);
     static void succeed(const char* filename, int lineno, const char* condition, const stringstream& str);
@@ -85,13 +90,18 @@ protected:
     static PropertyContext* context;
 
 protected:
-    virtual bool invoke(Random& rand);
+    bool invoke(Random& rand);
 
     static uint32_t defaultNumRuns;
 
     // TODO: configurations
     uint64_t seed;
     uint32_t numRuns;
+
+    std::shared_ptr<void> funcPtr;
+    std::shared_ptr<void> genTupPtr;
+    shared_ptr<function<void()>> onStartupPtr;
+    shared_ptr<function<void()>> onCleanupPtr;
 
     friend struct PropertyContext;
 };

@@ -340,6 +340,12 @@ TEST(PropTest, TestDerive2)
     }
 }
 
+struct Box {
+    Box() {}
+    Box(std::vector<Box>& _children) : children(_children) {}
+    std::vector<Box> children;
+};
+
 struct Node {
     Node(int _value) : value(_value) {}
     Node(int _value, std::vector<Node>& _children) : value(_value), children(_children) {}
@@ -348,10 +354,26 @@ struct Node {
     std::vector<Node> children;
 };
 
-
 namespace proptest {
 namespace util {
 
+template <>
+struct ShowDefault<Box>
+{
+    static ostream& show(ostream& os, const Box& n)
+    {
+        os << "B(";
+        if (!n.children.empty()) {
+            os << "children: " << "[ " << Show<Box>(*n.children.begin());
+            for (auto itr = n.children.begin() + 1; itr != n.children.end(); ++itr) {
+                os << ", " << Show<Box>(*itr);
+            }
+            os << " ]";
+        }
+        os << ")";
+        return os;
+    }
+};
 template <>
 struct ShowDefault<Node>
 {
@@ -360,7 +382,7 @@ struct ShowDefault<Node>
         os << "N(";
         os << "value: " << n.value;
         if (!n.children.empty()) {
-            os << "children: " << "[ " << Show<Node>(*n.children.begin());
+            os << ", children: " << "[ " << Show<Node>(*n.children.begin());
             for (auto itr = n.children.begin() + 1; itr != n.children.end(); ++itr) {
                 os << ", " << Show<Node>(*itr);
             }
@@ -377,7 +399,19 @@ struct ShowDefault<Node>
 
 TEST(PropTest, TestRecursive)
 {
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
 
+    auto emptyBoxGen = construct<Box>();
+    GenFunction<Box> boxGen =
+        construct<Box, std::vector<Box>>(
+            Arbi<std::vector<Box>>(oneOf<Box>(emptyBoxGen, reference(boxGen))).setSize(0,3));
+    auto tree = boxGen(rand).get();
+    cout << "tree: " << proptest::Show<Box>(tree) << endl;
+}
+
+TEST(PropTest, TestRecursive2)
+{
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
@@ -385,7 +419,10 @@ TEST(PropTest, TestRecursive)
     auto leafGen = construct<Node, int>(intGen);
     auto leafVecGen = Arbi<std::vector<Node>>(leafGen).setSize(1,2);
     auto branch1Gen = construct<Node, int, std::vector<Node>>(intGen, leafVecGen);
-    static GenFunction<Node> branchNGen = construct<Node, int, std::vector<Node>>(intGen, Arbi<std::vector<Node>>(oneOf<Node>(branch1Gen, branchNGen)).setSize(1,2));
+    GenFunction<Node> branchNGen =
+        construct<Node, int, std::vector<Node>>(
+            intGen,
+            Arbi<std::vector<Node>>(oneOf<Node>(branch1Gen, reference(branchNGen))).setSize(1,2));
     auto tree = branchNGen(rand).get();
     cout << "tree: " << proptest::Show<Node>(tree) << endl;
 }

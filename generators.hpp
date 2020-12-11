@@ -26,3 +26,5 @@
 #include "combinator/chain.hpp"
 #include "combinator/derive.hpp"
 #include "combinator/just.hpp"
+#include "combinator/lazy.hpp"
+#include "combinator/reference.hpp"
