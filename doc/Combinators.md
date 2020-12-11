@@ -17,6 +17,7 @@ While you can go through this document from top to the bottom, you might be want
 | Generate a struct or a class object                | a `Rectangle` object with width and height | `construct<T,ARGS...>`            |
 | Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | `filter` (`suchThat`)             |
 | Generate values with dependencies or relationships | a rectangle where `width == height * 2`    | `dependency`, `chain`, `pairWith`, `tupleWith` |
+| Generate recursive structures                      | a Tree structure                           | `reference`                       |
 
 &nbsp;
 
@@ -247,6 +248,42 @@ Actually you can achieve the similar goal using `filter` combinator:
 
 However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high. 
 
+### Generate recursive structures
+
+A tree consists of nodes that may have other nodes as children. This is a recursive definition:
+
+```cpp
+// recursive structure Node with 0 or more child Nodes
+struct Node {
+    Node() {}
+    Node(std::vector<Node>& _children) : children(_children) {}
+    
+    std::vector<Node> children;
+};
+```
+
+A recursive structure such as can be generated as following order:
+
+```cpp
+// terminal node generator using constructor with 0 arguments
+auto emptyNodeGen = construct<Node>();
+// general node generator - generate either terminal node or another general node
+GenFunction<Node> boxGen =
+    construct<Node, std::vector<Node>>(
+        Arbi<std::vector<Node>>(
+            oneOf<Node>(emptyNodeGen, reference(nodeGen))
+        ).setSize(0,3)
+    );
+```
+
+There are a few things can be discussed in above example. 
+1. Firstly, we're generating `Node` objects using `construct` combinator. This will generate objects by calling a proper constructor. 
+2. Next, `nodeGen` is referring to itself using `reference` helper function in its initializer. This lets a generator to be defined based on itself, in recursive fashion. 
+3. This requires a terminal node generator to be defined ahead.
+4. `oneOf` chooses whether to stop the recursion with a terminal node or continue to generate a node with children.
+5. Final thing to note is the use of `setSize` method. This limits the number of children.
+
+nbsp;
 
 ## Utility methods in standard generators
 
