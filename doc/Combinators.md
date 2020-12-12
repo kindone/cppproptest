@@ -278,7 +278,7 @@ There are a few things can be discussed in above example.
 #### Advanced generation of recursive structures
 
 We might want to add some restriction or context in generating recursive structures.
-For example, a tree bound to some height range could be desired. You can use a higher order function (a function returns a generator).
+For example, a tree bound to some height range could be desired. You can use a higher order function (a function that takes some context arguments and returns a generator) to achieve this.
 
 ```cpp
 std::function<GenFunction<Node>(int)> NodeGen = [&NodeGen](int level) -> GenFunction<Node> {
