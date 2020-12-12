@@ -283,7 +283,7 @@ There are a few things can be discussed in above example.
 4. `oneOf` chooses whether to stop the recursion with a terminal node or continue to generate a node with children.
 5. Final thing to note is the use of `setSize` method. This limits the number of children.
 
-nbsp;
+&nbsp;
 
 ## Utility methods in standard generators
 
