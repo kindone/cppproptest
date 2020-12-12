@@ -17,7 +17,7 @@ While you can go through this document from top to the bottom, you might be want
 | Generate a struct or a class object                | a `Rectangle` object with width and height | `construct<T,ARGS...>`            |
 | Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | `filter` (`suchThat`)             |
 | Generate values with dependencies or relationships | a rectangle where `width == height * 2`    | `dependency`, `chain`, `pairWith`, `tupleWith` |
-| Generate recursive structures                      | a Tree structure                           | `reference`                       |
+| Generate recursive structures                      | a Tree structure                           | `reference`, See [here](./Combinators.md#Generating-recursive-structures) for more |
 
 &nbsp;
 
@@ -206,19 +206,16 @@ You may want to include dependency in the generated values. There are two varian
     auto yearMonthGen = tupleOf(fromTo(0, 9999), fromTo(1,12));
     // number of days of month depends on month (28~31 days) and year (whether it's a leap year)
     auto yearMonthDayGen = chain<std::tuple<int, int>, int>(yearMonthGen, [](std::tuple<int,int>& yearMonth) {
-        int year = std::get<0>(yearMonth);
-        int month = std::get<1>(yearMonth);
-        if(monthHas31Days(month)) {
+        int year = std::get<0>(yearMonth), month = std::get<1>(yearMonth);
+        if(monthHas31Days(month))
             return fromTo(1, 31);
-        }
-        else if(monthHas30Days(month)) {
+        else if(monthHas30Days(month))
             return fromTo(1, 30);
-        }
         else { // february has 28 or 29 days
             if(isLeapYear(year))
-            return fromTo(1, 29);
-        else
-            return fromTo(1, 28);
+                return fromTo(1, 29);
+            else
+                return fromTo(1, 28);
         }
     }); // yearMonthDayGen generates std::tuple<int, int, int> of (year, month, day)
     ```
@@ -230,9 +227,7 @@ Actually you can achieve the similar goal using `filter` combinator:
     auto yearMonthDayGen = tupleOf(fromTo(0, 9999), fromTo(1,12), fromTo(1,31));
     // apply filter
     auto validYearMonthDayGen = yearMonthDayGen.filter([](std::tuple<int,int,int>& ymd) {
-        int year = std::get<0>(ymd);
-        int month = std::get<1>(ymd);
-        int day = std::get<2>(ymd);
+        int year = std::get<0>(ymd), month = std::get<1>(ymd), day = std::get<2>(ymd);
         if(monthHas31Days(month) && day <= 31)
             return true;
         else if(monthHas30Days(month) && day <= 30)
@@ -246,11 +241,13 @@ Actually you can achieve the similar goal using `filter` combinator:
     });
 ```
 
-However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high. 
+However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's not recommended to use `filter` for that purpose if the ratio of discarded values is high. 
 
-### Generate recursive structures
 
-A tree consists of nodes that may have other nodes as children. This is a recursive definition:
+### Generating recursive structures
+
+A complex real world object may contain recursive structure.
+For example, a tree consists of nodes that may have other nodes as children. This is a recursive definition of a tree node:
 
 ```cpp
 // recursive structure Node with 0 or more child Nodes
@@ -262,28 +259,65 @@ struct Node {
 };
 ```
 
-A recursive structure such as can be generated as following order:
+A recursive node can be generated as following:
 
 ```cpp
-// terminal node generator using constructor with 0 arguments
-auto emptyNodeGen = construct<Node>();
-// general node generator - generate either terminal node or another general node
 GenFunction<Node> boxGen =
     construct<Node, std::vector<Node>>(
-        Arbi<std::vector<Node>>(
-            oneOf<Node>(emptyNodeGen, reference(nodeGen))
-        ).setSize(0,3)
+        Arbi<std::vector<Node>>(reference(nodeGen)).setSize(0,2)
     );
 ```
 
 There are a few things can be discussed in above example. 
-1. Firstly, we're generating `Node` objects using `construct` combinator. This will generate objects by calling a proper constructor. 
-2. Next, `nodeGen` is referring to itself using `reference` helper function in its initializer. This lets a generator to be defined based on itself, in recursive fashion. 
-3. This requires a terminal node generator to be defined ahead.
-4. `oneOf` chooses whether to stop the recursion with a terminal node or continue to generate a node with children.
-5. Final thing to note is the use of `setSize` method. This limits the number of children.
+* Firstly, we're generating `Node` objects using `construct` combinator. This will generate objects by calling a proper constructor. 
+* Next, `nodeGen` is referring to itself using `reference` helper function in its initializer. This lets a generator to be defined based on itself, in recursive fashion. 
+* `setSize` method limits the number of children. Size of 0 means a terminal node is created. 
+    * Be cautious for of this number. If the probability of a terminal node being created is too small, The tree can grow unmanageably, leading to OOM easily.
+    * If you'd like to limit the overall size of a tree rather than controlling the number of children, see the next section.
+
+#### Advanced generation of recursive structures
+
+We might want to add some restriction or context in generating recursive structures.
+For example, a tree bound to some height range could be desired. You can use a higher order function (a function returns a generator).
+
+```cpp
+std::function<GenFunction<Node>(int)> NodeGen = [&NodeGen](int level) -> GenFunction<Node> {
+    if(level > 0)
+        return construct<Node, std::vector<Node>>(
+            Arbi<std::vector<Node>>(NodeGen(level-1)));
+    else
+        return construct<Box>();
+};
+
+auto nodeGen = NodeGen(4); // maximum height
+auto node = nodeGen(rand).get();
+```
+
+This can be equally but more formally achieved using functor style:
+
+```cpp
+struct NodeGen {
+    NodeGen(int _level) : level(_level) {
+    }
+
+    // interface requirement for a GenFunction<Node>
+    Shrinkable<Node> operator()(Random& rand) {
+        if(level > 0)
+            return construct<Node, std::vector<Node>>(
+                Arbi<std::vector<Node>>(NodeGen(level-1)).setSize(0,10))(rand);
+        else
+            return construct<Node>()(rand);
+    }
+
+    int level;
+};
+
+auto nodeGen = NodeGen(4); // maximum height
+auto node = nodeGen(rand).get();
+```
 
 &nbsp;
+
 
 ## Utility methods in standard generators
 
