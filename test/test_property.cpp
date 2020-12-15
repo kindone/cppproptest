@@ -113,7 +113,7 @@ struct Bit
     bool null;
 
     Bit(uint8_t vbit, bool null) : v(vbit), len(sizeof(uint8_t)), null(null) {}
-    ~Bit() {}
+    ~Bit() = default;
 };
 
 namespace proptest {

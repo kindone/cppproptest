@@ -7,6 +7,14 @@ Random::Random(uint64_t seed) : engine(seed) {}
 
 Random::Random(const Random& other) : engine(other.engine), dist(other.dist) {}
 
+Random& Random::operator=(const Random& other)
+{
+    engine = other.engine;
+    dist = other.dist;
+
+    return *this;
+}
+
 uint64_t Random::next8U()
 {
     auto value = dist(engine);

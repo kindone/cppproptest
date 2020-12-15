@@ -49,6 +49,14 @@ struct Stream
     {
     }
 
+    Stream& operator=(const Stream& other)
+    {
+        headPtr = other.headPtr;
+        tailGen = other.tailGen;
+
+        return *this;
+    }
+
     bool isEmpty() const { return !static_cast<bool>(headPtr); }
 
     T head() const { return *headPtr; }

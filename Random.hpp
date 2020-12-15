@@ -24,6 +24,8 @@ public:
     double getRandomDouble();
     uint32_t getRandomSize(size_t fromIncluded, size_t toExcluded);
 
+    Random& operator=(const Random& other);
+
     template <typename T>
     T getRandom(int64_t /*min*/, int64_t /*max*/)
     {

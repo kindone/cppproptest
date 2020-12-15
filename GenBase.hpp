@@ -16,7 +16,7 @@ struct GenBase
 {
     using type = T;
 
-    virtual ~GenBase() {}
+    virtual ~GenBase() = default;
 
     virtual Shrinkable<T> operator()(Random&) { throw runtime_error("operator() should be defined for GenBase"); }
 };

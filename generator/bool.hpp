@@ -14,6 +14,9 @@ public:
         return shrinkBool(value);
     }
 
+    Arbi<bool>() = default;
+    Arbi<bool>(const Arbi<bool>&) = default;
+
     virtual ~Arbi();
 };
 

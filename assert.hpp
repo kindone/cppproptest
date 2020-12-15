@@ -12,6 +12,8 @@ struct PROPTEST_API AssertFailed : public logic_error
     {
     }
 
+    AssertFailed(const AssertFailed&) = default;
+
     virtual ~AssertFailed();
 
     const char* filename;

@@ -414,6 +414,7 @@ TEST(PropTest, Polymorphic)
 
     struct Vehicle
     {
+        virtual ~Vehicle() = default;
         virtual int get() { return 0; }
     };
 
