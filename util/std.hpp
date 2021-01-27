@@ -48,6 +48,7 @@ using std::move;
 using std::make_pair;
 using std::make_tuple;
 using std::make_shared;
+using std::make_unique;
 using std::transform;
 using std::back_inserter;
 }
@@ -63,6 +64,7 @@ using std::result_of;
 using std::enable_if;
 using std::enable_if_t;
 
+using std::unique_ptr;
 using std::shared_ptr;
 using std::to_string;
 
