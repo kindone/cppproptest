@@ -135,7 +135,7 @@ struct Shrinkable
 
         auto thisShrinksPtr = shrinksPtr;
 
-        static function<Stream<Shrinkable<T>>(const Stream<Shrinkable>&,
+        function<Stream<Shrinkable<T>>(const Stream<Shrinkable>&,
                shared_ptr<function<bool(const Shrinkable<T>&)>>)> filterStream =
             [tolerance](const Stream<Shrinkable>& stream,
                shared_ptr<function<bool(const Shrinkable<T>&)>> _criteriaPtr) -> Stream<Shrinkable<T>> {
