@@ -25,6 +25,7 @@
 #include "combinator/dependency.hpp"
 #include "combinator/chain.hpp"
 #include "combinator/derive.hpp"
+#include "combinator/aggregate.hpp"
 #include "combinator/just.hpp"
 #include "combinator/lazy.hpp"
 #include "combinator/reference.hpp"
