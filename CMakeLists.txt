@@ -106,6 +106,7 @@ SET(compile_sources
     test/compile/printing.cpp
     test/compile/derive.cpp
     test/compile/aggregate.cpp
+    test/compile/accumulate.cpp
     test/compile/oneof.cpp
     test/compile/elementof.cpp
     test/compile/integral.cpp

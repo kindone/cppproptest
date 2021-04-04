@@ -340,13 +340,56 @@ TEST(PropTest, TestDerive2)
     }
 }
 
-struct Box {
+TEST(PropTest, TestAggregate)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen1 = interval<int>(0, 1).map([](int& num) { return list<int>{num}; });
+
+    [[maybe_unused]] auto gen = aggregate(
+        gen1,
+        [](list<int>& nums) {
+            auto last = nums.back();
+            return interval(last, last + 1).map([nums](int& num) {
+                auto newList = list<int>(nums);
+                newList.push_back(num);
+                return newList;
+            });
+        },
+        2, 4);
+
+    for (int i = 0; i < 10; i++) {
+        auto shr = gen(rand);
+        exhaustive(shr, 0);
+    }
+}
+
+TEST(PropTest, TestAccumulate)
+{
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto gen1 = interval<int>(0, 1);
+
+    [[maybe_unused]] auto gen = accumulate(
+        gen1, [](int& num) { return interval(num, num + 2); }, 2, 4);
+
+    for (int i = 0; i < 10; i++) {
+        auto shr = gen(rand);
+        exhaustive(shr, 0);
+    }
+}
+
+struct Box
+{
     Box() {}
     Box(std::vector<Box>& _children) : children(_children) {}
     std::vector<Box> children;
 };
 
-struct Node {
+struct Node
+{
     Node(int _value) : value(_value) {}
     Node(int _value, std::vector<Node>& _children) : value(_value), children(_children) {}
 
@@ -364,7 +407,8 @@ struct ShowDefault<Box>
     {
         os << "B(";
         if (!n.children.empty()) {
-            os << "children: " << "[ " << Show<Box>(*n.children.begin());
+            os << "children: "
+               << "[ " << Show<Box>(*n.children.begin());
             for (auto itr = n.children.begin() + 1; itr != n.children.end(); ++itr) {
                 os << ", " << Show<Box>(*itr);
             }
@@ -382,7 +426,8 @@ struct ShowDefault<Node>
         os << "N(";
         os << "value: " << n.value;
         if (!n.children.empty()) {
-            os << ", children: " << "[ " << Show<Node>(*n.children.begin());
+            os << ", children: "
+               << "[ " << Show<Node>(*n.children.begin());
             for (auto itr = n.children.begin() + 1; itr != n.children.end(); ++itr) {
                 os << ", " << Show<Node>(*itr);
             }
@@ -395,7 +440,7 @@ struct ShowDefault<Node>
 
 }  // namespace util
 
-}  // na
+}  // namespace proptest
 
 TEST(PropTest, TestRecursive)
 {
@@ -403,9 +448,7 @@ TEST(PropTest, TestRecursive)
     Random rand(seed);
 
     [[maybe_unused]] auto emptyBoxGen = construct<Box>();
-    GenFunction<Box> boxGen =
-        construct<Box, std::vector<Box>>(
-            Arbi<std::vector<Box>>(reference(boxGen)).setSize(0,2));
+    GenFunction<Box> boxGen = construct<Box, std::vector<Box>>(Arbi<std::vector<Box>>(reference(boxGen)).setSize(0, 2));
     auto tree = boxGen(rand).get();
     cout << "tree: " << proptest::Show<Box>(tree) << endl;
 }
@@ -417,12 +460,10 @@ TEST(PropTest, TestRecursive2)
 
     auto intGen = Arbi<int>();
     auto leafGen = construct<Node, int>(intGen);
-    auto leafVecGen = Arbi<std::vector<Node>>(leafGen).setSize(1,2);
+    auto leafVecGen = Arbi<std::vector<Node>>(leafGen).setSize(1, 2);
     auto branch1Gen = construct<Node, int, std::vector<Node>>(intGen, leafVecGen);
-    GenFunction<Node> branchNGen =
-        construct<Node, int, std::vector<Node>>(
-            intGen,
-            Arbi<std::vector<Node>>(oneOf<Node>(branch1Gen, reference(branchNGen))).setSize(1,2));
+    GenFunction<Node> branchNGen = construct<Node, int, std::vector<Node>>(
+        intGen, Arbi<std::vector<Node>>(oneOf<Node>(branch1Gen, reference(branchNGen))).setSize(1, 2));
     auto tree = branchNGen(rand).get();
     cout << "tree: " << proptest::Show<Node>(tree) << endl;
 }
@@ -433,15 +474,14 @@ TEST(PropTest, TestRecursive3)
     Random rand(seed);
 
     [[maybe_unused]] auto emptyBoxGen = construct<Box>();
-    struct BoxGen {
-        BoxGen(int _level) : level(_level) {
+    struct BoxGen
+    {
+        BoxGen(int _level) : level(_level) {}
 
-        }
-
-        Shrinkable<Box> operator()(Random& rand) {
-            if(level > 0)
-                return construct<Box, std::vector<Box>>(
-                    Arbi<std::vector<Box>>(BoxGen(level-1)).setSize(0,10))(rand);
+        Shrinkable<Box> operator()(Random& rand)
+        {
+            if (level > 0)
+                return construct<Box, std::vector<Box>>(Arbi<std::vector<Box>>(BoxGen(level - 1)).setSize(0, 10))(rand);
             else
                 return construct<Box>()(rand);
         }
@@ -454,9 +494,8 @@ TEST(PropTest, TestRecursive3)
     cout << "tree: " << proptest::Show<Box>(tree) << endl;
 
     std::function<GenFunction<Box>(int)> BoxGen2 = [&BoxGen2](int level) -> GenFunction<Box> {
-        if(level > 0)
-            return construct<Box, std::vector<Box>>(
-                Arbi<std::vector<Box>>(BoxGen2(level-1)).setSize(0,10));
+        if (level > 0)
+            return construct<Box, std::vector<Box>>(Arbi<std::vector<Box>>(BoxGen2(level - 1)).setSize(0, 10));
         else
             return construct<Box>();
     };
