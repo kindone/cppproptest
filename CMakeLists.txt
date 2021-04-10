@@ -14,7 +14,7 @@ SET(CMAKE_CXX_STANDARD 14)
 #SET(CMAKE_CXX_FLAGS "-Werror -Weverything -Wno-thread-safety-analysis -Wunreachable-code-loop-increment -Wno-error=deprecated -Wno-c++98-compat -Wno-shadow-uncaptured-local -Wno-shadow -Wno-c++98-compat-pedantic -Wno-inconsistent-missing-destructor-override -Wno-exit-time-destructors -Wno-sign-conversion -Wno-double-promotion -Wno-implicit-int-conversion -Wno-weak-vtables -Wno-shorten-64-to-32 -Wno-extra-semi -Wno-deprecated -Wno-undef -Wno-undefined-reinterpret-cast -Wno-redundant-parens -Wno-missing-noreturn -Wno-zero-as-null-pointer-constant -Wno-shift-sign-overflow -Wno-newline-eof -Wno-missing-prototypes -Wno-padded -Wno-global-constructors -Wno-unused-parameter -Wno-c++17-extensions -Wno-sign-compare -Wno-covered-switch-default -Wno-format-nonliteral -Wno-used-but-marked-unused -Wno-unused-template -Wno-switch-enum -Wno-unused-member-function -Wno-old-style-cast -Wno-unused-variable -Wno-unreachable-code -Wno-implicit-float-conversion -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-exception-parameter -Wno-unused-local-typedef")
 #SET(CMAKE_CXX_LDFLAGS "${CMAKE_CXX_LDFLAGS} -lc++")
 
-SET(CMAKE_CXX_FLAGS "-Os -Werror -Wignored-qualifiers -Wimplicit-fallthrough -Wunused-variable -Wcast-qual -Wunused-local-typedefs -Wunused-function -Wmissing-field-initializers -Wunused-parameter -Warray-bounds -Wextra-semi -Wshadow")
+#SET(CMAKE_CXX_FLAGS "-Werror -Wignored-qualifiers -Wimplicit-fallthrough -Wunused-variable -Wcast-qual -Wunused-local-typedefs -Wunused-function -Wmissing-field-initializers -Wunused-parameter -Warray-bounds -Wextra-semi -Wshadow")
 
 add_subdirectory("googletest")
 
@@ -118,6 +118,7 @@ SET(compile_sources
     test/compile/tuple.cpp
     test/compile/shrinkable.cpp
     test/compile/stream.cpp
+    test/compile/example.cpp
 )
 
 ADD_EXECUTABLE(compile_proptest
