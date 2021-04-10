@@ -66,25 +66,25 @@ public:
     }
 
     template <typename U>
-    Generator<pair<CLASS, U>> pairWith(function<GenFunction<U>(const CLASS&)> gengen)
+    Generator<pair<CLASS, U>> pairWith(function<GenFunction<U>(const CLASS&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+        return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
     }
 
     template <typename U>
-    decltype(auto) tupleWith(function<GenFunction<U>(CLASS&)> gengen)
+    decltype(auto) tupleWith(function<GenFunction<U>(CLASS&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen);
+        return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
     }
 
     template <typename U>
-    Generator<U> flatmap(function<U(CLASS&)> gengen)
+    Generator<U> flatmap(function<U(CLASS&)> genFactory)
     {
         auto thisPtr = clone();
         return Generator<U>(
-            proptest::derive<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, gengen));
+            proptest::derive<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory));
     }
 
     shared_ptr<Construct<CLASS, ARGTYPES...>> clone()
@@ -121,7 +121,11 @@ private:
 };
 
 /**
- * Generates a CLASS type by specifying target constructor's paremeter types
+ * @brief Generates a CLASS type by specifying target constructor's paremeter types
+ *
+ * Usage:
+ *
+ * @code
  *      struct Point {
  *          Point() : x(0), y(0) {}
  *          Point(int x, int y) : x(x), y(y) {}
@@ -131,6 +135,7 @@ private:
  *      GenFunction<Point> objectGen = construct<Point>(); // calls Point()
  *      GenFunction<Point> objectGen2 = construct<Point, int, int>(nonNegative(), nonNegative()); // calls Point(int,
  * int) GenFunction<Point> objectGen3 = construct<Point, int, int>(); // ints are generated using Arbi<int>
+ * @endcode
  */
 template <typename CLASS, typename... ARGTYPES>
 decltype(auto) construct()

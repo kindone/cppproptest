@@ -46,24 +46,24 @@ struct Generator : public GenBase<T>
     }
 
     template <typename U>
-    Generator<pair<T, U>> pairWith(function<GenFunction<U>(T&)> gengen)
+    Generator<pair<T, U>> pairWith(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
+        return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
     template <typename U>
-    decltype(auto) tupleWith(function<GenFunction<U>(T&)> gengen)
+    decltype(auto) tupleWith(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
+        return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
     template <typename U>
-    Generator<U> flatMap(function<GenFunction<U>(T&)> gengen)
+    Generator<U> flatMap(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, gengen);
+        return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
     shared_ptr<Generator<T>> clone() { return util::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }

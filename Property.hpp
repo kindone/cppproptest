@@ -14,9 +14,16 @@
 #include "Stream.hpp"
 #include "util/std.hpp"
 
+/**
+ * @file
+ *
+ * Core API for `cppproptest` Property-based testing library
+ */
+
 namespace proptest {
 
 namespace util {
+/// @private
 struct Matrix {
     template <size_t N, typename Lists>
     static decltype(auto) pickN(Lists&& lists, vector<int>& indices) {
@@ -60,42 +67,89 @@ struct Matrix {
 };
 } // namespace util
 
+/**
+ * @brief Holder class for properties
+ * @details When a property is defined using `proptest::property` or `proptest::forAll`, a `Property` object is created to hold the property.
+ */
 template <typename... ARGS>
 class Property final : public PropertyBase {
 public:
     using Func = function<bool(ARGS...)>;
     using GenTuple = tuple<GenFunction<decay_t<ARGS>>...>;
+private:
     using ValueTuple = tuple<Shrinkable<decay_t<ARGS>>...>;
     using ShrinksTuple = tuple<Stream<Shrinkable<decay_t<ARGS>>>...>;
 
+public:
     Property(const Func& f, const GenTuple& g) : PropertyBase(new Func(f), new GenTuple(g)) {}
 
+private:
     bool invoke(Random& rand) { return util::invokeWithGenTuple(rand, getFunc(), getGenTup()); }
 
+public:
+    /**
+     * @brief Sets the seed value for deterministic input generation
+     *
+     * @param s Seed in uint64_t type
+     * @return Property& `Property` object itself for chaining
+     */
     Property& setSeed(uint64_t s)
     {
         seed = s;
         return *this;
     }
 
+    /**
+     * @brief Sets the number of runs
+     *
+     * @param runs Number of runs
+     * @return Property& `Property` object itself for chaining
+     */
     Property& setNumRuns(uint32_t runs)
     {
         numRuns = runs;
         return *this;
     }
 
+    /**
+     * @brief Sets the startup function
+     *
+     * @param onStartUp Invoked in each run before running the property function
+     * @return Property& `Property` object itself for chaining
+     */
     Property& setOnStartup(function<void()> onStartup) {
         onStartupPtr = util::make_shared<function<void()>>(onStartup);
         return *this;
     }
 
+    /**
+     * @brief Sets the cleanup function
+     *
+     * @param onCleanup Invoked in each run after running the property function.
+     * @return Property& `Property` object itself for chaining
+     */
     Property& setOnCleanup(function<void()> onCleanup) {
         onCleanupPtr = util::make_shared<function<void()>>(onCleanup);
         return *this;
     }
 
-    template <typename... EXPGENS>
-    bool forAll(EXPGENS&&... gens)
+    /**
+     * @brief Executes randomized tests for given property. If explicit generator arguments are omitted, utilizes default generators (a.k.a. Arbitraries) instead
+     *
+     * Usage of explicit generators:
+     * @code
+     *  auto prop = property([](int a, float b) { ... });
+     *  prop.forAll();                  // Arbitrary<int>, Arbitrary<float> is used to generate a and b
+     *  prop.forAll(intGen);            // intGen, Arbitrary<float> is used to generate a and b
+     *  prop.forAll(intGen, floatGen);  // intGen, floatGen is used to generate a and b
+     * @endcode
+     * @tparam ExplicitGens Explicitly given generator types
+     * @param gens Variadic list of optional explicit generators (in same order as in definition of property arguments)
+     * @return true if all the cases succeed
+     * @return false if any one of the cases fails
+     */
+    template <typename... ExplicitGens>
+    bool forAll(ExplicitGens&&... gens)
     {
         Random rand(seed);
         Random savedRand(seed);
@@ -162,12 +216,20 @@ public:
         return true;
     }
 
+    /**
+     * @brief Executes single example-based test for given property.
+     *
+     * @param args Variadic list of explicit arguments (in same order as in definition of property arguments)
+     * @return true if the case succeeds
+     * @return false if the cases fails
+     */
     bool example(ARGS&&... args)
     {
         auto valueTup = util::make_tuple(args...);
         return example(valueTup);
     }
 
+private:
     bool example(const tuple<ARGS...>& valueTup)
     {
         PropertyContext context;
@@ -202,7 +264,22 @@ public:
         return false;
     }
 
-    /* TODO: Test all input combinations in the Cartesian product of input lists
+public:
+    /**
+    * @brief Executes all input combinations in the Cartesian product of input lists
+    *
+    * Usage:
+    * @code
+        // As property is defined with two arguments: int and float, matrix() requires two arguments: int and float lists
+        auto prop = property([](int i, float f) {
+            // ...
+        });
+
+        // examples are auto-generated as Cartesian propduct of the lists:
+        //   {1, 0.2f}, {1, 0.3f}, {2, 0.2f}, {2, 0.3f}, {3, 0.2f}, {3, 0.3f}
+        prop.matrix({1,2,3}, {0.2f, 0.3f});
+    * @endcode
+    * @param lists Lists of valid arguments (types must be in same order as in definition of property arguments)
     */
     bool matrix(initializer_list<ARGS>&&...lists)
     {
@@ -311,10 +388,6 @@ private:
         cout << "  simplest args found by shrinking: " << Show<decltype(shrunk)>(shrunk) << endl;
     }
 
-
-
-private:
-
     Func& getFunc() {
         return *std::static_pointer_cast<Func>(funcPtr);
     }
@@ -326,6 +399,7 @@ private:
 
 namespace util {
 
+/// @private
 template <typename RetType, typename Callable, typename... ARGS>
 enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
@@ -333,6 +407,7 @@ enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWith
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
+/// @private
 template <typename RetType, typename Callable, typename... ARGS>
 enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
@@ -343,6 +418,7 @@ enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWith
     });
 }
 
+/// @private
 template <class Callable>
 decltype(auto) functionWithBoolResult(Callable&& callable)
 {
@@ -351,12 +427,14 @@ decltype(auto) functionWithBoolResult(Callable&& callable)
     return functionWithBoolResultHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
+/// @private
 template <typename RetType, typename Callable, typename... ARGS>
 function<RetType(ARGS...)> asFunctionHelper(util::TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
+/// @private
 template <class Callable>
 decltype(auto) asFunction(Callable&& callable)
 {
@@ -365,6 +443,7 @@ decltype(auto) asFunction(Callable&& callable)
     return asFunctionHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
+/// @private
 template <typename... ARGS>
 decltype(auto) createProperty(function<bool(ARGS...)> func,
                               tuple<GenFunction<decay_t<ARGS>>...>&& genTup)
@@ -374,8 +453,16 @@ decltype(auto) createProperty(function<bool(ARGS...)> func,
 
 }  // namespace util
 
-template <typename Callable, typename... EXPGENS>
-auto property(Callable&& callable, EXPGENS&&... gens)
+/**
+ * @brief creates a property object that can be used to run various property tests
+ * @details @see Property
+ * @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
+ * @tparam ExplicitGens Explicit generator callable types for each `ARG` in `(Random&) -> Shrinkable<ARG>`
+ * @param callable passed as any either `std::function`, functor object, function pointer
+ * @param gens variadic list of generators for `ARG`s (optional if `Arbitrary<ARG>` is preferred)
+ */
+template <typename Callable, typename... ExplicitGens>
+auto property(Callable&& callable, ExplicitGens&&... gens)
 {
     // acquire full tuple of generators
     typename function_traits<Callable>::argument_type_list argument_type_list;
@@ -383,9 +470,20 @@ auto property(Callable&& callable, EXPGENS&&... gens)
     auto genTup = util::createGenTuple(argument_type_list, util::asFunction(util::forward<decltype(gens)>(gens))...);
     return util::createProperty(func, util::forward<decltype(genTup)>(genTup));
 }
-
-template <typename Callable, typename... EXPGENS>
-bool forAll(Callable&& callable, EXPGENS&&... gens)
+/**
+ * @brief immediately executes a randomized property test
+ *
+ * equivalent to `property(...).forAll()`
+ *
+ * @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
+ * @tparam ExplicitGens Explicit generator callable types for `ARG` in `(Random&) -> Shrinkable<ARG>`
+ * @param callable passed as any either `std::function`, functor object, function pointer
+ * @param gens variadic list of generators for `ARG`s (optional if `Arbitrary<ARG>` is preferred)
+ * @return true if all the cases succeed
+ * @return false if any one of the cases fails
+ */
+template <typename Callable, typename... ExplicitGens>
+bool forAll(Callable&& callable, ExplicitGens&&... gens)
 {
     return property(callable, gens...).forAll();
 }
