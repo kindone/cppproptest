@@ -167,8 +167,8 @@ Shrinkable<ListLike<Shrinkable<T>>> shrinkListLikeLength(const shared_ptr<ListLi
 {
     auto size = shrinkableElems->size();
     auto rangeShrinkable =
-        util::binarySearchShrinkable(size - minSize).map<size_t>([minSize](const size_t& s) { return s + minSize; });
-    return rangeShrinkable.map<ListLike<Shrinkable<T>>>([shrinkableElems](const size_t& newSize) {
+        util::binarySearchShrinkable(size - minSize).template map<size_t>([minSize](const size_t& s) { return s + minSize; });
+    return rangeShrinkable.template map<ListLike<Shrinkable<T>>>([shrinkableElems](const size_t& newSize) {
         if (newSize == 0)
             return ListLike<Shrinkable<T>>();
         else

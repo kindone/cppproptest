@@ -47,7 +47,7 @@ Generator<vector<T>> accumulateImpl(GenFunction<T> gen1, function<GenFunction<T>
                             return make_shrinkable<vector<Shrinkable<T>>>(copy);
                         });
                 })
-                .map<vector<T>>([](const vector<Shrinkable<T>>& shrVec) {
+                .template map<vector<T>>([](const vector<Shrinkable<T>>& shrVec) {
                     vector<T> valVec;
                     valVec.reserve(shrVec.size());
                     util::transform(shrVec.begin(), shrVec.end(), util::back_inserter(valVec),
