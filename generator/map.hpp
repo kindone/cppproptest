@@ -26,16 +26,16 @@ public:
         shared_ptr<set<Shrinkable<Key>>> shrinkSet = util::make_shared<set<Shrinkable<Key>>>();
 
         while (shrinkSet->size() < size) {
-            auto elem = elemGen(rand);
-            shrinkSet->insert(elem);
+            auto key = keyGen(rand);
+            shrinkSet->insert(key);
         }
 
         shared_ptr<map<Shrinkable<Key>, Shrinkable<T>>> shrinkableMap =
             util::make_shared<map<Shrinkable<Key>, Shrinkable<T>>>();
 
         for (auto itr = shrinkSet->begin(); itr != shrinkSet->end(); ++itr) {
-            auto key = keyGen(rand);
-            shrinkableMap->insert(pair<Shrinkable<Key>, Shrinkable<T>>(*itr, key));
+            auto elem = elemGen(rand);
+            shrinkableMap->insert(pair<Shrinkable<Key>, Shrinkable<T>>(*itr, elem));
         }
 
         return shrinkMap(shrinkableMap, minSize);

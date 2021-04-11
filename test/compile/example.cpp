@@ -58,9 +58,9 @@ TEST(Example, MapGen)
         return std::to_string(num);
     });
 
-    Arbi<std::map<std::string, std::string>> mapGen;
+    Arbi<std::map<int, std::string>> mapGen;
 
-    forAll([](std::string str, std::map<std::string, std::string> nameAgeMap) {
+    forAll([](std::string str, std::map<int, std::string> nameAgeMap) {
         //std::cout << str << std::endl; 
     }, stringIntGen, mapGen.setElemGen(stringIntGen).setMaxSize(3));
 }
