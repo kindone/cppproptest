@@ -97,7 +97,7 @@ struct VectorShrinker
         return genStream(ancestor, power, offset, ancestor, frompos, topos, elemStreams);
     }
 
-    static stream_t shrinkBulkRecursive(const shrinkable_t& shrinkable, size_t power, size_t offset)
+    static stream_t shrinkElementwise(const shrinkable_t& shrinkable, size_t power, size_t offset)
     {
         if (shrinkable.getRef().empty())
             return stream_t::empty();
@@ -118,38 +118,70 @@ struct VectorShrinker
 
         return newShrinkable.shrinks();
     }
+
+    static shrinkable_t shrinkMid(shared_ptr<vector<Shrinkable<T>>> shrinkableVector, size_t minSize, size_t maxSize) {
+        // if maxSize < size, rear exists (rear is fixed)
+        // remove mid as much as possible
+        size_t rearSize = shrinkableVector->size() - maxSize;
+        // front size within [min,max]
+        auto rangeShrinkable = util::binarySearchShrinkable(maxSize - minSize).template map<size_t>([minSize](const size_t& s) { return s + minSize; });
+        return rangeShrinkable.template flatMap<vector<Shrinkable<T>>>([shrinkableVector, minSize, maxSize, rearSize](const size_t& size) {
+            // concat front and rear
+            auto vec = util::make_shared<vector<Shrinkable<T>>>(shrinkableVector->begin(), shrinkableVector->begin() + size);
+            vec->insert(vec->end(), shrinkableVector->begin() + maxSize, shrinkableVector->end());
+            return Shrinkable<vector<Shrinkable<T>>>(vec);
+        // NOTE: use of andThen instead of concat reduces diversity and converges faster
+        }).concat([minSize, rearSize](const shrinkable_t& parent) {
+            // reduce front [0,size-rearSize-1] as much possible
+            size_t size = parent.getRef().size();
+            // no further shrinking possible
+            if(size <= rearSize + 1 || size <= minSize + rearSize)
+                return Stream<Shrinkable<vector<Shrinkable<T>>>>::empty();
+            // shrink front further by fixing last element in front to rear
+            // [1,[2,3,4]]
+            // [[1,2,3],4]
+            // [[1,2],3,4]
+            size_t newRearSize = rearSize + 1;
+            return shrinkMid(parent.getSharedPtr(), (minSize > 1) ? (minSize - 1) : 0, size - newRearSize).shrinks();
+        });
+    }
 };
 
 }  // namespace util
 
+
 template <template <typename...> class ListLike, typename T>
-Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize)
+Shrinkable<vector<Shrinkable<T>>> shrinkMembershipwise(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize, size_t maxSize) {
+    return util::VectorShrinker<T>::shrinkMid(shrinkableVector, minSize, maxSize);
+}
+
+/**
+ * @brief Shrinking of list-like container using membership-wise and element-wise shrinking
+ *
+ *  * Membership-wise shrinking searches through inclusion or exclusion of elements in the container
+ *  * Element-wise shrinking tries to shrink the elements themselves (e.g. shrink integer elements in vector<int>)
+ * @tparam ListLike A list-like container such as vector or list
+ * @tparam T Contained type
+ * @param shrinkableVector vector of Shrinkable<T>
+ * @param minSize minimum size a shrunk list can be
+ * @param elementwise whether to enable element-wise shrinking. If false, only membership-wise shrinking is performed
+ * @return Shrinkable<ListLike<T>>
+ */
+template <template <typename...> class ListLike, typename T>
+Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize, bool elementwise = false)
 {
-    using shrinkable_vector_t = vector<Shrinkable<T>>;
-    using shrinkable_t = Shrinkable<shrinkable_vector_t>;
+    // membershipwise shrinking
+    Shrinkable<vector<Shrinkable<T>>> shrinkableElemsShr = shrinkMembershipwise<ListLike, T>(shrinkableVector, minSize, shrinkableVector->size());
 
-    size_t size = shrinkableVector->size();
-    // shrink list size with sub-list using binary numeric shrink of sizes
-    auto rangeShrinkable =
-        util::binarySearchShrinkableU(size - minSize).template map<size_t>([minSize](const uint64_t& _size) -> size_t {
-            return _size + minSize;
-        });
-    // this make sure shrinking is possible towards minSize
-    shrinkable_t shrinkable = rangeShrinkable.template flatMap<shrinkable_vector_t>(
-        [shrinkableVector](const size_t& _size) -> Shrinkable<shrinkable_vector_t> {
-            if (_size <= 0)
-                return make_shrinkable<shrinkable_vector_t>();
-
-            auto begin = shrinkableVector->begin();
-            auto last = shrinkableVector->begin() + _size;  // sub-list of (0, size)
-            return make_shrinkable<shrinkable_vector_t>(begin, last);
+    // elementwise shrinking
+    if(elementwise)
+        shrinkableElemsShr = shrinkableElemsShr.andThen(+[](const Shrinkable<vector<Shrinkable<T>>>& parent) {
+            return util::VectorShrinker<T>::shrinkElementwise(parent, 0, 0);
         });
 
-    shrinkable = shrinkable.andThen(
-        +[](const shrinkable_t& shr) { return util::VectorShrinker<T>::shrinkBulkRecursive(shr, 0, 0); });
-
-    auto listLikeShrinkable = shrinkable.template flatMap<ListLike<T>>(
-        +[](const shrinkable_vector_t& _shrinkableVector) -> Shrinkable<ListLike<T>> {
+    // transform to proper output type
+    return shrinkableElemsShr.template flatMap<ListLike<T>>(
+        +[](const vector<Shrinkable<T>>& _shrinkableVector) -> Shrinkable<ListLike<T>> {
             auto value = make_shrinkable<ListLike<T>>();
             ListLike<T>& valueVec = value.getRef();
             transform(
@@ -157,10 +189,15 @@ Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<T>>>& 
                 +[](const Shrinkable<T>& shr) -> T { return shr.getRef(); });
             return value;
         });
-
-    return listLikeShrinkable;
 }
 
+/**
+ * @brief Simple shrinking of list-like containers into sublists within minSize and the given list size
+ *
+ * @param shrinkableElems Shrinkable<T>
+ * @param minSize minimum size the shrunk container can be
+ * @return Shrinkable<ListLike<T>>
+ */
 template <template <typename...> class ListLike, typename T>
 Shrinkable<ListLike<Shrinkable<T>>> shrinkListLikeLength(const shared_ptr<ListLike<Shrinkable<T>>>& shrinkableElems,
                                                          size_t minSize)
