@@ -98,8 +98,8 @@ protected:
     uint64_t seed;
     uint32_t numRuns;
 
-    std::shared_ptr<void> funcPtr;
-    std::shared_ptr<void> genTupPtr;
+    shared_ptr<void> funcPtr;
+    shared_ptr<void> genTupPtr;
     shared_ptr<function<void()>> onStartupPtr;
     shared_ptr<function<void()>> onCleanupPtr;
 

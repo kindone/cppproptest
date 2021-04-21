@@ -66,6 +66,7 @@ using std::enable_if_t;
 
 using std::unique_ptr;
 using std::shared_ptr;
+using std::static_pointer_cast;
 using std::to_string;
 
 using std::numeric_limits;
