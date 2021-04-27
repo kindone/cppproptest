@@ -216,6 +216,138 @@ ostream& decodeCESU8(ostream& os, vector<uint8_t>& chars)
     return os;
 }
 
+uint32_t decodeCESU8(vector<uint8_t>& chars)
+{
+    for (size_t i = 0; i < chars.size(); i++) {
+        // U+0000..U+007F
+        if (chars[i] <= 0x7f) {
+            return static_cast<uint32_t>(chars[i]);
+        } else if (i + 2 > chars.size()) {
+            throw runtime_error("invalid CESU8 sequence");
+            // U+0080..U+07FF
+        } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
+                return static_cast<uint32_t>(0x80 + (chars[i] - 0xc2) * (0xbf - 0x80 + 1) + (chars[i + 1] - 0x80));
+                i++;
+            } else {
+                throw runtime_error("invalid CESU8 sequence");
+            }
+        } else if (i + 3 > chars.size()) {
+            throw runtime_error("invalid CESU8 sequence");
+            // U+0800..U+0FFF
+        } else if (0xe0 == chars[i]) {
+            if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                return static_cast<uint32_t>(0x0800 + (chars[i] - 0xe0) * (0xbf - 0xa0 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0xa0) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+            } else
+                throw runtime_error("invalid CESU8 sequence");
+            // U+1000..U+CFFF
+        } else if (0xe1 <= chars[i] && chars[i] <= 0xec) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2]);
+                return static_cast<uint32_t>(0x1000 + (chars[i] - 0xe1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+            } else
+                throw runtime_error("invalid CESU8 sequence");
+            // U+D000..U+D7FF
+        } else if (0xed == chars[i]) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x9f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                return static_cast<uint32_t>(0xD000 + (chars[i] - 0xed) * (0x9f - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+            } else {
+                if (i + 6 > chars.size()) {
+                    throw runtime_error("invalid CESU8 sequence");
+                } else if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xaf && 0x80 <= chars[i + 2] &&
+                           chars[i + 2] <= 0xbf && 0xed == chars[i + 3] && 0xb0 <= chars[i + 4] &&
+                           chars[i + 4] <= 0xbf && 0x80 <= chars[i + 5] && chars[i + 5] <= 0xbf) {
+                    // surrogate pairs
+                    uint16_t high = 0xD800 + (chars[i] - 0xed) * (0xaf - 0xa0 + 1) * (0xbf - 0x80 + 1) +
+                                    (chars[i + 1] - 0xa0) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80);
+                    uint16_t low = 0xDC00 + (chars[i + 3] - 0xed) * (0xbf - 0xb0 + 1) * (0xbf - 0x80 + 1) +
+                                   (chars[i + 4] - 0xb0) * (0xbf - 0x80 + 1) + (chars[i + 5] - 0x80);
+                    uint32_t code = 0x10000 + ((high & 0x03FF) << 10) + (low & 0x03FF);
+                    return static_cast<uint32_t>(code);
+                } else
+                    throw runtime_error("invalid CESU8 sequence");
+            }
+            // U+E000..U+FFFF
+        } else if (0xee <= chars[i] && chars[i] <= 0xef) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2]);
+                return static_cast<uint32_t>(0xe000 + (chars[i] - 0xee) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+            } else
+                throw runtime_error("invalid CESU8 sequence");
+        } else {
+            throw runtime_error("invalid CESU8 sequence");
+        }
+    }
+    throw runtime_error("invalid CESU8 sequence");
+}
+
+void encodeCESU8(uint32_t code, vector<uint8_t>& chars)
+{
+    if (code <= 0x7f) {
+        chars.push_back(static_cast<uint8_t>(code));
+    } else if (code <= 0x07FF) {
+        code -= 0x80;
+        uint8_t c0 = (code >> 6) + 0xc2;
+        uint8_t c1 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+    } else if (code <= 0x0FFF) {
+        code -= 0x800;
+        uint8_t c0 = 0xe0;
+        uint8_t c1 = (code >> 6) + 0xa0;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0xCFFF) {
+        code -= 0x1000;
+        uint8_t c0 = (code >> 12) + 0xe1;
+        uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0xD7FF) {
+        code -= 0xD000;
+        uint8_t c0 = 0xed;
+        uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0xDFFF) {
+        throw runtime_error("should not reach here. surrogate region");
+    } else if (code <= 0xFFFF) {
+        code -= 0xE000;
+        uint8_t c0 = (code >> 12) + 0xee;
+        uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0x10FFFF) {
+        code -= 0x10000;
+        uint16_t surrogates[2] = {static_cast<uint16_t>(0xD800 + (code >> 10)),
+                                    static_cast<uint16_t>(0xDC00 + (code & 0x3FF))};
+        for (int j = 0; j < 2; j++) {
+            code = surrogates[j];
+            code -= (j == 0 ? 0xd800 : 0xdc00);
+            uint8_t c0 = 0xed;
+            uint8_t c1 = ((code >> 6) & 0x3f) + (j == 0 ? 0xa0 : 0xb0);
+            uint8_t c2 = (code & 0x3f) + 0x80;
+            chars.push_back(c0);
+            chars.push_back(c1);
+            chars.push_back(c2);
+        }
+    } else {
+        throw runtime_error("should not reach here. code too big");
+    }
+}
+
 int CESU8CharSize(const string& str)
 {
     vector<uint8_t> chars(str.size());

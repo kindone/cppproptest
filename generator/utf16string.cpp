@@ -52,40 +52,9 @@ Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
         // U+D800..U+DFFF is forbidden for surrogate use
         Shrinkable<uint32_t> codeShr = elemGen(rand);
         uint32_t code = codeShr.get();
-
         positions.push_back(chars.size());
         codes.push_back(code);
-
-        if (code <= 0xd7FF || (0xE000 <= code && code <= 0xFFFF)) {
-            uint8_t c0 = (code >> 8);
-            uint8_t c1 = (code & 0xff);
-            chars.push_back(c0);
-            chars.push_back(c1);
-        }
-        // code page U+10000..U+10FFFF
-        else {
-            code -= 0x10000;
-            uint16_t surrogates[2] = {static_cast<uint16_t>(0xD800 + (code >> 10)),
-                                      static_cast<uint16_t>(0xDC00 + (code & 0x3FF))};
-            uint8_t c0 = surrogates[0] >> 8;
-            uint8_t c1 = surrogates[0] & 0xFF;
-            uint8_t c2 = surrogates[1] >> 8;
-            uint8_t c3 = surrogates[1] & 0xFF;
-            if (!(0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)) {
-                stringstream os;
-                os << "invalid surrogate pairs: ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c0) << " ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c1) << " ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c2) << " ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c3) << " ";
-                throw runtime_error(os.str());
-            }
-
-            chars.push_back(c0);
-            chars.push_back(c1);
-            chars.push_back(c2);
-            chars.push_back(c3);
-        }
+        util::encodeUTF16BE(code, chars);
     }
     positions.push_back(chars.size());
     chars.push_back(0);
@@ -151,40 +120,9 @@ Shrinkable<UTF16LEString> Arbi<UTF16LEString>::operator()(Random& rand)
         // U+D800..U+DFFF is forbidden for surrogate use
         Shrinkable<uint32_t> codeShr = elemGen(rand);
         uint32_t code = codeShr.get();
-
         positions.push_back(chars.size());
         codes.push_back(code);
-
-        if (code <= 0xd7ff || (0xE000 <= code && code <= 0xFFFF)) {
-            uint8_t c0 = (code >> 8);
-            uint8_t c1 = (code & 0xff);
-            chars.push_back(c1);
-            chars.push_back(c0);
-        }
-        // code page U+10000..U+10FFFF
-        else {
-            code -= 0x10000;
-            uint16_t surrogates[2] = {static_cast<uint16_t>(0xD800 + (code >> 10)),
-                                      static_cast<uint16_t>(0xDC00 + (code & 0x3FF))};
-            uint8_t c0 = surrogates[0] >> 8;
-            uint8_t c1 = surrogates[0] & 0xFF;
-            uint8_t c2 = surrogates[1] >> 8;
-            uint8_t c3 = surrogates[1] & 0xFF;
-            if (!(0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)) {
-                stringstream os;
-                os << "invalid surrogate pairs: ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c1) << " ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c0) << " ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c3) << " ";
-                os << setfill('0') << setw(2) << hex << static_cast<int>(c2) << " ";
-                throw runtime_error(os.str());
-                // throw runtime_error("invalid surrogate pairs: ");
-            }
-            chars.push_back(c1);
-            chars.push_back(c0);
-            chars.push_back(c3);
-            chars.push_back(c2);
-        }
+        util::encodeUTF16LE(code, chars);
     }
     positions.push_back(chars.size());
     chars.push_back(0);

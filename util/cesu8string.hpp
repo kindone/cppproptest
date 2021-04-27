@@ -20,6 +20,10 @@ PROPTEST_API ostream& decodeCESU8(ostream& os, vector<uint8_t>& chars);
 PROPTEST_API ostream& decodeCESU8(ostream& os, const string& str);
 PROPTEST_API ostream& decodeCESU8(ostream& os, const CESU8String& str);
 
+PROPTEST_API uint32_t decodeCESU8(vector<uint8_t>& chars);
+PROPTEST_API void encodeCESU8(uint32_t utf32, vector<uint8_t>& chars);
+
+
 struct PROPTEST_API DecodeCESU8
 {
     DecodeCESU8(const string& _str) : str(_str) {}

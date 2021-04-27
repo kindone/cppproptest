@@ -67,27 +67,24 @@ TEST(PropTest, MockOnCall)
 
 namespace proptest {
 
-template <>
-struct Arbi<shared_ptr<NiceMock<MockCat>>> : ArbiBase<shared_ptr<NiceMock<MockCat>>> {
-    Shrinkable<shared_ptr<NiceMock<MockCat>>> operator()(Random& rand) {
-        auto vecGen = Arbitrary<vector<int>>();
-        auto mockGen = vecGen.map<shared_ptr<NiceMock<MockCat>>>([](vector<int>& vec) {
-            auto cat = util::make_shared<NiceMock<MockCat>>();
-            auto index = util::make_shared<int>(0);
-            auto vecPtr = util::make_shared<vector<int>>(vec);
-            ON_CALL(*cat, meow(_)).WillByDefault(Return(0));
-            ON_CALL(*cat, meow(0)).WillByDefault(Invoke([vecPtr,index](int) {
-                int& i = *index;
-                if(i >= vecPtr->size())
-                    return 0;
-                i ++;
-                return (*vecPtr)[i];
-            }));
-            return cat;
-        });
-        return mockGen(rand);
-    }
-};
+DEFINE_ARBITRARY(shared_ptr<NiceMock<MockCat>>, []() {
+    auto vecGen = Arbitrary<vector<int>>();
+    auto mockGen = vecGen.map<shared_ptr<NiceMock<MockCat>>>([](vector<int>& vec) {
+        auto cat = util::make_shared<NiceMock<MockCat>>();
+        auto index = util::make_shared<int>(0);
+        auto vecPtr = util::make_shared<vector<int>>(vec);
+        ON_CALL(*cat, meow(_)).WillByDefault(Return(0));
+        ON_CALL(*cat, meow(0)).WillByDefault(Invoke([vecPtr,index](int) {
+            int& i = *index;
+            if(i >= vecPtr->size())
+                return 0;
+            i ++;
+            return (*vecPtr)[i];
+        }));
+        return cat;
+    });
+    return mockGen;
+});
 
 namespace util {
 
@@ -107,29 +104,25 @@ struct Functor {
 
 }
 
-
-template <>
-struct Arbi<shared_ptr<MockCat>> : ArbiBase<shared_ptr<MockCat>> {
-    Shrinkable<shared_ptr<MockCat>> operator()(Random& rand) {
-        auto vecGen = Arbitrary<vector<int>>();
-        vecGen.setMinSize(1);
-        auto mockGen = vecGen.map<shared_ptr<MockCat>>([](vector<int>& vec) {
-            auto cat = util::make_shared<MockCat>();
-            auto index = util::make_shared<int>(0);
-            auto vecPtr = util::make_shared<vector<int>>(vec);
-            ON_CALL(*cat, meow(_)).WillByDefault(Return(0));
-            ON_CALL(*cat, meow(0)).WillByDefault(Invoke([vecPtr,index](int) {
-                int& i = *index;
-                if(i >= vecPtr->size())
-                    return 0;
-                i ++;
-                return (*vecPtr)[i];
-            }));
-            return cat;
-        });
-        return mockGen(rand);
-    }
-};
+DEFINE_ARBITRARY(shared_ptr<MockCat>, []() {
+    auto vecGen = Arbitrary<vector<int>>();
+    vecGen.setMinSize(1);
+    auto mockGen = vecGen.map<shared_ptr<MockCat>>([](vector<int>& vec) {
+        auto cat = util::make_shared<MockCat>();
+        auto index = util::make_shared<int>(0);
+        auto vecPtr = util::make_shared<vector<int>>(vec);
+        ON_CALL(*cat, meow(_)).WillByDefault(Return(0));
+        ON_CALL(*cat, meow(0)).WillByDefault(Invoke([vecPtr,index](int) {
+            int& i = *index;
+            if(i >= vecPtr->size())
+                return 0;
+            i ++;
+            return (*vecPtr)[i];
+        }));
+        return cat;
+    });
+    return mockGen;
+});
 
 }
 

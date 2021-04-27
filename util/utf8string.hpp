@@ -20,6 +20,9 @@ PROPTEST_API ostream& UTF8ToHex(ostream& os, vector<uint8_t>& chars);
 PROPTEST_API ostream& decodeUTF8(ostream& os, const string& str);
 PROPTEST_API ostream& decodeUTF8(ostream& os, const UTF8String& str);
 
+PROPTEST_API uint32_t decodeUTF8(vector<uint8_t>& chars);
+void encodeUTF8(uint32_t code, vector<uint8_t>& chars);
+
 struct PROPTEST_API DecodeUTF8
 {
     DecodeUTF8(const string& _str) : str(_str) {}

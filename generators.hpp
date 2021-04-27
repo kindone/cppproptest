@@ -4,6 +4,7 @@
 #include "generator/floating.hpp"
 #include "generator/bool.hpp"
 #include "generator/string.hpp"
+#include "generator/unicode.hpp"
 #include "generator/utf8string.hpp"
 #include "generator/utf16string.hpp"
 #include "generator/cesu8string.hpp"

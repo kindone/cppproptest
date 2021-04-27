@@ -33,6 +33,10 @@ PROPTEST_API ostream& decodeUTF16BE(ostream& os, vector<uint8_t>& chars);
 PROPTEST_API ostream& decodeUTF16BE(ostream& os, const string& str);
 PROPTEST_API ostream& decodeUTF16BE(ostream& os, const UTF16BEString& str);
 
+PROPTEST_API uint32_t decodeUTF16BE(vector<uint8_t>& chars);
+PROPTEST_API void encodeUTF16BE(uint32_t utf32, vector<uint8_t>& chars);
+
+
 struct PROPTEST_API DecodeUTF16BE
 {
     DecodeUTF16BE(const string& _str) : str(_str) {}
@@ -49,6 +53,10 @@ PROPTEST_API int UTF16BECharSize(const string& str);
 PROPTEST_API ostream& decodeUTF16LE(ostream& os, vector<uint8_t>& chars);
 PROPTEST_API ostream& decodeUTF16LE(ostream& os, const string& str);
 PROPTEST_API ostream& decodeUTF16LE(ostream& os, const UTF16LEString& str);
+
+PROPTEST_API uint32_t decodeUTF16LE(vector<uint8_t>& chars);
+PROPTEST_API void encodeUTF16LE(uint32_t utf32, vector<uint8_t>& chars);
+
 
 struct PROPTEST_API DecodeUTF16LE
 {

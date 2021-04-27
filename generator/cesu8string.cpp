@@ -56,69 +56,9 @@ Shrinkable<CESU8String> Arbi<CESU8String>::operator()(Random& rand)
         // U+D800..U+DFFF is forbidden for surrogate use
         Shrinkable<uint32_t> codeShr = elemGen(rand);
         uint32_t code = codeShr.get();
-
         positions.push_back(chars.size());
         codes.push_back(code);
-
-        if (code <= 0x7f) {
-            chars.push_back(static_cast<uint8_t>(code));
-        } else if (code <= 0x07FF) {
-            code -= 0x80;
-            uint8_t c0 = (code >> 6) + 0xc2;
-            uint8_t c1 = (code & 0x3f) + 0x80;
-            chars.push_back(c0);
-            chars.push_back(c1);
-        } else if (code <= 0x0FFF) {
-            code -= 0x800;
-            uint8_t c0 = 0xe0;
-            uint8_t c1 = (code >> 6) + 0xa0;
-            uint8_t c2 = (code & 0x3f) + 0x80;
-            chars.push_back(c0);
-            chars.push_back(c1);
-            chars.push_back(c2);
-        } else if (code <= 0xCFFF) {
-            code -= 0x1000;
-            uint8_t c0 = (code >> 12) + 0xe1;
-            uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
-            uint8_t c2 = (code & 0x3f) + 0x80;
-            chars.push_back(c0);
-            chars.push_back(c1);
-            chars.push_back(c2);
-        } else if (code <= 0xD7FF) {
-            code -= 0xD000;
-            uint8_t c0 = 0xed;
-            uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
-            uint8_t c2 = (code & 0x3f) + 0x80;
-            chars.push_back(c0);
-            chars.push_back(c1);
-            chars.push_back(c2);
-        } else if (code <= 0xDFFF) {
-            throw runtime_error("should not reach here. surrogate region");
-        } else if (code <= 0xFFFF) {
-            code -= 0xE000;
-            uint8_t c0 = (code >> 12) + 0xee;
-            uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
-            uint8_t c2 = (code & 0x3f) + 0x80;
-            chars.push_back(c0);
-            chars.push_back(c1);
-            chars.push_back(c2);
-        } else if (code <= 0x10FFFF) {
-            code -= 0x10000;
-            uint16_t surrogates[2] = {static_cast<uint16_t>(0xD800 + (code >> 10)),
-                                      static_cast<uint16_t>(0xDC00 + (code & 0x3FF))};
-            for (int j = 0; j < 2; j++) {
-                code = surrogates[j];
-                code -= (j == 0 ? 0xd800 : 0xdc00);
-                uint8_t c0 = 0xed;
-                uint8_t c1 = ((code >> 6) & 0x3f) + (j == 0 ? 0xa0 : 0xb0);
-                uint8_t c2 = (code & 0x3f) + 0x80;
-                chars.push_back(c0);
-                chars.push_back(c1);
-                chars.push_back(c2);
-            }
-        } else {
-            throw runtime_error("should not reach here. code too big");
-        }
+        util::encodeCESU8(code, chars);
     }
     positions.push_back(chars.size());
 

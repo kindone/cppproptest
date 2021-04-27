@@ -389,11 +389,11 @@ private:
     }
 
     Func& getFunc() {
-        return *std::static_pointer_cast<Func>(funcPtr);
+        return *static_pointer_cast<Func>(funcPtr);
     }
 
     GenTuple& getGenTup() {
-        return *std::static_pointer_cast<GenTuple>(genTupPtr);
+        return *static_pointer_cast<GenTuple>(genTupPtr);
     }
 };
 

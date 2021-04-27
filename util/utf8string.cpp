@@ -178,6 +178,193 @@ ostream& decodeUTF8(ostream& os, vector<uint8_t>& chars)
     return os;
 }
 
+uint32_t decodeUTF8(vector<uint8_t>& chars)
+{
+    for (size_t i = 0; i < chars.size(); i++) {
+        // U+0000..U+007F
+        if (chars[i] <= 0x7f) {
+            return static_cast<uint32_t>(chars[i]);
+            // os << static_cast<char>(chars[i]);
+        } else if (i + 2 > chars.size()) {
+            throw runtime_error("invalid UTF-8 sequence");
+            // U+0080..U+07FF
+        } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
+                // validChar(os, chars[i] - 0xc2, chars[i+1]);
+                return static_cast<uint32_t>(0x80 + (chars[i] - 0xc2) * (0xbf - 0x80 + 1) + (chars[i + 1] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1]);
+                i++;
+            } else {
+                throw runtime_error("invalid UTF-8 sequence");
+            }
+        } else if (i + 3 > chars.size()) {
+            throw runtime_error("invalid UTF-8 sequence");
+            // U+0800..U+0FFF
+        } else if (0xe0 == chars[i]) {
+            if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2]);
+                return static_cast<uint32_t>(0x0800 + (chars[i] - 0xe0) * (0xbf - 0xa0 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0xa0) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
+                i += 2;
+            } else
+                throw runtime_error("invalid UTF-8 sequence");
+            // U+1000..U+CFFF
+        } else if (0xe1 <= chars[i] && chars[i] <= 0xec) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2]);
+                return static_cast<uint32_t>(0x1000 + (chars[i] - 0xe1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
+                i += 2;
+            } else
+                throw runtime_error("invalid UTF-8 sequence");
+            // U+D000..U+D7FF
+        } else if (0xed == chars[i]) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x9f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2]);
+                return static_cast<uint32_t>(0xD000 + (chars[i] - 0xed) * (0x9f - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
+                i += 2;
+            } else
+                throw runtime_error("invalid UTF-8 sequence");
+            // U+E000..U+FFFF
+        } else if (0xee <= chars[i] && chars[i] <= 0xef) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2]);
+                return static_cast<uint32_t>(0xe000 + (chars[i] - 0xee) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
+                i += 2;
+            } else
+                throw runtime_error("invalid UTF-8 sequence");
+        } else if (i + 4 > chars.size()) {
+            throw runtime_error("invalid UTF-8 sequence");
+            // U+10000..U+3FFFF
+        } else if (0xf0 == chars[i]) {
+            if (0x90 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
+                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
+                return static_cast<uint32_t>(0x10000 + (chars[i] - 0xf0) * (0xbf - 0x90 + 1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x90) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 2] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 3] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
+                i += 3;
+            } else
+                throw runtime_error("invalid UTF-8 sequence");
+            // U+40000..U+FFFFF
+        } else if (0xf1 <= chars[i] && chars[i] <= 0xf3) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
+                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
+                return static_cast<uint32_t>(0x40000 + (chars[i] - 0xf1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 2] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 3] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
+                i += 3;
+            } else
+                throw runtime_error("invalid UTF-8 sequence");
+            // U+100000..U+10FFFF
+        } else if (0xf4 == chars[i]) {
+            if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x8f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
+                0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
+                // validChar(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
+                return static_cast<uint32_t>(0x100000 + (chars[i] - 0xf4) * (0x8f - 0x80 + 1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
+                                 (chars[i + 2] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 3] - 0x80));
+                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
+                i += 3;
+            } else {
+                throw runtime_error("invalid UTF-8 sequence");
+            }
+        } else {
+            throw runtime_error("invalid UTF-8 sequence");
+        }
+    }
+    throw runtime_error("invalid UTF-8 sequence");
+}
+
+void encodeUTF8(uint32_t code, vector<uint8_t>& chars)
+{
+    if (code <= 0x7f) {
+        chars.push_back(static_cast<uint8_t>(code));
+    } else if (code <= 0x07FF) {
+        code -= 0x80;
+        uint8_t c0 = (code >> 6) + 0xc2;
+        uint8_t c1 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+    } else if (code <= 0x0FFF) {
+        code -= 0x800;
+        uint8_t c0 = 0xe0;
+        uint8_t c1 = (code >> 6) + 0xa0;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0xCFFF) {
+        code -= 0x1000;
+        uint8_t c0 = (code >> 12) + 0xe1;
+        uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0xD7FF) {
+        code -= 0xD000;
+        uint8_t c0 = 0xed;
+        uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0xDFFF) {
+        throw runtime_error("should not reach here. surrogate region");
+    } else if (code <= 0xFFFF) {
+        code -= 0xE000;
+        uint8_t c0 = (code >> 12) + 0xee;
+        uint8_t c1 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c2 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+    } else if (code <= 0x3FFFF) {
+        code -= 0x10000;
+        uint8_t c0 = 0xf0;
+        uint8_t c1 = (code >> 12) + 0x90;
+        uint8_t c2 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c3 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+        chars.push_back(c3);
+    } else if (code <= 0xFFFFF) {
+        code -= 0x40000;
+        uint8_t c0 = (code >> 18) + 0xf1;
+        uint8_t c1 = ((code >> 12) & 0x3f) + 0x80;
+        uint8_t c2 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c3 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+        chars.push_back(c3);
+    } else if (code <= 0x10FFFF) {
+        code -= 0x100000;
+        uint8_t c0 = 0xf4;
+        uint8_t c1 = (code >> 12) + 0x80;
+        uint8_t c2 = ((code >> 6) & 0x3f) + 0x80;
+        uint8_t c3 = (code & 0x3f) + 0x80;
+        chars.push_back(c0);
+        chars.push_back(c1);
+        chars.push_back(c2);
+        chars.push_back(c3);
+
+    } else {
+        throw runtime_error("should not reach here. code too big");
+    }
+}
+
 int UTF8CharSize(const string& str)
 {
     vector<uint8_t> chars(str.size());
