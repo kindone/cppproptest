@@ -18,7 +18,7 @@ TEST(PropTest, TestJust2)
     Random rand(seed);
 
     auto ptrGen = just<shared_ptr<int>>(util::make_shared<int>(0));
-    auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen);
+    auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen).setMaxSize(10);
 
     cout << "just: " << ptrGen(rand).get() << endl;
     auto shr = vecGen(rand);
@@ -32,7 +32,7 @@ TEST(PropTest, TestLazy)
     Random rand(seed);
 
     auto ptrGen = lazy([]() { return util::make_shared<int>(1); });
-    auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen);
+    auto vecGen = Arbi<vector<shared_ptr<int>>>(ptrGen).setMaxSize(10);
 
     auto vec = ptrGen(rand).get();
 

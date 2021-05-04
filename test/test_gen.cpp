@@ -284,8 +284,8 @@ TEST(PropTest, ShrinkSetExhaustive)
             });
             auto size = root.getRef().size();
             PROP_EXPECT_EQ(numTotal, pow(2, size) - sumCombinations(size, minSize-1));
-            cout << "rootSize: "  << size  << ", minSize: " << minSize << ", total: " << numTotal << ", pow: " << pow(2, size) << ", minus: " << sumCombinations(size, minSize-1) << endl;
-            cout << "exhaustive: " << exhaustiveStr.str() << endl;
+            // cout << "rootSize: "  << size  << ", minSize: " << minSize << ", total: " << numTotal << ", pow: " << pow(2, size) << ", minus: " << sumCombinations(size, minSize-1) << endl;
+            // cout << "exhaustive: " << exhaustiveStr.str() << endl;
         }
     }, minAndMaxSizeGen);
 
