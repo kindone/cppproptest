@@ -178,19 +178,22 @@ ostream& operator<<(ostream& os, const proptest::Nullable<T>& nullable)
 }
 
 template <typename T>
-void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level, bool print = true)
+void printShrinkable(const proptest::Shrinkable<T>& shrinkable, int level) {
+    for (int i = 0; i < level; i++)
+        cout << "  ";
+
+    cout << "shrinkable: " << proptest::Show<T>(shrinkable.get()) << endl;
+}
+
+template <typename T>
+void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level, proptest::function<void(const proptest::Shrinkable<T>&, int)> func =  printShrinkable<T>)
 {
     // using namespace proptest;
-    if (print) {
-        for (int i = 0; i < level; i++)
-            cout << "  ";
-
-        cout << "shrinkable: " << proptest::Show<T>(shrinkable.get()) << endl;
-    }
+    func(shrinkable, level);
 
     auto shrinks = shrinkable.shrinks();
     for (auto itr = shrinks.iterator(); itr.hasNext();) {
         auto shrinkable2 = itr.next();
-        exhaustive(shrinkable2, level + 1, print);
+        exhaustive(shrinkable2, level + 1, func);
     }
 }

@@ -119,30 +119,123 @@ struct VectorShrinker
         return newShrinkable.shrinks();
     }
 
-    static shrinkable_t shrinkMid(shared_ptr<vector<Shrinkable<T>>> shrinkableVector, size_t minSize, size_t maxSize) {
-        // if maxSize < size, rear exists (rear is fixed)
+    static shrinkable_t shrinkMid(shared_ptr<vector<Shrinkable<T>>> shrinkableCont, size_t minSize, size_t frontSize, size_t rearSize) {
         // remove mid as much as possible
-        size_t rearSize = shrinkableVector->size() - maxSize;
-        // front size within [min,max]
-        auto rangeShrinkable = util::binarySearchShrinkable(maxSize - minSize).template map<size_t>([minSize](const size_t& s) { return s + minSize; });
-        return rangeShrinkable.template flatMap<vector<Shrinkable<T>>>([shrinkableVector, minSize, maxSize, rearSize](const size_t& size) {
+        size_t minRearSize = minSize >= frontSize ? minSize - frontSize : 0;
+        size_t maxRearSize = shrinkableCont->size() - frontSize;
+        // rear size within [minRearSize, minRearSize]
+        auto rangeShrinkable = util::binarySearchShrinkable(maxRearSize - minRearSize).template map<size_t>([minRearSize](const size_t& s) { return s + minRearSize; });
+        return rangeShrinkable.template flatMap<vector<Shrinkable<T>>>([shrinkableCont, frontSize](const size_t& rearSize) {
             // concat front and rear
-            auto vec = util::make_shared<vector<Shrinkable<T>>>(shrinkableVector->begin(), shrinkableVector->begin() + size);
-            vec->insert(vec->end(), shrinkableVector->begin() + maxSize, shrinkableVector->end());
-            return Shrinkable<vector<Shrinkable<T>>>(vec);
-        // NOTE: use of andThen instead of concat reduces diversity and converges faster
+            auto cont = util::make_shared<vector<Shrinkable<T>>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize);
+            cont->insert(cont->end(), shrinkableCont->begin() + (cont->size()-rearSize), shrinkableCont->end());
+            return Shrinkable<vector<Shrinkable<T>>>(cont);
+        }).concat([minSize, frontSize, rearSize](const shrinkable_t& parent) {
+            size_t parentSize = parent.getRef().size();
+            // no further shrinking possible
+            if(parentSize <= minSize || parentSize <= frontSize)
+                return Stream<Shrinkable<vector<Shrinkable<T>>>>::empty();
+            return shrinkMid(parent.getSharedPtr(), minSize, frontSize + 1, rearSize).shrinks();
+        });
+    }
+
+    static shrinkable_t shrinkFrontAndThenMid(shared_ptr<vector<Shrinkable<T>>> shrinkableCont, size_t minSize, size_t rearSize) {
+        // remove front as much as possible
+        size_t minFrontSize = minSize >= rearSize ? minSize - rearSize : 0;
+        size_t maxFrontSize = shrinkableCont->size() - rearSize;
+        // front size within [min,max]
+        auto rangeShrinkable = util::binarySearchShrinkable(maxFrontSize - minFrontSize).template map<size_t>([minFrontSize](const size_t& s) { return s + minFrontSize; });
+        return rangeShrinkable.template flatMap<vector<Shrinkable<T>>>([shrinkableCont, minFrontSize, maxFrontSize](const size_t& frontSize) {
+            // concat front and rear
+            auto cont = util::make_shared<vector<Shrinkable<T>>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize);
+            cont->insert(cont->end(), shrinkableCont->begin() + maxFrontSize, shrinkableCont->end());
+            return Shrinkable<vector<Shrinkable<T>>>(cont);
         }).concat([minSize, rearSize](const shrinkable_t& parent) {
             // reduce front [0,size-rearSize-1] as much possible
-            size_t size = parent.getRef().size();
+            size_t parentSize = parent.getRef().size();
             // no further shrinking possible
-            if(size <= rearSize + 1 || size <= minSize + rearSize)
-                return Stream<Shrinkable<vector<Shrinkable<T>>>>::empty();
+            if(parentSize <= minSize || parentSize <= rearSize) {
+                // try shrinking mid
+                if(minSize < parentSize && rearSize + 1 < parentSize)
+                    return shrinkMid(parent.getSharedPtr(), minSize, 1, rearSize + 1).shrinks();
+                else
+                    return Stream<Shrinkable<vector<Shrinkable<T>>>>::empty();
+            }
             // shrink front further by fixing last element in front to rear
             // [1,[2,3,4]]
             // [[1,2,3],4]
             // [[1,2],3,4]
-            size_t newRearSize = rearSize + 1;
-            return shrinkMid(parent.getSharedPtr(), (minSize > 1) ? (minSize - 1) : 0, size - newRearSize).shrinks();
+            return shrinkFrontAndThenMid(parent.getSharedPtr(), minSize, rearSize + 1).shrinks();
+        });
+    }
+
+};
+
+template <template <typename...> class Container, typename T>
+struct ContainerShrinker
+{
+    using shrinkable_cont_t = Container<Shrinkable<T>>;
+    using shrinkable_t = Shrinkable<shrinkable_cont_t>;
+
+    static shrinkable_t shrinkMid(shared_ptr<Container<Shrinkable<T>>> shrinkableCont, size_t minSize, size_t frontSize, size_t rearSize) {
+        // remove mid as much as possible
+        size_t minRearSize = minSize >= frontSize ? minSize - frontSize : 0;
+        size_t maxRearSize = shrinkableCont->size() - frontSize;
+        // rear size within [minRearSize, minRearSize]
+        auto rangeShrinkable = util::binarySearchShrinkable(maxRearSize - minRearSize).template map<size_t>([minRearSize](const size_t& s) { return s + minRearSize; });
+        return rangeShrinkable.template flatMap<Container<Shrinkable<T>>>([shrinkableCont, frontSize](const size_t& rearSize) {
+            // concat front and rear
+            // auto cont = util::make_shared<Container<Shrinkable<T>>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize);
+            // cont->insert(cont->end(), shrinkableCont->begin() + (cont->size()-rearSize), shrinkableCont->end());
+            auto cont = util::make_shared<Container<Shrinkable<T>>>();
+            size_t i = 0;
+            for(auto itr = shrinkableCont->begin(); itr != shrinkableCont->end(); ++itr, ++i) {
+                if(i < frontSize || i >= cont->size() - rearSize)
+                    cont->insert(*itr);
+            }
+            return Shrinkable<Container<Shrinkable<T>>>(cont);
+        }).concat([minSize, frontSize, rearSize](const shrinkable_t& parent) {
+            size_t parentSize = parent.getRef().size();
+            // no further shrinking possible
+            if(parentSize <= minSize || parentSize <= frontSize)
+                return Stream<Shrinkable<Container<Shrinkable<T>>>>::empty();
+            return shrinkMid(parent.getSharedPtr(), minSize, frontSize + 1, rearSize).shrinks();
+        });
+    }
+
+    static shrinkable_t shrinkFrontAndThenMid(shared_ptr<Container<Shrinkable<T>>> shrinkableCont, size_t minSize, size_t rearSize) {
+        // remove front as much as possible
+        size_t minFrontSize = minSize >= rearSize ? minSize - rearSize : 0;
+        size_t maxFrontSize = shrinkableCont->size() - rearSize;
+        // front size within [min,max]
+        auto rangeShrinkable = util::binarySearchShrinkable(maxFrontSize - minFrontSize).template map<size_t>([minFrontSize](const size_t& s) { return s + minFrontSize; });
+        return rangeShrinkable.template flatMap<Container<Shrinkable<T>>>([shrinkableCont, minFrontSize, maxFrontSize](const size_t& frontSize) {
+            // concat front and rear
+            // auto cont = util::make_shared<Container<Shrinkable<T>>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize);
+            // cont->insert(cont->end(), shrinkableCont->begin() + maxFrontSize, shrinkableCont->end());
+            auto cont = util::make_shared<Container<Shrinkable<T>>>();
+            size_t i = 0;
+            for(auto itr = shrinkableCont->begin(); itr != shrinkableCont->end(); ++itr, ++i) {
+                if(i < frontSize || i >= maxFrontSize)
+                    cont->insert(*itr);
+            }
+            return Shrinkable<Container<Shrinkable<T>>>(cont);
+        }).concat([minSize, rearSize](const shrinkable_t& parent) {
+            // reduce front [0,size-rearSize-1] as much possible
+            size_t parentSize = parent.getRef().size();
+            // no further shrinking possible
+            if(parentSize <= minSize || parentSize <= rearSize) {
+                // try shrinking mid
+                if(minSize < parentSize && rearSize + 1 < parentSize)
+                    return shrinkMid(parent.getSharedPtr(), minSize, 1, rearSize + 1).shrinks();
+                else
+                    return Stream<Shrinkable<Container<Shrinkable<T>>>>::empty();
+            }
+            // shrink front further by fixing last element in front to rear
+            // [1,[2,3,4]]
+            // [[1,2,3],4]
+            // [[1,2],3,4]
+            return shrinkFrontAndThenMid(parent.getSharedPtr(), minSize, rearSize + 1).shrinks();
         });
     }
 };
@@ -150,10 +243,45 @@ struct VectorShrinker
 }  // namespace util
 
 
-template <template <typename...> class ListLike, typename T>
-Shrinkable<vector<Shrinkable<T>>> shrinkMembershipwise(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize, size_t maxSize) {
-    return util::VectorShrinker<T>::shrinkMid(shrinkableVector, minSize, maxSize);
+template <template <typename...> class Container, typename T>
+Shrinkable<Container<Shrinkable<T>>> shrinkMembershipwise(const shared_ptr<Container<Shrinkable<T>>>& shrinkableCont, size_t minSize) {
+    return util::ContainerShrinker<Container, T>::shrinkFrontAndThenMid(shrinkableCont, minSize, 0);
 }
+
+template <typename T>
+Shrinkable<vector<Shrinkable<T>>> shrinkMembershipwise(const shared_ptr<vector<Shrinkable<T>>>& shrinkableCont, size_t minSize) {
+    return util::VectorShrinker<T>::shrinkFrontAndThenMid(shrinkableCont, minSize, 0);
+}
+
+/**
+ * @brief Shrinking of a container using membership-wise shrinking
+ *
+ *  * Membership-wise shrinking searches through inclusion or exclusion of elements in the container
+ * @tparam Container A container such as vector or set
+ * @tparam T Contained type
+ * @param shrinkableCont container of Shrinkable<T>
+ * @param minSize minimum size a shrunk list can be
+ * @param elementwise whether to enable element-wise shrinking. If false, only membership-wise shrinking is performed
+ * @return Shrinkable<ListLike<T>>
+ */
+template <template <typename...> class Container, typename T>
+Shrinkable<Container<T>> shrinkContainer(const shared_ptr<Container<Shrinkable<T>>>& shrinkableCont, size_t minSize)
+{
+    // membershipwise shrinking
+    Shrinkable<Container<Shrinkable<T>>> shrinkableElemsShr = shrinkMembershipwise<Container, T>(shrinkableCont, minSize);
+
+    // transform to proper output type
+    return shrinkableElemsShr.template flatMap<Container<T>>(
+        +[](const Container<Shrinkable<T>>& _shrinkableCont) -> Shrinkable<Container<T>> {
+            auto value = make_shrinkable<Container<T>>();
+            Container<T>& valueCont = value.getRef();
+            for(auto itr = _shrinkableCont.begin(); itr != _shrinkableCont.end(); ++itr) {
+                valueCont.insert(itr->getRef());
+            }
+            return value;
+        });
+}
+
 
 /**
  * @brief Shrinking of list-like container using membership-wise and element-wise shrinking
@@ -168,10 +296,10 @@ Shrinkable<vector<Shrinkable<T>>> shrinkMembershipwise(const shared_ptr<vector<S
  * @return Shrinkable<ListLike<T>>
  */
 template <template <typename...> class ListLike, typename T>
-Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize, bool elementwise = false)
+Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<T>>>& shrinkableVector, size_t minSize, bool elementwise = true)
 {
     // membershipwise shrinking
-    Shrinkable<vector<Shrinkable<T>>> shrinkableElemsShr = shrinkMembershipwise<ListLike, T>(shrinkableVector, minSize, shrinkableVector->size());
+    Shrinkable<vector<Shrinkable<T>>> shrinkableElemsShr = shrinkMembershipwise<T>(shrinkableVector, minSize);
 
     // elementwise shrinking
     if(elementwise)

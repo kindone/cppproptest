@@ -232,6 +232,66 @@ TEST(PropTest, ShrinkVectorFromGen)
     // return make_shrinkable<vector<T>>(util::move(vec));
     exhaustive(vecShrinkable, 0);
 }
+
+TEST(PropTest, ShrinkSetExhaustive)
+{
+    static auto combination = [](int n, int r) {
+        int result = 1;
+        for(int i = 1; i <= r; i++)
+        {
+            result *= n--;
+            result /= i;
+        }
+        return result;
+    };
+
+    static auto sumCombinations = [](int n, int maxR) {
+        if(maxR < 0)
+            return 0;
+        int result = 0;
+        for(int r = 0; r <= maxR; r++)
+            result += combination(n, r);
+        return result;
+    };
+
+    int64_t seed = getCurrentTime();
+    Random rand(seed);
+
+    auto minAndMaxSizeGen = interval(0, 10).pairWith<int>([](int& n) {
+        return interval(n, 10);
+    });
+
+    forAll([&rand](pair<int, int> minAndMaxSize) {
+        auto elemGen = interval(0, 99);
+        int minSize = minAndMaxSize.first;
+        int maxSize = minAndMaxSize.second;
+        auto setGen = Arbi<set<int>>(elemGen).setSize(minSize, maxSize);
+        for(int i = 0; i < 3; i++) {
+            auto strSet = set<string>();
+            stringstream exhaustiveStr;
+            int numTotal = 0;
+            auto root = setGen(rand);
+            exhaustive<set<int>>(root, 0, [&numTotal, &strSet,&exhaustiveStr](const Shrinkable<set<int>>& shrinkable, int level) {
+                exhaustiveStr << "\n";
+                for (int i = 0; i < level; i++) exhaustiveStr << "  ";
+                exhaustiveStr << proptest::Show<set<int>>(shrinkable.get());
+                numTotal ++;
+
+                stringstream str;
+                str <<  proptest::Show<set<int>>(shrinkable.get());
+                PROP_EXPECT(strSet.find(str.str()) == strSet.end()) << str.str() << " already exists in: " << exhaustiveStr.str();
+                strSet.insert(str.str());
+            });
+            auto size = root.getRef().size();
+            PROP_EXPECT_EQ(numTotal, pow(2, size) - sumCombinations(size, minSize-1));
+            cout << "rootSize: "  << size  << ", minSize: " << minSize << ", total: " << numTotal << ", pow: " << pow(2, size) << ", minus: " << sumCombinations(size, minSize-1) << endl;
+            cout << "exhaustive: " << exhaustiveStr.str() << endl;
+        }
+    }, minAndMaxSizeGen);
+
+}
+
+
 TEST(PropTest, TuplePair1)
 {
     auto intGen = Arbi<int>();
