@@ -36,16 +36,16 @@ TEST(Example, TemplatedGen)
 {
     auto intGen = interval<int>(2, 100000);
     auto stringIntGen = intGen.map([](int& num) {
-        return std::to_string(num);/// "2", "4", "6" 
+        return std::to_string(num);/// "2", "4", "6"
     });
 
     forAll([](std::string str, std::vector<std::string> numStrings) {
-        //std::cout << str << std::endl; 
+        //std::cout << str << std::endl;
         std::cout << "[ ";
         if(numStrings.size() > 0)
-            std::cout << numStrings[0]; 
+            std::cout << numStrings[0];
         for(size_t i = 1; i < numStrings.size(); i++)
-            std::cout << ", " << numStrings[i]; 
+            std::cout << ", " << numStrings[i];
         std::cout << " ]" << std::endl;
 
     }, stringIntGen, Arbi<std::vector<std::string>>(stringIntGen) );
@@ -61,6 +61,6 @@ TEST(Example, MapGen)
     Arbi<std::map<int, std::string>> mapGen;
 
     forAll([](std::string str, std::map<int, std::string> nameAgeMap) {
-        //std::cout << str << std::endl; 
+        //std::cout << str << std::endl;
     }, stringIntGen, mapGen.setElemGen(stringIntGen).setMaxSize(3));
 }

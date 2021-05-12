@@ -1,6 +1,7 @@
 #pragma once
 #include "../Shrinkable.hpp"
 #include "../util/std.hpp"
+#include "../shrinker/set.hpp"
 
 namespace proptest {
 

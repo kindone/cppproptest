@@ -190,10 +190,7 @@ uint32_t decodeUTF8(vector<uint8_t>& chars)
             // U+0080..U+07FF
         } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
-                // validChar(os, chars[i] - 0xc2, chars[i+1]);
                 return static_cast<uint32_t>(0x80 + (chars[i] - 0xc2) * (0xbf - 0x80 + 1) + (chars[i + 1] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1]);
-                i++;
             } else {
                 throw runtime_error("invalid UTF-8 sequence");
             }
@@ -202,41 +199,29 @@ uint32_t decodeUTF8(vector<uint8_t>& chars)
             // U+0800..U+0FFF
         } else if (0xe0 == chars[i]) {
             if (0xa0 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 return static_cast<uint32_t>(0x0800 + (chars[i] - 0xe0) * (0xbf - 0xa0 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0xa0) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
-                i += 2;
             } else
                 throw runtime_error("invalid UTF-8 sequence");
             // U+1000..U+CFFF
         } else if (0xe1 <= chars[i] && chars[i] <= 0xec) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 return static_cast<uint32_t>(0x1000 + (chars[i] - 0xe1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
-                i += 2;
             } else
                 throw runtime_error("invalid UTF-8 sequence");
             // U+D000..U+D7FF
         } else if (0xed == chars[i]) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x9f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 return static_cast<uint32_t>(0xD000 + (chars[i] - 0xed) * (0x9f - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
-                i += 2;
             } else
                 throw runtime_error("invalid UTF-8 sequence");
             // U+E000..U+FFFF
         } else if (0xee <= chars[i] && chars[i] <= 0xef) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2]);
                 return static_cast<uint32_t>(0xe000 + (chars[i] - 0xee) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 2] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2]);
-                i += 2;
             } else
                 throw runtime_error("invalid UTF-8 sequence");
         } else if (i + 4 > chars.size()) {
@@ -245,36 +230,27 @@ uint32_t decodeUTF8(vector<uint8_t>& chars)
         } else if (0xf0 == chars[i]) {
             if (0x90 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
                 0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
                 return static_cast<uint32_t>(0x10000 + (chars[i] - 0xf0) * (0xbf - 0x90 + 1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0x90) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 2] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 3] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
-                i += 3;
             } else
                 throw runtime_error("invalid UTF-8 sequence");
             // U+40000..U+FFFFF
         } else if (0xf1 <= chars[i] && chars[i] <= 0xf3) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
                 0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
                 return static_cast<uint32_t>(0x40000 + (chars[i] - 0xf1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 2] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 3] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
-                i += 3;
             } else
                 throw runtime_error("invalid UTF-8 sequence");
             // U+100000..U+10FFFF
         } else if (0xf4 == chars[i]) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0x8f && 0x80 <= chars[i + 2] && chars[i + 2] <= 0xbf &&
                 0x80 <= chars[i + 3] && chars[i + 3] <= 0xbf) {
-                // validChar(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
                 return static_cast<uint32_t>(0x100000 + (chars[i] - 0xf4) * (0x8f - 0x80 + 1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 1] - 0x80) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[i + 2] - 0x80) * (0xbf - 0x80 + 1) + (chars[i + 3] - 0x80));
-                // charAsHex(os, chars[i], chars[i+1], chars[i+2], chars[i+3]);
-                i += 3;
             } else {
                 throw runtime_error("invalid UTF-8 sequence");
             }

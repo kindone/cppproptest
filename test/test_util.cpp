@@ -82,7 +82,7 @@ TEST(UtilTestCase, transformHeteroTest3)
 template <typename T>
 struct Bind
 {
-    string to_string(int a) { return to_string(a); }
+    string to_string(int a) { return ::proptest::to_string(a); }
 };
 
 template <template <typename> class T, typename P>

@@ -76,7 +76,7 @@ DEFINE_ARBITRARY(shared_ptr<NiceMock<MockCat>>, []() {
         ON_CALL(*cat, meow(_)).WillByDefault(Return(0));
         ON_CALL(*cat, meow(0)).WillByDefault(Invoke([vecPtr,index](int) {
             int& i = *index;
-            if(i >= vecPtr->size())
+            if(i >= static_cast<int>(vecPtr->size()))
                 return 0;
             i ++;
             return (*vecPtr)[i];
@@ -114,7 +114,7 @@ DEFINE_ARBITRARY(shared_ptr<MockCat>, []() {
         ON_CALL(*cat, meow(_)).WillByDefault(Return(0));
         ON_CALL(*cat, meow(0)).WillByDefault(Invoke([vecPtr,index](int) {
             int& i = *index;
-            if(i >= vecPtr->size())
+            if(i >= static_cast<int>(vecPtr->size()))
                 return 0;
             i ++;
             return (*vecPtr)[i];

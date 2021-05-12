@@ -145,7 +145,7 @@ struct VectorShrinker
         size_t maxFrontSize = shrinkableCont->size() - rearSize;
         // front size within [min,max]
         auto rangeShrinkable = util::binarySearchShrinkable(maxFrontSize - minFrontSize).template map<size_t>([minFrontSize](const size_t& s) { return s + minFrontSize; });
-        return rangeShrinkable.template flatMap<vector<Shrinkable<T>>>([shrinkableCont, minFrontSize, maxFrontSize](const size_t& frontSize) {
+        return rangeShrinkable.template flatMap<vector<Shrinkable<T>>>([shrinkableCont, maxFrontSize](const size_t& frontSize) {
             // concat front and rear
             auto cont = util::make_shared<vector<Shrinkable<T>>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize);
             cont->insert(cont->end(), shrinkableCont->begin() + maxFrontSize, shrinkableCont->end());
@@ -209,7 +209,7 @@ struct ContainerShrinker
         size_t maxFrontSize = shrinkableCont->size() - rearSize;
         // front size within [min,max]
         auto rangeShrinkable = util::binarySearchShrinkable(maxFrontSize - minFrontSize).template map<size_t>([minFrontSize](const size_t& s) { return s + minFrontSize; });
-        return rangeShrinkable.template flatMap<Container<Shrinkable<T>>>([shrinkableCont, minFrontSize, maxFrontSize](const size_t& frontSize) {
+        return rangeShrinkable.template flatMap<Container<Shrinkable<T>>>([shrinkableCont, maxFrontSize](const size_t& frontSize) {
             // concat front and rear
             // auto cont = util::make_shared<Container<Shrinkable<T>>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize);
             // cont->insert(cont->end(), shrinkableCont->begin() + maxFrontSize, shrinkableCont->end());

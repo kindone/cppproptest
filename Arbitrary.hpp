@@ -112,7 +112,7 @@ struct ArbiBase : public GenBase<T>
         return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
     }
 
-    /// @private
+    /// @internal
     shared_ptr<Arbi<T>> clone() { return util::make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
 };
 
@@ -168,7 +168,7 @@ using ArbitraryContainer = ArbiContainer<ARGS...>;
 
 #define DEFINE_ARBITRARY(TYPE, ...) \
     template <> \
-    struct ::proptest::Arbi<TYPE> : ::proptest::ArbiBase<TYPE> \
+    struct Arbi<TYPE> : ::proptest::ArbiBase<TYPE> \
     { \
         ::proptest::Shrinkable<TYPE> operator()(::proptest::Random& rand) { \
             return (__VA_ARGS__)()(rand); \

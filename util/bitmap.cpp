@@ -114,7 +114,7 @@ int Bitmap::occupyUnavailable(int n)
     for (int i = 0; i < n; i++) {
         State UnavailableState = Unavailable;
         if (states[i].compare_exchange_strong(UnavailableState, Changing))
-            return i;   
+            return i;
     }
     return -1;
 }

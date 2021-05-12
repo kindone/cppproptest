@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Shrinkable.hpp"
+#include "../util/tuple.hpp"
 
 namespace proptest {
 

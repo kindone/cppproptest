@@ -52,7 +52,7 @@ struct Shrinkable
     Shrinkable<U> map(shared_ptr<function<U(const T&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
-        auto shrinkable = make_shrinkable<U>(util::move((*transformerPtr)(getRef())));
+        auto shrinkable = make_shrinkable<U>((*transformerPtr)(getRef()));
         return shrinkable.with([thisShrinksPtr, transformerPtr]() {
             return (*thisShrinksPtr)().template transform<Shrinkable<U>>(
                 [transformerPtr](const Shrinkable<T>& shr) { return shr.map(transformerPtr); });

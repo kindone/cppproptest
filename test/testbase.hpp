@@ -186,7 +186,20 @@ void printShrinkable(const proptest::Shrinkable<T>& shrinkable, int level) {
 }
 
 template <typename T>
-void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level, proptest::function<void(const proptest::Shrinkable<T>&, int)> func =  printShrinkable<T>)
+void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level)
+{
+    // using namespace proptest;
+    printShrinkable(shrinkable, level);
+
+    auto shrinks = shrinkable.shrinks();
+    for (auto itr = shrinks.iterator(); itr.hasNext();) {
+        auto shrinkable2 = itr.next();
+        exhaustive(shrinkable2, level + 1);
+    }
+}
+
+template <typename T>
+void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level, proptest::function<void(const proptest::Shrinkable<T>&, int)> func)
 {
     // using namespace proptest;
     func(shrinkable, level);

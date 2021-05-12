@@ -2,6 +2,7 @@
 
 #include "../Shrinkable.hpp"
 #include "../util/std.hpp"
+#include "../generator/util.hpp"
 
 namespace proptest {
 

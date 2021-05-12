@@ -125,32 +125,27 @@ ostream& decodeUTF16BE(ostream& os, vector<uint8_t>& chars)
 
 uint32_t decodeUTF16BE(vector<uint8_t>& chars)
 {
-    for (size_t i = 0; i < chars.size(); i++) {
-        if (i + 2 > chars.size()) {
-            throw runtime_error("invalid UTF-16 BE sequence");
-        }
-        // ASCII: U+0000..U+007F
-        if (chars[i] == 0 && chars[i + 1] <= 0x7f) {
-            return static_cast<uint32_t>(chars[i + 1]);
-            i++;
-        }
-        // U+0000..U+D7FF or U+E000..U+FFFF
-        else if (chars[i] <= 0xD7 || 0xE0 <= chars[i]) {
-            return static_cast<uint32_t>((chars[i] << 8) + chars[i + 1]);
-            i++;
-        } else if (i + 4 > chars.size()) {
-            throw runtime_error("invalid UTF-16 BE sequence");
-            break;
-        }
-        // U+10000.. use surrogate pairs
-        // U+0000..U+D7FF or U+E000..U+FFFF
-        else {
-            uint16_t s0 = ((chars[i] << 8) + chars[i+1]);
-            uint16_t s1 = ((chars[i+2] << 8) + chars[i+3]);
-            uint32_t p0 = (s0 - 0xD800) << 10;
-            uint32_t p1 = (s1 - 0xDC00);
-            return static_cast<uint32_t>(0x10000 + p0 + p1);
-        }
+    if (2 > chars.size()) {
+        throw runtime_error("invalid UTF-16 BE sequence");
+    }
+    // ASCII: U+0000..U+007F
+    if (chars[0] == 0 && chars[1] <= 0x7f) {
+        return static_cast<uint32_t>(chars[1]);
+    }
+    // U+0000..U+D7FF or U+E000..U+FFFF
+    else if (chars[0] <= 0xD7 || 0xE0 <= chars[0]) {
+        return static_cast<uint32_t>((chars[0] << 8) + chars[1]);
+    } else if (4 > chars.size()) {
+        throw runtime_error("invalid UTF-16 BE sequence");
+    }
+    // U+10000.. use surrogate pairs
+    // U+0000..U+D7FF or U+E000..U+FFFF
+    else {
+        uint16_t s0 = ((chars[0] << 8) + chars[1]);
+        uint16_t s1 = ((chars[2] << 8) + chars[3]);
+        uint32_t p0 = (s0 - 0xD800) << 10;
+        uint32_t p1 = (s1 - 0xDC00);
+        return static_cast<uint32_t>(0x10000 + p0 + p1);
     }
     throw runtime_error("invalid UTF-16 BE sequence");
 }
@@ -224,29 +219,27 @@ ostream& decodeUTF16LE(ostream& os, vector<uint8_t>& chars)
 
 uint32_t decodeUTF16LE(vector<uint8_t>& chars)
 {
-    for (size_t i = 0; i < chars.size(); i++) {
-        if (i + 2 > chars.size()) {
-            throw runtime_error("invalid UTF-16 LE sequence");
-        }
-        // ASCII: U+0000..U+007F
-        if (chars[i + 1] == 0 && chars[i] <= 0x7f) {
-            return static_cast<uint32_t>(chars[i]);
-        }
-        // U+0000..U+D7FF or U+E000..U+FFFF
-        else if (chars[i + 1] <= 0xD7 || 0xE0 <= chars[i + 1]) {
-            return static_cast<uint32_t>((chars[i + 1] << 8) + chars[i]);
-        } else if (i + 4 > chars.size()) {
-            throw runtime_error("invalid UTF-16 LE sequence");
-        }
-        // U+10000.. use surrogate pairs
-        // U+0000..U+D7FF or U+E000..U+FFFF
-        else {
-            uint16_t s0 = ((chars[i+1] << 8) + chars[i]);
-            uint16_t s1 = ((chars[i+3] << 8) + chars[i+2]);
-            uint32_t p0 = (s0 - 0xD800) << 10;
-            uint32_t p1 = (s1 - 0xDC00);
-            return static_cast<uint32_t>(0x10000 + p0 + p1);
-        }
+    if (2 > chars.size()) {
+        throw runtime_error("invalid UTF-16 LE sequence");
+    }
+    // ASCII: U+0000..U+007F
+    if (chars[1] == 0 && chars[0] <= 0x7f) {
+        return static_cast<uint32_t>(chars[0]);
+    }
+    // U+0000..U+D7FF or U+E000..U+FFFF
+    else if (chars[1] <= 0xD7 || 0xE0 <= chars[1]) {
+        return static_cast<uint32_t>((chars[1] << 8) + chars[0]);
+    } else if (4 > chars.size()) {
+        throw runtime_error("invalid UTF-16 LE sequence");
+    }
+    // U+10000.. use surrogate pairs
+    // U+0000..U+D7FF or U+E000..U+FFFF
+    else {
+        uint16_t s0 = ((chars[1] << 8) + chars[0]);
+        uint16_t s1 = ((chars[3] << 8) + chars[2]);
+        uint32_t p0 = (s0 - 0xD800) << 10;
+        uint32_t p1 = (s1 - 0xDC00);
+        return static_cast<uint32_t>(0x10000 + p0 + p1);
     }
     throw runtime_error("invalid UTF-16 LE sequence");
 }

@@ -228,7 +228,6 @@ uint32_t decodeCESU8(vector<uint8_t>& chars)
         } else if (0xc2 <= chars[i] && chars[i] <= 0xdf) {
             if (0x80 <= chars[i + 1] && chars[i + 1] <= 0xbf) {
                 return static_cast<uint32_t>(0x80 + (chars[i] - 0xc2) * (0xbf - 0x80 + 1) + (chars[i + 1] - 0x80));
-                i++;
             } else {
                 throw runtime_error("invalid CESU8 sequence");
             }
