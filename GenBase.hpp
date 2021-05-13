@@ -33,7 +33,7 @@ class Random;
 template <typename T>
 using GenFunction = function<Shrinkable<T>(Random&)>;
 
-/// @internal
+/// * private
 template <typename T>
 struct GenBase
 {

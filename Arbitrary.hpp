@@ -112,7 +112,7 @@ struct ArbiBase : public GenBase<T>
         return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
     }
 
-    /// @internal
+    /// * private
     shared_ptr<Arbi<T>> clone() { return util::make_shared<Arbi<T>>(*dynamic_cast<Arbi<T>*>(this)); }
 };
 

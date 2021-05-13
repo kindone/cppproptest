@@ -21,7 +21,7 @@ struct PROPTEST_API StringAsHex
 
     friend ostream& operator<<(ostream& os, const StringAsHex& obj) { return charAsHex(os, obj.str); }
 
-    const string& str;
+    string str;
 };
 
 struct PROPTEST_API StringPrintable
@@ -30,7 +30,7 @@ struct PROPTEST_API StringPrintable
 
     friend ostream& operator<<(ostream& os, const StringPrintable& obj) { return validString(os, obj.str); }
 
-    const string& str;
+    string str;
 };
 
 ostream& validChar(ostream& os, uint8_t c);

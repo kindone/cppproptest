@@ -43,7 +43,7 @@ struct PROPTEST_API DecodeUTF16BE
     DecodeUTF16BE(const UTF16BEString& _str) : str(_str) {}
     friend ostream& operator<<(ostream& os, const DecodeUTF16BE& obj) { return decodeUTF16BE(os, obj.str); }
 
-    const string& str;
+    string str;
 };
 
 PROPTEST_API bool isValidUTF16BE(vector<uint8_t>& chars);
@@ -64,7 +64,7 @@ struct PROPTEST_API DecodeUTF16LE
     DecodeUTF16LE(const UTF16LEString& _str) : str(_str) {}
     friend ostream& operator<<(ostream& os, const DecodeUTF16LE& obj) { return decodeUTF16LE(os, obj.str); }
 
-    const string& str;
+    string str;
 };
 
 PROPTEST_API bool isValidUTF16LE(vector<uint8_t>& chars);

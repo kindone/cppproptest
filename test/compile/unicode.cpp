@@ -3,6 +3,7 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 #include "util/unicode.hpp"
+#include "generator/unicode.hpp"
 
 using namespace proptest;
 

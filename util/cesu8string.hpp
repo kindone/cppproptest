@@ -30,7 +30,7 @@ struct PROPTEST_API DecodeCESU8
     DecodeCESU8(const CESU8String& _str) : str(_str) {}
     friend ostream& operator<<(ostream& os, const DecodeCESU8& obj) { return decodeCESU8(os, obj.str); }
 
-    const string& str;
+    string str;
 };
 
 PROPTEST_API bool isValidCESU8(vector<uint8_t>& chars);

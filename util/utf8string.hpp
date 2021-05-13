@@ -29,7 +29,7 @@ struct PROPTEST_API DecodeUTF8
     DecodeUTF8(const UTF8String& _str) : str(_str) {}
 
     friend ostream& operator<<(ostream& os, const DecodeUTF8& obj) { return decodeUTF8(os, obj.str); }
-    const string& str;
+    string str;
 };
 
 PROPTEST_API ostream& decodeUTF8(ostream& os, vector<uint8_t>& chars);

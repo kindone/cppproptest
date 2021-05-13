@@ -23,7 +23,7 @@
 namespace proptest {
 
 namespace util {
-/// @internal
+/// * private
 struct Matrix {
     template <size_t N, typename Lists>
     static decltype(auto) pickN(Lists&& lists, vector<int>& indices) {
@@ -399,7 +399,7 @@ private:
 
 namespace util {
 
-/// @internal
+/// * private
 template <typename RetType, typename Callable, typename... ARGS>
 enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
@@ -407,7 +407,7 @@ enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWith
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
-/// @internal
+/// * private
 template <typename RetType, typename Callable, typename... ARGS>
 enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
@@ -418,7 +418,7 @@ enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWith
     });
 }
 
-/// @internal
+/// * private
 template <class Callable>
 decltype(auto) functionWithBoolResult(Callable&& callable)
 {
@@ -427,14 +427,14 @@ decltype(auto) functionWithBoolResult(Callable&& callable)
     return functionWithBoolResultHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
-/// @internal
+/// * private
 template <typename RetType, typename Callable, typename... ARGS>
 function<RetType(ARGS...)> asFunctionHelper(util::TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
-/// @internal
+/// * private
 template <class Callable>
 decltype(auto) asFunction(Callable&& callable)
 {
@@ -443,7 +443,7 @@ decltype(auto) asFunction(Callable&& callable)
     return asFunctionHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
-/// @internal
+/// * private
 template <typename... ARGS>
 decltype(auto) createProperty(function<bool(ARGS...)> func,
                               tuple<GenFunction<decay_t<ARGS>>...>&& genTup)
