@@ -165,6 +165,7 @@ void testUTF8(PropertyContext& context, Random rand)
 void testUTF32(PropertyContext& context, Random rand)
 {
     uint32_t rangeSize = 0x10FFFF - 0x0001 + (0xDFFF - 0xD800 + 1) + 1;
+    auto unicodeGen = UnicodeGen();
     for (int i = 0; i < 100000; i++) {
         rand.getRandomSize(0, 1);  // dummy call to align with string generators
         uint32_t code = unicodeGen(rand).get();

@@ -14,7 +14,7 @@ TEST(Compile, utf8)
         util::encodeUTF8(unicode, encoded);
         uint32_t out = util::decodeUTF8(encoded);
         PROP_EXPECT_EQ(unicode, out);
-    }, unicodeGen);
+    }, UnicodeGen());
 }
 
 TEST(Compile, cesu8)
@@ -24,7 +24,7 @@ TEST(Compile, cesu8)
         util::encodeCESU8(unicode, encoded);
         uint32_t out = util::decodeCESU8(encoded);
         PROP_EXPECT_EQ(unicode, out);
-    }, unicodeGen);
+    }, UnicodeGen());
 }
 
 TEST(Compile, utf16be)
@@ -36,7 +36,7 @@ TEST(Compile, utf16be)
         stringstream str;
         util::charAsHex(str, encoded);
         PROP_EXPECT_EQ(unicode, out) << hex << unicode << " : " << out << "(" << str.str() << ")";
-    }, unicodeGen);
+    }, UnicodeGen());
 }
 
 TEST(Compile, utf16le)
@@ -46,7 +46,7 @@ TEST(Compile, utf16le)
         util::encodeUTF16LE(unicode, encoded);
         uint32_t out = util::decodeUTF16LE(encoded);
         PROP_EXPECT_EQ(unicode, out) << hex << unicode << " : " << out;
-    }, unicodeGen);
+    }, UnicodeGen());
 }
 
 TEST(Compile, unicode_stream)
@@ -67,7 +67,7 @@ TEST(Compile, unicode_stream)
         PROP_EXPECT_EQ(stream_utf16le.str(), stream_utf16be.str()) << hex << unicode << " " << stream_utf16le.str() << " : " << stream_utf16be.str();
         PROP_EXPECT_EQ(stream_utf16le.str(), stream_utf8.str()) << hex << unicode << " " << stream_utf16le.str() << " : " << stream_utf8.str();
         PROP_EXPECT_EQ(stream_utf16le.str(), stream_cesu8.str()) << hex << unicode << " " << stream_utf16le.str() << " : " << stream_cesu8.str();
-    }, unicodeGen);
+    }, UnicodeGen());
 }
 
 TEST(Compile, CESU8UTF16BE)

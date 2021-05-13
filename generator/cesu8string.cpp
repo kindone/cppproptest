@@ -12,7 +12,7 @@ namespace proptest {
 size_t Arbi<CESU8String>::defaultMinSize = 0;
 size_t Arbi<CESU8String>::defaultMaxSize = 200;
 
-Arbi<CESU8String>::Arbi() : ArbiContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
+Arbi<CESU8String>::Arbi() : ArbiContainer<CESU8String>(defaultMinSize, defaultMaxSize), elemGen(UnicodeGen()) {}
 
 Arbi<CESU8String>::Arbi(Arbi<uint32_t>& _elemGen)
     : ArbiContainer<CESU8String>(defaultMinSize, defaultMaxSize),

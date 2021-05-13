@@ -5,7 +5,7 @@
 
 namespace proptest {
 
-Shrinkable<uint32_t> unicodeGen(Random& rand)
+Shrinkable<uint32_t> UnicodeGen::operator()(Random& rand)
 {
     auto frontSize = 0xD7FF - 0x1 + 1;
     auto rearSize = 0x10FFFF - 0xE000 + 1;

@@ -7,6 +7,9 @@
 
 namespace proptest {
 
-PROPTEST_API Shrinkable<uint32_t> unicodeGen(Random& rand);
+// PROPTEST_API Shrinkable<uint32_t> unicodeGen(Random& rand);
+struct PROPTEST_API UnicodeGen {
+    Shrinkable<uint32_t> operator()(Random& rand);
+};
 
 }

@@ -12,7 +12,7 @@ namespace proptest {
 size_t Arbi<UTF16BEString>::defaultMinSize = 0;
 size_t Arbi<UTF16BEString>::defaultMaxSize = 200;
 
-Arbi<UTF16BEString>::Arbi() : ArbiContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
+Arbi<UTF16BEString>::Arbi() : ArbiContainer<UTF16BEString>(defaultMinSize, defaultMaxSize), elemGen(UnicodeGen()) {}
 
 Arbi<UTF16BEString>::Arbi(Arbi<uint32_t>& _elemGen)
     : ArbiContainer<UTF16BEString>(defaultMinSize, defaultMaxSize),
@@ -80,7 +80,7 @@ Shrinkable<UTF16BEString> Arbi<UTF16BEString>::operator()(Random& rand)
 size_t Arbi<UTF16LEString>::defaultMinSize = 0;
 size_t Arbi<UTF16LEString>::defaultMaxSize = 200;
 
-Arbi<UTF16LEString>::Arbi() : ArbiContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(unicodeGen) {}
+Arbi<UTF16LEString>::Arbi() : ArbiContainer<UTF16LEString>(defaultMinSize, defaultMaxSize), elemGen(UnicodeGen()) {}
 
 Arbi<UTF16LEString>::Arbi(Arbi<uint32_t>& _elemGen)
     : ArbiContainer<UTF16LEString>(defaultMinSize, defaultMaxSize),
