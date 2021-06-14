@@ -164,8 +164,9 @@ They can be chained to create another generator out of themselves. See [Combinat
 
 &nbsp;
 
+# Advanced Topics
 
-## Advanced Topic - `GenFunction<T>` - Common representation for all generators for type `T`
+## `GenFunction<T>` - Common representation for all generators for type `T`
 
 All generators, including the default ones, share the same base *function* type. A generator can be a callable (function, functor, or lambda) with following common signature:
 
@@ -204,7 +205,7 @@ struct MyIntGen {
 };
 ```
 
-## Advanced Topic - `Generator<T>` - Decorator class for supercharging a generator
+## `Generator<T>` - Decorator class for supercharging a generator
 
 The template class `Generator<T>` is an abstract functor class that also coerces to `GenFunction<T>`. A `Generator<T>` gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of `cppproptest` produce decorated `Generator<T>`s, you can use the utility methods out-of-box.
 
