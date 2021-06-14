@@ -18,122 +18,30 @@ forAll([](int age, std::string name) {
 
 Now you see that `forAll` actually requires some information how to generate the values of the extracted types. They're just hidden as defaults.
 
-## `GenFunction<T>` - Common representation for all generators for type `T`
-
-All generators, including the default ones, share the same base *function* type. A generator can be a callable (function, functor, or lambda) with following common signature:
-
-```cpp
-// (Random&) -> Shrinkable<T>
-```
-
-This can be represented as (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term *GenFunction* throughout this page to refer the generator function type.
-
-```cpp
-template <typename T>
-using GenFunction = std::function<Shrinkable<T>(Random&);
-```
-
-By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following: 
-
-```cpp
-// lambda style
-auto myIntGen = [](Random& rand) {
-    int smallInt = rand.getRandomInt8();
-    return make_shrinkable<int>(smallInt);
-};
-
-// function style
-Shrinkable<int> myIntGen(Random& rand) {
-    int smallInt = rand.getRandomInt8();
-    return make_shrinkable<int>(smallInt);
-}
-
-// functor style
-struct MyIntGen {
-    Shrinkable<int> operator()(Random& rand) {
-        int smallInt = rand.getRandomInt8();
-        return make_shrinkable<int>(smallInt);
-    }
-};
-```
-
-## `Generator<T>` - Decorator class for supercharging a generator
-
-The template class `Generator<T>` is an abstract functor class that also coerces to `GenFunction<T>`. A `Generator<T>` gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of `cppproptest` produce decorated `Generator<T>`s, you can use the utility methods out-of-box.
-
-```cpp
-// decorate a GenFunction with Generator<T>
-auto myIntGen = Generator<int>([](Random& rand) {
-    int smallInt = rand.getRandomInt8();
-    return make_shrinkable<int>(smallInt);
-});
-
-// .filter and other utility methods can be used once the generator is decorated with Generator<T>
-auto evenGen = myIntGen.filter([](int& value) {
-    return value % 2 == 0;
-}); // generates even numbers only
-```
+&nbsp;
 
 ## Arbitraries - The globally default generators
 
 ### Arbitrary lets you omit generator arguments
 
-An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type that also coerces to `GenFunction<T>`.
+An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type (that also coerces to `GenFunction<T>`).
 These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no custom generator is provided. 
 
 ```cpp
-// if there is no default generator available, you should provide a generator for the type. 
+// if there is no default generator available, you must provide a generator for the type. 
 forAll([](SomeNewType x) {
 }, someNewTypeGen);
 
 
-// if there is a default generator (Arbitrary<SomeNewType>) available, you may use that generator by omitting the argument 
-forAll([](SomeNewType x) {
+// if there is a default generator (Arbitrary<SomeType>) available, you may use that generator by omitting the argument 
+forAll([](SomeType x) {
 });
 ```
 
-### Defining an arbitrary
-
-With template specialization, new `Arbi<T>` (or its alias `Arbitrary<T>`) for type `T` can be defined, if it isn't already defined yet. By defining an _Arbitrary_, you are effectively adding a default generator for a type to the library.
-
-Following shows an example of defining an _Arbitrary_. Note that it should be defined under `proptest` namespace in order to be noticed and accessible in the library core.
-
-```cpp
-namespace proptest { // you should define your Arbi<T> inside the namespace
-
-// define a template specialization of Arbi for Car type
-// by extending ArbiBase, you are decorating your arbitrary with standard methods (map, flatMap, filter, etc.)
-template <>
-struct Arbi<Car> : ArbiBase<Car> {
-  Shrinkable<Car> operator()(Random& rand) {
-    bool isAutomatic = rand.getRandomBool();
-    return make_shrinkable<Car>(isAutomatic); // make_shrinkable creates a Car object by calling Car's constructor with 1 boolean parameter
-  }
-};
-
-}
-```
-
-### Arbitrary provides utility methods
-
-As an `Arbitrary<T>` is also a `Generator<T>`, an arbitrary provides useful helpers for creating new generators from existing ones. `filter` is such a helper. It restrictively generates values that satisfy a criteria function. Following is an even number generator from the integer `Arbitrary`.
-
-```cpp
-// generates any integers
-auto anyIntGen = Arbi<int>();
-// generates even integers
-auto evenGen = anyIntGen.filter([](int& num) {
-    return num % 2 == 0;
-});
-```
-
-You can find the full list of such helpers in section [Utility methods in standard generators](#Utility-methods-in-standard-generators).
-
-&nbsp;
 
 ### Built-in Arbitraries
 
-Built-in generators are in the form of Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used in practice.
+`cppproptest` provides a set of built-in generators for immediate generation of types that are often used in practice. Built-in generators are in the form of Arbitraries. 
 
 Here's a quick reference for built-in arbitraries
 
@@ -206,8 +114,109 @@ Here's a quick reference for built-in arbitraries
 		vecInt.setSize(1, 10); // 3) generated vector will have size >= 1 and size <= 10
 		```
 
+
+### Defining an arbitrary
+
+With template specialization, new `Arbi<T>` (or its alias `Arbitrary<T>`) for type `T` can be defined, if it isn't already defined yet. By defining an _Arbitrary_, you are effectively adding a default generator for a type.
+
+Following shows an example of defining an _Arbitrary_. Note that it should be defined under `proptest` namespace in order to be noticed and accessible in the library core.
+
+```cpp
+namespace proptest { // you should define your Arbi<T> inside the namespace
+
+// define a template specialization of Arbi for Car type
+// by extending ArbiBase, you are decorating your arbitrary with standard methods (map, flatMap, filter, etc.)
+template <>
+struct Arbi<Car> : ArbiBase<Car> {
+  Shrinkable<Car> operator()(Random& rand) {
+    bool isAutomatic = rand.getRandomBool();
+    return make_shrinkable<Car>(isAutomatic); // make_shrinkable creates a Car object by calling Car's constructor with 1 boolean parameter
+  }
+};
+
+}
+```
+
+### Arbitrary provides utility methods
+
+As an `Arbitrary<T>` is also a `Generator<T>`, an arbitrary provides useful helpers for creating new generators from existing ones. `filter` is such a helper. It restrictively generates values that satisfy a criteria function. Following is an even number generator from the integer `Arbitrary`.
+
+```cpp
+// generates any integers
+auto anyIntGen = Arbi<int>();
+// generates even integers
+auto evenGen = anyIntGen.filter([](int& num) {
+    return num % 2 == 0;
+});
+```
+
+You can find the full list of such helpers in section [Utility methods in standard generators](#Utility-methods-in-standard-generators).
+
+&nbsp;
+
+
 ## Building Custom Generators with Generator Combinators
 
 While you can build your own generator manually defining a `GenFunction<T>` for type `T`, it's usually not recommended as there is a better option - generator combinators.
 Generator combinators are toolkit for building new generators based on existing ones. 
 They can be chained to create another generator out of themselves. See [Combinators](./Combinators.md) page for the detail. 
+
+
+&nbsp;
+
+
+## Advanced Topic - `GenFunction<T>` - Common representation for all generators for type `T`
+
+All generators, including the default ones, share the same base *function* type. A generator can be a callable (function, functor, or lambda) with following common signature:
+
+```cpp
+// (Random&) -> Shrinkable<T>
+```
+
+This can be represented as (or coerced to) a standard function type, `std::function<Shrinkable<T>(Random&)>`. In `cppproptest`, this function type is aliased as `GenFunction<T>`. We will use this term *GenFunction* throughout this page to refer the generator function type.
+
+```cpp
+template <typename T>
+using GenFunction = std::function<Shrinkable<T>(Random&);
+```
+
+By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following: 
+
+```cpp
+// lambda style
+auto myIntGen = [](Random& rand) {
+    int smallInt = rand.getRandomInt8();
+    return make_shrinkable<int>(smallInt);
+};
+
+// function style
+Shrinkable<int> myIntGen(Random& rand) {
+    int smallInt = rand.getRandomInt8();
+    return make_shrinkable<int>(smallInt);
+}
+
+// functor style
+struct MyIntGen {
+    Shrinkable<int> operator()(Random& rand) {
+        int smallInt = rand.getRandomInt8();
+        return make_shrinkable<int>(smallInt);
+    }
+};
+```
+
+## Advanced Topic - `Generator<T>` - Decorator class for supercharging a generator
+
+The template class `Generator<T>` is an abstract functor class that also coerces to `GenFunction<T>`. A `Generator<T>` gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of `cppproptest` produce decorated `Generator<T>`s, you can use the utility methods out-of-box.
+
+```cpp
+// decorate a GenFunction with Generator<T>
+auto myIntGen = Generator<int>([](Random& rand) {
+    int smallInt = rand.getRandomInt8();
+    return make_shrinkable<int>(smallInt);
+});
+
+// .filter and other utility methods can be used once the generator is decorated with Generator<T>
+auto evenGen = myIntGen.filter([](int& value) {
+    return value % 2 == 0;
+}); // generates even numbers only
+```
