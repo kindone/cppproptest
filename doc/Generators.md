@@ -135,6 +135,22 @@ You can find the full list of such helpers in section [Utility methods in standa
 
 Built-in generators are in the form of Arbitraries. `cppproptest` provides a set of Arbitraries for immediate generation of types that are often used in practice.
 
+Here's a quick reference for built-in arbitraries
+
+ Purpose                                             | Examples                                   | Generator                             | 
+|----------------------------------------------------| -------------------------------------------|---------------------------------------|
+| Generate a boolean                                 | `true` or `false`                          | `Arbi<bool>()`                        |
+| Generate a character                               | `'c'` or `'%'`                             | `Arbi<char>()`                        |
+| Generate an integer                                | `12` or `-1133`                            | `Arbi<int>()`, `Arbi<uint64_t>()`, ...|
+| Generate a floating point number                   | `3.4` or `-1.4e3`                          | `Arbi<float>()`, `Arbi<double>()`     |
+| Generate a string                                  | `"world"` or `"あ叶葉말"`                    | `Arbi<std::string>()`, `Arbi<UTF8String>()`|
+| Generate a pair                                    | `{1, "xv"}` or `{true, 3.4}`               | `Arbi<std::pair<T1,T2>>()`            |
+| Generate a tuple                                   | `{1, "xv", true}` or `{true, 3.4}`         | `Arbi<std::tuple<Ts...>>()`           |
+| Generate a list                                    | `{10, -4, 0}` or `{"k", "&"}`              | `Arbi<std::list<T>>()`                |
+| Generate a vector                                  | `{10, -4, 0}` or `{"k", "&"}`              | `Arbi<std::vector<T>>()`              |
+| Generate a set                                     | set `{1, 3, 4}` but not `{1, 1, 3}`        | `Arbi<std::set<T>>()`                 |
+| Generate a map                                     | map of `"Bob" -> 25, "Alice" -> 30`        | `Arbi<std::map<K,V>()`                |
+
 * Boolean type:`bool`
 * Character type: `char`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
@@ -157,14 +173,17 @@ Built-in generators are in the form of Arbitraries. `cppproptest` provides a set
 	};
 	Generator<std::shared_ptr<Action>>(...); // can hold both Insert and Delete
 	```
-* Standard containers: `std::vector`, `std::list`, `std::set`, `std::pair`, `std::tuple`, `std::map`
+* Standard containers: `std::string`, `std::vector`, `std::list`, `std::set`, `std::pair`, `std::tuple`, `std::map`
 	* Arbitraries for containers can optionally take a generator for their element types
 		```cpp
 		// You can supply a specific generator for integers
 		auto vecInt0to100 = Arbi<std::vector<int>>(interval<int>(0,100));
 		// otherwise, Arbi<int> is used
 		auto vecInt = Arbi<std::vector<int>>();
+		
+		// string aarbitraries also take optional element generator
 		auto uppercaseGen = Arbi<std::string>(interval('A', 'Z'));
+		auto alphabetGen = Arbi<std::string>(unionOf(interval('A', 'Z'), interval('a','z')));
 		```
 
 	* `Arbi<std::Map>` provides setter methods for assigning key and value generators
