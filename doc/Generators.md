@@ -57,7 +57,7 @@ Here's a quick reference for built-in arbitraries
 | Generate a list                                    | `{10, -4, 0}` or `{"k", "&"}`              | `Arbi<std::list<T>>()`                |
 | Generate a vector                                  | `{10, -4, 0}` or `{"k", "&"}`              | `Arbi<std::vector<T>>()`              |
 | Generate a set                                     | set `{1, 3, 4}` but not `{1, 1, 3}`        | `Arbi<std::set<T>>()`                 |
-| Generate a map                                     | map of `"Bob" -> 25, "Alice" -> 30`        | `Arbi<std::map<K,V>()`                |
+| Generate a map                                     | map of `"Bob" -> 25, "Alice" -> 30`        | `Arbi<std::map<K,V>>()`               |
 
 * Boolean type:`bool`
 * Character type: `char`
