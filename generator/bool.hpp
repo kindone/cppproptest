@@ -8,16 +8,18 @@ namespace proptest {
 template <>
 class PROPTEST_API Arbi<bool> final : public ArbiBase<bool> {
 public:
+    Arbi(double prob = 0.5) : trueProb(prob) { }
     Shrinkable<bool> operator()(Random& rand) override
     {
-        bool value = rand.getRandomBool();
+        bool value = rand.getRandomBool(trueProb);
         return shrinkBool(value);
     }
 
-    Arbi<bool>() = default;
     Arbi<bool>(const Arbi<bool>&) = default;
 
     virtual ~Arbi();
+
+    bool trueProb;
 };
 
 // template struct Arbi<bool>;
