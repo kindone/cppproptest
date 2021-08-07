@@ -12,13 +12,13 @@ T abs(T t)
 template <>
 int8_t abs<int8_t>(int8_t val)
 {
-    return std::abs(val);
+    return static_cast<int8_t>(std::abs(val));
 }
 
 template <>
 int16_t abs<int16_t>(int16_t val)
 {
-    return std::abs(val);
+    return static_cast<int16_t>(std::abs(val));
 }
 
 template <>
@@ -53,7 +53,7 @@ TYPED_TEST(IntegralTest, GenInRange)
 
     auto gen0 = isSigned ? interval<TypeParam>(-10, 10) : interval<TypeParam>(0, 20);
     TypeParam min = gen0(rand).get();
-    TypeParam max = min + rand.getRandomInt32(0, 10);
+    TypeParam max = static_cast<TypeParam>(min + rand.getRandomInt32(0, 10));
     auto gen = interval<TypeParam>(min, max);
     cout << "min: " << min << ", max: " << max << endl;
 

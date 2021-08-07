@@ -116,19 +116,19 @@ int64_t getCurrentTime()
 template <>
 char Random::getRandom<char>(int64_t min, int64_t max)
 {
-    return static_cast<char>(getRandomUInt8(min, max));
+    return static_cast<char>(getRandomUInt8(static_cast<uint8_t>(min), static_cast<uint8_t>(max)));
 }
 
 template <>
 int8_t Random::getRandom<int8_t>(int64_t min, int64_t max)
 {
-    return getRandomInt8(min, max);
+    return getRandomInt8(static_cast<int8_t>(min), static_cast<int8_t>(max));
 }
 
 template <>
 int16_t Random::getRandom<int16_t>(int64_t min, int64_t max)
 {
-    return getRandomInt16(min, max);
+    return getRandomInt16(static_cast<int16_t>(min), static_cast<int16_t>(max));
 }
 
 template <>
@@ -146,19 +146,19 @@ int64_t Random::getRandom<int64_t>(int64_t min, int64_t max)
 template <>
 char Random::getRandomU<char>(uint64_t min, uint64_t max)
 {
-    return static_cast<char>(getRandomUInt8(min, max));
+    return static_cast<char>(getRandomUInt8(static_cast<uint8_t>(min), static_cast<uint8_t>(max)));
 }
 
 template <>
 uint8_t Random::getRandomU<uint8_t>(uint64_t min, uint64_t max)
 {
-    return getRandomUInt8(min, max);
+    return getRandomUInt8(static_cast<uint8_t>(min), static_cast<uint8_t>(max));
 }
 
 template <>
 uint16_t Random::getRandomU<uint16_t>(uint64_t min, uint64_t max)
 {
-    return getRandomUInt16(min, max);
+    return getRandomUInt16(static_cast<uint16_t>(min), static_cast<uint16_t>(max));
 }
 
 template <>

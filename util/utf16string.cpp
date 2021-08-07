@@ -109,8 +109,8 @@ ostream& decodeUTF16BE(ostream& os, vector<uint8_t>& chars)
         // U+10000.. use surrogate pairs
         // U+0000..U+D7FF or U+E000..U+FFFF
         else {
-            uint16_t s0 = ((chars[i] << 8) + chars[i+1]);
-            uint16_t s1 = ((chars[i+2] << 8) + chars[i+3]);
+            uint16_t s0 = static_cast<uint16_t>(((chars[i] << 8) + chars[i+1]));
+            uint16_t s1 = static_cast<uint16_t>(((chars[i+2] << 8) + chars[i+3]));
             uint32_t p0 = (s0 - 0xD800) << 10;
             uint32_t p1 = (s1 - 0xDC00);
             codepage(os, 0x10000 + p0 + p1);
@@ -141,8 +141,8 @@ uint32_t decodeUTF16BE(vector<uint8_t>& chars)
     // U+10000.. use surrogate pairs
     // U+0000..U+D7FF or U+E000..U+FFFF
     else {
-        uint16_t s0 = ((chars[0] << 8) + chars[1]);
-        uint16_t s1 = ((chars[2] << 8) + chars[3]);
+        uint16_t s0 = static_cast<uint16_t>((chars[0] << 8) + chars[1]);
+        uint16_t s1 = static_cast<uint16_t>((chars[2] << 8) + chars[3]);
         uint32_t p0 = (s0 - 0xD800) << 10;
         uint32_t p1 = (s1 - 0xDC00);
         return static_cast<uint32_t>(0x10000 + p0 + p1);
@@ -153,7 +153,7 @@ uint32_t decodeUTF16BE(vector<uint8_t>& chars)
 void encodeUTF16BE(uint32_t code, vector<uint8_t>& chars)
 {
     if (code <= 0xd7FF || (0xE000 <= code && code <= 0xFFFF)) {
-        uint8_t c0 = (code >> 8);
+        uint8_t c0 = static_cast<uint8_t>(code >> 8);
         uint8_t c1 = (code & 0xff);
         chars.push_back(c0);
         chars.push_back(c1);
@@ -206,8 +206,8 @@ ostream& decodeUTF16LE(ostream& os, vector<uint8_t>& chars)
         // U+10000.. use surrogate pairs
         // U+0000..U+D7FF or U+E000..U+FFFF
         else {
-            uint16_t s0 = ((chars[i+1] << 8) + chars[i]);
-            uint16_t s1 = ((chars[i+3] << 8) + chars[i+2]);
+            uint16_t s0 = static_cast<uint16_t>((chars[i+1] << 8) + chars[i]);
+            uint16_t s1 = static_cast<uint16_t>((chars[i+3] << 8) + chars[i+2]);
             uint32_t p0 = (s0 - 0xD800) << 10;
             uint32_t p1 = (s1 - 0xDC00);
             codepage(os, 0x10000 + p0 + p1);
@@ -235,8 +235,8 @@ uint32_t decodeUTF16LE(vector<uint8_t>& chars)
     // U+10000.. use surrogate pairs
     // U+0000..U+D7FF or U+E000..U+FFFF
     else {
-        uint16_t s0 = ((chars[1] << 8) + chars[0]);
-        uint16_t s1 = ((chars[3] << 8) + chars[2]);
+        uint16_t s0 = static_cast<uint16_t>((chars[1] << 8) + chars[0]);
+        uint16_t s1 = static_cast<uint16_t>((chars[3] << 8) + chars[2]);
         uint32_t p0 = (s0 - 0xD800) << 10;
         uint32_t p1 = (s1 - 0xDC00);
         return static_cast<uint32_t>(0x10000 + p0 + p1);
@@ -247,7 +247,7 @@ uint32_t decodeUTF16LE(vector<uint8_t>& chars)
 void encodeUTF16LE(uint32_t code, vector<uint8_t>& chars)
 {
     if (code <= 0xd7ff || (0xE000 <= code && code <= 0xFFFF)) {
-        uint8_t c0 = (code >> 8);
+        uint8_t c0 = static_cast<uint8_t>(code >> 8);
         uint8_t c1 = (code & 0xff);
         chars.push_back(c1);
         chars.push_back(c0);
