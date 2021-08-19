@@ -40,7 +40,7 @@ Among many other benefits, property-based tests can immediately replace dull dum
     // a text encoded and then decoded must be identical to original
     MyEncoder encoder;
     MyDecoder decoder;    
-    auto original = "Hello world";
+    auto original = "Some dummy content that hopefully prove or disprove this works";
     auto encoded = encoder.encode(original);
     auto decoded = decoder.decode(encoded);
     ASSERT_EQ(original, decoded);
