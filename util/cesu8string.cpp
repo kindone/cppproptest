@@ -243,7 +243,7 @@ uint32_t decodeCESU8(vector<uint8_t>& chars)
             // U+1000..U+CFFF
         } else if (0xe1 <= chars[0] && chars[0] <= 0xec) {
             if (0x80 <= chars[1] && chars[1] <= 0xbf && 0x80 <= chars[2] && chars[2] <= 0xbf) {
-                // validChar(os, chars[0], chars[0+1], chars[0+2]);
+                // validChar(os, chars[0], chars[1], chars[2]);
                 return static_cast<uint32_t>(0x1000 + (chars[0] - 0xe1) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[1] - 0x80) * (0xbf - 0x80 + 1) + (chars[2] - 0x80));
             } else
@@ -272,7 +272,7 @@ uint32_t decodeCESU8(vector<uint8_t>& chars)
             // U+E000..U+FFFF
         } else if (0xee <= chars[0] && chars[0] <= 0xef) {
             if (0x80 <= chars[1] && chars[1] <= 0xbf && 0x80 <= chars[2] && chars[2] <= 0xbf) {
-                // validChar(os, chars[0], chars[0+1], chars[0+2]);
+                // validChar(os, chars[0], chars[1], chars[2]);
                 return static_cast<uint32_t>(0xe000 + (chars[0] - 0xee) * (0xbf - 0x80 + 1) * (0xbf - 0x80 + 1) +
                                  (chars[1] - 0x80) * (0xbf - 0x80 + 1) + (chars[2] - 0x80));
             } else

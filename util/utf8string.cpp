@@ -180,11 +180,10 @@ ostream& decodeUTF8(ostream& os, vector<uint8_t>& chars)
 
 uint32_t decodeUTF8(vector<uint8_t>& chars)
 {
-    if(0 < chars.size()) {
+    if (0 < chars.size()) {
         // U+0000..U+007F
         if (chars[0] <= 0x7f) {
             return static_cast<uint32_t>(chars[0]);
-            // os << static_cast<char>(chars[0]);
         } else if (2 > chars.size()) {
             throw runtime_error("invalid UTF-8 sequence");
             // U+0080..U+07FF
