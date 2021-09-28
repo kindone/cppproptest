@@ -17,10 +17,12 @@ struct MyObj2 {
 
 using namespace proptest;
 
+namespace proptest {
 DEFINE_ARBITRARY(MyObj, []() {
     auto intGen = interval(10, 20);
     return construct<MyObj, int>(intGen);
 });
+}
 
 TEST(Compile, define_arbitrary)
 {
