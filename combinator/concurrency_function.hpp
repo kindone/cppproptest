@@ -119,6 +119,7 @@ bool Concurrency<ObjectType, ModelType>::go()
     Random rand(seed);
     Random savedRand(seed);
     cout << "random seed: " << seed << endl;
+    PropertyContext ctx;
     int i = 0;
     try {
         for (; i < numRuns; i++) {
