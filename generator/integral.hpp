@@ -271,6 +271,16 @@ Generator<T> interval(T min, T max)
 }
 
 /**
+ * Generates numeric values in [from, to)
+ * e.g. inRange(0,100) generates a value in {0, ..., 99}
+ */
+template <typename T>
+Generator<T> inRange(T from, T to)
+{
+    return Generator<T>([from, to](Random& rand) { return generateInteger<T>(rand, from, to - 1); });
+}
+
+/**
  * Generates numeric values in [a, a+count)
  * e.g. integers(0,100) generates a value in {0, ..., 99}
  */
