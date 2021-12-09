@@ -61,7 +61,7 @@ struct Matrix {
     {
         constexpr auto Size = tuple_size<Lists>::value;
         bool incremented = false;
-        [[maybe_unused]] auto runEach = std::initializer_list<int>{(progressN<Size-index-1>(incremented, util::forward<Lists>(lists), indices), 0)...};
+        [[maybe_unused]] std::initializer_list<int> runEach{(progressN<Size-index-1>(incremented, util::forward<Lists>(lists), indices), 0)...};
         return incremented;
     }
 };
