@@ -19,7 +19,7 @@ public:
 
     virtual ~Arbi();
 
-    bool trueProb;
+    double trueProb;
 };
 
 // template struct Arbi<bool>;
