@@ -91,6 +91,7 @@ using std::invalid_argument;
 using std::error_code;
 
 using std::uniform_int_distribution;
+using std::uniform_real_distribution;
 using std::boolalpha;
 using std::mt19937_64;
 

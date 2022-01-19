@@ -22,6 +22,8 @@ public:
     uint64_t getRandomUInt64(uint64_t min = 0, uint64_t max = UINT64_MAX);
     float getRandomFloat();
     double getRandomDouble();
+    float getRandomFloat(float min, float max);
+    double getRandomDouble(double min, double max);
     uint32_t getRandomSize(size_t fromIncluded, size_t toExcluded);
 
     Random& operator=(const Random& other);

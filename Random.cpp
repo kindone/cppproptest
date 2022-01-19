@@ -30,80 +30,81 @@ bool Random::getRandomBool(double threshold)
 
 int8_t Random::getRandomInt8(int8_t min, int8_t max)
 {
-    uint64_t span = static_cast<uint64_t>(static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1);
-    uint8_t unsignedVal = (getRandomUInt8() % span);
-    return *reinterpret_cast<int8_t*>(&unsignedVal) + min;
+    uniform_int_distribution<int> dist(min, max);
+    return static_cast<int8_t>(dist(engine));
 }
 
 uint8_t Random::getRandomUInt8(uint8_t min, uint8_t max)
 {
-    uint64_t span = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
-    return static_cast<uint8_t>((next8U() % span) + min);
+    uniform_int_distribution<int> dist(min, max);
+    return static_cast<uint8_t>(dist(engine));
 }
 
 int16_t Random::getRandomInt16(int16_t min, int16_t max)
 {
-    uint64_t span = static_cast<uint64_t>(static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1);
-    uint16_t unsignedVal = (getRandomUInt16() % span);
-    return *reinterpret_cast<int16_t*>(&unsignedVal) + min;
+    uniform_int_distribution<int> dist(min, max);
+    return static_cast<int16_t>(dist(engine));
 }
 
 uint16_t Random::getRandomUInt16(uint16_t min, uint16_t max)
 {
-    uint64_t span = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
-    return static_cast<uint16_t>((next8U() % span) + min);
+    uniform_int_distribution<int> dist(min, max);
+    return static_cast<uint16_t>(dist(engine));
 }
 
 int32_t Random::getRandomInt32(int32_t min, int32_t max)
 {
-    uint64_t span = static_cast<uint64_t>(static_cast<int64_t>(max) - static_cast<int64_t>(min) + 1);
-    uint32_t unsignedVal = (getRandomUInt32() % span);
-    return *reinterpret_cast<int32_t*>(&unsignedVal) + min;
+    uniform_int_distribution<int32_t> dist(min, max);
+    return static_cast<int32_t>(dist(engine));
 }
 
 uint32_t Random::getRandomUInt32(uint32_t min, uint32_t max)
 {
-    uint64_t span = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
-    return static_cast<uint32_t>((next8U() % span) + min);
+    uniform_int_distribution<uint32_t> dist(min, max);
+    return static_cast<uint32_t>(dist(engine));
 }
 
 int64_t Random::getRandomInt64(int64_t min, int64_t max)
 {
-    if (min == INT64_MIN && max == INT64_MAX) {
-        uint64_t unsignedVal = getRandomUInt64();
-        return *reinterpret_cast<int64_t*>(&unsignedVal) + INT64_MIN;
-    }
-    uint64_t span = max - min + 1;
-    uint64_t unsignedVal = (getRandomUInt64() % span);
-    return *reinterpret_cast<int64_t*>(&unsignedVal) + min;
+    uniform_int_distribution<int64_t> dist(min, max);
+    return static_cast<int64_t>(dist(engine));
 }
 
 uint64_t Random::getRandomUInt64(uint64_t min, uint64_t max)
 {
-    if (min == 0 && max == UINT64_MAX)
-        return next8U();
-
-    uint64_t span = max - min + 1;
-    return static_cast<uint64_t>((next8U() % span) + min);
+    uniform_int_distribution<uint64_t> dist(min, max);
+    return static_cast<uint64_t>(dist(engine));
 }
 
 // [fromIncluded, toExclued)
 uint32_t Random::getRandomSize(size_t fromIncluded, size_t toExcluded)
 {
-    return (next8U() % (toExcluded - fromIncluded)) + fromIncluded;
+    return getRandomUInt32(fromIncluded, toExcluded-1);
 }
 
 float Random::getRandomFloat()
 {
-    uint32_t intVal = getRandomUInt32();
-    return *reinterpret_cast<float*>(&intVal);
+    uniform_real_distribution<float> dist;
+    return dist(engine);
 }
 
 double Random::getRandomDouble()
 {
-    uint64_t intVal = getRandomUInt64();
-    return *reinterpret_cast<double*>(&intVal);
+    uniform_real_distribution<double> dist;
+    return dist(engine);
 }
+float Random::getRandomFloat(float min, float max)
+{
+    uniform_real_distribution<float> dist(min, max);
+    return dist(engine);
+}
+
+double Random::getRandomDouble(double min, double max)
+{
+    uniform_real_distribution<double> dist(min, max);
+    return dist(engine);
+}
+
 
 int64_t getCurrentTime()
 {
