@@ -60,9 +60,10 @@ using std::is_pointer;
 using std::is_same;
 
 using std::decay_t;
-using std::result_of;
 using std::enable_if;
 using std::enable_if_t;
+using std::invoke_result;
+using std::invoke_result_t;
 
 using std::unique_ptr;
 using std::shared_ptr;

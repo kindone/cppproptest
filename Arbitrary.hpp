@@ -47,10 +47,10 @@ struct ArbiBase : public GenBase<T>
      * @param mapper Function that takes a value of type `T` and returns a value of type `U`
      * @return Generator<U> Generator for type `U`
      */
-    template <typename F, typename U = typename result_of<F(T&)>::type>
-    auto map(F&& mapper) -> Generator<U>
+    template <typename F>
+    auto map(F&& mapper) -> Generator<invoke_result_t<F, T&>>
     {
-        return map<U>(util::forward<F>(mapper));
+        return map<invoke_result_t<F, T&>>(util::forward<F>(mapper));
     }
 
     /**

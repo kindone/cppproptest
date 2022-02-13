@@ -14,10 +14,10 @@ Generator<T> lazy(LazyEval&& lazyEval)
     return generator([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });
 }
 
-template <typename LazyEval, typename T = typename result_of<LazyEval()>::type>
-auto lazy(LazyEval&& lazyEval) -> Generator<T>
+template <typename LazyEval>
+auto lazy(LazyEval&& lazyEval) -> Generator<invoke_result_t<LazyEval>>
 {
-    return lazy<T>(util::forward<LazyEval>(lazyEval));
+    return lazy<invoke_result_t<LazyEval>>(util::forward<LazyEval>(lazyEval));
 }
 
-} // namespace proptest
+}  // namespace proptest

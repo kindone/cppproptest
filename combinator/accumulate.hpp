@@ -63,11 +63,11 @@ Generator<vector<T>> accumulateImpl(GenFunction<T> gen1, function<GenFunction<T>
 template <typename GEN1, typename GEN2GEN>
 decltype(auto) accumulate(GEN1&& gen1, GEN2GEN&& gen2gen, size_t minSize, size_t maxSize)
 {
-    using CHAIN = typename function_traits<GEN1>::return_type::type;  // get the T from shrinkable<T>(Random&)
-    using RetType = typename function_traits<GEN2GEN>::return_type;
-    GenFunction<CHAIN> funcGen1 = gen1;
-    function<RetType(CHAIN&)> funcGen2Gen = gen2gen;
-    return util::accumulateImpl<CHAIN>(funcGen1, funcGen2Gen, minSize, maxSize);
+    using T = typename invoke_result_t<GEN1, Random&>::type;  // get the T from shrinkable<T>(Random&)
+    using RetType = invoke_result_t<GEN2GEN, T&>;
+    GenFunction<T> funcGen1 = gen1;
+    function<RetType(T&)> funcGen2Gen = gen2gen;
+    return util::accumulateImpl<T>(funcGen1, funcGen2Gen, minSize, maxSize);
 }
 
 }  // namespace proptest

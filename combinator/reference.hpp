@@ -7,12 +7,10 @@
 
 namespace proptest {
 
-template <typename GEN, typename T = typename result_of<GEN(Random&)>::type::type>
-auto reference(GEN&& gen) -> Generator<T>
+template <typename GEN>
+auto reference(GEN&& gen) -> Generator<typename invoke_result_t<GEN, Random&>::type>
 {
-    return generator([&gen](Random& rand) {
-        return util::forward<GEN>(gen)(rand);
-    });
+    return generator([&gen](Random& rand) { return util::forward<GEN>(gen)(rand); });
 }
 
-} // namespace proptest
+}  // namespace proptest
