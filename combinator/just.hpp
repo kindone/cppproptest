@@ -13,7 +13,7 @@ Generator<T> just(U* valuePtr)
     return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });
 }
 
-template <typename T, typename U = T>
+template <typename T>
 Generator<T> just(shared_ptr<T> sharedPtr)
 {
     return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });

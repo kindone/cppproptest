@@ -52,12 +52,8 @@ TEST(StateTest, StateFunction)
     auto actionGen =
         oneOf<SimpleAction<T>>(pushBackGen, popBackGen, popBackGen2, weightedGen<SimpleAction<T>>(clearGen, 0.1));
     auto prop = statefulProperty<T>(Arbi<T>(), actionGen);
-    prop.setOnStartup([]() {
-        cout << "startup" << endl;
-    });
-    prop.setOnCleanup([]() {
-        cout << "cleanup" << endl;
-    });
+    prop.setOnStartup([]() { cout << "startup" << endl; });
+    prop.setOnCleanup([]() { cout << "cleanup" << endl; });
     prop.setSeed(0).setNumRuns(100).go();
 }
 
@@ -84,7 +80,7 @@ TEST(StateTest, StateFunctionWithModel)
         PROP_ASSERT(obj.size() == size - 1);
     }));
 
-    auto popBackGen2 = just(Action<T, Model>("PopBack2",[](T& obj, Model&) {
+    auto popBackGen2 = just(Action<T, Model>("PopBack2", [](T& obj, Model&) {
         auto size = obj.size();
         if (obj.empty())
             return;
@@ -100,12 +96,11 @@ TEST(StateTest, StateFunctionWithModel)
     auto actionGen = oneOf<Action<T, Model>>(pushBackGen, popBackGen, popBackGen2, clearGen);
     auto prop = statefulProperty<T, Model>(
         Arbi<T>(), [](T& obj) -> Model { return VectorModel2(obj.size()); }, actionGen);
-    prop.setOnStartup([]() {
-        cout << "startup" << endl;
-    });
+    prop.setOnStartup([]() { cout << "startup" << endl; });
     prop.setOnCleanup([]() {
         cout << "cleanup" << endl;
         // PROP_ASSERT(false);
     });
+    prop.setPostCheck([](T&, Model&) { cout << "postCheck" << endl; });
     prop.setSeed(0).setNumRuns(10).go();
 }
