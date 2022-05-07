@@ -5,12 +5,17 @@
 #include "../gen.hpp"
 #include "../GenBase.hpp"
 
+/**
+ * @file oneof.hpp
+ * @brief Generator combinator for generating a type by choosing one of given generators with some probability
+ */
+
 namespace proptest {
 
 namespace util {
 template <typename T>
 struct Weighted;
-}
+}  // namespace util
 
 template <typename T, typename GEN>
 util::Weighted<T> weightedGen(GEN&& gen, double weight);
@@ -20,6 +25,7 @@ namespace util {
 template <typename T>
 struct Weighted
 {
+    using type = T;
     using FuncType = GenFunction<T>;
 
     Weighted(shared_ptr<FuncType> _funcPtr, double _weight) : funcPtr(_funcPtr), weight(_weight) {}
@@ -99,19 +105,39 @@ util::Weighted<T> weightedGen(GEN&& gen, double weight)
     return util::Weighted<T>(funcPtr, weight);
 }
 
-// a GEN can be a generator or a weightedGen(GEN, weight)
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for generating a type by choosing one of given generators with some probability
+ * @details You can combine generators into a single generator that can generate one of them with some probability. This
+ * can be considered as taking a union of generators. It can generate a type T from multiple generators for type T, by
+ * choosing one of the generators randomly, with even probability, or weighted probability. a GEN can be a generator or
+ * a weightedGen(generator, weight) with the weight between 0 and 1 (exclusive). Unweighted generators take rest of
+ * unweighted probability evenly.
+ */
 template <typename T, typename... GENS>
 decltype(auto) oneOf(GENS&&... gens)
 {
+    static_assert(
+        conjunction_v<std::bool_constant<(is_convertible_v<GENS, function<Shrinkable<T>(Random&)>> ||
+                                          is_convertible_v<GENS, util::Weighted<T>>)>...>,
+        "A GENS must be a generator callable for T (GenFunction<T> or Random& -> Shrinkable<T>) or a WeightGen<T>");
     using WeightedVec = vector<util::Weighted<T>>;
     shared_ptr<WeightedVec> genVecPtr(new WeightedVec{util::GenToWeighted<T>(util::forward<GENS>(gens))...});
 
     return util::oneOfHelper<T>(genVecPtr);
 }
 
-/* Alias */
+/**
+ * @ingroup Combinators
+ * @brief Alias for \ref oneOf combinator
+ */
 template <typename T, typename... GENS>
-decltype(auto) unionOf(GENS&&... gens) {
+decltype(auto) unionOf(GENS&&... gens)
+{
+    static_assert(
+        conjunction_v<std::bool_constant<(is_convertible_v<GENS, function<Shrinkable<T>(Random&)>> ||
+                                          is_convertible_v<GENS, util::Weighted<T>>)>...>,
+        "A GENS must be a generator callable for T (GenFunction<T> or Random& -> Shrinkable<T>) or a WeightGen<T>");
     return oneOf(util::forward<GENS>(gens)...);
 }
 

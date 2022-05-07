@@ -3,8 +3,17 @@
 #include "../util/utf16string.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file utf16string.hpp
+ * @brief Arbitrary for UTF16BEString and UTF16LEString
+ */
+
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for UTF-16 big endian string with configurable code generator and min/max sizes
+ */
 template <>
 class PROPTEST_API Arbi<UTF16BEString> final : public ArbiContainer<UTF16BEString> {
 public:
@@ -22,6 +31,10 @@ public:
     GenFunction<uint32_t> elemGen;
 };
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for UTF-16 little endian string with configurable code generator and min/max sizes
+ */
 template <>
 class PROPTEST_API Arbi<UTF16LEString> final : public ArbiContainer<UTF16LEString> {
 public:

@@ -7,8 +7,17 @@
 #include "util.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file vector.hpp
+ * @brief Arbitrary for vector<T>
+ */
+
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for vector<T> with configurable element generators and min/max sizes
+ */
 template <typename T>
 class PROPTEST_API Arbi<vector<T>> final : public ArbiContainer<vector<T>> {
 public:

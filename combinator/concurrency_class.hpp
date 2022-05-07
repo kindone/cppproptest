@@ -124,7 +124,7 @@ bool Concurrency<ActionType>::go(function<void(ObjectType&, ModelType&)> postChe
         }
     } catch (const PropertyFailedBase& e) {
         cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
-                  << ")" << endl;
+             << ")" << endl;
 
         // shrink
         handleShrink(savedRand);

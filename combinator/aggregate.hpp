@@ -7,6 +7,11 @@
 #include "../util/std.hpp"
 #include "../generator/integral.hpp"
 
+/**
+ * @file aggregate.hpp
+ * @brief Generator combinator for aggregating sequencially generated values into a value with a generator generator
+ */
+
 namespace proptest {
 
 namespace util {
@@ -29,7 +34,17 @@ Generator<T> aggregateImpl(GenFunction<T> gen1, function<GenFunction<T>(T&)> gen
 }
 
 }  // namespace util
-
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for aggregating a value of type T from a generator generator
+ * @tparam GEN1 Generator type of (Random&) -> Shrinkable<T>
+ * @tparam GEN2GEN (T&) -> ((Random&) -> Shrinkable<T>) (Generator for T)
+ * @param gen1 base generator for type T
+ * @param gen2gen function that returns a generator for type T based on previously generated value of the same type
+ * @param minSize minimum size of the aggregate steps
+ * @param maxSize maximum size of the aggregate steps
+ * @return last generated value of T throughout the aggregation
+ */
 template <typename GEN1, typename GEN2GEN>
 decltype(auto) aggregate(GEN1&& gen1, GEN2GEN&& gen2gen, size_t minSize, size_t maxSize)
 {

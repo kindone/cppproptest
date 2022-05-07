@@ -15,18 +15,19 @@
 #include "util/std.hpp"
 
 /**
- * @file
- *
- * Core API for `cppproptest` Property-based testing library
+ * @file Property.hpp
+ * @brief Core API for `cppproptest` Property-based testing library
  */
 
 namespace proptest {
 
 namespace util {
-/// * private
-struct Matrix {
+
+struct Matrix
+{
     template <size_t N, typename Lists>
-    static decltype(auto) pickN(Lists&& lists, vector<int>& indices) {
+    static decltype(auto) pickN(Lists&& lists, vector<int>& indices)
+    {
         auto& vec = get<N>(lists);
         auto& index = indices[N];
         return vec[index];
@@ -35,21 +36,20 @@ struct Matrix {
     template <size_t... index, typename Lists>
     static decltype(auto) pickEach(Lists&& lists, vector<int>& indices, index_sequence<index...>)
     {
-        return util::make_tuple(
-            pickN<index>(util::forward<Lists>(lists), indices)...);
+        return util::make_tuple(pickN<index>(util::forward<Lists>(lists), indices)...);
     }
 
     template <size_t N, typename Lists>
-    static decltype(auto) progressN(bool& incremented, Lists&& lists, vector<int>& indices) {
+    static decltype(auto) progressN(bool& incremented, Lists&& lists, vector<int>& indices)
+    {
         auto& list = get<N>(lists);
         // already incremented
-        if(incremented)
+        if (incremented)
             return incremented;
-        else if(indices[N] < static_cast<int>(list.size()-1)) {
-            indices[N] ++;
+        else if (indices[N] < static_cast<int>(list.size() - 1)) {
+            indices[N]++;
             incremented = true;
-        }
-        else {
+        } else {
             incremented = false;
             indices[N] = 0;
         }
@@ -61,21 +61,24 @@ struct Matrix {
     {
         constexpr auto Size = tuple_size<Lists>::value;
         bool incremented = false;
-        [[maybe_unused]] std::initializer_list<int> runEach{(progressN<Size-index-1>(incremented, util::forward<Lists>(lists), indices), 0)...};
+        [[maybe_unused]] std::initializer_list<int> runEach{
+            (progressN<Size - index - 1>(incremented, util::forward<Lists>(lists), indices), 0)...};
         return incremented;
     }
 };
-} // namespace util
+}  // namespace util
 
 /**
  * @brief Holder class for properties
- * @details When a property is defined using `proptest::property` or `proptest::forAll`, a `Property` object is created to hold the property.
+ * @details When a property is defined using `proptest::property` or `proptest::forAll`, a `Property` object is created
+ * to hold the property.
  */
 template <typename... ARGS>
 class Property final : public PropertyBase {
 public:
     using Func = function<bool(ARGS...)>;
     using GenTuple = tuple<GenFunction<decay_t<ARGS>>...>;
+
 private:
     using ValueTuple = tuple<Shrinkable<decay_t<ARGS>>...>;
     using ShrinksTuple = tuple<Stream<Shrinkable<decay_t<ARGS>>>...>;
@@ -114,10 +117,11 @@ public:
     /**
      * @brief Sets the startup function
      *
-     * @param onStartUp Invoked in each run before running the property function
+     * @param onStartup Invoked in each run before running the property function
      * @return Property& `Property` object itself for chaining
      */
-    Property& setOnStartup(function<void()> onStartup) {
+    Property& setOnStartup(function<void()> onStartup)
+    {
         onStartupPtr = util::make_shared<function<void()>>(onStartup);
         return *this;
     }
@@ -128,13 +132,15 @@ public:
      * @param onCleanup Invoked in each run after running the property function.
      * @return Property& `Property` object itself for chaining
      */
-    Property& setOnCleanup(function<void()> onCleanup) {
+    Property& setOnCleanup(function<void()> onCleanup)
+    {
         onCleanupPtr = util::make_shared<function<void()>>(onCleanup);
         return *this;
     }
 
     /**
-     * @brief Executes randomized tests for given property. If explicit generator arguments are omitted, utilizes default generators (a.k.a. Arbitraries) instead
+     * @brief Executes randomized tests for given property. If explicit generator arguments are omitted, utilizes
+     * default generators (a.k.a. Arbitraries) instead
      *
      * Usage of explicit generators:
      * @code
@@ -165,10 +171,10 @@ public:
                     pass = true;
                     try {
                         savedRand = rand;
-                        if(onStartupPtr)
+                        if (onStartupPtr)
                             (*onStartupPtr)();
                         bool result = util::invokeWithGenTuple(rand, getFunc(), curGenTup);
-                        if(onCleanupPtr)
+                        if (onCleanupPtr)
                             (*onCleanupPtr)();
                         stringstream failures = ctx.flushFailures();
                         // failed expectations
@@ -192,20 +198,19 @@ public:
                 } while (!pass);
             }
         } catch (const AssertFailed& e) {
-            cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
-                      << e.lineno << ")" << endl;
+            cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
+                 << ")" << endl;
             // shrink
             shrink(savedRand, util::forward<GenTuple>(curGenTup));
             return false;
         } catch (const PropertyFailedBase& e) {
-            cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":"
-                      << e.lineno << ")" << endl;
+            cerr << "Falsifiable, after " << (i + 1) << " tests: " << e.what() << " (" << e.filename << ":" << e.lineno
+                 << ")" << endl;
             // shrink
             shrink(savedRand, util::forward<GenTuple>(curGenTup));
             return false;
         } catch (const exception& e) {
-            cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what()
-                      << endl;
+            cerr << "Falsifiable, after " << (i + 1) << " tests - unhandled exception thrown: " << e.what() << endl;
             // shrink
             shrink(savedRand, util::forward<GenTuple>(curGenTup));
             return false;
@@ -236,10 +241,10 @@ private:
         try {
             try {
                 try {
-                    if(onStartupPtr)
+                    if (onStartupPtr)
                         (*onStartupPtr)();
                     bool result = util::invokeWithArgs(getFunc(), valueTup);
-                    if(onCleanupPtr)
+                    if (onCleanupPtr)
                         (*onCleanupPtr)();
                     return result;
                 } catch (const AssertFailed& e) {
@@ -270,8 +275,8 @@ public:
     *
     * Usage:
     * @code
-        // As property is defined with two arguments: int and float, matrix() requires two arguments: int and float lists
-        auto prop = property([](int i, float f) {
+        // As property is defined with two arguments: int and float, matrix() requires two arguments: int and float
+    lists auto prop = property([](int i, float f) {
             // ...
         });
 
@@ -281,18 +286,20 @@ public:
     * @endcode
     * @param lists Lists of valid arguments (types must be in same order as in definition of property arguments)
     */
-    bool matrix(initializer_list<ARGS>&&...lists)
+    bool matrix(initializer_list<ARGS>&&... lists)
     {
         constexpr auto Size = sizeof...(ARGS);
         auto vecTuple = util::make_tuple(vector<ARGS>(lists)...);
         vector<int> indices;
-        for(size_t i = 0; i < Size; i++)
+        for (size_t i = 0; i < Size; i++)
             indices.push_back(0);
 
         do {
-            auto valueTup = util::Matrix::pickEach(util::forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{});
+            auto valueTup = util::Matrix::pickEach(util::forward<decltype(vecTuple)>(vecTuple), indices,
+                                                   make_index_sequence<Size>{});
             example(valueTup);
-        } while(util::Matrix::progress(util::forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{}));
+        } while (
+            util::Matrix::progress(util::forward<decltype(vecTuple)>(vecTuple), indices, make_index_sequence<Size>{}));
 
         return true;
     }
@@ -304,11 +311,11 @@ private:
         bool result = false;
         auto values = util::transformHeteroTuple<util::ShrinkableGet>(util::forward<ValueTuple>(valueTup));
         try {
-            if(onStartupPtr)
+            if (onStartupPtr)
                 (*onStartupPtr)();
-            result =
-                util::invokeWithArgTupleWithReplace<N>(getFunc(), util::forward<decltype(values)>(values), replace.get());
-            if(onCleanupPtr)
+            result = util::invokeWithArgTupleWithReplace<N>(getFunc(), util::forward<decltype(values)>(values),
+                                                            replace.get());
+            if (onCleanupPtr)
                 (*onCleanupPtr)();
         } catch (const AssertFailed&) {
             result = false;
@@ -353,8 +360,7 @@ private:
                 }
             }
             if (shrinkFound) {
-                cout << "  shrinking found simpler failing arg " << N << ": " << Show<ValueTuple>(valueTup)
-                          << endl;
+                cout << "  shrinking found simpler failing arg " << N << ": " << Show<ValueTuple>(valueTup) << endl;
                 if (context.hasFailures())
                     cout << "    by failed expectation: " << context.flushFailures(4).str() << endl;
             } else {
@@ -388,18 +394,13 @@ private:
         cout << "  simplest args found by shrinking: " << Show<decltype(shrunk)>(shrunk) << endl;
     }
 
-    Func& getFunc() {
-        return *static_pointer_cast<Func>(funcPtr);
-    }
+    Func& getFunc() { return *static_pointer_cast<Func>(funcPtr); }
 
-    GenTuple& getGenTup() {
-        return *static_pointer_cast<GenTuple>(genTupPtr);
-    }
+    GenTuple& getGenTup() { return *static_pointer_cast<GenTuple>(genTupPtr); }
 };
 
 namespace util {
 
-/// * private
 template <typename RetType, typename Callable, typename... ARGS>
 enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
@@ -407,7 +408,6 @@ enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWith
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
-/// * private
 template <typename RetType, typename Callable, typename... ARGS>
 enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
@@ -418,7 +418,6 @@ enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWith
     });
 }
 
-/// * private
 template <class Callable>
 decltype(auto) functionWithBoolResult(Callable&& callable)
 {
@@ -427,14 +426,12 @@ decltype(auto) functionWithBoolResult(Callable&& callable)
     return functionWithBoolResultHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
-/// * private
 template <typename RetType, typename Callable, typename... ARGS>
 function<RetType(ARGS...)> asFunctionHelper(util::TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
-/// * private
 template <class Callable>
 decltype(auto) asFunction(Callable&& callable)
 {
@@ -443,10 +440,8 @@ decltype(auto) asFunction(Callable&& callable)
     return asFunctionHelper<RetType>(argument_type_list, util::forward<Callable>(callable));
 }
 
-/// * private
 template <typename... ARGS>
-decltype(auto) createProperty(function<bool(ARGS...)> func,
-                              tuple<GenFunction<decay_t<ARGS>>...>&& genTup)
+decltype(auto) createProperty(function<bool(ARGS...)> func, tuple<GenFunction<decay_t<ARGS>>...>&& genTup)
 {
     return Property<ARGS...>(func, genTup);
 }
@@ -456,7 +451,8 @@ decltype(auto) createProperty(function<bool(ARGS...)> func,
 /**
  * @brief creates a property object that can be used to run various property tests
  * @details @see Property
- * @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
+ * @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or
+ * `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
  * @tparam ExplicitGens Explicit generator callable types for each `ARG` in `(Random&) -> Shrinkable<ARG>`
  * @param callable passed as any either `std::function`, functor object, function pointer
  * @param gens variadic list of generators for `ARG`s (optional if `Arbitrary<ARG>` is preferred)
@@ -475,7 +471,8 @@ auto property(Callable&& callable, ExplicitGens&&... gens)
  *
  * equivalent to `property(...).forAll()`
  *
- * @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
+ * @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or
+ * `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
  * @tparam ExplicitGens Explicit generator callable types for `ARG` in `(Random&) -> Shrinkable<ARG>`
  * @param callable passed as any either `std::function`, functor object, function pointer
  * @param gens variadic list of generators for `ARG`s (optional if `Arbitrary<ARG>` is preferred)

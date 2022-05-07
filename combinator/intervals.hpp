@@ -5,6 +5,11 @@
 #include "../api.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file intervals.hpp
+ * @brief generator combinator for generating integers in multiple intervals
+ */
+
 namespace proptest {
 
 struct Interval
@@ -25,7 +30,17 @@ struct UInterval
     uint64_t max;
 };
 
+/**
+ * @ingroup Combinators
+ * @brief generates integer values in union of intervals
+ * @details auto intGen = intervals({Interval(-100, 0), Interval(10, 100)}); // generates integers in [-100,0] or
+ * [10,100]
+ */
 PROPTEST_API Generator<int64_t> intervals(initializer_list<Interval> interval_list);
+/**
+ * @brief generates unsigned integer values in union of intervals
+ * @details auto intGen = uintervals({UInterval(0, 2), UInterval(5, 10)}); // generates integers in [0,2] or [5,10]
+ */
 PROPTEST_API Generator<uint64_t> uintervals(initializer_list<UInterval> interval_list);
 
 }  // namespace proptest

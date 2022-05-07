@@ -1,14 +1,22 @@
 #pragma once
 
-
 #include "../gen.hpp"
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 #include "../util/nullable.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file nullable.hpp
+ * @brief Arbitrary for Nullable<T>
+ */
+
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for Nullable<T> with configurable element generator
+ */
 template <typename T>
 class Arbi<Nullable<T>> final : public ArbiBase<Nullable<T>> {
 public:

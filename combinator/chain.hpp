@@ -6,6 +6,12 @@
 #include "../util/function_traits.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file chain.hpp
+ * @brief Generator combinator for chaining two generators to generate a tuple of values, where the second generator
+ * depends on generated value from the first generator
+ */
+
 namespace proptest {
 
 template <typename GEN>
@@ -73,8 +79,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
     auto gen2genPtr = util::make_shared<function<GenFunction<U>(const Chain<T0, T1, Ts...>&)>>(
         [gen2gen](const Chain<T0, T1, Ts...>& ts) { return gen2gen(const_cast<Chain<T0, T1, Ts...>&>(ts)); });
 
-    auto genTuple = [gen1Ptr, gen2genPtr](Random & rand) -> Shrinkable<Chain<T0, T1, Ts..., U>>
-    {
+    auto genTuple = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<Chain<T0, T1, Ts..., U>> {
         // generate T
         Shrinkable<Chain<T0, T1, Ts...>> shrinkableTs = (*gen1Ptr)(rand);
         using Intermediate = pair<Chain<T0, T1, Ts...>, Shrinkable<U>>;
@@ -86,8 +91,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
                     // generate U
                     auto gen2 = (*gen2genPtr)(ts);
                     Shrinkable<U> shrinkableU = gen2(rand);
-                    return make_shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
-                        util::make_pair(ts, shrinkableU));
+                    return make_shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(util::make_pair(ts, shrinkableU));
                 });
 
         // shrink strategy 2: expand Shrinkable<U>
@@ -109,8 +113,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
         return intermediate.template flatMap<Chain<T0, T1, Ts..., U>>(
             +[](const Intermediate& interpair) -> Shrinkable<tuple<T0, T1, Ts..., U>> {
                 const Chain<T0, T1, Ts...>& ts = interpair.first;
-                return make_shrinkable<Chain<T0, T1, Ts..., U>>(
-                    tuple_cat(ts, tuple<U>(interpair.second.getRef())));
+                return make_shrinkable<Chain<T0, T1, Ts..., U>>(tuple_cat(ts, tuple<U>(interpair.second.getRef())));
             });
     };
 
@@ -119,14 +122,20 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
 
 }  // namespace util
 
-// this is required to overcome deduction failure for callables that we'd like to have as functions
 /**
- * Generates a tuple<T,U> with dependency.  Generator for U is decided by T value
+ * @ingroup Combinators
+ * @brief Generator combinator for chaining two generators to generate a tuple of values, where the second generator
+ * depends on generated value from the first generator. Serves similar purpose as \ref derive, the only difference is in
+ * the chained type (tuple).
+ * @details Generates a tuple<T,U> with dependency.  Generator for U is decided by T value
+ * @code
  *     GenFunction<tuple<T,U>> tupleGen = chain(intGen, [](int& intVal) {
  *         auto stringGen = Arbi<string>();
  *         stringGen.setMaxSize(intVal); // string size is dependent to intVal generated from intGen
  *         return intVal;
  *     });
+ *     // chain(gen, ...) is equivalent to gen.tupleWith(...), if gen is of Arbitrary or Generator type
+ * @endcode
  */
 template <typename GEN1, typename GEN2GEN>
 decltype(auto) chain(GEN1&& gen1, GEN2GEN&& gen2gen)

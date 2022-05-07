@@ -7,16 +7,14 @@ TEST(PropTest, FilterWithTolerance)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    auto smallIntGen = interval<int>(0,100);
+    auto smallIntGen = interval<int>(0, 100);
 
     for (int i = 0; i < 4; i++) {
         auto shr = smallIntGen(rand);
-        auto criteria = [](int& v) {
-            return v % 4 == 1;
-        };
-        auto criteriaPtr =
-            util::make_shared<function<bool(const int&)>>([criteria](const int& t) { return criteria(const_cast<int&>(t)); });
-        if(!criteria(shr.getRef()))
+        auto criteria = [](int& v) { return v % 4 == 1; };
+        auto criteriaPtr = util::make_shared<function<bool(const int&)>>(
+            [criteria](const int& t) { return criteria(const_cast<int&>(t)); });
+        if (!criteria(shr.getRef()))
             continue;
         cout << "filter with tolerance:" << endl;
         exhaustive(shr.filter(criteriaPtr, 1), 0);
@@ -237,8 +235,7 @@ TEST(PropTest, ShrinkSetExhaustive)
 {
     static auto combination = [](int n, int r) {
         int result = 1;
-        for(int i = 1; i <= r; i++)
-        {
+        for (int i = 1; i <= r; i++) {
             result *= n--;
             result /= i;
         }
@@ -246,10 +243,10 @@ TEST(PropTest, ShrinkSetExhaustive)
     };
 
     static auto sumCombinations = [](int n, int maxR) {
-        if(maxR < 0)
+        if (maxR < 0)
             return 0;
         int result = 0;
-        for(int r = 0; r <= maxR; r++)
+        for (int r = 0; r <= maxR; r++)
             result += combination(n, r);
         return result;
     };
@@ -257,40 +254,42 @@ TEST(PropTest, ShrinkSetExhaustive)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto minAndMaxSizeGen = interval(0, 10).pairWith<int>([](int& n) {
-        return interval(n, 10);
-    });
+    auto minAndMaxSizeGen = interval(0, 10).pairWith<int>([](int& n) { return interval(n, 10); });
 
-    forAll([&rand](pair<int, int> minAndMaxSize) {
-        auto elemGen = interval(0, 99);
-        int minSize = minAndMaxSize.first;
-        int maxSize = minAndMaxSize.second;
-        auto setGen = Arbi<set<int>>(elemGen).setSize(minSize, maxSize);
-        for(int i = 0; i < 3; i++) {
-            auto strSet = set<string>();
-            stringstream exhaustiveStr;
-            int numTotal = 0;
-            auto root = setGen(rand);
-            exhaustive<set<int>>(root, 0, [&numTotal, &strSet,&exhaustiveStr](const Shrinkable<set<int>>& shrinkable, int level) {
-                exhaustiveStr << "\n";
-                for (int i = 0; i < level; i++) exhaustiveStr << "  ";
-                exhaustiveStr << proptest::Show<set<int>>(shrinkable.get());
-                numTotal ++;
+    forAll(
+        [&rand](pair<int, int> minAndMaxSize) {
+            auto elemGen = interval(0, 99);
+            int minSize = minAndMaxSize.first;
+            int maxSize = minAndMaxSize.second;
+            auto setGen = Arbi<set<int>>(elemGen).setSize(minSize, maxSize);
+            for (int i = 0; i < 3; i++) {
+                auto strSet = set<string>();
+                stringstream exhaustiveStr;
+                int numTotal = 0;
+                auto root = setGen(rand);
+                exhaustive<set<int>>(
+                    root, 0, [&numTotal, &strSet, &exhaustiveStr](const Shrinkable<set<int>>& shrinkable, int level) {
+                        exhaustiveStr << "\n";
+                        for (int i = 0; i < level; i++)
+                            exhaustiveStr << "  ";
+                        exhaustiveStr << proptest::Show<set<int>>(shrinkable.get());
+                        numTotal++;
 
-                stringstream str;
-                str <<  proptest::Show<set<int>>(shrinkable.get());
-                PROP_EXPECT(strSet.find(str.str()) == strSet.end()) << str.str() << " already exists in: " << exhaustiveStr.str();
-                strSet.insert(str.str());
-            });
-            auto size = root.getRef().size();
-            PROP_EXPECT_EQ(numTotal, pow(2, size) - sumCombinations(size, minSize-1));
-            // cout << "rootSize: "  << size  << ", minSize: " << minSize << ", total: " << numTotal << ", pow: " << pow(2, size) << ", minus: " << sumCombinations(size, minSize-1) << endl;
-            // cout << "exhaustive: " << exhaustiveStr.str() << endl;
-        }
-    }, minAndMaxSizeGen);
-
+                        stringstream str;
+                        str << proptest::Show<set<int>>(shrinkable.get());
+                        PROP_EXPECT(strSet.find(str.str()) == strSet.end())
+                            << str.str() << " already exists in: " << exhaustiveStr.str();
+                        strSet.insert(str.str());
+                    });
+                auto size = root.getRef().size();
+                PROP_EXPECT_EQ(numTotal, pow(2, size) - sumCombinations(size, minSize - 1));
+                // cout << "rootSize: "  << size  << ", minSize: " << minSize << ", total: " << numTotal << ", pow: " <<
+                // pow(2, size) << ", minus: " << sumCombinations(size, minSize-1) << endl; cout << "exhaustive: " <<
+                // exhaustiveStr.str() << endl;
+            }
+        },
+        minAndMaxSizeGen);
 }
-
 
 TEST(PropTest, TuplePair1)
 {
@@ -522,7 +521,7 @@ TEST(PropTest, ConstraintObject)
     Random rand(seed);
     // You cannot directly generate Constraint object, as it's a non-copyable object.
     // But you can create a shared_ptr of Constraint
-    auto gen = lazy<shared_ptr<Constraint>>([]() { return util::make_shared<Constraint>(5);});
+    auto gen = lazy<shared_ptr<Constraint>>([]() { return util::make_shared<Constraint>(5); });
 
     gen(rand);
 }

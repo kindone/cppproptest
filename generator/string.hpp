@@ -5,8 +5,16 @@
 #include "../util/cesu8string.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file string.hpp
+ * @brief Arbitrary for string
+ */
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for string with configurable character generators and min/max sizes
+ */
 template <>
 class PROPTEST_API Arbi<string> final : public ArbiContainer<string> {
     using ArbiContainer<string>::minSize;

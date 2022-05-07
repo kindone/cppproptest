@@ -106,7 +106,7 @@ With our `Action`s properly defined, we can generate a sequence of `Action`s.
 `actionClasses` function is a useful shorthand for `oneOf` generator combinator that is specialized for generating `Action` Sequences.
 
 ```cpp
-auto actionListGen = actionListGenOf<SimpleAction<MyVector>>(
+        auto actionListGen = actionListGenOf<SimpleAction<MyVector>>(
         // int -> PushBack(int)
         transform<int, std::shared_ptr<SimpleAction<MyVector>>>(
             Arbi<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),

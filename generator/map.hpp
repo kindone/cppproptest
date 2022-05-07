@@ -6,7 +6,16 @@
 #include "set.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file map.hpp
+ * @brief Arbitrary for map<Key, T>
+ */
+
 namespace proptest {
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for map<Key, T> with configurable Key and T generators and min/max sizes
+ */
 template <typename Key, typename T>
 class Arbi<map<Key, T>> final : public ArbiContainer<map<Key, T>> {
     using Map = map<Key, T>;

@@ -19,8 +19,17 @@ public:
 
 }  // namespace std
 
+/**
+ * @file set.hpp
+ * @brief Arbitrary for set<T>
+ */
+
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for set<T> with configurable element generators and min/max sizes
+ */
 template <typename T>
 class Arbi<set<T>> final : public ArbiContainer<set<T>> {
     using Set = set<T>;

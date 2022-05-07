@@ -8,6 +8,12 @@
 #include "../generator/integral.hpp"
 #include "../shrinker/listlike.hpp"
 
+/**
+ * @file accumulate.hpp
+ * @brief Generator combinator for accumulating values into a vector where each value is generated from a given
+ * generator generator
+ */
+
 namespace proptest {
 
 namespace util {
@@ -60,6 +66,18 @@ Generator<vector<T>> accumulateImpl(GenFunction<T> gen1, function<GenFunction<T>
 
 }  // namespace util
 
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for accumulating values into a vector where each value is generated from a given
+ * generator generator
+ * @tparam GEN1 Generator type of (Random&) -> Shrinkable<T>
+ * @tparam GEN2GEN (T&) -> ((Random&) -> Shrinkable<T>) (Generator for T)
+ * @param gen1 base generator for type T
+ * @param gen2gen function that returns a generator for type T based on previously generated value of the same type
+ * @param minSize minimum size of the aggregate
+ * @param maxSize maximum size of the aggregate
+ * @return vector of generated values of type T
+ */
 template <typename GEN1, typename GEN2GEN>
 decltype(auto) accumulate(GEN1&& gen1, GEN2GEN&& gen2gen, size_t minSize, size_t maxSize)
 {

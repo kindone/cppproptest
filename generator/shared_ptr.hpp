@@ -5,8 +5,17 @@
 #include "../Shrinkable.hpp"
 #include "../Random.hpp"
 
+/**
+ * @file shared_ptr.hpp
+ * @brief Arbitrary for shared_ptr<T> and utility function pairOf(gen1, gen2)
+ */
+
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for shared_ptr<T> with configurable element generators
+ */
 template <typename T>
 class Arbi<shared_ptr<T>> final : public ArbiBase<shared_ptr<T>> {
 public:

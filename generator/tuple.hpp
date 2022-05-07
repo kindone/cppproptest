@@ -8,11 +8,18 @@
 #include "../shrinker/tuple.hpp"
 #include "util.hpp"
 
-
 namespace proptest {
 
-// generates e.g. (int, int)
-// and shrinks one parameter by one and then continues to the next
+/**
+ * @file tuple.hpp
+ * @brief Arbitrary for tuple<T1,..., Tn> and utility function tupleOf(gen0, ..., gens)
+ * @details shrinking is done by one parameter and then continues to the next
+ */
+
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for tuple<T1, ..., Tn> with given generators for T1, ..., Tn
+ */
 template <typename GEN0, typename... GENS>
 decltype(auto) tupleOf(GEN0&& gen0, GENS&&... gens)
 {
@@ -26,6 +33,10 @@ decltype(auto) tupleOf(GEN0&& gen0, GENS&&... gens)
     });
 }
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for tuple<T1, ..., Tn> based on Arbitraries for T1, ..., Tn
+ */
 template <typename... ARGS>
 class PROPTEST_API Arbi<tuple<ARGS...>> final : public ArbiBase<tuple<ARGS...>> {
 public:

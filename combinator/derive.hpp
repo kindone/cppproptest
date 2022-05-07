@@ -4,6 +4,12 @@
 #include "../Random.hpp"
 #include "../GenBase.hpp"
 
+/**
+ * @file derive.hpp
+ * @brief Generator combinator for chaining two generators to generate a pair of values, where the second generator
+ * depends on generated value from the first generator
+ */
+
 namespace proptest {
 
 template <typename GEN>
@@ -12,6 +18,21 @@ template <typename T>
 struct Generator;
 
 // returns a shrinkable pair of <T,U> where U depends on T
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for chaining two generators to generate a pair of values, where the second generator
+ * depends on generated value from the first generator. Serves similar purpose as \ref chain, the only difference is in
+ * the chained type (pair).
+ * @details Generates a tuple<T,U> with dependency.  Generator for U is decided by T value
+ * @code
+ *     GenFunction<pair<T,U>> pairGen = derive(intGen, [](int& intVal) {
+ *         auto stringGen = Arbi<string>();
+ *         stringGen.setMaxSize(intVal); // string size is dependent to intVal generated from intGen
+ *         return intVal;
+ *     });
+ *     // derive(gen, ...) is equivalent to gen.pairWith(...), if gen is of Arbitrary or Generator type
+ * @endcode
+ */
 template <typename T, typename U>
 Generator<U> derive(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
 {

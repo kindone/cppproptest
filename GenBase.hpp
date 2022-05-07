@@ -4,7 +4,7 @@
 #include "Random.hpp"
 #include "Shrinkable.hpp"
 
-/** @file
+/** @file GenBase.hpp
  *  @brief Defines fundamental generator types
  */
 
@@ -33,7 +33,6 @@ class Random;
 template <typename T>
 using GenFunction = function<Shrinkable<T>(Random&)>;
 
-/// * private
 template <typename T>
 struct GenBase
 {

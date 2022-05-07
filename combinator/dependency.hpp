@@ -4,6 +4,11 @@
 #include "../Random.hpp"
 #include "../GenBase.hpp"
 
+/**
+ * @file dependency.hpp
+ * @brief Generator combinator for generating values with dependency or relation to a base generator
+ */
+
 namespace proptest {
 
 template <typename GEN>
@@ -11,6 +16,13 @@ decltype(auto) generator(GEN&& gen);
 template <typename T>
 struct Generator;
 
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for generating values with dependencies or relation to a base generator
+ * @param gen1 base generator
+ * @param gen2gen generator generator that generates a value based on generated value from the base generator
+ * @return template <typename T, typename U>
+ */
 // returns a shrinkable pair of <T,U> where U depends on T
 template <typename T, typename U>
 Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
@@ -48,10 +60,9 @@ Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&
             });
 
         // reformat pair<T, Shrinkable<U>> to pair<T, U>
-        return intermediate.template flatMap<pair<T, U>>(
-            +[](const Intermediate& interpair) -> Shrinkable<pair<T, U>> {
-                return make_shrinkable<pair<T, U>>(util::make_pair(interpair.first, interpair.second.getRef()));
-            });
+        return intermediate.template flatMap<pair<T, U>>(+[](const Intermediate& interpair) -> Shrinkable<pair<T, U>> {
+            return make_shrinkable<pair<T, U>>(util::make_pair(interpair.first, interpair.second.getRef()));
+        });
     };
 
     return generator(genPair);

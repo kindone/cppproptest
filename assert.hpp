@@ -2,6 +2,11 @@
 #include "api.hpp"
 #include "util/std.hpp"
 
+/**
+ * @file assert.hpp
+ * @brief Assertion helpers for property-based testing
+ */
+
 namespace proptest {
 
 struct PROPTEST_API AssertFailed : public logic_error
@@ -78,7 +83,7 @@ ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STREAM(condition, a, sign, b)                                                                  \
     do {                                                                                                           \
         if (!(condition)) {                                                                                        \
-            stringstream __prop_assert_stream_str;                                                            \
+            stringstream __prop_assert_stream_str;                                                                 \
             __prop_assert_stream_str << #condition << " with " << a << sign << b;                                  \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {}, __prop_assert_stream_str.str(), \
                                                            nullptr);                                               \
@@ -100,7 +105,7 @@ ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STREQ(a, b, n)                                                                            \
     do {                                                                                                      \
         if (!(memcmp(a, b, n) == 0)) {                                                                        \
-            stringstream __prop_assert_stream_str;                                                       \
+            stringstream __prop_assert_stream_str;                                                            \
             __prop_assert_stream_str << #a << " not equals " << #b << " with " << proptest::Show<char*>(a, n) \
                                      << " not equals " << proptest::Show<char*>(b, n);                        \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                            \
@@ -112,7 +117,7 @@ ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STREQ2(a, b, n1, n2)                                                                       \
     do {                                                                                                       \
         if (!(memcmp(a, b, (n1 <= n2 ? n1 : n2)) == 0)) {                                                      \
-            stringstream __prop_assert_stream_str;                                                        \
+            stringstream __prop_assert_stream_str;                                                             \
             __prop_assert_stream_str << #a << " not equals " << #b << " with " << proptest::Show<char*>(a, n1) \
                                      << " not equals " << proptest::Show<char*>(b, n2);                        \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                             \
@@ -124,7 +129,7 @@ ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STRNE(a, b, n)                                                                           \
     do {                                                                                                     \
         if (!(memcmp(a, b, n) != 0)) {                                                                       \
-            stringstream __prop_assert_stream_str;                                                      \
+            stringstream __prop_assert_stream_str;                                                           \
             __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n)    \
                                      << " equals " << proptest::Show<char*>(b, n);                           \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \
@@ -136,7 +141,7 @@ ostream& errorOrEmpty(bool condition);
 #define PROP_ASSERT_STRNE2(a, b, n1, n2)                                                                     \
     do {                                                                                                     \
         if (!(memcmp(a, b, (n1 <= n2 ? n1 : n2)) != 0)) {                                                    \
-            stringstream __prop_assert_stream_str;                                                      \
+            stringstream __prop_assert_stream_str;                                                           \
             __prop_assert_stream_str << #a << " equals " << #b << " with " << proptest::Show<char*>(a, n1)   \
                                      << " equals " << proptest::Show<char*>(b, n2);                          \
             ::proptest::AssertFailed __proptest_except_obj(__FILE__, __LINE__, {},                           \

@@ -5,11 +5,11 @@
 
 using namespace proptest;
 
-TEST(Compile, map)
+TEST(Compile, filter)
 {
     Random rand(3);
     auto gen = Arbi<map<string, string>>();
     gen(rand);
-    gen.map([](map<string, string>&) { return 0; });
-    gen.map<int>([](map<string, string>&) { return 0; });
+    filter(gen, [](map<string, string>&) { return true; });
+    suchThat<map<string, string>>(gen, [](map<string, string>&) { return true; });
 }

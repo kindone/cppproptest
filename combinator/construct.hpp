@@ -3,6 +3,10 @@
 #include "../util/createGenTuple.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file construct.hpp
+ * @brief Generator combinator for generating a type with a constructor
+ */
 namespace proptest {
 
 class Random;
@@ -69,7 +73,8 @@ public:
     Generator<pair<CLASS, U>> pairWith(function<GenFunction<U>(const CLASS&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
+        return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+                                              genFactory);
     }
 
     template <typename U>
@@ -121,7 +126,8 @@ private:
 };
 
 /**
- * @brief Generates a CLASS type by specifying target constructor's paremeter types
+ * @ingroup Combinators
+ * @brief Generates a CLASS type by specifying target constructor's parameter types and their (optional) generators
  *
  * Usage:
  *
@@ -133,8 +139,8 @@ private:
  *          int y;
  *      };
  *      GenFunction<Point> objectGen = construct<Point>(); // calls Point()
- *      GenFunction<Point> objectGen2 = construct<Point, int, int>(nonNegative(), nonNegative()); // calls Point(int,
- * int) GenFunction<Point> objectGen3 = construct<Point, int, int>(); // ints are generated using Arbi<int>
+ *      GenFunction<Point> objectGen2 = construct<Point, int, int>(nonNegative(), nonNegative()); // Point(int, int)
+ *      GenFunction<Point> objectGen3 = construct<Point, int, int>(); // ints are generated using Arbi<int>
  * @endcode
  */
 template <typename CLASS, typename... ARGTYPES>
@@ -155,8 +161,8 @@ Construct<CLASS, ARGTYPES...> construct(EXPGEN0&& gen0, EXPGENS&&... gens)
     using ArgsAsTuple = tuple<decay_t<ARGTYPES>...>;
 
     auto explicits = util::make_tuple(util::genToFunc(gen0), util::genToFunc(gens)...);
-    auto implicits = util::createGenHelperListed<ArgsAsTuple>(
-        util::addOffset<ExplicitSize>(make_index_sequence<ImplicitSize>{}));
+    auto implicits =
+        util::createGenHelperListed<ArgsAsTuple>(util::addOffset<ExplicitSize>(make_index_sequence<ImplicitSize>{}));
 
     return Construct<CLASS, ARGTYPES...>(tuple_cat(explicits, implicits));
 }

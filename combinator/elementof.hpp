@@ -7,6 +7,11 @@
 #include "oneof.hpp"
 #include "just.hpp"
 
+/**
+ * @file elementof.hpp
+ * @brief Generator combinator for generating a type by choosing one of given values with some probability
+ */
+
 namespace proptest {
 
 namespace util {
@@ -56,6 +61,15 @@ util::WeightedValue<T> weightedVal(Impl&& value, double weight)
 }
 
 // a value can be a raw Impl or a weightedVal(Impl, weight)
+/**
+ * @ingroup Combinators
+ * @brief Generator combinator for generating a type by choosing one of given values with some probability
+ * @details It can generate a type T from given values of type T, by choosing one of the values randomly, with even
+ * probability, or weighted probability.
+ * @tparam T result type
+ * @tparam Impl an Impl can be a value of type T or a weightedValue(value of type T, weight) with the weight
+ * between 0 and 1 (exclusive). Unweighted values take rest of unweighted probability evenly.
+ */
 template <typename T, typename... Impl>
 decltype(auto) elementOf(Impl&&... values)
 {

@@ -106,6 +106,8 @@ SET(compile_sources
     test/compile/unicode.cpp
     test/compile/property.cpp
     test/compile/printing.cpp
+    test/compile/lazy.cpp
+    test/compile/filter.cpp
     test/compile/derive.cpp
     test/compile/aggregate.cpp
     test/compile/accumulate.cpp

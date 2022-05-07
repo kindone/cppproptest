@@ -3,8 +3,17 @@
 #include "../util/cesu8string.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file cesu8string.hpp
+ * @brief Arbitrary for CESU8String
+ */
+
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for CESU-8 string with configurable code generator and min/max sizes
+ */
 template <>
 class PROPTEST_API Arbi<CESU8String> final : public ArbiContainer<CESU8String> {
 public:

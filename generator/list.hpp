@@ -7,8 +7,16 @@
 #include "util.hpp"
 #include "../util/std.hpp"
 
+/**
+ * @file list.hpp
+ * @brief Arbitrary for list<T>
+ */
 namespace proptest {
 
+/**
+ * @ingroup Generators
+ * @brief Arbitrary for list<T> with configurable element generator and min/max sizes
+ */
 template <typename T>
 class PROPTEST_API Arbi<list<T>> final : public ArbiContainer<list<T>> {
 public:
