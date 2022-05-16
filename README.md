@@ -4,7 +4,7 @@
 
 * Out-of-box generators for primitives and standard containers. See the [full list of built-in generators](doc/Generators.md#arbitraries-provided-by-cppproptest) for more.
 
-* Versatile generator combinators for creating custom generators based on existing ones. See [generator combinators](doc/Combinators.md) for more.
+* Versatile generator combinators for creating custom generators based on existing generators. See [generator combinators](doc/Combinators.md) for more.
 * [Shrinking](doc/Shrinking.md) for automated debugging support
 * [Stateful testing support](doc/StatefulTesting.md) for testing state changes
 * [Concurrency testing support](doc/ConcurrencyTesting.md) for testing concurrent state changes
@@ -13,7 +13,7 @@ You can [get started with `cppproptest` in this page](doc/GettingStarted.md).
 
 ## Example: Turning conventional unit tests into property tests
 
-A *property function* is in the form of `function<bool(InputType...)>` (or `function<void(InputType...)`)
+A *property function* is in the form of `function<bool(InputType...)>` (or `function<void(InputType...)` without a return value)
 
 ```cpp
 [](int a, int b) -> bool {
@@ -21,9 +21,9 @@ A *property function* is in the form of `function<bool(InputType...)>` (or `func
 }
 ```
 
-A property-based testing library can generate random combinations of `a` and `b` and validate the given property function whether it always returns `true` for all the generated combinations (or, returns without exception for `void` returning property functions). 
+As shown in above code, A property-based testing library can generate random combinations of inputs (`a` and `b`) and validate given property function whether it always returns `true` for all the generated combinations (or, returns without throwing an exception, for property functions with `void` return type). 
 
-A typical outcome of a property test would be:
+A probable outcome of above property test would be:
 
 > OK, passed 1000 tests
 
@@ -33,7 +33,7 @@ or
 >   a = 4,
 >   b = -4
 
-Among many other benefits, property-based tests can immediately replace dull dummy-based tests, such as:
+Among many other benefits, property-based tests can immediately replace dummy-based tests, such as:
 
 ```cpp
     // typical dummy-based test 
@@ -47,7 +47,7 @@ Among many other benefits, property-based tests can immediately replace dull dum
 
 ```
 
-This can be turned into a property-based test, which fully tests the component againt arbitrary input strings:
+This can be turned into a property-based test, which fully tests the components againt arbitrary input strings:
 
 ```cpp
     // property test 
@@ -60,6 +60,9 @@ This can be turned into a property-based test, which fully tests the component a
         PROP_ASSERT_EQ(original, decoded);
     });
 ```
+
+*Generalization* is the core idea of property-based testing. As shown in previous example code, the test inputs were generalized - example inputs were turned into fully randomized inputs. As a result, we can say with higher confidence that the tested component works with more general input domain.
+
 
 ## Power of automation and versatility
 
@@ -87,6 +90,7 @@ Here is the comparison table showing some of the benefits of writing property ba
 | Code Coverage     | Low                       | High                         |
 | Readability       | Low                       | High                         |
 | Confidence        | Low                       | High                         |
+| Reusability       | Low                       | High                         |
 | Discovers new bugs| No                        | Yes                          |
 | Debugging failures| Manual                    | Automated (via shrinking)    |
 
