@@ -1,10 +1,8 @@
-
-
 # Why Property-based testing?
 
 #### Generalization and abstraction
 
-Property-based testing lets you write tests using abstract ideas, instead of some dummy examples or contrived scenarios that are easy to break over time and hard to interpret. You can write your tests using specification or requirements - which are essentially described as combination of an input domain and expected behavior (=properties) of the concerned component.
+Property-based testing lets you write a test using abstract idea, instead of some dummy examples or a contrived scenario that is easy to break over time and hard to interpret. You can write your tests using specification or requirements - which are essentially expressed as combination of input domain and expected behavior (=properties) of the concerned component.
 
 #### Clear separation of variants and invariants
 
