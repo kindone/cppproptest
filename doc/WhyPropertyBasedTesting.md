@@ -2,6 +2,24 @@
 
 # Why Property-based testing?
 
+#### Generalization and abstraction
+
+Property-based testing lets you write tests using abstract ideas, instead of some dummy examples or contrived scenarios that are easy to break over time and hard to interpret. You can write your tests using specification or requirements - which are essentially described as combination of an input domain and expected behavior (=properties) of the concerned component.
+
+#### Clear separation of variants and invariants
+
+Describing a test using input domain and expected behavior means that we have clear cut between variants and invariants. In property-based tests, we describe invariants as properties and variants as input domain. 
+
+#### Convenience and versatility
+
+With the convenient out-of-box generators and combinators (that lets you make new generators out of existing ones), you can effortlessly define the input domain for your tests. You can specify your input domains using various notions - range, constraint, union, transformation, composition, and dependency, just to name a few.
+
+#### Reusability
+
+As it's often founded on functional programming paradigm, property-based testing lets you define and reuse existing input domain and properties to build new ones with ease. These new ones can then be reused as building blocks for another test and so on.
+
+&nbsp;
+
 ## An attempt to approximate software quality 
 
 Property-based testing, or sometimes refered to as *specification-based testing*, tries to verify software's integrity by validating the requirements of a software component, where the requirements are often written as *properties*(or *specifications*). They are validated using massive input combinations. 
