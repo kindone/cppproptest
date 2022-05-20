@@ -62,13 +62,16 @@ public:
         return *this;
     }
 
-    StatefulProperty& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)
+
+    template <typename M = ModelType>
+    enable_if_t<!is_same_v<M, EmptyModel>, StatefulProperty>& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)
     {
         postCheckPtr = util::make_shared<function<void(ObjectType&, ModelType&)>>(postCheck);
         return *this;
     }
 
-    StatefulProperty& setPostCheck(function<void(ObjectType&)> postCheck)
+    template <typename M = ModelType>
+    enable_if_t<is_same_v<M, EmptyModel>, StatefulProperty>& setPostCheck(function<void(ObjectType&)> postCheck)
     {
         function<void(ObjectType&, ModelType&)> fullPostCheck = [postCheck](ObjectType& sys, ModelType&) {
             postCheck(sys);
