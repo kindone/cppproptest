@@ -2,7 +2,7 @@
 
 ## Running your first property-based test
 
-`cppproptest` requires [CMake](https://cmake.org) for build tool and a C++14-compliant compiler.
+`cppproptest` requires [CMake](https://cmake.org) for build tool and C++14-compliant compiler (likely be OK with latest standards).
 You can examine the requirements with: 
 
 ```Shell
