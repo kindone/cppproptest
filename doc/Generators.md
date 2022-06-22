@@ -1,22 +1,23 @@
 # Introduction to Generators
 
-## Generators in action
+## Generators in Property-based testing
 
-Generators play key role in property-based testing and `cppproptest`. You use _generators_ to generate randomized arguments for properties. A simple `forAll` statement utilizes generators under the hood.
+Property-based testing clearly separates concepts of input domain and property. _Generators_ are the representation of input domain for a property-based test. A _generator_ is basically a function that can generate random values with some constraint. 
+A simple `forAll` statement depends on generators under the hood:
 
 ```cpp
 forAll([](int age, std::string name) {
 });
 ```
 
-This `forAll` takes a function having parameters of types `int` and `std::string`. The parameter types are first extracted and then used to invoke the default generators for the types. Default generators are called *arbitraries* and above code is actually equivalent to the following:
+Above `forAll` takes a function having parameters of types `int` and `std::string`. This function is the property function. If no additional information on how to generate values for `age` and `name` as in this example, the parameter types are extracted and then used to invoke the default generators for those types. In this case, it calls default generators for `int` and `std::string`. Those default generators are called *arbitraries*. This code is actually equivalent to:
 
 ```cpp
 forAll([](int age, std::string name) {
 }, Arbitrary<int>(), Arbitrary<std::string>());
 ``` 
 
-Now you see that `forAll` actually requires some information how to generate the values of the extracted types. They're just hidden as defaults.
+Notice the extra arguments `Arbitrary<int>()` and `Arbitrary<std::string>()`. As you can see, `forAll` actually needs some information how to generate values of the parameter types. They can be ommitted if you're using the defaults, the _arbitraries_. 
 
 &nbsp;
 
@@ -25,7 +26,7 @@ Now you see that `forAll` actually requires some information how to generate the
 ### Arbitrary lets you omit generator arguments
 
 An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type (that also coerces to `GenFunction<T>`).
-These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no custom generator is provided. 
+These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no other generator is specified. 
 
 ```cpp
 // if there is no default generator available, you must provide a generator for the type. 
@@ -43,7 +44,7 @@ forAll([](SomeType x) {
 
 `cppproptest` provides a set of built-in generators for immediate generation of types that are often used in practice. Built-in generators are in the form of Arbitraries. 
 
-Here's a quick reference for built-in arbitraries
+Here's quick reference for built-in arbitraries
 
  Purpose                                             | Examples                                   | Generator                             | 
 |----------------------------------------------------| -------------------------------------------|---------------------------------------|
@@ -119,7 +120,7 @@ Here's a quick reference for built-in arbitraries
 
 With template specialization, new `Arbi<T>` (or its alias `Arbitrary<T>`) for type `T` can be defined, if it isn't already defined yet. By defining an _Arbitrary_, you are effectively adding a default generator for a type.
 
-Following shows an example of defining an _Arbitrary_. Note that it should be defined under `proptest` namespace in order to be noticed and accessible in the library core.
+Following shows an example of defining an _Arbitrary_. Note that it should be defined under `proptest` namespace in order to be recognized and accessible by the library core.
 
 ```cpp
 namespace proptest { // you should define your Arbi<T> inside the namespace
@@ -139,7 +140,7 @@ struct Arbi<Car> : ArbiBase<Car> {
 
 ### Arbitrary provides utility methods
 
-As an `Arbitrary<T>` is also a `Generator<T>`, an arbitrary provides useful helpers for creating new generators from existing ones. `filter` is such a helper. It restrictively generates values that satisfy a criteria function. Following is an even number generator from the integer `Arbitrary`.
+As an `Arbitrary<T>` is also a `Generator<T>`, an arbitrary provides useful helpers for creating new generators from existing ones. `filter` is such a helper. It restrictively generates values that satisfy a criteria function. Following shows an even number generator from the integer `Arbitrary`.
 
 ```cpp
 // generates any integers
@@ -157,7 +158,7 @@ You can find the full list of such helpers in section [Utility methods in standa
 
 ## Building Custom Generators with Generator Combinators
 
-While you can build your own generator manually defining a `GenFunction<T>` for type `T`, it's usually not recommended as there is a better option - generator combinators.
+While you can build your own generator by manually defining a `GenFunction<T>` for type `T`, it's usually not recommended as there is a better option - generator combinators.
 Generator combinators are toolkit for building new generators based on existing ones. 
 They can be chained to create another generator out of themselves. See [Combinators](./Combinators.md) page for the detail. 
 
