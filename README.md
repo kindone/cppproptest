@@ -9,62 +9,66 @@
 * [Stateful testing support](doc/StatefulTesting.md) for testing state changes
 * [Concurrency testing support](doc/ConcurrencyTesting.md) for testing concurrent state changes
 
-You can [get started with `cppproptest` in this page](doc/GettingStarted.md).
+You can get started with `cppproptest` on this [page](doc/GettingStarted.md).
 
-## Example: Turning conventional unit tests into property tests
+&nbsp;
 
-A *property function* is in the form of `function<bool(InputType...)>` (or `function<void(InputType...)` without a return value)
+# Why Property-based testing?
+
+## Generalization and abstraction
+
+Property-based testing, or PBT in short, lets you write a test using abstract idea, instead of some dummy examples or contrived scenarios that are easy to break over time and hard to interpret. You can write tests using specification or requirements - which are essentially expressed as combination of input domain (=generators) and expected behavior (=properties) of tested component. 
+
+Property-based tests can immediately replace example-based tests, such as:
 
 ```cpp
-[](int a, int b) -> bool {
-    return a + b == b + a;
-}
+MyEncoder encoder;
+MyDecoder decoder;    
+auto original = "Some dummy content that hopefully prove or disprove this encoder/decoder works";
+auto encoded = encoder.encode(original);
+auto decoded = decoder.decode(encoded);
+ASSERT_EQ(original, decoded);
 ```
 
-As shown in above code, A property-based testing library can generate random combinations of inputs (`a` and `b`) and validate given property function whether it always returns `true` for all the generated combinations (or, returns without throwing an exception, for property functions with `void` return type). 
-
-A probable outcome of above property test would be:
-
-> OK, passed 1000 tests
-
-or 
-
-> Falsifiable after 12 tests, where
->   a = 4,
->   b = -4
-
-Among many other benefits, property-based tests can immediately replace dummy-based tests, such as:
+This can be turned into a property-based test, which fully tests the components against arbitrary input strings:
 
 ```cpp
-    // typical dummy-based test 
+forAll([](std::string original) {
     // a text encoded and then decoded must be identical to original
     MyEncoder encoder;
     MyDecoder decoder;    
-    auto original = "Some dummy content that hopefully prove or disprove this works";
     auto encoded = encoder.encode(original);
     auto decoded = decoder.decode(encoded);
-    ASSERT_EQ(original, decoded);
-
+    PROP_ASSERT_EQ(original, decoded);
+});
 ```
 
-This can be turned into a property-based test, which fully tests the components againt arbitrary input strings:
+Example inputs were turned into fully randomized inputs. As a result, we can say with higher confidence that the tested component works with more general input domain.
+
+## Clear separation of variants and invariants
+
+Describing a test using input domain and expected behavior means that we have clear cut between variants and invariants. 
+We often mix variants and invariants in our tests in typical *example-based tests*. This is one of the reasons why those tests become hard to maintain and difficult to read over time. With property-based tests, however, we can clearly separate invariants as properties and variants as input domain. Thus tests become more readable, gets easier to maintain, and carry test writers' intention better.
+
+## Convenience and versatility
+
+Property-based testing often provides with the convenient out-of-box generators and combinators (that lets you make new generators out of existing ones), and lets you to effortlessly define the input domain for your tests. You can specify your input domains using various notions - range, constraint, union, transformation, composition, and dependency, just to name a few.
 
 ```cpp
-    // property test 
-    forAll([](std::string original) {
-        // a text encoded and then decoded must be identical to original
-        MyEncoder encoder;
-        MyDecoder decoder;    
-        auto encoded = encoder.encode(original);
-        auto decoded = decoder.decode(encoded);
-        PROP_ASSERT_EQ(original, decoded);
+// a tailored string generator
+auto stringGen = Arbitrary<int>()
+    .filter([] (int& num) { num % 2 == 0; }) // even numbers only
+    .map([] (int& num) {
+        return "<" + std::to_string(numStr) + ">"; // string like "<0>", ..., "<n>"
     });
+    
+// property
+forAll([](std::string original) {
+    // ... //
+}, stringGen);
 ```
 
-*Generalization* is the core idea of property-based testing. As shown in previous example code, the test inputs were generalized - example inputs were turned into fully randomized inputs. As a result, we can say with higher confidence that the tested component works with more general input domain.
-
-
-## Power of automation and versatility
+The framework identifies the parameter types of a given property function. It then automatically feeds in the randomly generated values of those types to the function. Any number of parameters of simple or complex types can be used to test a property:
 
 ```cpp
 forAll([](int a, long b, float c, std::string d, std::vector<std::string> e, std::map<int, std::string> e) {
@@ -72,35 +76,18 @@ forAll([](int a, long b, float c, std::string d, std::vector<std::string> e, std
 });
 ```
 
-As seen in previous example, at the core of a property-based testing library, there is this `forAll` function. This itself is a powerful value generation engine. It identifies the parameter types of a given property function. It then automatically feeds in the random generated values of those types to the function. While you can use the out-of-box, default generators, you can build your own or fine-tune existing generators. Property-based testing libraries often accompany with versatile toolkit based on functional programming paradigm, to conveniently and precisely define new generators.
-
-Given this powerful generation engine, we can fully parameterize and randomize our tests with high flexibility but little effort. You don't need to care much about *how* to test your requirements. Much of it is automatically done for you by the test library. With property-based testing, you can focus on two things: 
-
-* Identifying requirements that your components should fulfill and writing them as test
-* Defining the inputs to be tested (i.e. generators. Optional if you're using the defaults)
-
-Here is the comparison table showing some of the benefits of writing property based tests over conventional unit tests:
+Given this powerful generation engine, we can fully parameterize and randomize our tests with high flexibility but little effort. You don't need to care too much about *how* to test your requirements. Much of it is automatically done for you by the framework.
 
 
-|                   | Conventional Unit Tests   | **Property-Based Tests**     |
-| ----------------- |---------------------------| ---------------------------- |
-| Test inputs       | Dummy combinations        | Auto-generated combinations  |
-| Test body         | Contrived scenarios       | Simple properties            |
-| Test target       | Low-level implementations | High-level requirements      |
-| Code Coverage     | Low                       | High                         |
-| Readability       | Low                       | High                         |
-| Confidence        | Low                       | High                         |
-| Reusability       | Low                       | High                         |
-| Discovers new bugs| No                        | Yes                          |
-| Debugging failures| Manual                    | Automated (via shrinking)    |
+## Reusability and Scalability
 
+As it defines input domain with generators and combinators, Property-based testing lets you define and reuse existing input domain and properties to build new input domain and properties with ease. These new ones then can be reused as building blocks for next tests and so on. Reusable nature of property-based testing lets you write tests with scale. Complex combinations of components can be readily tested if simpler pieces are already available by tests written previously.
 
 &nbsp;
 
-## Further topics and details of the library can be found in:
 
-* [Why property-based testing?](doc/WhyPropertyBasedTesting.md)
-* [Getting started with `cppproptest`](doc/GettingStarted.md)
+# Further topics and details:
+
 * [Introduction to generators](doc/Generators.md)
     * [Arbitraries](doc/Generators.md#arbitraries---the-globally-default-generators)
     * [Built-in generators](doc/Generators.md#arbitraries---the-globally-default-generators)
@@ -109,5 +96,5 @@ Here is the comparison table showing some of the benefits of writing property ba
 * [Printing facilities](doc/Printing.md)
 * [Stateful testing with `cppproptest`](doc/StatefulTesting.md)
 * [Concurrency testing with `cppproptest`](doc/ConcurrencyTesting.md)
-* [Advanced mocking with `cppproptest`](doc/Mocking.md)
+* [Advanced mocking with `cppproptest` (work in progress)](doc/Mocking.md)
 
