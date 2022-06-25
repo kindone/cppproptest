@@ -117,6 +117,7 @@ SET(compile_sources
     test/compile/floating.cpp
     test/compile/vector.cpp
     test/compile/map.cpp
+    test/compile/flatmap.cpp
     test/compile/string.cpp
     test/compile/pair.cpp
     test/compile/tuple.cpp

@@ -254,7 +254,7 @@ TEST(PropTest, ShrinkSetExhaustive)
     int64_t seed = getCurrentTime();
     Random rand(seed);
 
-    auto minAndMaxSizeGen = interval(0, 10).pairWith<int>([](int& n) { return interval(n, 10); });
+    auto minAndMaxSizeGen = interval(0, 10).pairWith([](int& n) { return interval(n, 10); });
 
     forAll(
         [&rand](pair<int, int> minAndMaxSize) {

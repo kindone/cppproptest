@@ -99,6 +99,14 @@ struct Generator : public GenBase<T>
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
+    template <typename FACTORY>
+    decltype(auto) pairWith(FACTORY&& genFactory)
+    {
+        using GEN = invoke_result_t<FACTORY, T&>;
+        using RetType = typename invoke_result_t<GEN, Random&>::type;
+        return pairWith<RetType>(util::forward<FACTORY>(genFactory));
+    }
+
     /**
      * @brief Higher-order function that lets you produce a tuple of dependent generators, by taking a generated result
      * from this Generator
@@ -119,6 +127,13 @@ struct Generator : public GenBase<T>
         return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
+    template <typename FACTORY>
+    decltype(auto) tupleWith(FACTORY&& genFactory)
+    {
+        using U = typename invoke_result_t<invoke_result_t<FACTORY, T&>, Random&>::type;
+        return tupleWith<U>(util::forward<FACTORY>(genFactory));
+    }
+
     /**
      * @brief Higher-order function that transforms the Generator for type `T` into a generator for type `U`
      *
@@ -134,6 +149,13 @@ struct Generator : public GenBase<T>
     {
         auto thisPtr = clone();
         return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
+    }
+
+    template <typename FACTORY>
+    decltype(auto) flatMap(FACTORY&& genFactory)
+    {
+        using U = typename invoke_result_t<invoke_result_t<FACTORY, T&>, Random&>::type;
+        return flatMap<U>(util::forward(genFactory));
     }
 
     shared_ptr<Generator<T>> clone() { return util::make_shared<Generator<T>>(*dynamic_cast<Generator<T>*>(this)); }

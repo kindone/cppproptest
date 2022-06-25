@@ -21,8 +21,8 @@ struct Generator;
 /**
  * @ingroup Combinators
  * @brief Generator combinator for chaining two generators to generate a pair of values, where the second generator
- * depends on generated value from the first generator. Serves similar purpose as \ref chain, the only difference is in
- * the chained type (pair).
+ * depends on generated value from the first generator. Serves similar purpose as \ref chain() and the only difference
+ * is in the chained type (pair vs. tuple).
  * @details Generates a tuple<T,U> with dependency.  Generator for U is decided by T value
  * @code
  *     GenFunction<pair<T,U>> pairGen = derive(intGen, [](int& intVal) {

@@ -11,7 +11,7 @@ TEST(Compile, pair)
     auto gen = Arbi<pair<int8_t, uint8_t>>();
     gen(rand);
 
-    Arbi<bool>().pairWith<int>(+[](bool& value) {
+    Arbi<bool>().pairWith(+[](bool& value) {
         if (value)
             return interval(0, 10);
         else
