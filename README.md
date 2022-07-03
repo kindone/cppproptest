@@ -17,7 +17,7 @@ You can get started with `cppproptest` on this [page](doc/GettingStarted.md).
 
 ## Generalization and abstraction
 
-Property-based testing, or PBT in short, lets you write a test using abstract idea, instead of some dummy examples or contrived scenarios that are easy to break over time and hard to interpret. You can write tests using specification or requirements - which are essentially expressed as combination of input domain (=generators) and expected behavior (=properties) of tested component. 
+Property-based testing, or PBT in short, lets you write a test using abstract idea, instead of some dummy examples or contrived scenarios that are either too trivivial or too complicated. You can write tests using specification or requirements - which are essentially  combination of input domain (=generators) and expected behavior (=properties) of the tested component. 
 
 Property-based tests can immediately replace example-based tests, such as:
 
@@ -30,7 +30,7 @@ auto decoded = decoder.decode(encoded);
 ASSERT_EQ(original, decoded);
 ```
 
-This can be turned into a property-based test, which fully tests the components against arbitrary input strings:
+When this is turned into a property-based test, it fully tests the components against arbitrary input strings:
 
 ```cpp
 forAll([](std::string original) {
@@ -88,6 +88,7 @@ As it defines input domain with generators and combinators, Property-based testi
 
 # Further topics and details:
 
+* [Getting Started with cppproptest](doc/GettingStarted.md)
 * [Introduction to generators](doc/Generators.md)
     * [Arbitraries](doc/Generators.md#arbitraries---the-globally-default-generators)
     * [Built-in generators](doc/Generators.md#arbitraries---the-globally-default-generators)
