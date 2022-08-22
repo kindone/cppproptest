@@ -6,7 +6,7 @@ Property-based testing, or PBT in short, lets you write a test using abstract id
 
 #### Clear separation of variants and invariants
 
-Describing a test using input domain and expected behavior means that we have clear cut between variants and invariants. 
+Describing a test using input domain and expected behavior means that we have clear cut between variants and invariants.
 We often mix variants and invariants in our tests in typical *example-based tests*. This is one of the reasons why those tests become hard to maintain and difficult to read over time. In property-based tests, however, we clearly separate invariants as properties and variants as input domain. Thus tests become more readable and gets easier to maintain, as they carry test writers' intention better.
 
 #### Convenience and versatility

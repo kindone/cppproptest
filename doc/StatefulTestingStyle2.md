@@ -1,5 +1,5 @@
 
-# [Stateful Testing](./StatefulTesting.md) 
+# [Stateful Testing](./StatefulTesting.md)
 
 ## Style 2: Using Action Classes
 
@@ -32,13 +32,13 @@ You would prefer to use `SimpleAction` if you don't need a model structure, and 
 * `precondition` is called to check if an action in the sequence is applicable to current state. If it's not the action is skipped.
     * Overriding `precondition` is optional and returns `true` by default
 * `run` is called to actually apply the state change and perform validations against your model after the state change
-    
+
 ```cpp
 template <typename ObjectType, typename ModelType>
 struct Action
 {
     virtual bool precondition(const ObjectType& system, const ModelType&) { ... }
- 
+
     virtual bool run(ObjectType& system, ModelType&) { ... }
 };
 ```
@@ -57,20 +57,20 @@ void clear();
 ```cpp
 struct PushBack : public SimpleAction<MyVector> {
     int val;
-    
+
     PushBack(int val) : val(val) {
     }
-    
+
     bool run(MyVector& vector) {
         vector.push_back(val);
     }
 };
 
-struct PopBack : public SimpleAction<MyVector> {    
+struct PopBack : public SimpleAction<MyVector> {
     bool precondition(MyVector& vector) {
         return vector.size() > 0;
     }
-    
+
     bool run(MyVector& vector) {
         vector.pop_back(val);
     }
@@ -79,14 +79,14 @@ struct PopBack : public SimpleAction<MyVector> {
 struct SetAt : public SimpleAction<MyVector> {
     int pos;
     int val;
-    
+
     SetAt(int pos, int val) : pos(pos), val(val) {
     }
-    
+
     bool precondition(MyVector& vector) {
         return pos < vector.size();
     }
-    
+
     bool run(MyVector& vector) {
         vector.at(pos) = val;
     }
@@ -110,14 +110,14 @@ With our `Action`s properly defined, we can generate a sequence of `Action`s.
         // int -> PushBack(int)
         transform<int, std::shared_ptr<SimpleAction<MyVector>>>(
             Arbi<int>(), [](const int& value) { return std::make_shared<PushBack>(value); }),
-            
+
         // Popback()
         just<std::shared_ptr<SimpleAction<MyVector>>>([]() { return std::make_shared<PopBack>(); }),
-        
+
         // (int, int) -> SetAt(int, int)
         transform<int, std::shared_ptr<SimpleAction<MyVector>>>(
             Arbi<std::pair<int,int>>(), [](const std:;pair<int,int>& posAndVal) { return std::make_shared<SetAt>(posAndVal.first, posAndVal.second); }),
-            
+
         // Clear()
         just<std::shared_ptr<SimpleAction<MyVector>>>([]() { return std::make_shared<Clear>(); })
     );

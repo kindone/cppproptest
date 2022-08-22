@@ -5,7 +5,7 @@ Generator combinators are provided for building a new generator based on existin
 
 While you can go through this document from top to the bottom, you might be want to find a suitable combinator for your use case using this table:
 
-| Purpose                                            | Examples                                   | Related Generator/Combinator      | 
+| Purpose                                            | Examples                                   | Related Generator/Combinator      |
 |----------------------------------------------------| -------------------------------------------|-----------------------------------|
 | Generate just a constant                           | `0` or `"1337"`                            | [`just<T>`](#constants)           |
 | Generate a list of unique values                   | `{3,5,1}` but not `{3,5,5}`                | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)|
@@ -50,7 +50,7 @@ Some utility generators for integers are provided
 
 ### Selecting from values
 
-You may want to random choose from specific list of values. 
+You may want to random choose from specific list of values.
 
 * `elementOf<T>(val1, ..., valN)`: generates a type `T` from multiple values for type `T`, by choosing one of the values randomly
     ```cpp
@@ -59,7 +59,7 @@ You may want to random choose from specific list of values.
     ```
 
     * `elementOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
-    `weightedVal(<value>, <weight>)` is used to annotate the desired weight. 
+    `weightedVal(<value>, <weight>)` is used to annotate the desired weight.
 
     ```cpp
     // generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
@@ -98,7 +98,7 @@ You can combine generators to a single generator that can generate each of them 
     ```
 
     * `oneOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
-    `weightedGen(<generator>, <weight>)` is used to annotate the desired weight. 
+    `weightedGen(<generator>, <weight>)` is used to annotate the desired weight.
 
     ```cpp
     // generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
@@ -154,8 +154,8 @@ You can transform an existing generator to create new generator by providing a t
 
 Another combinator that resembles `transform` is `derive`. This is equivalent to *flat-mapping* or *binding* in functional programming. Difference to `transform<T,U>` is that you can have greater control on the resultant generator.
 
-* `derive<T, U>(genT, genUGen)`: derives a new generator for type `U`, based on result of `genT`, which is a generator for type `T`. 
-    
+* `derive<T, U>(genT, genUGen)`: derives a new generator for type `U`, based on result of `genT`, which is a generator for type `T`.
+
     ```cpp
     // generates a string something like "KOPZZFASF", "ghnpqpojv", or "49681002378", ... that consists of only uppercase/lowercase alphabets/numeric characters.
     auto stringGen = derive<int, std::string>(integers(0, 2), [](int& num) {
@@ -165,12 +165,12 @@ Another combinator that resembles `transform` is `derive`. This is equivalent to
             return Arbi<std::string>(interval('a', 'z'));
         else // num == 2
             return Arbi<std::string>(interval('0', '9'));
-    });    
+    });
     ```
-    
+
 Following table compares `transform` and `derive`:
 
-| Combinator                  | transformer signature       | Result type          | 
+| Combinator                  | transformer signature       | Result type          |
 |-----------------------------| ----------------------------|----------------------|
 | `transform<T,U>`            | `function<U(T)>`            | `Generator<U>`       |
 | `derive<T,U>`               | `function<Generator<U>(T)>` | `Generator<U>`       |
@@ -245,7 +245,7 @@ Actually you can achieve the similar goal using `filter` combinator:
     });
 ```
 
-However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high. 
+However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high.
 
 
 ## Utility methods in standard generators
@@ -283,20 +283,20 @@ These functions and methods can be continuously chained.
     auto evenGen = Arbi<int>().filter([](int& num) {
         return num % 2 == 0;
     });
-    
+
     auto evenGen = filter<int>(Arbi<int>(),[](int& num) {
         return num % 2 == 0;
     });
     ```
-    
+
 * `.flatMap<U>(genUGen)`: based on generated result of the generator object itself, induces a new generator for type `U`. It's equivalent combinator is `derive<T,U>`. Difference to `.map<U>` (or `transform<T,U>`) is that you can have greater control on the resultant generator.
-    
+
     ```cpp
     auto stringGen = Arbi<int>().flatMap<std::string>([](int& num) {
         auto genString = Arbi<std::string>();
         genString.setMaxSize(num);
         return genString;
-    });    
+    });
     ```
 
 * `.pairWith<U>(genUGen)` or `tupleWith<U>(genUGen)`: chains itself to create a generator of pair or tuple. Equivalent to `dependency` or `chain`, respectively.

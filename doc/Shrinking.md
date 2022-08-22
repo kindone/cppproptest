@@ -32,7 +32,7 @@ Although There is no universal definition of *simple* or *simpler*, we can agree
     * remove sign or take a smaller absolute value/exponent (e.g. `-34` -> `34`, `16384` -> `1024`, `12e55` -> `12e20`)
     * round some of the digits (e.g. `-29.5134` -> `-29`)
 * Strings: drop some of characters in the back (e.g. `"Hello world!"` -> `"Hello"`)
-* Containers: remove some of the elements (in the back) 
+* Containers: remove some of the elements (in the back)
     * `[0,1,2,3,4,5]` -> `[0,1,2]`
-   
+
 *Shrinking* also shines during the early stage of writing a test. It can quickly summarize a test failure so that we can easily identify whether it was the component that had a bug or the test itself that was badly designed.

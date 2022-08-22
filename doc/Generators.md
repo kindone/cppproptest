@@ -2,7 +2,7 @@
 
 ## Generators in Property-based testing
 
-Property-based testing clearly separates concepts of input domain and property. _Generators_ are the representation of input domain for a property-based test. A _generator_ is basically a function that can generate random values with some constraint. 
+Property-based testing clearly separates concepts of input domain and property. _Generators_ are the representation of input domain for a property-based test. A _generator_ is basically a function that can generate random values with some constraint.
 A simple `forAll` statement depends on generators under the hood:
 
 ```cpp
@@ -15,9 +15,9 @@ Above `forAll` takes a function having parameters of types `int` and `std::strin
 ```cpp
 forAll([](int age, std::string name) {
 }, Arbitrary<int>(), Arbitrary<std::string>());
-``` 
+```
 
-Notice the extra arguments `Arbitrary<int>()` and `Arbitrary<std::string>()`. As you can see, `forAll` actually needs some information how to generate values of the parameter types. They can be ommitted if you're using the defaults, the _arbitraries_. 
+Notice the extra arguments `Arbitrary<int>()` and `Arbitrary<std::string>()`. As you can see, `forAll` actually needs some information how to generate values of the parameter types. They can be ommitted if you're using the defaults, the _arbitraries_.
 
 &nbsp;
 
@@ -26,15 +26,15 @@ Notice the extra arguments `Arbitrary<int>()` and `Arbitrary<std::string>()`. As
 ### Arbitrary lets you omit generator arguments
 
 An `Arbitrary<T>` or its alias `Arbi<T>` is a generator type (that also coerces to `GenFunction<T>`).
-These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no other generator is specified. 
+These generator types are specially treated in `cppproptest`. An arbitrary serves as globally defined default _generator_ for the type. If a default generator for a type is available, `cppproptest` uses that generator to generate a value of that type, if no other generator is specified.
 
 ```cpp
-// if there is no default generator available, you must provide a generator for the type. 
+// if there is no default generator available, you must provide a generator for the type.
 forAll([](SomeNewType x) {
 }, someNewTypeGen);
 
 
-// if there is a default generator (Arbitrary<SomeType>) available, you may use that generator by omitting the argument 
+// if there is a default generator (Arbitrary<SomeType>) available, you may use that generator by omitting the argument
 forAll([](SomeType x) {
 });
 ```
@@ -42,11 +42,11 @@ forAll([](SomeType x) {
 
 ### Built-in Arbitraries
 
-`cppproptest` provides a set of built-in generators for immediate generation of types that are often used in practice. Built-in generators are in the form of Arbitraries. 
+`cppproptest` provides a set of built-in generators for immediate generation of types that are often used in practice. Built-in generators are in the form of Arbitraries.
 
 Here's quick reference for built-in arbitraries
 
- Purpose                                             | Examples                                   | Generator                             | 
+ Purpose                                             | Examples                                   | Generator                             |
 |----------------------------------------------------| -------------------------------------------|---------------------------------------|
 | Generate a boolean                                 | `true` or `false`                          | `Arbi<bool>()`                        |
 | Generate a character                               | `'c'` or `'%'`                             | `Arbi<char>()`                        |
@@ -64,56 +64,56 @@ Here's quick reference for built-in arbitraries
 * Character type: `char`
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
-* String types: 
+* String types:
         * `std::string` (defaults to generate ASCII character strings in \[0x01, 0x7F\] range)
-	* `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbi<UTF8String>`)
-	* `CESU8String` (similar to UTF-8, but can be used to generate valid [CESU-8](https://en.wikipedia.org/wiki/CESU-8) strings)
-	* `UTF16BEString` and `UTF16LEString` for [UTF-16](https://en.wikipedia.org/wiki/UTF-16) big and little endian strings. CESU-8 and Unicode types produce full unicode code point range of \[0x1, 0x10FFFF\], excluding forbidden surrogate code points (\[0xD800, 0xDFFF\])
+    * `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbi<UTF8String>`)
+    * `CESU8String` (similar to UTF-8, but can be used to generate valid [CESU-8](https://en.wikipedia.org/wiki/CESU-8) strings)
+    * `UTF16BEString` and `UTF16LEString` for [UTF-16](https://en.wikipedia.org/wiki/UTF-16) big and little endian strings. CESU-8 and Unicode types produce full unicode code point range of \[0x1, 0x10FFFF\], excluding forbidden surrogate code points (\[0xD800, 0xDFFF\])
 * Shared pointers: `std::shared_ptr<T>` where an `Arbi<T>` or a custom generator for `T` is available. It's also useful for generating polymorphic types.
-	```cpp
-	struct Action {
-	    virtual int get() = 0;
-	};
-	struct Insert : Action {
-	    virtual void get() { return 1; }
-	};
-	struct Delete : Action {
-	    virtual void get() { return 2; }	
-	};
-	Generator<std::shared_ptr<Action>>(...); // can hold both Insert and Delete
-	```
+    ```cpp
+    struct Action {
+        virtual int get() = 0;
+    };
+    struct Insert : Action {
+        virtual void get() { return 1; }
+    };
+    struct Delete : Action {
+        virtual void get() { return 2; }
+    };
+    Generator<std::shared_ptr<Action>>(...); // can hold both Insert and Delete
+    ```
 * Standard containers: `std::string`, `std::vector`, `std::list`, `std::set`, `std::pair`, `std::tuple`, `std::map`
-	* Arbitraries for containers can optionally take a generator for their element types
-		```cpp
-		// You can supply a specific generator for integers
-		auto vecInt0to100 = Arbi<std::vector<int>>(interval<int>(0,100));
-		// otherwise, Arbi<int> is used
-		auto vecInt = Arbi<std::vector<int>>();
-		
-		// string aarbitraries also take optional element generator
-		auto uppercaseGen = Arbi<std::string>(interval('A', 'Z'));
-		auto alphabetGen = Arbi<std::string>(unionOf(interval('A', 'Z'), interval('a','z')));
-		```
+    * Arbitraries for containers can optionally take a generator for their element types
+        ```cpp
+        // You can supply a specific generator for integers
+        auto vecInt0to100 = Arbi<std::vector<int>>(interval<int>(0,100));
+        // otherwise, Arbi<int> is used
+        auto vecInt = Arbi<std::vector<int>>();
 
-	* `Arbi<std::Map>` provides setter methods for assigning key and value generators
+        // string aarbitraries also take optional element generator
+        auto uppercaseGen = Arbi<std::string>(interval('A', 'Z'));
+        auto alphabetGen = Arbi<std::string>(unionOf(interval('A', 'Z'), interval('a','z')));
+        ```
 
-		```cpp
-		auto mapGen = Arbi<std::map<int,int>>();
-		mapGen.setKeyGen(interval<int>(0,100)); // key ranges from 0 to 100
-		mapGen.setElemGen(interval<int>(-100, 100)); // value ranges from -100 to 100
-		```
+    * `Arbi<std::Map>` provides setter methods for assigning key and value generators
 
-   	* Containers provide methods for configuring desired sizes
-		* `setMinSize(size)`, `setMaxSize(size)` for restricting to specific range of sizes
-		* `setSize(size)` for restricting to specific size
+        ```cpp
+        auto mapGen = Arbi<std::map<int,int>>();
+        mapGen.setKeyGen(interval<int>(0,100)); // key ranges from 0 to 100
+        mapGen.setElemGen(interval<int>(-100, 100)); // value ranges from -100 to 100
+        ```
 
-		```cpp
-		auto vecInt = Arbi<std::vector<int>>();
-		vecInt.setSize(10); // 1) generated vector will always have size 10
-		vecInt.setMinSize(1); // 2) generated vector will have size >= 1
-		vecInt.setMaxSize(10); // generated vector will have size <= 10
-		vecInt.setSize(1, 10); // 3) generated vector will have size >= 1 and size <= 10
-		```
+       * Containers provide methods for configuring desired sizes
+        * `setMinSize(size)`, `setMaxSize(size)` for restricting to specific range of sizes
+        * `setSize(size)` for restricting to specific size
+
+        ```cpp
+        auto vecInt = Arbi<std::vector<int>>();
+        vecInt.setSize(10); // 1) generated vector will always have size 10
+        vecInt.setMinSize(1); // 2) generated vector will have size >= 1
+        vecInt.setMaxSize(10); // generated vector will have size <= 10
+        vecInt.setSize(1, 10); // 3) generated vector will have size >= 1 and size <= 10
+        ```
 
 
 ### Defining an arbitrary
@@ -159,8 +159,8 @@ You can find the full list of such helpers in section [Utility methods in standa
 ## Building Custom Generators with Generator Combinators
 
 While you can build your own generator by manually defining a `GenFunction<T>` for type `T`, it's usually not recommended as there is a better option - generator combinators.
-Generator combinators are toolkit for building new generators based on existing ones. 
-They can be chained to create another generator out of themselves. See [Combinators](./Combinators.md) page for the detail. 
+Generator combinators are toolkit for building new generators based on existing ones.
+They can be chained to create another generator out of themselves. See [Combinators](./Combinators.md) page for the detail.
 
 
 &nbsp;
@@ -182,7 +182,7 @@ template <typename T>
 using GenFunction = std::function<Shrinkable<T>(Random&);
 ```
 
-By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following: 
+By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following:
 
 ```cpp
 // lambda style

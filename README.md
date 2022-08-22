@@ -17,13 +17,13 @@ You can get started with `cppproptest` on this [page](doc/GettingStarted.md).
 
 ## Generalization and abstraction
 
-Property-based testing, or PBT in short, lets you write a test using abstract idea, instead of some dummy examples or contrived scenarios that are either too trivivial or too complicated. You can write tests using specification or requirements - which are essentially  combination of input domain (=generators) and expected behavior (=properties) of the tested component. 
+Property-based testing, or PBT in short, lets you write a test using abstract idea, instead of some dummy examples or contrived scenarios that are either too trivivial or too complicated. You can write tests using specification or requirements - which are essentially  combination of input domain (=generators) and expected behavior (=properties) of the tested component.
 
 Property-based tests can immediately replace example-based tests, such as:
 
 ```cpp
 MyEncoder encoder;
-MyDecoder decoder;    
+MyDecoder decoder;
 auto original = "Some dummy content that hopefully prove or disprove this encoder/decoder works";
 auto encoded = encoder.encode(original);
 auto decoded = decoder.decode(encoded);
@@ -36,7 +36,7 @@ When this is turned into a property-based test, it fully tests the components ag
 forAll([](std::string original) {
     // a text encoded and then decoded must be identical to original
     MyEncoder encoder;
-    MyDecoder decoder;    
+    MyDecoder decoder;
     auto encoded = encoder.encode(original);
     auto decoded = decoder.decode(encoded);
     PROP_ASSERT_EQ(original, decoded);
@@ -47,7 +47,7 @@ Example inputs were turned into fully randomized inputs. As a result, we can say
 
 ## Clear separation of variants and invariants
 
-Describing a test using input domain and expected behavior means that we have clear cut between variants and invariants. 
+Describing a test using input domain and expected behavior means that we have clear cut between variants and invariants.
 We often mix variants and invariants in our tests in typical *example-based tests*. This is one of the reasons why those tests become hard to maintain and difficult to read over time. With property-based tests, however, we can clearly separate invariants as properties and variants as input domain. Thus tests become more readable, gets easier to maintain, and carry test writers' intention better.
 
 ## Convenience and versatility
@@ -61,7 +61,7 @@ auto stringGen = Arbitrary<int>()
     .map([] (int& num) {
         return "<" + std::to_string(numStr) + ">"; // string like "<0>", ..., "<n>"
     });
-    
+
 // property
 forAll([](std::string original) {
     // ... //
