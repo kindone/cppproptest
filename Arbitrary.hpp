@@ -97,7 +97,6 @@ struct ArbiBase : public GenBase<T>
     template <typename FACTORY>
     decltype(auto) pairWith(FACTORY&& genFactory)
     {
-        using GEN = invoke_result_t<FACTORY, T&>;
         using U = typename invoke_result_t<invoke_result_t<FACTORY, T&>, Random&>::type;
         return pairWith<U>(util::forward<FACTORY>(genFactory));
     }
