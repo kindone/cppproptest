@@ -21,7 +21,7 @@ class Arbi<shared_ptr<T>> final : public ArbiBase<shared_ptr<T>> {
 public:
     Arbi() : elemGen(Arbi<T>()) {}
 
-    Arbi(const Arbi<T>& _elemGen) : elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); }) {}
+    Arbi(Arbi<T>& _elemGen) : elemGen([_elemGen](Random& rand) mutable -> Shrinkable<T> { return _elemGen(rand); }) {}
 
     Arbi(GenFunction<T> _elemGen) : elemGen(_elemGen) {}
 

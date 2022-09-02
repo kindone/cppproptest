@@ -125,6 +125,7 @@ SET(compile_sources
     test/compile/stream.cpp
     test/compile/example.cpp
     test/compile/arbitrary.cpp
+    test/compile/container.cpp
 )
 
 ADD_EXECUTABLE(compile_proptest

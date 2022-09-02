@@ -42,9 +42,9 @@ public:
 
     Arbi() : ArbiContainer<Set>(defaultMinSize, defaultMaxSize), elemGen(Arbi<T>()) {}
 
-    Arbi(const Arbi<T>& _elemGen)
+    Arbi(Arbi<T>& _elemGen)
         : ArbiContainer<Set>(defaultMinSize, defaultMaxSize),
-          elemGen([_elemGen](Random& rand) -> Shrinkable<T> { return _elemGen(rand); })
+          elemGen([_elemGen](Random& rand) mutable -> Shrinkable<T> { return _elemGen(rand); })
     {
     }
 
