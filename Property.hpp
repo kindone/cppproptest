@@ -80,6 +80,7 @@ public:
     using GenTuple = tuple<GenFunction<decay_t<ARGS>>...>;
 
 private:
+    using ArgTuple = tuple<decay_t<ARGS>...>;
     using ValueTuple = tuple<Shrinkable<decay_t<ARGS>>...>;
     using ShrinksTuple = tuple<Stream<Shrinkable<decay_t<ARGS>>>...>;
 
@@ -305,16 +306,15 @@ public:
     }
 
 private:
-    template <size_t N, typename Replace>
-    bool test(ValueTuple&& valueTup, Replace&& replace)
+    template <typename Invoker, typename Replace>
+    bool test(Invoker invoker, ValueTuple&& valueTup, Replace&& replace)
     {
         bool result = false;
         auto values = util::transformHeteroTuple<util::ShrinkableGet>(util::forward<ValueTuple>(valueTup));
         try {
             if (onStartupPtr)
                 (*onStartupPtr)();
-            result = util::invokeWithArgTupleWithReplace<N>(getFunc(), util::forward<decltype(values)>(values),
-                                                            replace.get());
+            result = invoker(getFunc(), util::forward<decltype(values)>(values), replace.get());
             if (onCleanupPtr)
                 (*onCleanupPtr)();
         } catch (const AssertFailed&) {
@@ -352,7 +352,9 @@ private:
             while (iter.hasNext()) {
                 // get shrinkable
                 auto next = iter.next();
-                if (!test<N>(util::forward<ValueTuple>(valueTup), next) || context.hasFailures()) {
+                if (!test(util::invokeWithArgTupleWithReplace<N, Func&, ArgTuple, typename decltype(next)::type>,
+                          util::forward<ValueTuple>(valueTup), next) ||
+                    context.hasFailures()) {
                     shrinks = next.shrinks();
                     get<N>(valueTup) = next;
                     shrinkFound = true;

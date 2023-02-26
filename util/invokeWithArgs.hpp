@@ -31,7 +31,7 @@ enable_if_t<N != M, tuple_element_t<M, Tuple>> ReplaceHelper(Tuple&& valueTup, R
 }
 
 template <size_t N, typename Function, typename Tuple, typename Replace, size_t... index>
-decltype(auto) invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&& replace, index_sequence<index...>)
+bool invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&& replace, index_sequence<index...>)
 {
     /*static_assert(is_same<Replace,
         typename tuple_element<N,Tuple>::type >::value, "");*/
@@ -39,7 +39,7 @@ decltype(auto) invokeWithReplaceHelper(Function&& f, Tuple&& valueTup, Replace&&
 }
 
 template <size_t N, typename Function, typename ArgTuple, typename Replace>
-decltype(auto) invokeWithArgTupleWithReplace(Function&& f, ArgTuple&& argTup, Replace&& replace)
+bool invokeWithArgTupleWithReplace(Function&& f, ArgTuple&& argTup, Replace&& replace)
 {
     constexpr auto Size = tuple_size<ArgTuple>::value;
     return invokeWithReplaceHelper<N>(util::forward<Function>(f), util::forward<decltype(argTup)>(argTup),
