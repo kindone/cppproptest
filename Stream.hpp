@@ -11,9 +11,9 @@ struct Iterator;
 
 struct Stream
 {
-    Stream() {}
-    Stream(const Stream& other) : headPtr(other.headPtr), tailGen(other.tailGen) {}
-    Stream(const shared_ptr<Stream>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
+    Stream();
+    Stream(const Stream& other);
+    Stream(const shared_ptr<Stream>& other);
 
     template <typename T>
     Stream(const shared_ptr<T>& h, function<Stream()> gen)
@@ -33,26 +33,14 @@ struct Stream
     {
     }
 
-    Stream& operator=(const Stream& other)
-    {
-        headPtr = other.headPtr;
-        tailGen = other.tailGen;
+    Stream& operator=(const Stream& other);
 
-        return *this;
-    }
-
-    bool isEmpty() const { return !static_cast<bool>(headPtr); }
+    bool isEmpty() const;
 
     template <typename T>
     T head() const { return any_cast<T>(*headPtr); }
 
-    Stream tail() const
-    {
-        if (isEmpty())
-            return Stream();
-
-        return Stream((*tailGen)());
-    }
+    Stream tail() const;
 
     template <typename T>
     Iterator<T> iterator() const { return Iterator<T>{Stream{*this}}; }
@@ -101,39 +89,16 @@ struct Stream
         }
     }
 
-    Stream concat(const Stream& other) const
-    {
-        if (isEmpty())
-            return other;
-        else {
-            return Stream(headPtr,
-                             [tailGen = this->tailGen, other]() { return Stream((*tailGen)()).concat(other); });
-        }
-    }
+    Stream concat(const Stream& other) const;
 
-    Stream take(int n) const
-    {
-        if (isEmpty())
-            return empty();
-        else {
-            auto self = *this;
-            if (n == 0)
-                return Stream::empty();
-
-            return Stream(headPtr, [self, n]() { return Stream(self.tail()).take(n - 1); });
-        }
-    }
+    Stream take(int n) const;
 
     shared_ptr<util::any> headPtr;
     shared_ptr<function<Stream()>> tailGen;
 
-    static Stream empty() { return Stream(); }
+    static Stream empty();
 
-    static function<Stream()> done()
-    {
-        static auto produceEmpty = +[]() -> Stream { return empty(); };
-        return produceEmpty;
-    }
+    static function<Stream()> done();
 
     template <typename T>
     static Stream one(T&& a) { return Stream(a); }

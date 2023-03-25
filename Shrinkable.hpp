@@ -10,13 +10,23 @@ struct Shrinkable;
 template <typename T, typename... Args>
 Shrinkable<T> make_shrinkable(Args&&... args);
 
+struct ShrinkableBase {
+    ShrinkableBase(const shared_ptr<void>& p, const shared_ptr<function<Stream()>>& _shrinks) : ptr(p), shrinksPtr(_shrinks)
+    {
+    }
+
+    shared_ptr<void> ptr;
+    shared_ptr<function<Stream()>> shrinksPtr;
+};
+
+
 template <typename T>
-struct Shrinkable
+struct Shrinkable : public ShrinkableBase
 {
     using type = T;
 
-    Shrinkable(shared_ptr<T> p) : ptr(p) { shrinksPtr = emptyPtr(); }
-    Shrinkable(const Shrinkable& other) : ptr(other.ptr), shrinksPtr(other.shrinksPtr) {}
+    Shrinkable(shared_ptr<T> p) : ShrinkableBase(static_pointer_cast<void>(p), emptyPtr()) {}
+    Shrinkable(const Shrinkable& other) : ShrinkableBase(other.ptr, other.shrinksPtr) {}
 
     Shrinkable& operator=(const Shrinkable& other)
     {
@@ -36,19 +46,19 @@ struct Shrinkable
     }
 
     // operator T() const { return get(); }
-    T get() const { return *ptr; }
-    T* getPtr() const { return ptr.get(); }
-    T& getRef() const { return *ptr.get(); }
-    shared_ptr<T> getSharedPtr() const { return ptr; }
+    T get() const { return *static_pointer_cast<T>(ptr); }
+    T* getPtr() const { return static_pointer_cast<T>(ptr).get(); }
+    T& getRef() const { return *static_pointer_cast<T>(ptr).get(); }
+    shared_ptr<T> getSharedPtr() const { return static_pointer_cast<T>(ptr); }
 
-    template <typename U = T>
+    template <typename U>
     Shrinkable<U> map(function<U(const T&)> transformer) const
     {
         auto transformerPtr = util::make_shared<decltype(transformer)>(transformer);
         return map<U>(transformerPtr);
     }
 
-    template <typename U = T>
+    template <typename U>
     Shrinkable<U> map(shared_ptr<function<U(const T&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
@@ -59,14 +69,14 @@ struct Shrinkable
         });
     }
 
-    template <typename U = T>
+    template <typename U>
     Shrinkable<U> flatMap(function<Shrinkable<U>(const T&)> transformer) const
     {
         auto transformerPtr = util::make_shared<function<Shrinkable<U>(const T&)>>(transformer);
         return flatMap<U>(transformerPtr);
     }
 
-    template <typename U = T>
+    template <typename U>
     Shrinkable<U> flatMap(shared_ptr<function<Shrinkable<U>(const T&)>> transformerPtr) const
     {
         auto thisShrinksPtr = shrinksPtr;
@@ -77,14 +87,14 @@ struct Shrinkable
         });
     }
 
-    template <typename U = T>
+    template <typename U>
     Shrinkable<U> mapShrinkable(function<Shrinkable<U>(const Shrinkable<T>&)> transformer) const
     {
         auto transformerPtr = util::make_shared<function<Shrinkable<U>(const Shrinkable<T>&)>>(transformer);
         return mapShrinkable<U>(transformerPtr);
     }
 
-    template <typename U = T>
+    template <typename U>
     Shrinkable<U> mapShrinkable(
         shared_ptr<function<Shrinkable<U>(const Shrinkable<T>&)>> transformerPtr) const
     {
@@ -256,9 +266,8 @@ struct Shrinkable
 private:
     Shrinkable() { shrinksPtr = emptyPtr(); }
 
-    Shrinkable(shared_ptr<T> p, shared_ptr<function<Stream()>> s) : ptr(p), shrinksPtr(s)
-    {
-    }
+    Shrinkable(shared_ptr<void> p, shared_ptr<function<Stream()>> s) : ShrinkableBase(p, s) { }
+    Shrinkable(shared_ptr<T> p, shared_ptr<function<Stream()>> s) : ShrinkableBase(static_pointer_cast<void>(p), s) { }
 
     shared_ptr<function<Stream()>> emptyPtr()
     {
@@ -267,12 +276,8 @@ private:
         return empty;
     }
 
-    shared_ptr<T> ptr;
-
 public:
     Stream shrinks() const { return (*shrinksPtr)(); }
-
-    shared_ptr<function<Stream()>> shrinksPtr;
 
     template <typename U, typename... Args>
     friend Shrinkable<U> make_shrinkable(Args&&... args);
