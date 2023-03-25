@@ -82,7 +82,7 @@ public:
 private:
     using ArgTuple = tuple<decay_t<ARGS>...>;
     using ValueTuple = tuple<Shrinkable<decay_t<ARGS>>...>;
-    using ShrinksTuple = tuple<Stream<Shrinkable<decay_t<ARGS>>>...>;
+    using ShrinksTuple = tuple<conditional_t<is_same_v<ARGS, bool>, Stream, Stream>...>;
 
 public:
     Property(const Func& f, const GenTuple& g) : PropertyBase(new Func(f), new GenTuple(g)) {}
@@ -341,11 +341,12 @@ private:
     template <size_t N, typename ValueTuple, typename ShrinksTuple>
     decltype(auto) shrinkN(ValueTuple&& valueTup, ShrinksTuple&& shrinksTuple)
     {
+        using ShrinksType = tuple_element_t<N, ValueTuple>;//tuple_element_t<N, tuple<Shrinkable<decay_t<ARGS>>...>>;
         auto shrinks = get<N>(shrinksTuple);
         // keep shrinking until no shrinking is possible
         while (!shrinks.isEmpty()) {
             // printShrinks(shrinks);
-            auto iter = shrinks.iterator();
+            auto iter = shrinks.template iterator<ShrinksType>();
             bool shrinkFound = false;
             PropertyContext context;
             // keep trying until failure is reproduced

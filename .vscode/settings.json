@@ -87,7 +87,8 @@
     "typeindex": "cpp",
     "valarray": "cpp",
     "variant": "cpp",
-    "queue": "cpp"
+    "queue": "cpp",
+    "any": "cpp"
   },
   "editor.formatOnSave": true,
   "files.exclude": {

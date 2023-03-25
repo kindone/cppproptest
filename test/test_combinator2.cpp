@@ -18,11 +18,11 @@ TEST(PropTest, TestTransform)
             auto shrinkable = stringGen(rand);
             cout << "string: " << shrinkable.get() << endl;
             int j = 0;
-            for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
+            for (auto itr = shrinkable.shrinks().iterator<Shrinkable<string>>(); itr.hasNext() && j < 3; j++) {
                 auto shrinkable2 = itr.next();
                 cout << "  shrink: " << shrinkable2.get() << endl;
                 int k = 0;
-                for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
+                for (auto itr2 = shrinkable2.shrinks().iterator<Shrinkable<string>>(); itr2.hasNext() && k < 3; k++) {
                     cout << "    shrink: " << itr2.next().get() << endl;
                 }
             }
@@ -47,11 +47,11 @@ TEST(PropTest, TestTransform)
             auto shrinkable = stringGen(savedRand);
             cout << "string2: " << shrinkable.get() << endl;
             int j = 0;
-            for (auto itr = shrinkable.shrinks().iterator(); itr.hasNext() && j < 3; j++) {
+            for (auto itr = shrinkable.shrinks().iterator<Shrinkable<string>>(); itr.hasNext() && j < 3; j++) {
                 auto shrinkable2 = itr.next();
                 cout << "  shrink2: " << shrinkable2.get() << endl;
                 int k = 0;
-                for (auto itr2 = shrinkable2.shrinks().iterator(); itr2.hasNext() && k < 3; k++) {
+                for (auto itr2 = shrinkable2.shrinks().iterator<Shrinkable<string>>(); itr2.hasNext() && k < 3; k++) {
                     cout << "    shrink2: " << itr2.next().get() << endl;
                 }
             }

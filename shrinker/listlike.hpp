@@ -12,8 +12,8 @@ struct VectorShrinker
 {
     using shrinkable_vector_t = vector<Shrinkable<T>>;
     using shrinkable_t = Shrinkable<shrinkable_vector_t>;
-    using stream_t = Stream<shrinkable_t>;
-    using e_stream_t = Stream<Shrinkable<T>>;
+    using stream_t = Stream;
+    using e_stream_t = Stream;
 
     static stream_t shrinkBulk(const shrinkable_t& ancestor, size_t power, size_t offset)
     {
@@ -46,7 +46,7 @@ struct VectorShrinker
                     newVec[i + frompos] = make_shrinkable<T>(ancestorVec[i + frompos].get());
                     newElemStreams->push_back(e_stream_t::empty());  // [1] -> []
                 } else {
-                    newVec[i + frompos] = (*elemStreams)[i].head();
+                    newVec[i + frompos] = (*elemStreams)[i].head<Shrinkable<T>>();
                     newElemStreams->push_back((*elemStreams)[i].tail());  // [0,4,6,7] -> [4,6,7]
                     nothingToDo = false;
                 }
@@ -134,7 +134,7 @@ struct VectorShrinker
             size_t parentSize = parent.getRef().size();
             // no further shrinking possible
             if(parentSize <= minSize || parentSize <= frontSize)
-                return Stream<Shrinkable<vector<Shrinkable<T>>>>::empty();
+                return Stream::empty();
             return shrinkMid(parent.getSharedPtr(), minSize, frontSize + 1, rearSize).shrinks();
         });
     }
@@ -159,7 +159,7 @@ struct VectorShrinker
                 if(minSize < parentSize && rearSize + 1 < parentSize)
                     return shrinkMid(parent.getSharedPtr(), minSize, 1, rearSize + 1).shrinks();
                 else
-                    return Stream<Shrinkable<vector<Shrinkable<T>>>>::empty();
+                    return Stream::empty();
             }
             // shrink front further by fixing last element in front to rear
             // [1,[2,3,4]]
@@ -198,7 +198,7 @@ struct ContainerShrinker
             size_t parentSize = parent.getRef().size();
             // no further shrinking possible
             if(parentSize <= minSize || parentSize <= frontSize)
-                return Stream<Shrinkable<Container<Shrinkable<T>>>>::empty();
+                return Stream::empty();
             return shrinkMid(parent.getSharedPtr(), minSize, frontSize + 1, rearSize).shrinks();
         });
     }
@@ -229,7 +229,7 @@ struct ContainerShrinker
                 if(minSize < parentSize && rearSize + 1 < parentSize)
                     return shrinkMid(parent.getSharedPtr(), minSize, 1, rearSize + 1).shrinks();
                 else
-                    return Stream<Shrinkable<Container<Shrinkable<T>>>>::empty();
+                    return Stream::empty();
             }
             // shrink front further by fixing last element in front to rear
             // [1,[2,3,4]]

@@ -7,8 +7,7 @@ namespace util {
 
 Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
 {
-    using shrinkable_t = Shrinkable<int64_t>;
-    using stream_t = Stream<shrinkable_t>;
+    using stream_t = Stream;
     using genfunc_t = function<stream_t(int64_t, int64_t)>;
 
     // given min, max, generate stream
@@ -48,8 +47,7 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
 
 Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
 {
-    using shrinkable_t = Shrinkable<uint64_t>;
-    using stream_t = Stream<shrinkable_t>;
+    using stream_t = Stream;
     using genfunc_t = function<stream_t(uint64_t, uint64_t)>;
 
     // given min, max, generate stream

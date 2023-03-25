@@ -4,48 +4,32 @@
 
 namespace proptest {
 
-template <typename T>
 struct Stream;
 
 template <typename T>
-struct Iterator
-{
-    Iterator(const Stream<T>& str) : stream(str) {}
+struct Iterator;
 
-    bool hasNext() const { return !stream.isEmpty(); }
-
-    T next()
-    {
-        if (!hasNext()) {
-            throw invalid_argument("iterator has no more next");
-        }
-        T value = stream.head();
-        stream = stream.tail();
-        return value;
-    }
-
-    Stream<T> stream;
-};
-
-template <typename T>
 struct Stream
 {
-    using type = T;
     Stream() {}
     Stream(const Stream& other) : headPtr(other.headPtr), tailGen(other.tailGen) {}
-    Stream(const shared_ptr<Stream<T>>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
+    Stream(const shared_ptr<Stream>& other) : headPtr(other->headPtr), tailGen(other->tailGen) {}
 
-    Stream(const T& h, function<Stream<T>()> gen)
-        : headPtr(util::make_shared<T>(h)), tailGen(util::make_shared<function<Stream<T>()>>(gen))
+    template <typename T>
+    Stream(const shared_ptr<T>& h, function<Stream()> gen)
+        : headPtr(static_pointer_cast<util::any>(h)), tailGen(util::make_shared<function<Stream()>>(gen))
     {
     }
 
-    Stream(const shared_ptr<T>& h, function<Stream<T>()> gen)
-        : headPtr(h), tailGen(util::make_shared<function<Stream<T>()>>(gen))
+    template <typename T>
+    Stream(const T& h, function<Stream()> gen)
+        : headPtr(util::make_shared<util::any>(h)), tailGen(util::make_shared<function<Stream()>>(gen))
     {
     }
 
-    Stream(const T& h) : headPtr(util::make_shared<T>(h)), tailGen(util::make_shared<function<Stream<T>()>>(done()))
+
+    template <typename T>
+    Stream(const T& h) : headPtr(util::make_shared<util::any>(h)), tailGen(util::make_shared<function<Stream()>>(done()))
     {
     }
 
@@ -59,9 +43,10 @@ struct Stream
 
     bool isEmpty() const { return !static_cast<bool>(headPtr); }
 
-    T head() const { return *headPtr; }
+    template <typename T>
+    T head() const { return any_cast<T>(*headPtr); }
 
-    Stream<T> tail() const
+    Stream tail() const
     {
         if (isEmpty())
             return Stream();
@@ -69,61 +54,64 @@ struct Stream
         return Stream((*tailGen)());
     }
 
-    Iterator<T> iterator() const { return Iterator<T>{Stream<T>{*this}}; }
+    template <typename T>
+    Iterator<T> iterator() const { return Iterator<T>{Stream{*this}}; }
 
-    template <typename U = T>
-    Stream<U> transform(function<U(const T&)> transformer)
+    template <typename T, typename U>
+    Stream transform(function<U(const T&)> transformer)
     {
         auto transformerPtr = util::make_shared<decltype(transformer)>(transformer);
-        return transform<U>(transformerPtr);
+        return transform<T, U>(transformerPtr);
     }
 
-    template <typename U = T>
-    Stream<U> transform(shared_ptr<function<U(const T&)>> transformerPtr)
+    template <typename T, typename U>
+    Stream transform(shared_ptr<function<U(const T&)>> transformerPtr)
     {
         if (isEmpty()) {
-            return Stream<U>::empty();
+            return Stream::empty();
         } else {
             auto thisTailGen = tailGen;
-            return Stream<U>((*transformerPtr)(head()), [transformerPtr, thisTailGen]() -> Stream<U> {
+            return Stream((*transformerPtr)(head<T>()), [transformerPtr, thisTailGen]() -> Stream {
                 return (*thisTailGen)().transform(transformerPtr);
             });
         }
     }
 
-    Stream<T> filter(function<bool(const T&)> criteria) const
+    template <typename T>
+    Stream filter(function<bool(const T&)> criteria) const
     {
         auto criteriaPtr = util::make_shared<decltype(criteria)>(criteria);
         return filter(criteriaPtr);
     }
 
-    Stream<T> filter(shared_ptr<function<bool(const T&)>> criteriaPtr) const
+    template <typename T>
+    Stream filter(shared_ptr<function<bool(const T&)>> criteriaPtr) const
     {
         if (isEmpty()) {
             return Stream::empty();
         } else {
-            for (auto itr = iterator(); itr.hasNext();) {
+            for (auto itr = iterator<T>(); itr.hasNext();) {
                 auto value = itr.next();
                 if ((*criteriaPtr)(value)) {
                     auto tail = itr.stream;
-                    return Stream<T>{value, [criteriaPtr, tail]() { return tail.filter(criteriaPtr); }};
+                    return Stream{value, [criteriaPtr, tail]() { return tail.filter(criteriaPtr); }};
                 }
             }
-            return Stream<T>::empty();
+            return Stream::empty();
         }
     }
 
-    Stream<T> concat(const Stream<T>& other) const
+    Stream concat(const Stream& other) const
     {
         if (isEmpty())
             return other;
         else {
-            return Stream<T>(headPtr,
+            return Stream(headPtr,
                              [tailGen = this->tailGen, other]() { return Stream((*tailGen)()).concat(other); });
         }
     }
 
-    Stream<T> take(int n) const
+    Stream take(int n) const
     {
         if (isEmpty())
             return empty();
@@ -132,27 +120,51 @@ struct Stream
             if (n == 0)
                 return Stream::empty();
 
-            return Stream(headPtr, [self, n]() { return Stream<T>(self.tail()).take(n - 1); });
+            return Stream(headPtr, [self, n]() { return Stream(self.tail()).take(n - 1); });
         }
     }
 
-    shared_ptr<T> headPtr;
-    shared_ptr<function<Stream<T>()>> tailGen;
+    shared_ptr<util::any> headPtr;
+    shared_ptr<function<Stream()>> tailGen;
 
-    static Stream<T> empty() { return Stream(); }
+    static Stream empty() { return Stream(); }
 
-    static function<Stream<T>()> done()
+    static function<Stream()> done()
     {
-        static auto produceEmpty = +[]() -> Stream<T> { return empty(); };
+        static auto produceEmpty = +[]() -> Stream { return empty(); };
         return produceEmpty;
     }
 
-    static Stream<T> one(T&& a) { return Stream(a); }
+    template <typename T>
+    static Stream one(T&& a) { return Stream(a); }
 
-    static Stream<T> two(T&& a, T&& b)
+    template <typename T>
+    static Stream two(T&& a, T&& b)
     {
-        return Stream(a, [=]() -> Stream<T> { return Stream(b); });
+        return Stream(a, [=]() -> Stream { return Stream(b); });
     }
 };
+
+
+template <typename T>
+struct Iterator
+{
+    Iterator(const Stream& str) : stream(str) {}
+
+    bool hasNext() const { return !stream.isEmpty(); }
+
+    T next()
+    {
+        if (!hasNext()) {
+            throw invalid_argument("iterator has no more next");
+        }
+        T value = stream.head<T>();
+        stream = stream.tail();
+        return value;
+    }
+
+    Stream stream;
+};
+
 
 }  // namespace proptest

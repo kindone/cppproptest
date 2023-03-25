@@ -164,7 +164,7 @@ TEST(PropTest, TestFilter3)
         auto shrinkable = evenGen(rand);
         cout << "GenShrinks: " << shrinkable.get() << endl;
         auto shrinks = shrinkable.shrinks();
-        for (auto itr = shrinks.iterator(); itr.hasNext();) {
+        for (auto itr = shrinks.iterator<Shrinkable<int>>(); itr.hasNext();) {
             cout << "  shrinks: " << itr.next().get() << endl;
         }
     }
@@ -175,7 +175,7 @@ TEST(PropTest, TestFilter3)
         auto shrinkable = evenGen(savedRand);
         cout << "GenShrinks2: " << shrinkable.get() << endl;
         auto shrinks = shrinkable.shrinks();
-        for (auto itr = shrinks.iterator(); itr.hasNext();) {
+        for (auto itr = shrinks.iterator<Shrinkable<int>>(); itr.hasNext();) {
             cout << "  shrinks2: " << itr.next().get() << endl;
         }
     }

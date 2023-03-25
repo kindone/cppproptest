@@ -10,7 +10,7 @@ class PairShrinker {
     using out_pair_t = pair<ARG1, ARG2>;
     using pair_t = pair<Shrinkable<ARG1>, Shrinkable<ARG2>>;
     using shrinkable_t = Shrinkable<pair_t>;
-    using stream_t = Stream<shrinkable_t>;
+    using stream_t = Stream;
 
 private:
     static function<stream_t(const shrinkable_t&)> shrinkFirst()

@@ -13,7 +13,7 @@ class TupleShrinker {
     using out_tuple_t = tuple<ARGS...>;
     using tuple_t = tuple<Shrinkable<ARGS>...>;
     using shrinkable_t = Shrinkable<tuple_t>;
-    using stream_t = Stream<shrinkable_t>;
+    using stream_t = Stream;
 
     static constexpr auto Size = sizeof...(ARGS);
 

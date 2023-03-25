@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <list>
 #include <vector>
 #include <set>
@@ -43,6 +44,7 @@ using std::remove_reference;
 using std::remove_reference_t;
 
 namespace util {
+using std::any;
 using std::back_inserter;
 using std::forward;
 using std::make_pair;
@@ -53,6 +55,7 @@ using std::move;
 using std::transform;
 }  // namespace util
 
+using std::conditional_t;
 using std::get;
 using std::is_lvalue_reference;
 using std::is_pointer;
@@ -68,6 +71,7 @@ using std::invoke_result_t;
 
 using std::shared_ptr;
 using std::static_pointer_cast;
+using std::any_cast;
 using std::to_string;
 using std::unique_ptr;
 

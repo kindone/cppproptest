@@ -38,8 +38,8 @@ public:
 
     using vector_t = vector<Shrinkable<T>>;
     using shrinkable_t = Shrinkable<vector_t>;
-    using stream_t = Stream<shrinkable_t>;
-    using e_stream_t = Stream<Shrinkable<T>>;
+    using stream_t = Stream;
+    using e_stream_t = Stream;
 
     Shrinkable<list<T>> operator()(Random& rand) override
     {

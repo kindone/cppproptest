@@ -72,7 +72,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto andThen = evenShrinkable.andThenStatic(
-        [evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
+        [evenShrinkable]() { return Stream::one(make_shrinkable<int>(1000)); });
 
     cout << "even.andThenStatic([1000]): " << andThen.get() << endl;
     {
@@ -80,7 +80,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto andThen2 = evenShrinkable.andThen([evenShrinkable](const Shrinkable<int>& parent) {
-        return Stream<Shrinkable<int>>::one(make_shrinkable<int>(parent.get() / 2));
+        return Stream::one(make_shrinkable<int>(parent.get() / 2));
     });
 
     cout << "even.andThen([n/2]): " << andThen2.get() << endl;
@@ -89,7 +89,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto concat = evenShrinkable.concatStatic(
-        [evenShrinkable]() { return Stream<Shrinkable<int>>::one(make_shrinkable<int>(1000)); });
+        [evenShrinkable]() { return Stream::one(make_shrinkable<int>(1000)); });
 
     cout << "even.concatStatic(1000): " << concat.get() << endl;
     {
@@ -97,7 +97,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto concat2 = evenShrinkable.concat([evenShrinkable](const Shrinkable<int>& parent) {
-        return Stream<Shrinkable<int>>::one(make_shrinkable<int>(parent.get() / 2));
+        return Stream::one(make_shrinkable<int>(parent.get() / 2));
     });
 
     cout << "even.concat(n/2): " << concat2.get() << endl;
@@ -211,7 +211,7 @@ TEST(PropTest, ShrinkVector)
         vector<T> copy = shr.get();
         if (!copy.empty())
             copy[0] /= 2;
-        return Stream<Shrinkable<vector<T>>>(make_shrinkable<vector<T>>(copy));
+        return Stream(make_shrinkable<vector<T>>(copy));
     });
 
     exhaustive(shrinkableVector, 0);
