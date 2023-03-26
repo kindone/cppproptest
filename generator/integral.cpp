@@ -4,7 +4,40 @@
 #include "util.hpp"
 #include "../util/std.hpp"
 
+
+// for template instantiations
+#define DEFINE_GENERATEINTEGER(TYPE) \
+    template Shrinkable<TYPE> generateInteger(Random& rand, TYPE min, TYPE max)
+
+#define DEFINE_NATURAL(TYPE) \
+    template Generator<TYPE> natural(TYPE max)
+
+#define DEFINE_NONNEGATIVE(TYPE) \
+    template Generator<TYPE> nonNegative(TYPE max)
+
+#define DEFINE_INTERVAL(TYPE) \
+    template Generator<TYPE> interval(TYPE min, TYPE max)
+
+#define DEFINE_INRANGE(TYPE) \
+    template Generator<TYPE> inRange(TYPE from, TYPE to)
+
+#define DEFINE_INTEGERS(TYPE) \
+    template Generator<TYPE> integers(TYPE start, TYPE count)
+
+#define DEFINE_FOR_ALL_INTTYPES(DEF) \
+    DEF(int8_t);\
+    DEF(int16_t);\
+    DEF(int32_t);\
+    DEF(int64_t);\
+    DEF(uint8_t);\
+    DEF(uint16_t);\
+    DEF(uint32_t);\
+    DEF(uint64_t)
+
+
 namespace proptest {
+
+DEFINE_FOR_ALL_INTTYPES(DEFINE_INTEGERS);
 
 Shrinkable<char> Arbi<char>::operator()(Random& rand)
 {
@@ -61,16 +94,12 @@ constexpr uint16_t Arbi<uint16_t>::boundaryValues[];
 constexpr uint32_t Arbi<uint32_t>::boundaryValues[];
 constexpr uint64_t Arbi<uint64_t>::boundaryValues[];
 
-/*
-template struct Arbi<int8_t>;
-template struct Arbi<int16_t>;
-template struct Arbi<int32_t>;
-template struct Arbi<int64_t>;
-template struct Arbi<uint8_t>;
-template struct Arbi<uint16_t>;
-template struct Arbi<uint32_t>;
-template struct Arbi<uint64_t>;
-template struct Arbi<float>;
-template struct Arbi<double>;
-*/
+// template instantiation
+DEFINE_FOR_ALL_INTTYPES(DEFINE_GENERATEINTEGER);
+DEFINE_FOR_ALL_INTTYPES(DEFINE_NATURAL);
+DEFINE_FOR_ALL_INTTYPES(DEFINE_NONNEGATIVE);
+DEFINE_FOR_ALL_INTTYPES(DEFINE_INTERVAL);
+DEFINE_FOR_ALL_INTTYPES(DEFINE_INRANGE);
+
+
 }  // namespace proptest

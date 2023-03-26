@@ -48,19 +48,31 @@ struct Stream
     template <typename T, typename U>
     Stream transform(function<U(const T&)> transformer)
     {
-        auto transformerPtr = util::make_shared<decltype(transformer)>(transformer);
-        return transform<T, U>(transformerPtr);
+        function<util::any(const util::any&)> anytransformer = [transformer](const util::any& any) -> util::any {
+            return util::any(transformer(any_cast<T>(any)));
+        };
+        auto transformerPtr = util::make_shared<decltype(anytransformer)>(anytransformer);
+        return transform2(transformerPtr);
     }
 
     template <typename T, typename U>
     Stream transform(shared_ptr<function<U(const T&)>> transformerPtr)
     {
+        function<util::any(const util::any&)> anytransformer = [transformerPtr](const util::any& any) -> util::any {
+            return util::any((*transformerPtr)(any_cast<T>(any)));
+        };
+        auto transformerPtr2 = util::make_shared<decltype(anytransformer)>(anytransformer);
+        return transform2(transformerPtr2);
+    }
+
+    Stream transform2(shared_ptr<function<util::any(const util::any&)>> transformerPtr)
+    {
         if (isEmpty()) {
             return Stream::empty();
         } else {
             auto thisTailGen = tailGen;
-            return Stream((*transformerPtr)(head<T>()), [transformerPtr, thisTailGen]() -> Stream {
-                return (*thisTailGen)().transform(transformerPtr);
+            return Stream((*transformerPtr)(*headPtr), [transformerPtr, thisTailGen]() -> Stream {
+                return (*thisTailGen)().transform2(transformerPtr);
             });
         }
     }

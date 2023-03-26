@@ -34,6 +34,7 @@ SET(proptest_sources
     generator/unicode.cpp
     shrinker/bool.cpp
     shrinker/string.cpp
+    shrinker/listlike.cpp
     combinator/intervals.cpp
     util/fork.cpp
     util/utf8string.cpp
