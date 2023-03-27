@@ -16,7 +16,7 @@ using ContainerTypes = ::testing::Types<vector<uint32_t>, set<uint32_t>, list<ui
      Nullable<uint32_t>, shared_ptr<uint32_t>, CESU8String, UTF8String, UTF16BEString, UTF16LEString>;
 
 
-TYPED_TEST_CASE(ContainerTest, ContainerTypes);
+TYPED_TEST_SUITE(ContainerTest, ContainerTypes);
 
 TYPED_TEST(ContainerTest, various_generators)
 {
