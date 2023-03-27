@@ -21,7 +21,7 @@ decltype(auto) GetShrinksHelper(const Shrinkable<T>& shr)
 template <typename T>
 struct GetShrinks
 {
-    static Stream<T> transform(T&& v) { return GetShrinksHelper(v); }
+    static Stream transform(T&& v) { return GetShrinksHelper(v); }
 };
 
 template <typename T>

@@ -34,6 +34,7 @@ SET(proptest_sources
     generator/unicode.cpp
     shrinker/bool.cpp
     shrinker/string.cpp
+    shrinker/listlike.cpp
     combinator/intervals.cpp
     util/fork.cpp
     util/utf8string.cpp
@@ -42,6 +43,7 @@ SET(proptest_sources
     util/unicode.cpp
     util/printing.cpp
     util/bitmap.cpp
+    Stream.cpp
     Property.cpp
     PropertyContext.cpp
     Random.cpp

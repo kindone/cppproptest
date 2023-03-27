@@ -47,7 +47,7 @@ Generator<pair<T, U>> dependency(GenFunction<T> gen1, function<GenFunction<U>(T&
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
-            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
+            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream {
                 // assume interShr has no shrinks
                 shared_ptr<Intermediate> interpair = interShr.getSharedPtr();
                 Shrinkable<U>& shrinkableU = interpair->second;

@@ -192,7 +192,7 @@ void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level)
     printShrinkable(shrinkable, level);
 
     auto shrinks = shrinkable.shrinks();
-    for (auto itr = shrinks.iterator(); itr.hasNext();) {
+    for (auto itr = shrinks.template iterator<proptest::Shrinkable<T>>(); itr.hasNext();) {
         auto shrinkable2 = itr.next();
         exhaustive(shrinkable2, level + 1);
     }
@@ -205,7 +205,7 @@ void exhaustive(const proptest::Shrinkable<T>& shrinkable, int level, proptest::
     func(shrinkable, level);
 
     auto shrinks = shrinkable.shrinks();
-    for (auto itr = shrinks.iterator(); itr.hasNext();) {
+    for (auto itr = shrinks.template iterator<proptest::Shrinkable<T>>(); itr.hasNext();) {
         auto shrinkable2 = itr.next();
         exhaustive(shrinkable2, level + 1, func);
     }

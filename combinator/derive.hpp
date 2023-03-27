@@ -56,7 +56,7 @@ Generator<U> derive(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
-            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
+            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream {
                 // assume interShr has no shrinks
                 Intermediate& interpair = interShr.getRef();
                 T& t = interpair.first;

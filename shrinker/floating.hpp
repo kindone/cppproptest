@@ -39,13 +39,13 @@ double composeFloat<double>(double value, int exp)
 }  // namespace util
 
 template <typename FLOATTYPE>
-Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
+Stream shrinkFloat(FLOATTYPE value)
 {
     int exp = 0;
     if (value == 0.0f) {
-        return Stream<Shrinkable<FLOATTYPE>>::empty();
+        return Stream::empty();
     } else if (isnan(value)) {
-        return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
+        return Stream::one(make_shrinkable<FLOATTYPE>(0.0f));
     } else {
         FLOATTYPE fraction = 0.0f;
         if (isinf(value)) {
@@ -67,7 +67,7 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
 
         // prepend 0.0
         floatShrinkable = floatShrinkable.with([shrinksPtr = floatShrinkable.shrinksPtr]() {
-            auto zero = Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(0.0f));
+            auto zero = Stream::one(make_shrinkable<FLOATTYPE>(0.0f));
             return zero.concat((*shrinksPtr)());
         });
 
@@ -77,11 +77,11 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
             int exp = 0;
             /*FLOATTYPE fraction = */ util::decomposeFloat(value, &exp);
             if (value == 0.0f)
-                return Stream<Shrinkable<FLOATTYPE>>::empty();
+                return Stream::empty();
             else if (value > 0) {
-                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(0.5f, exp)));
+                return Stream::one(make_shrinkable<FLOATTYPE>(util::composeFloat(0.5f, exp)));
             } else {
-                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
+                return Stream::one(make_shrinkable<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
             }
         });
 
@@ -90,9 +90,9 @@ Stream<Shrinkable<FLOATTYPE>> shrinkFloat(FLOATTYPE value)
             auto value = shr.get();
             auto intValue = static_cast<int>(value);
             if (intValue != 0 && abs(intValue) < abs(value)) {
-                return Stream<Shrinkable<FLOATTYPE>>::one(make_shrinkable<FLOATTYPE>(intValue));
+                return Stream::one(make_shrinkable<FLOATTYPE>(intValue));
             } else
-                return Stream<Shrinkable<FLOATTYPE>>::empty();
+                return Stream::empty();
         });
 
         return floatShrinkable.shrinks();

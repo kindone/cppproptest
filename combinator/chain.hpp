@@ -47,7 +47,7 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
-            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
+            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream {
                 // assume interShr has no shrinks
                 Intermediate& interpair = interShr.getRef();
                 T& t = interpair.first;
@@ -96,7 +96,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
-            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream<Shrinkable<Intermediate>> {
+            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream {
                 // assume interShr has no shrinks
                 Intermediate& interpair = interShr.getRef();
                 Chain<T0, T1, Ts...>& ts = interpair.first;
