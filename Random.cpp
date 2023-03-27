@@ -110,7 +110,7 @@ int64_t getCurrentTime()
 {
     auto curTime = std::chrono::system_clock::now();
     auto duration = curTime.time_since_epoch();
-    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    auto millis = duration_cast<util::milliseconds>(duration).count();
     return millis;
 }
 

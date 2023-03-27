@@ -140,6 +140,18 @@ public:
     }
 
     /**
+     * @brief Sets the timeout duration.
+     *
+     * @param durationMs maximum time to spend in the main loop, in milliseconds. Default is 0 meaning there is no timeout.
+     * @return Property& `Property` object itself for chaining
+     */
+    Property& setMaxDurationMs(uint32_t durationMs)
+    {
+        maxDurationMs = durationMs;
+        return *this;
+    }
+
+    /**
      * @brief Executes randomized tests for given property. If explicit generator arguments are omitted, utilizes
      * default generators (a.k.a. Arbitraries) instead
      *
@@ -163,10 +175,20 @@ public:
         cout << "random seed: " << seed << endl;
         PropertyContext ctx;
         auto curGenTup = util::overrideTuple(getGenTup(), gens...);
+        auto startedTime = steady_clock::now();
 
         int i = 0;
         try {
             for (; i < numRuns; i++) {
+                if(maxDurationMs != 0) {
+                    auto currentTime = steady_clock::now();
+                    if(duration_cast<util::milliseconds>(currentTime - startedTime).count() > maxDurationMs)
+                    {
+                        cout << "Timed out after " << duration_cast<util::milliseconds>(currentTime - startedTime).count() << "ms , passed " << i << " tests" << endl;
+                        ctx.printSummary();
+                        return true;
+                    }
+                }
                 bool pass = true;
                 do {
                     pass = true;

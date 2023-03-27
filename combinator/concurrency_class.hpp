@@ -43,7 +43,8 @@ public:
         : initialGenPtr(_initialGenPtr),
           actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
-          numRuns(defaultNumRuns)
+          numRuns(defaultNumRuns),
+          maxDurationMs(0)
     {
     }
 
@@ -53,7 +54,8 @@ public:
           modelFactoryPtr(_modelFactoryPtr),
           actionListGenPtr(_actionListGenPtr),
           seed(getCurrentTime()),
-          numRuns(defaultNumRuns)
+          numRuns(defaultNumRuns),
+          maxDurationMs(0)
     {
     }
 
@@ -75,12 +77,19 @@ public:
         return *this;
     }
 
+    Concurrency& setMaxDurationMs(uint32_t durationMs)
+    {
+        maxDurationMs = durationMs;
+        return *this;
+    }
+
 private:
     shared_ptr<ObjectTypeGen> initialGenPtr;
     shared_ptr<ModelTypeGen> modelFactoryPtr;
     shared_ptr<ActionListGen> actionListGenPtr;
     uint64_t seed;
-    int numRuns;
+    uint32_t numRuns;
+    uint32_t maxDurationMs;
 };
 
 template <typename ActionType>
@@ -105,8 +114,17 @@ bool Concurrency<ActionType>::go(function<void(ObjectType&, ModelType&)> postChe
     cout << "random seed: " << seed << endl;
     PropertyContext ctx;
     int i = 0;
+    auto startedTime = steady_clock::now();
     try {
         for (; i < numRuns; i++) {
+            if(maxDurationMs != 0) {
+                auto currentTime = steady_clock::now();
+                if(duration_cast<util::milliseconds>(currentTime - startedTime).count() > maxDurationMs)
+                {
+                    cout << "Timed out after " << duration_cast<util::milliseconds>(currentTime - startedTime).count() << "ms , passed " << i << " tests" << endl;
+                    return true;
+                }
+            }
             bool pass = true;
             do {
                 pass = true;

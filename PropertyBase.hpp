@@ -76,7 +76,7 @@ class PROPTEST_API PropertyBase {
 public:
     template <typename Func, typename GenTuple>
     PropertyBase(Func* _funcPtr, GenTuple* _genTupPtr)
- : seed(util::getGlobalSeed()), numRuns(defaultNumRuns), funcPtr(_funcPtr), genTupPtr(_genTupPtr)  {}
+ : seed(util::getGlobalSeed()), numRuns(defaultNumRuns), maxDurationMs(defaultMaxDurationMs), funcPtr(_funcPtr), genTupPtr(_genTupPtr)  {}
 
     static void setDefaultNumRuns(uint32_t);
     static void tag(const char* filename, int lineno, string key, string value);
@@ -93,10 +93,13 @@ protected:
     bool invoke(Random& rand);
 
     static uint32_t defaultNumRuns;
+    static uint32_t defaultMaxDurationMs;
 
     // TODO: configurations
     uint64_t seed;
     uint32_t numRuns;
+
+    uint32_t maxDurationMs; // indefinitely if 0
 
     shared_ptr<void> funcPtr;
     shared_ptr<void> genTupPtr;

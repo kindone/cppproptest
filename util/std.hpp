@@ -107,4 +107,10 @@ using std::true_type;
 using std::conjunction_v;
 using std::is_convertible_v;
 
+using std::chrono::steady_clock;
+using std::chrono::duration_cast;
+namespace util {
+using std::chrono::milliseconds;
+}
+
 }  // namespace proptest

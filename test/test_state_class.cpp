@@ -143,3 +143,19 @@ TEST(StateTest, StatesWithModel2)
         Arbi<vector<int>>(), [](vector<int>& sys) { return VectorModel(sys.size()); }, actionListGen);
     prop.go();
 }
+
+TEST(StateTest, StatesTimed)
+{
+     auto actionListGen = actionListGenOf<VectorAction2>(
+        Arbi<int>().map<shared_ptr<VectorAction2>>([](int& value) { return util::make_shared<PushBack2>(value); }),
+        Arbi<int>().map<VectorAction2*>([](int& value) { return new PushBack2(value); }),
+        lazy<VectorAction2*>([]() { return new PopBack2(); }), lazy<VectorAction2*>([]() { return new Clear2(); }));
+
+    auto prop = statefulProperty<VectorAction2>(
+        Arbi<vector<int>>(), [](vector<int>& sys) { return VectorModel(sys.size()); }, actionListGen);
+    
+    auto startTime = steady_clock::now();
+    prop.setNumRuns(1000000).setMaxDurationMs(2000).go();
+    auto endTime = steady_clock::now();
+    EXPECT_GE(duration_cast<util::milliseconds>(endTime - startTime).count(), 2000);
+}

@@ -102,5 +102,8 @@ TEST(StateTest, StateFunctionWithModel)
         // PROP_ASSERT(false);
     });
     prop.setPostCheck([](T&, Model&) { cout << "postCheck" << endl; });
-    prop.setSeed(0).setNumRuns(10).go();
+    auto startTime = steady_clock::now();
+    prop.setSeed(0).setNumRuns(1000000).setMaxDurationMs(2000).go();
+    auto endTime = steady_clock::now();
+    EXPECT_GE(duration_cast<util::milliseconds>(endTime - startTime).count(), 2000);
 }

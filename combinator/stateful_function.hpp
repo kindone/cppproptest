@@ -34,7 +34,7 @@ class StatefulProperty {
 
 public:
     StatefulProperty(InitialGen&& initGen, ModelFactoryFunction mdlFactory, ActionGen<ObjectType, ModelType>& actGen)
-        : seed(UINT64_MAX), numRuns(UINT32_MAX), initialGen(initGen), modelFactory(mdlFactory), actionGen(actGen)
+        : seed(UINT64_MAX), numRuns(UINT32_MAX), maxDurationMs(UINT32_MAX), initialGen(initGen), modelFactory(mdlFactory), actionGen(actGen)
     {
     }
 
@@ -47,6 +47,12 @@ public:
     StatefulProperty& setNumRuns(uint32_t runs)
     {
         numRuns = runs;
+        return *this;
+    }
+
+    StatefulProperty& setMaxDurationMs(uint32_t durationMs)
+    {
+        maxDurationMs = durationMs;
         return *this;
     }
 
@@ -108,12 +114,15 @@ public:
             prop->setSeed(seed);
         if (numRuns != UINT32_MAX)
             prop->setNumRuns(numRuns);
+        if (maxDurationMs != UINT32_MAX)
+            prop->setMaxDurationMs(maxDurationMs);
         return prop->forAll();
     }
 
 private:
     uint64_t seed;
     uint32_t numRuns;
+    uint32_t maxDurationMs;
     InitialGen initialGen;
     ModelFactoryFunction modelFactory;
     ActionGen<ObjectType, ModelType> actionGen;

@@ -360,3 +360,15 @@ TEST(PropTest, DISABLED_TestExpectDeath)
         // EXPECT_DEATH(, ".*") << "vector: " << vec.size() << ", n: " << n;
     });
 }
+
+TEST(StateTest, PropertyTimed)
+{
+    auto prop = property([](int value) {
+        PROP_STAT(value > 0);
+    });
+    auto startTime = steady_clock::now();
+    prop.setMaxDurationMs(2000).setNumRuns(10000000).forAll();
+    auto endTime = steady_clock::now();
+
+    EXPECT_GE(duration_cast<util::milliseconds>(endTime - startTime).count(), 2000);
+}

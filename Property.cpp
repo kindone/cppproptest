@@ -22,6 +22,7 @@ uint64_t getGlobalSeed()
 
 PropertyContext* PropertyBase::context = nullptr;
 uint32_t PropertyBase::defaultNumRuns = 1000;
+uint32_t PropertyBase::defaultMaxDurationMs = 0;
 
 void PropertyBase::setContext(PropertyContext* ctx)
 {

@@ -94,6 +94,12 @@ public:
         return *this;
     }
 
+    StatefulProperty& setMaxDurationMs(uint32_t maxDurationMs)
+    {
+        prop->setMaxDurationMs(maxDurationMs);
+        return *this;
+    }
+
     bool go() { return prop->forAll(); }
 
 private:
