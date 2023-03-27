@@ -1,15 +1,14 @@
 #pragma once
 
+#include "api.hpp"
 #include "util/std.hpp"
 
 namespace proptest {
 
-struct Stream;
-
 template <typename T>
 struct Iterator;
 
-struct Stream
+struct PROPTEST_API Stream
 {
     Stream();
     Stream(const Stream& other);

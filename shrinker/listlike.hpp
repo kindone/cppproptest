@@ -28,7 +28,7 @@ struct VectorShrinker
 }  // namespace util
 
 
-Shrinkable<vector<Shrinkable<util::any>>> shrinkMembershipwise(const shared_ptr<vector<Shrinkable<util::any>>>& shrinkableCont, size_t minSize);
+PROPTEST_API Shrinkable<vector<Shrinkable<util::any>>> shrinkMembershipwise(const shared_ptr<vector<Shrinkable<util::any>>>& shrinkableCont, size_t minSize);
 
 /**
  * @brief Shrinking of a container (such as a set) using membership-wise shrinking
@@ -46,7 +46,7 @@ Shrinkable<Container<T>> shrinkContainer(const shared_ptr<Container<Shrinkable<T
 {
     // change type to any
     shared_ptr<vector<Shrinkable<util::any>>> shrinkAnyVec = util::make_shared<vector<Shrinkable<util::any>>>();
-    transform(shrinkableCont->begin(), shrinkableCont->end(), back_inserter(*shrinkAnyVec), [](Shrinkable<T> shr) {
+    util::transform(shrinkableCont->begin(), shrinkableCont->end(), util::back_inserter(*shrinkAnyVec), [](Shrinkable<T> shr) {
         return shr.template map<util::any>(+[](const T& t) { return util::any{t}; });
     });
     // membershipwise shrinking
@@ -94,8 +94,8 @@ Shrinkable<ListLike<T>> shrinkListLike(const shared_ptr<vector<Shrinkable<util::
         +[](const vector<Shrinkable<util::any>>& _shrinkAnyVec) -> Shrinkable<ListLike<T>> {
             auto value = make_shrinkable<ListLike<T>>();
             ListLike<T>& valueVec = value.getRef();
-            transform(
-                _shrinkAnyVec.begin(), _shrinkAnyVec.end(), back_inserter(valueVec),
+            util::transform(
+                _shrinkAnyVec.begin(), _shrinkAnyVec.end(), util::back_inserter(valueVec),
                 +[](const Shrinkable<util::any>& shr) -> T { return any_cast<T>(shr.getRef()); });
             return value;
         });
