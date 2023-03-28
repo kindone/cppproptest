@@ -1,0 +1,899 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="C++ Property Testing">
+      
+      
+        <meta name="author" content="kindone">
+      
+      
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/StatefulTesting/">
+      
+      
+        <link rel="prev" href="../Printing/">
+      
+      
+        <link rel="next" href="../ConcurrencyTesting/">
+      
+      <link rel="icon" href="../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.4">
+    
+    
+      
+        <title>Stateful Testing - cppproptest</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.240905d7.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:300,300i,400,400i,700,700i%7CSpace+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Slab";--md-code-font:"Space Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="light-blue">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#stateful-testing" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="cppproptest" class="md-header__button md-logo" aria-label="cppproptest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            cppproptest
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Stateful Testing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kindone/cppproptest
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="cppproptest" class="md-nav__button md-logo" aria-label="cppproptest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    cppproptest
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kindone/cppproptest
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="..">cppproptest</a>
+          
+            <label for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          cppproptest
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GettingStarted/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Generators/" class="md-nav__link">
+        Generating Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Combinators/" class="md-nav__link">
+        Generator Combinators
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Shrinking/" class="md-nav__link">
+        Simplifying Failed Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Printing/" class="md-nav__link">
+        Printing Facilities
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Stateful Testing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Stateful Testing
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-action-functions" class="md-nav__link">
+    Using Action Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Using Action Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-simpleaction-working-without-a-model" class="md-nav__link">
+    Option 1: SimpleAction - Working without a model
+  </a>
+  
+    <nav class="md-nav" aria-label="Option 1: SimpleAction - Working without a model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#putting-it-together" class="md-nav__link">
+    Putting it together:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-action-working-with-a-model" class="md-nav__link">
+    Option 2: Action - Working with a model
+  </a>
+  
+    <nav class="md-nav" aria-label="Option 2: Action - Working with a model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#putting-it-together_1" class="md-nav__link">
+    Putting it together:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-stateful-test-failures" class="md-nav__link">
+    Debugging stateful test failures
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuring-stateful-test-runs" class="md-nav__link">
+    Configuring stateful test runs
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternative-style-using-action-classes" class="md-nav__link">
+    Alternative Style: Using Action Classes
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ConcurrencyTesting/" class="md-nav__link">
+        Concurrency Testing
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-action-functions" class="md-nav__link">
+    Using Action Functions
+  </a>
+  
+    <nav class="md-nav" aria-label="Using Action Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-simpleaction-working-without-a-model" class="md-nav__link">
+    Option 1: SimpleAction - Working without a model
+  </a>
+  
+    <nav class="md-nav" aria-label="Option 1: SimpleAction - Working without a model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#putting-it-together" class="md-nav__link">
+    Putting it together:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-action-working-with-a-model" class="md-nav__link">
+    Option 2: Action - Working with a model
+  </a>
+  
+    <nav class="md-nav" aria-label="Option 2: Action - Working with a model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#putting-it-together_1" class="md-nav__link">
+    Putting it together:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-stateful-test-failures" class="md-nav__link">
+    Debugging stateful test failures
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuring-stateful-test-runs" class="md-nav__link">
+    Configuring stateful test runs
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternative-style-using-action-classes" class="md-nav__link">
+    Alternative Style: Using Action Classes
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="stateful-testing">Stateful Testing<a class="headerlink" href="#stateful-testing" title="Permanent link">&para;</a></h1>
+<p>While property-based testing suits well with functions and stateless objects, it's also useful in testing for various state changes with ease. Typical properties we can test with stateful tests are as following:</p>
+<ul>
+<li>Test for consistency of internal state</li>
+<li>Test for memory leaks</li>
+<li>Test for concurrent accesses (see <a href="../ConcurrencyTesting/">Concurrency Testing</a> for more)</li>
+</ul>
+<p>The key idea of stateful testing with <code>cppproptest</code> is to generate <em>state changes</em>.</p>
+<ol>
+<li>Define action generators: Define <code>action</code>s that each represents unit of state change - e.g. For a numeric object, calling <code>.multiply(int multiplier)</code> method with a numeric multiplier as an argument, calling <code>.divide(int divisor)</code> method, etc.</li>
+<li>Build an action list generator: we then need a generator for the <code>action</code> types that can build a list of actions and pass required arguments to the selected actions</li>
+<li>Run the stateful test</li>
+</ol>
+<p>Say, you are to write stateful test for your <code>MyVector</code>, which is a linear container for integers.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyVector</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">push_back</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">pop_back</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">size</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="nf">at</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">pos</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">clear</span><span class="p">();</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>You first need to define actions for each state change.</p>
+<h2 id="using-action-functions">Using Action Functions<a class="headerlink" href="#using-action-functions" title="Permanent link">&para;</a></h2>
+<p>An <code>Action</code> or a <code>SimpleAction</code> is formally defined as a functor object of the form:</p>
+<p><em><code>Action&lt;ObjectType,ModelType&gt;</code>:</em>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nx">ObjectType</span><span class="o">&amp;</span><span class="p">,</span><span class="w"> </span><span class="nx">ModelType</span><span class="o">&amp;</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="ow">void</span>
+</code></pre></div></p>
+<p><em><code>SimpleAction&lt;ObjectType&gt;</code>:</em>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nx">ObjectType</span><span class="o">&amp;</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="ow">void</span>
+</code></pre></div></p>
+<p><code>ObjectType</code> refers to the type of the stateful object of our concern. <code>ModelType</code> indicates an optional object type with which we'd like to check our stateful object. This additional object is called a <em>model</em>. For example, you can mark number of elements in a model to track the inserted or removed elements in a container object. Or you could closely compare your object with an already validated implementation that works similar to yours.</p>
+<h3 id="option-1-simpleaction-working-without-a-model">Option 1: <code>SimpleAction</code> - Working without a model<a class="headerlink" href="#option-1-simpleaction-working-without-a-model" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nx">ObjectType</span><span class="o">&amp;</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="ow">void</span>
+</code></pre></div>
+<p>You can use <code>SimpleAction</code> and its variant if you do not intend to use a model object. Let's discuss this simper variant first. The function takes an <code>ObjectType</code> reference. You will typically be defining a <code>SimpleAction</code> with a lambda. Our first goal is to create a generator for our action. A generator for an action with no arguments such as <code>pop_back()</code> can be defined as:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;statefultest.hpp&quot;</span>
+
+<span class="c1">// ...</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">popBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">obj</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
+<span class="p">}));</span>
+</code></pre></div>
+<p>Notice the usage of <code>just</code> generator combinator which will always generate the same action. Compare with following <code>push_back()</code>'s action generator that requires an integer argument:</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">pushBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">([</span><span class="n">value</span><span class="p">](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">obj</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Here you can see an integer generator is transformed as an action generator. The outer lambda returns an action that calls <code>push_back()</code> with the integer argument <code>value</code>.</p>
+<p>You can add various assertions in the action. Any failed assertion will be reported and analyzed, as in ordinary property tests.</p>
+<p>With each action generator defined, we would typically combine these generators as one, using <code>oneOf</code> combinator:</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">actionGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">oneOf</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyAction</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">pushBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">popBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">clearGen</span><span class="p">);</span>
+</code></pre></div>
+<p>This will generate either of 3 actions, with evenly distributed probability (1/3).</p>
+<p>Finally, we can define a stateful property by calling <code>statefulProperty&lt;ObjectType&gt;()</code>. This method requires an initial state generator, and the <code>actionGen</code> we've just obtained. Calling <code>statefulProperty::go()</code> will execute the stateful property test.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// we can generate initial object from an arbitrary, assuming we have an Arbi&lt;MyVector&gt; defined</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statefulProperty</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">    </span><span class="cm">/* initial state generator */</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">(),</span>
+<span class="w">    </span><span class="cm">/* action generator */</span><span class="w"> </span><span class="n">actionGen</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
+
+<span class="c1">// ...</span>
+
+<span class="c1">// or, we can just initialize the object to an empty object</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statefulProperty</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">    </span><span class="cm">/* initial state generator */</span><span class="w"> </span><span class="n">just</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">([]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">MyVector</span><span class="p">();</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">    </span><span class="cm">/* action generator */</span><span class="w"> </span><span class="n">actionGen</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
+</code></pre></div>
+<h4 id="putting-it-together">Putting it together:<a class="headerlink" href="#putting-it-together" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyVector</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">push_back</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">pop_back</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">size</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="nf">at</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">clear</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">TEST</span><span class="p">(</span><span class="n">MyVectorTest</span><span class="p">,</span><span class="w"> </span><span class="n">Stateful</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">popBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+<span class="w">        </span><span class="n">obj</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
+<span class="w">        </span><span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}));</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">pushBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="p">](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+<span class="w">            </span><span class="n">obj</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+<span class="w">            </span><span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="p">};</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">clearGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">obj</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+<span class="w">        </span><span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}));</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">actionGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">oneOf</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">pushBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">popBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">weightedGen</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">clearGen</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">));</span>
+<span class="w">    </span><span class="c1">// `oneOf` can take weights, so you can adjust rate of generation of an action</span>
+<span class="w">    </span><span class="c1">//    auto actionGen = oneOf&lt;SimpleAction&lt;MyVector&gt;&gt;(pushBackGen, popBackGen, weightedGen&lt;SimpleAction&lt;MyVector&gt;&gt;(clearGen, 0.1));</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statefulProperty</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">        </span><span class="cm">/* initial state generator */</span><span class="w"> </span><span class="n">just</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">([]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">MyVector</span><span class="p">();</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">        </span><span class="cm">/* action generator */</span><span class="w"> </span><span class="n">actionGen</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Tests massive cases with randomly generated action sequences</span>
+<span class="w">    </span><span class="n">prop</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="option-2-action-working-with-a-model">Option 2: <code>Action</code> - Working with a model<a class="headerlink" href="#option-2-action-working-with-a-model" title="Permanent link">&para;</a></h3>
+<p>If you need a model for advanced tracking of state changes, use <code>Action</code> instead of <code>SimpleAction</code>. <code>Action</code> takes additional parameter indicating the model type. Let's define our model for tracking number of elements for <code>MyVector</code></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// our simple model that tracks number of elements</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Counter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Counter</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">num</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>With this defined, we can continue defining our actions.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">popBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">Action</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&amp;</span><span class="w"> </span><span class="n">counter</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="n">obj</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
+<span class="w">    </span><span class="n">counter</span><span class="p">.</span><span class="n">num</span><span class="o">--</span><span class="p">;</span>
+<span class="p">}));</span>
+</code></pre></div>
+<p>You can use <code>oneOf&lt;Action&lt;ObjectType, ModelType&gt;&gt;</code> to get the combined action generator:</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">actionGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">oneOf</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">pushBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">popBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">clearGen</span><span class="p">);</span>
+</code></pre></div>
+<p>Finally, we can define a stateful property by calling <code>statefulProperty&lt;ObjectType,ModelType&gt;()</code>. This method requires an initial state generator, and the <code>actionGen</code> we've just obtained. Compared to <code>SimpleAction</code> case, it additionally requires a model factory in the form of <code>ObjectType&amp; -&gt; ModelType</code>. This factory is to induce initial model from initial object. Calling <code>statefulProperty::go()</code> will execute the stateful property test.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statefulProperty</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">    </span><span class="cm">/* initial state generator */</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">(),</span>
+<span class="w">    </span><span class="cm">/* model factory */</span><span class="w"> </span><span class="p">[](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Counter</span><span class="p">(</span><span class="n">vec</span><span class="p">.</span><span class="n">size</span><span class="p">());</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="cm">/* action generator */</span><span class="w"> </span><span class="n">actionGen</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
+</code></pre></div>
+<p>While the model in this example is simple, you may choose to use more complex ones. It's often a clever idea to use an existing, well validated implementation as model. For example, we could use <code>std::vector&lt;int&gt;</code> as model and perform the actions on both <code>MyVector</code> and <code>std::vector</code>. We assure <code>MyVector</code> works correctly by comparing element-wise with the <code>std::vector</code> model object that has undergone the same state changes.</p>
+<h4 id="putting-it-together_1">Putting it together:<a class="headerlink" href="#putting-it-together_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyVector</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">push_back</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">pop_back</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">size</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="nf">at</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">clear</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// our simple model that tracks number of elements</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Counter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Counter</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">num</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">TEST</span><span class="p">(</span><span class="n">MyVectorTest</span><span class="p">,</span><span class="w"> </span><span class="n">Stateful</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">popBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">Action</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&amp;</span><span class="w"> </span><span class="n">cnt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span><span class="p">;</span>
+<span class="w">        </span><span class="n">obj</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cnt</span><span class="p">.</span><span class="n">num</span><span class="o">--</span><span class="p">;</span>
+<span class="w">        </span><span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">cnt</span><span class="p">.</span><span class="n">num</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}));</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">pushBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="p">](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">obj</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+<span class="w">            </span><span class="n">cnt</span><span class="p">.</span><span class="n">num</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">cnt</span><span class="p">.</span><span class="n">num</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="w">        </span><span class="p">};</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">clearGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">Action</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">obj</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+<span class="w">        </span><span class="n">cnt</span><span class="p">.</span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">cnt</span><span class="p">.</span><span class="n">num</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}));</span>
+
+<span class="w">    </span><span class="c1">// combine action generators</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">actionGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">oneOf</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">pushBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">popBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">clearGen</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// oneOf() can take weights, so you can adjust rate of generation of an action</span>
+<span class="w">    </span><span class="c1">//    auto actionGen = oneOf&lt;Action&lt;MyVector, Counter&gt;&gt;(pushBackGen, popBackGen, weightedGen&lt;Action&lt;MyVector, Counter&gt;&gt;(clearGen, 0.1));</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statefulProperty</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="p">,</span><span class="w"> </span><span class="n">Counter</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">        </span><span class="cm">/* initial state generator */</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;</span><span class="p">(),</span>
+<span class="w">        </span><span class="cm">/* initial model factory */</span><span class="w"> </span><span class="p">[](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Counter</span><span class="p">(</span><span class="n">vec</span><span class="p">.</span><span class="n">size</span><span class="p">());</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="cm">/* action generator */</span><span class="w"> </span><span class="n">actionGen</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Tests massive cases with randomly generated action sequences</span>
+<span class="w">    </span><span class="n">prop</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="debugging-stateful-test-failures">Debugging stateful test failures<a class="headerlink" href="#debugging-stateful-test-failures" title="Permanent link">&para;</a></h3>
+<p>A stateful test is succesful if all tried combinations were complete without issues. On the other hand, a failed assertion or an unexpected exception would end up with a stateful test failure. The framework will print the failed condition and tried input combinations so that you can debug the failure. Among the <code>args</code>, the first arg is the initial state, and the second one is the action list:</p>
+<div class="highlight"><pre><span></span><code>Falsifiable,<span class="w"> </span>after<span class="w"> </span><span class="m">12</span><span class="w"> </span>tests:<span class="w"> </span>vec.size<span class="o">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>count<span class="w"> </span><span class="o">(</span>test/test_state_func.cpp:111<span class="o">)</span>
+<span class="w">  </span>with<span class="w"> </span>args:<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1882384569</span>,<span class="w"> </span>-1157159508,<span class="w"> </span>...,<span class="w"> </span><span class="m">128</span>,<span class="w"> </span><span class="m">32768</span>,<span class="w"> </span><span class="m">840506558</span><span class="w"> </span><span class="o">]</span>,<span class="w"> </span><span class="o">[</span><span class="w"> </span>Action&lt;?&gt;,<span class="w"> </span>Action&lt;?&gt;,<span class="w"> </span>Action&lt;?&gt;,<span class="w"> </span>...,<span class="w"> </span>Action&lt;?&gt;<span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">}</span>
+</code></pre></div>
+<p>Note that, by default, an <code>Action</code> or a <code>SimpleAction</code> has no distinctive description. This is why there are indistinguishable <code>Action&lt;?&gt;</code>s printed in the action list. This can be avoided by prepending a description to each action constructor:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// action with no argument</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">clearGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;Clear&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}));</span>
+
+<span class="c1">// action with arguments can be printed nicely with a stringstream</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">pushBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">MyVector</span><span class="o">&gt;&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">stringstream</span><span class="w"> </span><span class="n">str</span><span class="p">;</span>
+<span class="w">    </span><span class="n">str</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;PushBack(&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;)&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">SimpleAction</span><span class="p">(</span><span class="n">str</span><span class="p">.</span><span class="n">str</span><span class="p">(),</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="p">](</span><span class="n">MyVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Now you can see the actions are correctly printed:</p>
+<div class="highlight"><pre><span></span><code>Falsifiable,<span class="w"> </span>after<span class="w"> </span><span class="m">1</span><span class="w"> </span>tests:<span class="w"> </span>vec.size<span class="o">()</span><span class="w"> </span>&lt;<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">(</span>test/test_state_func.cpp:111<span class="o">)</span>
+<span class="w">  </span>with<span class="w"> </span>args:<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1882384569</span>,<span class="w"> </span>-1157159508,<span class="w"> </span>...,<span class="w"> </span><span class="m">128</span>,<span class="w"> </span><span class="m">32768</span>,<span class="w"> </span><span class="m">840506558</span><span class="w"> </span><span class="o">]</span>,<span class="w"> </span><span class="o">[</span><span class="w"> </span>PushBack<span class="o">(</span><span class="m">1894834799</span><span class="o">)</span>,<span class="w"> </span>PopBack,<span class="w"> </span>Clear,<span class="w"> </span>...,<span class="w"> </span>PushBack<span class="o">(</span><span class="m">814265512</span><span class="o">)</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">}</span>
+</code></pre></div>
+<h3 id="configuring-stateful-test-runs">Configuring stateful test runs<a class="headerlink" href="#configuring-stateful-test-runs" title="Permanent link">&para;</a></h3>
+<p>You can alter some of test characteristics of stateful test runs.
+* Random seed
+* Number of runs</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statefulProperty</span><span class="p">(...);</span>
+<span class="c1">// set random seed</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">setSeed</span><span class="p">(</span><span class="mf">5464561L</span><span class="p">);</span>
+<span class="c1">// number of sequences to be tested</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">setNumRuns</span><span class="p">(</span><span class="mi">10000</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
+<span class="c1">// or you can simply chain the property:</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">setSeed</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">setNumRuns</span><span class="p">(</span><span class="mi">1000</span><span class="p">).</span><span class="n">go</span><span class="p">();</span>
+</code></pre></div>
+<h2 id="alternative-style-using-action-classes">Alternative Style: Using Action Classes<a class="headerlink" href="#alternative-style-using-action-classes" title="Permanent link">&para;</a></h2>
+<p>There are actually two styles of stateful testing - one with <em>action functions(lambda)</em> and one with <em>action classes</em>. While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests. See <a href="../StatefulTestingStyle2/">the separate page</a> for detail. This style is more traditional way of defining actions. Both styles are similar in terms of expressive power.</p>
+<h1 id="further-topics">Further topics<a class="headerlink" href="#further-topics" title="Permanent link">&para;</a></h1>
+<ul>
+<li>See <a href="../ConcurrencyTesting/">Concurrency Testing</a> for testing for concurrent changes of a stateful object.</li>
+</ul>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 26, 2023</span>
+      
+    
+  </small>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking", "navigation.tabs.sticky", "navigation.indexes", "navigation.path", "toc.follow", "navigation.top", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.19047be9.min.js"></script>
+      
+    
+  </body>
+</html>

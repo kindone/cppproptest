@@ -1,0 +1,859 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="C++ Property Testing">
+      
+      
+        <meta name="author" content="kindone">
+      
+      
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/Generators/">
+      
+      
+        <link rel="prev" href="../GettingStarted/">
+      
+      
+        <link rel="next" href="../Combinators/">
+      
+      <link rel="icon" href="../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.4">
+    
+    
+      
+        <title>Generating Inputs - cppproptest</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.240905d7.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:300,300i,400,400i,700,700i%7CSpace+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Slab";--md-code-font:"Space Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="light-blue">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#generating-inputs" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="cppproptest" class="md-header__button md-logo" aria-label="cppproptest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            cppproptest
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Generating Inputs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kindone/cppproptest
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="cppproptest" class="md-nav__button md-logo" aria-label="cppproptest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    cppproptest
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kindone/cppproptest
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="..">cppproptest</a>
+          
+            <label for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          cppproptest
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GettingStarted/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Generating Inputs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Generating Inputs
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#generators-in-property-based-testing" class="md-nav__link">
+    Generators in Property-based testing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arbitraries-the-globally-default-generators" class="md-nav__link">
+    Arbitraries - The globally default generators
+  </a>
+  
+    <nav class="md-nav" aria-label="Arbitraries - The globally default generators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arbitrary-lets-you-omit-generator-arguments" class="md-nav__link">
+    Arbitrary lets you omit generator arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-arbitraries" class="md-nav__link">
+    Built-in Arbitraries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defining-an-arbitrary" class="md-nav__link">
+    Defining an arbitrary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arbitrary-provides-utility-methods" class="md-nav__link">
+    Arbitrary provides utility methods
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-custom-generators-with-generator-combinators" class="md-nav__link">
+    Building Custom Generators with Generator Combinators
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Combinators/" class="md-nav__link">
+        Generator Combinators
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Shrinking/" class="md-nav__link">
+        Simplifying Failed Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Printing/" class="md-nav__link">
+        Printing Facilities
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../StatefulTesting/" class="md-nav__link">
+        Stateful Testing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ConcurrencyTesting/" class="md-nav__link">
+        Concurrency Testing
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#generators-in-property-based-testing" class="md-nav__link">
+    Generators in Property-based testing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arbitraries-the-globally-default-generators" class="md-nav__link">
+    Arbitraries - The globally default generators
+  </a>
+  
+    <nav class="md-nav" aria-label="Arbitraries - The globally default generators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arbitrary-lets-you-omit-generator-arguments" class="md-nav__link">
+    Arbitrary lets you omit generator arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-arbitraries" class="md-nav__link">
+    Built-in Arbitraries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defining-an-arbitrary" class="md-nav__link">
+    Defining an arbitrary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arbitrary-provides-utility-methods" class="md-nav__link">
+    Arbitrary provides utility methods
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-custom-generators-with-generator-combinators" class="md-nav__link">
+    Building Custom Generators with Generator Combinators
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="generating-inputs">Generating Inputs<a class="headerlink" href="#generating-inputs" title="Permanent link">&para;</a></h1>
+<h2 id="generators-in-property-based-testing">Generators in Property-based testing<a class="headerlink" href="#generators-in-property-based-testing" title="Permanent link">&para;</a></h2>
+<p>Property-based testing clearly separates concepts of input domain and property. <em>Generators</em> are the representation of input domain for a property-based test. A <em>generator</em> is basically a function that can generate random values with some constraint.
+A simple <code>forAll</code> statement depends on generators under the hood:</p>
+<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Above <code>forAll</code> takes a function having parameters of types <code>int</code> and <code>std::string</code>. This function is the property function. If no additional information on how to generate values for <code>age</code> and <code>name</code> as in this example, the parameter types are extracted and then used to invoke the default generators for those types. In this case, it calls default generators for <code>int</code> and <code>std::string</code>. Those default generators are called <em>arbitraries</em>. This code is actually equivalent to:</p>
+<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">},</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">());</span>
+</code></pre></div>
+<p>Notice the extra arguments <code>Arbitrary&lt;int&gt;()</code> and <code>Arbitrary&lt;std::string&gt;()</code>. As you can see, <code>forAll</code> actually needs some information how to generate values of the parameter types. They can be ommitted if you're using the defaults, the <em>arbitraries</em>.</p>
+<p>&nbsp;</p>
+<h2 id="arbitraries-the-globally-default-generators">Arbitraries - The globally default generators<a class="headerlink" href="#arbitraries-the-globally-default-generators" title="Permanent link">&para;</a></h2>
+<h3 id="arbitrary-lets-you-omit-generator-arguments">Arbitrary lets you omit generator arguments<a class="headerlink" href="#arbitrary-lets-you-omit-generator-arguments" title="Permanent link">&para;</a></h3>
+<p>An <code>Arbitrary&lt;T&gt;</code> or its alias <code>Arbi&lt;T&gt;</code> is a generator type (that also coerces to <code>GenFunction&lt;T&gt;</code>).
+These generator types are specially treated in <code>cppproptest</code>. An arbitrary serves as globally defined default <em>generator</em> for the type. If a default generator for a type is available, <code>cppproptest</code> uses that generator to generate a value of that type, if no other generator is specified.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// if there is no default generator available, you must provide a generator for the type.</span>
+<span class="n">forAll</span><span class="p">([](</span><span class="n">SomeNewType</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">},</span><span class="w"> </span><span class="n">someNewTypeGen</span><span class="p">);</span>
+
+
+<span class="c1">// if there is a default generator (Arbitrary&lt;SomeType&gt;) available, you may use that generator by omitting the argument</span>
+<span class="n">forAll</span><span class="p">([](</span><span class="n">SomeType</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div>
+<h3 id="built-in-arbitraries">Built-in Arbitraries<a class="headerlink" href="#built-in-arbitraries" title="Permanent link">&para;</a></h3>
+<p><code>cppproptest</code> provides a set of built-in generators for immediate generation of types that are often used in practice. Built-in generators are in the form of Arbitraries.</p>
+<p>Here's quick reference for built-in arbitraries</p>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Examples</th>
+<th>Generator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generate a boolean</td>
+<td><code>true</code> or <code>false</code></td>
+<td><code>Arbi&lt;bool&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a character</td>
+<td><code>'c'</code> or <code>'%'</code></td>
+<td><code>Arbi&lt;char&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate an integer</td>
+<td><code>12</code> or <code>-1133</code></td>
+<td><code>Arbi&lt;int&gt;()</code>, <code>Arbi&lt;uint64_t&gt;()</code>, ...</td>
+</tr>
+<tr>
+<td>Generate a floating point number</td>
+<td><code>3.4</code> or <code>-1.4e3</code></td>
+<td><code>Arbi&lt;float&gt;()</code>, <code>Arbi&lt;double&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a string</td>
+<td><code>"world"</code> or <code>"あ叶葉말"</code></td>
+<td><code>Arbi&lt;std::string&gt;()</code>, <code>Arbi&lt;UTF8String&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a pair</td>
+<td><code>{1, "xv"}</code> or <code>{true, 3.4}</code></td>
+<td><code>Arbi&lt;std::pair&lt;T1,T2&gt;&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a tuple</td>
+<td><code>{1, "xv", true}</code> or <code>{true, 3.4}</code></td>
+<td><code>Arbi&lt;std::tuple&lt;Ts...&gt;&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a list</td>
+<td><code>{10, -4, 0}</code> or <code>{"k", "&amp;"}</code></td>
+<td><code>Arbi&lt;std::list&lt;T&gt;&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a vector</td>
+<td><code>{10, -4, 0}</code> or <code>{"k", "&amp;"}</code></td>
+<td><code>Arbi&lt;std::vector&lt;T&gt;&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a set</td>
+<td>set <code>{1, 3, 4}</code> but not <code>{1, 1, 3}</code></td>
+<td><code>Arbi&lt;std::set&lt;T&gt;&gt;()</code></td>
+</tr>
+<tr>
+<td>Generate a map</td>
+<td>map of <code>"Bob" -&gt; 25, "Alice" -&gt; 30</code></td>
+<td><code>Arbi&lt;std::map&lt;K,V&gt;&gt;()</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Boolean type:<code>bool</code></li>
+<li>Character type: <code>char</code></li>
+<li>Integral types: <code>int8_t</code>, <code>uint8_t</code>, <code>int16_t</code>, <code>uint16_t</code>, <code>int32_t</code>, <code>uint32_t</code>, <code>int64_t</code>, <code>uint64_t</code></li>
+<li>Floating point types: <code>float</code>, <code>double</code></li>
+<li>String types:<ul>
+<li><code>std::string</code> (defaults to generate ASCII character strings in [0x01, 0x7F] range)</li>
+<li><code>UTF8String</code> (a class which extends <code>std::string</code> and can be used to generate valid <a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</a> strings by using <code>Arbi&lt;UTF8String&gt;</code>)</li>
+<li><code>CESU8String</code> (similar to UTF-8, but can be used to generate valid <a href="https://en.wikipedia.org/wiki/CESU-8">CESU-8</a> strings)</li>
+<li><code>UTF16BEString</code> and <code>UTF16LEString</code> for <a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a> big and little endian strings. CESU-8 and Unicode types produce full unicode code point range of [0x1, 0x10FFFF], excluding forbidden surrogate code points ([0xD800, 0xDFFF])</li>
+</ul>
+</li>
+<li>Shared pointers: <code>std::shared_ptr&lt;T&gt;</code> where an <code>Arbi&lt;T&gt;</code> or a custom generator for <code>T</code> is available. It's also useful for generating polymorphic types.
+    <div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">Action</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Insert</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Action</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Delete</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Action</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">};</span>
+<span class="n">Generator</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;&gt;</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// can hold both Insert and Delete</span>
+</code></pre></div></li>
+<li>
+<p>Standard containers: <code>std::string</code>, <code>std::vector</code>, <code>std::list</code>, <code>std::set</code>, <code>std::pair</code>, <code>std::tuple</code>, <code>std::map</code></p>
+<ul>
+<li>
+<p>Arbitraries for containers can optionally take a generator for their element types
+    <div class="highlight"><pre><span></span><code><span class="c1">// You can supply a specific generator for integers</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">vecInt0to100</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">));</span>
+<span class="c1">// otherwise, Arbi&lt;int&gt; is used</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">vecInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+
+<span class="c1">// string aarbitraries also take optional element generator</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">uppercaseGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">alphabetGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">unionOf</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">),</span><span class="w"> </span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;z&#39;</span><span class="p">)));</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><code>Arbi&lt;std::Map&gt;</code> provides setter methods for assigning key and value generators</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">mapGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+<span class="n">mapGen</span><span class="p">.</span><span class="n">setKeyGen</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">));</span><span class="w"> </span><span class="c1">// key ranges from 0 to 100</span>
+<span class="n">mapGen</span><span class="p">.</span><span class="n">setElemGen</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">-100</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">));</span><span class="w"> </span><span class="c1">// value ranges from -100 to 100</span>
+</code></pre></div>
+</li>
+<li>
+<p>Containers provide methods for configuring desired sizes</p>
+<ul>
+<li><code>setMinSize(size)</code>, <code>setMaxSize(size)</code> for restricting to specific range of sizes</li>
+<li><code>setSize(size)</code> for restricting to specific size</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">vecInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+<span class="n">vecInt</span><span class="p">.</span><span class="n">setSize</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"> </span><span class="c1">// 1) generated vector will always have size 10</span>
+<span class="n">vecInt</span><span class="p">.</span><span class="n">setMinSize</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// 2) generated vector will have size &gt;= 1</span>
+<span class="n">vecInt</span><span class="p">.</span><span class="n">setMaxSize</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"> </span><span class="c1">// generated vector will have size &lt;= 10</span>
+<span class="n">vecInt</span><span class="p">.</span><span class="n">setSize</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w"> </span><span class="c1">// 3) generated vector will have size &gt;= 1 and size &lt;= 10</span>
+</code></pre></div>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="defining-an-arbitrary">Defining an arbitrary<a class="headerlink" href="#defining-an-arbitrary" title="Permanent link">&para;</a></h3>
+<p>With template specialization, new <code>Arbi&lt;T&gt;</code> (or its alias <code>Arbitrary&lt;T&gt;</code>) for type <code>T</code> can be defined, if it isn't already defined yet. By defining an <em>Arbitrary</em>, you are effectively adding a default generator for a type.</p>
+<p>Following shows an example of defining an <em>Arbitrary</em>. Note that it should be defined under <code>proptest</code> namespace in order to be recognized and accessible by the library core.</p>
+<div class="highlight"><pre><span></span><code><span class="k">namespace</span><span class="w"> </span><span class="nn">proptest</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// you should define your Arbi&lt;T&gt; inside the namespace</span>
+
+<span class="c1">// define a template specialization of Arbi for Car type</span>
+<span class="c1">// by extending ArbiBase, you are decorating your arbitrary with standard methods (map, flatMap, filter, etc.)</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Arbi</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">ArbiBase</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span><span class="w"> </span><span class="k">operator</span><span class="p">()(</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">isAutomatic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomBool</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span><span class="p">(</span><span class="n">isAutomatic</span><span class="p">);</span><span class="w"> </span><span class="c1">// make_shrinkable creates a Car object by calling Car&#39;s constructor with 1 boolean parameter</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="arbitrary-provides-utility-methods">Arbitrary provides utility methods<a class="headerlink" href="#arbitrary-provides-utility-methods" title="Permanent link">&para;</a></h3>
+<p>As an <code>Arbitrary&lt;T&gt;</code> is also a <code>Generator&lt;T&gt;</code>, an arbitrary provides useful helpers for creating new generators from existing ones. <code>filter</code> is such a helper. It restrictively generates values that satisfy a criteria function. Following shows an even number generator from the integer <code>Arbitrary</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// generates any integers</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">anyIntGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="c1">// generates even integers</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">evenGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anyIntGen</span><span class="p">.</span><span class="n">filter</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>You can find the full list of such helpers in section <a href="#Utility-methods-in-standard-generators">Utility methods in standard generators</a>.</p>
+<p>&nbsp;</p>
+<h2 id="building-custom-generators-with-generator-combinators">Building Custom Generators with Generator Combinators<a class="headerlink" href="#building-custom-generators-with-generator-combinators" title="Permanent link">&para;</a></h2>
+<p>While you can build your own generator by manually defining a <code>GenFunction&lt;T&gt;</code> for type <code>T</code>, it's usually not recommended as there is a better option - generator combinators.
+Generator combinators are toolkit for building new generators based on existing ones.
+They can be chained to create another generator out of themselves. See <a href="../Combinators/">Combinators</a> page for the detail.</p>
+<p>&nbsp;</p>
+<h1 id="advanced-topics">Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permanent link">&para;</a></h1>
+<h2 id="genfunctiont-common-representation-for-all-generators-for-type-t"><code>GenFunction&lt;T&gt;</code> - Common representation for all generators for type <code>T</code><a class="headerlink" href="#genfunctiont-common-representation-for-all-generators-for-type-t" title="Permanent link">&para;</a></h2>
+<p>All generators, including the default ones, share the same base <em>function</em> type. A generator can be a callable (function, functor, or lambda) with following common signature:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// (Random&amp;) -&gt; Shrinkable&lt;T&gt;</span>
+</code></pre></div>
+<p>This can be represented as (or coerced to) a standard function type, <code>std::function&lt;Shrinkable&lt;T&gt;(Random&amp;)&gt;</code>. In <code>cppproptest</code>, this function type is aliased as <code>GenFunction&lt;T&gt;</code>. We will use this term <em>GenFunction</em> throughout this page to refer the generator function type.</p>
+<div class="highlight"><pre><span></span><code><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">using</span><span class="w"> </span><span class="n">GenFunction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Random</span><span class="o">&amp;</span><span class="p">);</span>
+</code></pre></div>
+<p>By the way, you may have noticed a strange template type <code>Shrinkable</code> in this signature. You can refer to <a href="../Shrinking/"><code>Shrinkable</code></a> for its further detail, but it can be treated as a wrapper for type <code>T</code> for now. So a generator (<code>Generator&lt;T&gt;</code>) basically generates a value of type <code>T</code> from a random number generator of <code>Random</code> type. A generator can be defined as function, functor, or lambda, as following:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// lambda style</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">myIntGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[](</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="c1">// function style</span>
+<span class="n">Shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">myIntGen</span><span class="p">(</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// functor style</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">MyIntGen</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="k">operator</span><span class="p">()(</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h2 id="generatort-decorator-class-for-supercharging-a-generator"><code>Generator&lt;T&gt;</code> - Decorator class for supercharging a generator<a class="headerlink" href="#generatort-decorator-class-for-supercharging-a-generator" title="Permanent link">&para;</a></h2>
+<p>The template class <code>Generator&lt;T&gt;</code> is an abstract functor class that also coerces to <code>GenFunction&lt;T&gt;</code>. A <code>Generator&lt;T&gt;</code> gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of <code>cppproptest</code> produce decorated <code>Generator&lt;T&gt;</code>s, you can use the utility methods out-of-box.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// decorate a GenFunction with Generator&lt;T&gt;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">myIntGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Generator</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// .filter and other utility methods can be used once the generator is decorated with Generator&lt;T&gt;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">evenGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myIntGen</span><span class="p">.</span><span class="n">filter</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">});</span><span class="w"> </span><span class="c1">// generates even numbers only</span>
+</code></pre></div>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 28, 2023</span>
+      
+    
+  </small>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking", "navigation.tabs.sticky", "navigation.indexes", "navigation.path", "toc.follow", "navigation.top", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.19047be9.min.js"></script>
+      
+    
+  </body>
+</html>
