@@ -1,2 +1,61 @@
-site_name: My Docs
+site_name: 'cppproptest'
+site_description: 'C++ Property Testing'
+site_author: 'kindone'
+site_url: 'https://github.com/pages/kindone/cppproptest'
 
+repo_name: 'kindone/cppproptest'
+repo_url: 'https://github.com/kindone/cppproptest'
+edit_uri: 'edit/master/docs'
+
+theme:
+  name: material
+  font:
+    text: 'Roboto Slab'
+    code: 'Space Mono'
+  palette:
+    primary: teal
+    accent: light blue
+  favicon: assets/favicon.ico
+  features:
+    - navigation.tracking
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - navigation.path
+    - toc.follow
+    - navigation.top
+    - search.highlight
+    - search.suggest
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.magiclink
+  - pymdownx.details
+  - attr_list
+  - meta
+  - footnotes
+  - tables
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - kroki:
+      DownloadImages: true
+
+nav:
+  - 'cppproptest':
+    - README.md
+    - 'Getting Started': GettingStarted.md
+    - Generators.md
+    - Combinators.md
+    - Shrinking.md
+    - Printing.md
+    - StatefulTesting.md
+    - ConcurrencyTesting.md

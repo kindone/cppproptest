@@ -34,6 +34,7 @@ While you can go through this document from top to the bottom, you might be want
 ### Integers and intervals
 
 Some utility generators for integers are provided
+
 * `interval<INT_TYPE>(min, max)`: generates an integer type(e.g. `uint16_t`) in the closed interval `[min, max]`.
 * `integers<INT_TYPE(from, count)`: generates an integer type starting from `from`
     ```cpp
@@ -319,4 +320,3 @@ These functions and methods can be continuously chained.
     ```
 
     Notice `tupleWith` can automatically chain a tuple generator of `n` parameters into a tuple generator of `n+1` parameters (`bool` generator -> `tuple<bool, int>` generator -> `tuple<bool, int, string>` generator in above example)
-

@@ -2,14 +2,14 @@
 
 `cppproptest` is a property-based testing library for C++. It focuses on usability with following features included:
 
-* Out-of-box generators for primitives and standard containers. See the [full list of built-in generators](doc/Generators.md#arbitraries-provided-by-cppproptest) for more.
+* Out-of-box generators for primitives and standard containers. See the [full list of built-in generators](Generators.md#arbitraries-provided-by-cppproptest) for more.
 
-* Versatile generator combinators for creating custom generators based on existing generators. See [generator combinators](doc/Combinators.md) for more.
-* [Shrinking](doc/Shrinking.md) for automated debugging support
-* [Stateful testing support](doc/StatefulTesting.md) for testing state changes
-* [Concurrency testing support](doc/ConcurrencyTesting.md) for testing concurrent state changes
+* Versatile generator combinators for creating custom generators based on existing generators. See [generator combinators](Combinators.md) for more.
+* [Shrinking](Shrinking.md) for automated debugging support
+* [Stateful testing support](StatefulTesting.md) for testing state changes
+* [Concurrency testing support](ConcurrencyTesting.md) for testing concurrent state changes
 
-You can get started with `cppproptest` on this [page](doc/GettingStarted.md).
+You can get started with `cppproptest` on this [page](GettingStarted.md).
 
 &nbsp;
 
@@ -88,14 +88,14 @@ As it defines input domain with generators and combinators, Property-based testi
 
 # Further topics and details:
 
-* [Getting Started with cppproptest](doc/GettingStarted.md)
-* [Introduction to generators](doc/Generators.md)
-    * [Arbitraries](doc/Generators.md#arbitraries---the-globally-default-generators)
-    * [Built-in generators](doc/Generators.md#arbitraries---the-globally-default-generators)
-* [Generator combinators for creating generators from existing ones](doc/Combinators.md)
-* [Counterexamples and notion of shrinking for automated debugging](doc/Shrinking.md)
-* [Printing facilities](doc/Printing.md)
-* [Stateful testing with `cppproptest`](doc/StatefulTesting.md)
-* [Concurrency testing with `cppproptest`](doc/ConcurrencyTesting.md)
-* [Advanced mocking with `cppproptest` (work in progress)](doc/Mocking.md)
+* [Getting Started with cppproptest](GettingStarted.md)
+* [Introduction to generators](Generators.md)
+    * [Arbitraries](Generators.md#arbitraries---the-globally-default-generators)
+    * [Built-in generators](Generators.md#arbitraries---the-globally-default-generators)
+* [Generator combinators for creating generators from existing ones](Combinators.md)
+* [Counterexamples and notion of shrinking for automated debugging](Shrinking.md)
+* [Printing facilities](Printing.md)
+* [Stateful testing with `cppproptest`](StatefulTesting.md)
+* [Concurrency testing with `cppproptest`](ConcurrencyTesting.md)
+* [Advanced mocking with `cppproptest` (work in progress)](Mocking.md)
 

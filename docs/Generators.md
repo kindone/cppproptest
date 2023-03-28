@@ -1,4 +1,4 @@
-# Introduction to Generators
+# Generating Inputs
 
 ## Generators in Property-based testing
 
@@ -65,7 +65,7 @@ Here's quick reference for built-in arbitraries
 * Integral types: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 * Floating point types: `float`, `double`
 * String types:
-        * `std::string` (defaults to generate ASCII character strings in \[0x01, 0x7F\] range)
+    * `std::string` (defaults to generate ASCII character strings in \[0x01, 0x7F\] range)
     * `UTF8String` (a class which extends `std::string` and can be used to generate valid [UTF-8](https://en.wikipedia.org/wiki/UTF-8) strings by using `Arbi<UTF8String>`)
     * `CESU8String` (similar to UTF-8, but can be used to generate valid [CESU-8](https://en.wikipedia.org/wiki/CESU-8) strings)
     * `UTF16BEString` and `UTF16LEString` for [UTF-16](https://en.wikipedia.org/wiki/UTF-16) big and little endian strings. CESU-8 and Unicode types produce full unicode code point range of \[0x1, 0x10FFFF\], excluding forbidden surrogate code points (\[0xD800, 0xDFFF\])
@@ -182,7 +182,7 @@ template <typename T>
 using GenFunction = std::function<Shrinkable<T>(Random&);
 ```
 
-By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](doc/Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following:
+By the way, you may have noticed a strange template type `Shrinkable` in this signature. You can refer to [`Shrinkable`](Shrinking.md) for its further detail, but it can be treated as a wrapper for type `T` for now. So a generator (`Generator<T>`) basically generates a value of type `T` from a random number generator of `Random` type. A generator can be defined as function, functor, or lambda, as following:
 
 ```cpp
 // lambda style

@@ -1,4 +1,4 @@
-## Concurrency testing
+# Concurrency Testing
 
 Once you're familiar with [stateful testing](./StatefulTesting.md), you can get acquanted with concurrent stateful testing easily.
 Concurrency testing performs interleaved state transitions using multiple threads in parallel to see if any anomaly or breaking of requirement can be found.

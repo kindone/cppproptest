@@ -1,3 +1,5 @@
+# Simplifying Failed Inputs
+
 Shrinking is powerful notion widely utilized in most property-based testing libraries. It automates some of typical debugging process and greatly reduces the effort required to analyse a test failure. `cppproptest` fully supports shrinking for all built-in generators and combinators.
 
 ## Counterexample and Shrinking
