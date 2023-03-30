@@ -5,17 +5,17 @@ Generator combinators are provided for building a new generator based on existin
 
 While you can go through this document from top to the bottom, you might be want to find a suitable combinator for your use case using this table:
 
-| Purpose                                            | Examples                                   | Related Generator/Combinator      |
-|----------------------------------------------------| -------------------------------------------|-----------------------------------|
-| Generate just a constant                           | `0` or `"1337"`                            | [`just<T>`](#constants)           |
-| Generate a list of unique values                   | `{3,5,1}` but not `{3,5,5}`                | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)|
-| Generate a value within numeric range of values    | a number within `1`~`9999`                 | [`interval<T>`, `integers<T>`](#integers-and-intervals)|
-| Generate a value within a set of values            | a prime number under 100                   | [`elementOf<T>`](#selecting-from-values)|
-| Generate a pair or a tuple of different types      | a `pair<int, string>`                      | [`pairOf<T1,T2>`, `tupleOf<Ts...>`](#pair-and-tuples) |
-| Union multiple generators                          | `20~39` or `60~79` combined                | [`unionOf<T>` (`oneOf<T>`)](#selecting-from-generators)|
-| Transform into another type or a value             | `"0"` or `"1.4"` (a number as string).     | [`transform<T,U>`](#transforming-or-mapping)|
-| Generate a struct or a class object                | a `Rectangle` object with width and height | [`construct<T,ARGS...>`](#constructing-an-object)            |
-| Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | [`filter` (`suchThat`)](#applying-constraints)|
+| Purpose                                            | Examples                                   | Related Generator/Combinator                                                                                           |
+| -------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Generate just a constant                           | `0` or `"1337"`                            | [`just<T>`](#constants)                                                                                                |
+| Generate a list of unique values                   | `{3,5,1}` but not `{3,5,5}`                | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)                                                                   |
+| Generate a value within numeric range of values    | a number within `1`~`9999`                 | [`interval<T>`, `integers<T>`](#integers-and-intervals)                                                                |
+| Generate a value within a set of values            | a prime number under 100                   | [`elementOf<T>`](#selecting-from-values)                                                                               |
+| Generate a pair or a tuple of different types      | a `pair<int, string>`                      | [`pairOf<T1,T2>`, `tupleOf<Ts...>`](#pair-and-tuples)                                                                  |
+| Union multiple generators                          | `20~39` or `60~79` combined                | [`unionOf<T>` (`oneOf<T>`)](#selecting-from-generators)                                                                |
+| Transform into another type or a value             | `"0"` or `"1.4"` (a number as string).     | [`transform<T,U>`](#transforming-or-mapping)                                                                           |
+| Generate a struct or a class object                | a `Rectangle` object with width and height | [`construct<T,ARGS...>`](#constructing-an-object)                                                                      |
+| Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | [`filter` (`suchThat`)](#applying-constraints)                                                                         |
 | Generate values with dependencies or relationships | a rectangle where `width == height * 2`    | [`dependency`, `chain`](#values-with-dependencies), [`pairWith`, `tupleWith`](#utility-methods-in-standard-generators) |
 
 &nbsp;
@@ -171,10 +171,10 @@ Another combinator that resembles `transform` is `derive`. This is equivalent to
 
 Following table compares `transform` and `derive`:
 
-| Combinator                  | transformer signature       | Result type          |
-|-----------------------------| ----------------------------|----------------------|
-| `transform<T,U>`            | `function<U(T)>`            | `Generator<U>`       |
-| `derive<T,U>`               | `function<Generator<U>(T)>` | `Generator<U>`       |
+| Combinator       | transformer signature       | Result type    |
+| ---------------- | --------------------------- | -------------- |
+| `transform<T,U>` | `function<U(T)>`            | `Generator<U>` |
+| `derive<T,U>`    | `function<Generator<U>(T)>` | `Generator<U>` |
 
 
 
@@ -253,14 +253,14 @@ However, using `filter` for generating values with complex dependency may result
 
 Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) returns a `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>` (aliased as `GenFunction<T>`), but has additional combinator methods decorated for ease of use. They in fact have equivalent standalone counterparts. Following table shows this relationship:
 
-| Decorated method               | Result type                   | Equivalent Standalone combinator  |
-|--------------------------------| ----------------------------- |---------------------------------- |
-| `Generator<T>::filter`         | `Generator<T>`                | `filter<T>`                       |
-| `Generator<T>::map<U>`         | `Generator<U>`                | `transform<T,U>`                  |
-| `Generator<T>::flatMap<U>`     | `Generator<U>`                | `derive<T,U>`                     |
-| `Generator<T>::pairWith<U>`    | `Generator<std::pair<T,U>>`   | `dependency<T,U>`                 |
-| `Generator<T>::tupleWith<U>`   | `Generator<std::tuple<T,U>>`  | `chain<T,U>`                      |
-| `Generator<std::tuple<Ts...>>::tupleWith<U>`  | `Generator<std::tuple<Ts...,U>>`  | `chain<std::tuple<Ts...>,U>`             |
+| Decorated method                             | Result type                      | Equivalent Standalone combinator |
+| -------------------------------------------- | -------------------------------- | -------------------------------- |
+| `Generator<T>::filter`                       | `Generator<T>`                   | `filter<T>`                      |
+| `Generator<T>::map<U>`                       | `Generator<U>`                   | `transform<T,U>`                 |
+| `Generator<T>::flatMap<U>`                   | `Generator<U>`                   | `derive<T,U>`                    |
+| `Generator<T>::pairWith<U>`                  | `Generator<std::pair<T,U>>`      | `dependency<T,U>`                |
+| `Generator<T>::tupleWith<U>`                 | `Generator<std::tuple<T,U>>`     | `chain<T,U>`                     |
+| `Generator<std::tuple<Ts...>>::tupleWith<U>` | `Generator<std::tuple<Ts...,U>>` | `chain<std::tuple<Ts...>,U>`     |
 
 These functions and methods can be continuously chained.
 

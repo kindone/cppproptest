@@ -10,11 +10,11 @@ edit_uri: 'edit/master/docs'
 theme:
   name: material
   font:
-    text: 'Roboto Slab'
-    code: 'Space Mono'
+    text: 'Inter'
+    code: 'Inconsolata'
   palette:
     primary: teal
-    accent: light blue
+    accent: light green
   favicon: assets/favicon.ico
   features:
     - navigation.tracking
