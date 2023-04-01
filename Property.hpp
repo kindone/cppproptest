@@ -177,7 +177,7 @@ public:
         auto curGenTup = util::overrideTuple(getGenTup(), gens...);
         auto startedTime = steady_clock::now();
 
-        int i = 0;
+        size_t i = 0;
         try {
             for (; i < numRuns; i++) {
                 if(maxDurationMs != 0) {

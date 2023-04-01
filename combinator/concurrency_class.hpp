@@ -113,7 +113,7 @@ bool Concurrency<ActionType>::go(function<void(ObjectType&, ModelType&)> postChe
     Random savedRand(seed);
     cout << "random seed: " << seed << endl;
     PropertyContext ctx;
-    int i = 0;
+    size_t i = 0;
     auto startedTime = steady_clock::now();
     try {
         for (; i < numRuns; i++) {

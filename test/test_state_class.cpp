@@ -68,8 +68,8 @@ TEST(StateTest, States)
 
 struct VectorModel
 {
-    VectorModel(int size) : size(size) {}
-    int size;
+    VectorModel(size_t size) : size(size) {}
+    size_t size;
 };
 
 struct VectorAction2 : public Action<vector<int>, VectorModel>
