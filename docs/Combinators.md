@@ -55,8 +55,8 @@ You may want to random choose from specific list of values.
 
 * `elementOf<T>(val1, ..., valN)`: generates a type `T` from multiple values for type `T`, by choosing one of the values randomly
     ```cpp
-    // generates a prime number under 100
-    auto primeGen = elementOf<int>(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97);
+    // generates a prime number under 50
+    auto primeGen = elementOf<int>(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47);
     ```
 
     * `elementOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
@@ -64,7 +64,8 @@ You may want to random choose from specific list of values.
 
     ```cpp
     // generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
-    elementOf<int>(weightedVal(2, 0.8), weightedVal(5, 0.15), 10/* weight automatically becomes 1.0 - (0.8 + 0.15) == 0.05 */);
+    //   weight for 10 automatically becomes 1.0 - 0.8 - 0.15 == 0.05
+    elementOf<int>(weightedVal(2, 0.8), weightedVal(5, 0.15), 10);
     ```
 
 ### Pair and Tuples
@@ -249,7 +250,7 @@ Actually you can achieve the similar goal using `filter` combinator:
 However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high.
 
 
-## Utility methods in standard generators
+## Utility Methods in Standard Generators
 
 Standard generators and combinators (including `Arbi<T>` and `Construct<...>`) returns a `Generator<T>`, which is of the form `(Random&) -> Shrinkable<T>` (aliased as `GenFunction<T>`), but has additional combinator methods decorated for ease of use. They in fact have equivalent standalone counterparts. Following table shows this relationship:
 

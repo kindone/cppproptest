@@ -49,15 +49,25 @@ TEST(AudioCodec, EncoderDecoder)
 
 Note that `ASSERT_FOR_ALL` is a simple macro wrapping an `ASSERT_TRUE` google test macro around the `proptest::forAll` function. You can find more information in [Using Assertion](#using-assertions) section.
 
-## Defining and running a `property` test
+## What you can do with `cppproptest`
 
-| Name                  | Description                                     | Remark                                    |
-| :-------------------- | :---------------------------------------------- | :---------------------------------------- |
-| `property()`          | Defines a property                              | Returns a `proptest::Property` Object     |
-| `forAll()`            | Define and run a property                       | Shorthand for property(callable).forAll() |
-| `Property::forAll()`  | Run a property with random inputs               | Requires generators (defined or supplied) |
-| `Property::example()` | Run a property with specific inputs             |                                           |
-| `Property::matrix()`  | Run a property with cartesian product of inputs | Input list as `initializer_list`          |
+Here's the list of property-based test functions (with namespace `proptest`) you can use in `cppproptest`:
+
+| Name                                    | Description                                       | Remark                                      |
+| :-------------------------------------- | :------------------------------------------------ | :------------------------------------------ |
+| `property()`                            | Define a property                                 | Returns a `proptest::Property` Object       |
+| `forAll()`                              | Define and run a property                         | Shorthand for `property(callable).forAll()` |
+| `matrix()`                              | Define and run a matrix test                      | Shorthand for `property(callable).matrix()` |
+| `Property::forAll()`                    | Run the property with random inputs               | Requires generators (defined or supplied)   |
+| `Property::matrix()`                    | Run the property with cartesian product of inputs | Input list as `initializer_list`            |
+| `Property::example()`&nbsp;&nbsp;&nbsp; | Run the property with specific inputs             |                                             |
+| `EXPECT_FOR_ALL()`                      | Run `forAll` with `EXPECT_TRUE` Google Test macro | Shorthand for `EXPECT_TRUE(forAll(...))`    |
+| `ASSERT_FOR_ALL()`                      | Run `forAll` with `ASSERT_TRUE` Google Test macro | Shorthand for `ASSERT_TRUE(forAll(...))`    |
+
+You can define a property with a criteria function and certain input domain. You can choose to verify the criteria function with randomly generated inputs (`forAll()`) or with manually specified ones (`example()`). You can also exhaustively test all combinations of inputs based on the values you provided (`matrix`).
+You can wrap arround a property test with Google Tests' macro so that you make Google Test consider the property test failure as a test failure (otherwise, the property test will only print the failure information to standard output and return false.).
+
+## Defining and running a `property` test
 
 `property()` defines a property with optional configurations. By calling `property()`, you are creating a `Property` object. `forAll()` is the shorthand for calling `Property`'s method `forAll()`. `Property::forAll()` performs property-based test using supplied callable (function, functor, or lambda). While `forAll()` would work most of the time, `property()` in combination with its methods `.forAll()`, `.example()`, `.matrix()` can be more versatile and configurable at times.
 
@@ -203,7 +213,7 @@ auto prop = property([](int a, int b) -> bool {
 prop.setSeed(savedSeed).forAll();
 ```
 
-If no random seed is specified, current timestamp in milliseconds is used. You can override these unspecified random seeds with an environment variable `PROPTEST_SEED`. This comes in handy when you have encountered a failure and its random seed value is available for reproduction:
+If no random seed is specified, current timestamp in milliseconds is used. You can override these unspecified random seeds globally with an environment variable `PROPTEST_SEED`. This comes in handy when you have encountered a failure and its random seed value is available for reproduction:
 
 ```Shell
 # ... failed test with random seed 15665312
@@ -218,7 +228,7 @@ You can set maximum duration for a property test run by calling `Property::setMa
 prop.setMaxDurationMs(60000); // will run the test for maximum of 60 seconds, if number of runs does not run out first.
 ```
 
-#### Chaining the configurations
+#### Chaining configurations
 
 You can chain the configurations for a property as following, for ease of use:
 
@@ -260,7 +270,7 @@ PROP_ASSERT_GE(A, B);
 PROP_ASSERT_STREQ(A, B, N);
 ```
 
-Also, there are [Google Test](https://github.com/google/googletest) compatible macros for `forAll` that fails the gtest test case or suite upon a property test failure (since with a bare `forAll`, failures won't behave as gtest failure):
+Also, there are [Google Test](https://github.com/google/googletest) compatible macros for `forAll` that fails the gtest test case or suite upon a property test failure (since with a bare `forAll`, the failures won't behave as gtest failure):
 
 ```cpp
 EXPECT_FOR_ALL(...); // non-fatal, shorthand for EXPECT_TRUE(proptest::forAll(...));
