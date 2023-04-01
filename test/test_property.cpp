@@ -253,6 +253,14 @@ TEST(PropTest, TestVectorCheckFail)
         vecGen);
 }
 
+TEST(PropTest, TestExampleForAll)
+{
+    proptest::matrix([](int a, int b) {
+        cout << "a: " << a << ", b: " << b << endl;
+    }, {1,2,3}, {4,5,6});
+
+}
+
 TEST(PropTest, TestTupleCheckFail)
 {
     forAll([](tuple<int, tuple<int>> tup) {

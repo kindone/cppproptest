@@ -170,11 +170,32 @@ public:
     template <typename... ExplicitGens>
     bool forAll(ExplicitGens&&... gens)
     {
+        // combine explicit generators and implicit generators into a tuple by overriding implicit generators with explicit generators
+        auto curGenTup = util::overrideTuple(getGenTup(), gens...);
+        return runForAll(util::forward<decltype(curGenTup)>(curGenTup));
+    }
+
+    /**
+     * @brief Executes single example-based test for given property.
+     *
+     * @param args Variadic list of explicit arguments (in same order as in definition of property arguments)
+     * @return true if the case succeeds
+     * @return false if the cases fails
+     */
+    bool example(ARGS&&... args)
+    {
+        auto valueTup = util::make_tuple(args...);
+        return example(valueTup);
+    }
+
+private:
+
+    bool runForAll(GenTuple&& curGenTup)
+    {
         Random rand(seed);
         Random savedRand(seed);
         cout << "random seed: " << seed << endl;
         PropertyContext ctx;
-        auto curGenTup = util::overrideTuple(getGenTup(), gens...);
         auto startedTime = steady_clock::now();
 
         size_t i = 0;
@@ -244,20 +265,6 @@ public:
         return true;
     }
 
-    /**
-     * @brief Executes single example-based test for given property.
-     *
-     * @param args Variadic list of explicit arguments (in same order as in definition of property arguments)
-     * @return true if the case succeeds
-     * @return false if the cases fails
-     */
-    bool example(ARGS&&... args)
-    {
-        auto valueTup = util::make_tuple(args...);
-        return example(valueTup);
-    }
-
-private:
     bool example(const tuple<ARGS...>& valueTup)
     {
         PropertyContext context;
@@ -299,7 +306,8 @@ public:
     * Usage:
     * @code
         // As property is defined with two arguments: int and float, matrix() requires two arguments: int and float
-    lists auto prop = property([](int i, float f) {
+    lists
+        auto prop = property([](int i, float f) {
             // ...
         });
 
@@ -307,7 +315,7 @@ public:
         //   {1, 0.2f}, {1, 0.3f}, {2, 0.2f}, {2, 0.3f}, {3, 0.2f}, {3, 0.3f}
         prop.matrix({1,2,3}, {0.2f, 0.3f});
     * @endcode
-    * @param lists Lists of valid arguments (types must be in same order as in definition of property arguments)
+    * @param lists Lists of valid arguments (types must be in same order as in parameters of the callable)
     */
     bool matrix(initializer_list<ARGS>&&... lists)
     {
@@ -492,7 +500,7 @@ auto property(Callable&& callable, ExplicitGens&&... gens)
     return util::createProperty(func, util::forward<decltype(genTup)>(genTup));
 }
 /**
- * @brief immediately executes a randomized property test
+ * @brief Immediately executes a randomized property test
  *
  * equivalent to `property(...).forAll()`
  *
@@ -508,6 +516,38 @@ template <typename Callable, typename... ExplicitGens>
 bool forAll(Callable&& callable, ExplicitGens&&... gens)
 {
     return property(callable, gens...).forAll();
+}
+
+/**
+* @brief Immediately executes all input combinations in the Cartesian product of input lists
+*
+* equivalent to `property(...).forAll()`
+*
+* Usage:
+* @code
+    // If property callable is defined with two arguments: int and float,
+    // matrix() requires as arguments the callable and two more of types initializer_list<int> and initializer_list<float>.
+lists
+    // examples are auto-generated as Cartesian propduct of the lists:
+    //   {1, 0.2f}, {1, 0.3f}, {2, 0.2f}, {2, 0.3f}, {3, 0.2f}, {3, 0.3f}
+    proptest::matrix([](int i, float f) {
+        // ...
+    }, {1,2,3}, {0.2f, 0.3f});
+* @endcode
+*
+* @tparam Callable property callable type in either `(ARGS...) -> bool` (success/fail by boolean return value) or
+* `(ARGS...) -> void` (fail if exception is thrown, success eitherwise)
+* @tparam ARGS variadic types for callable and the initializer_lists
+* @param callable passed as any either `std::function`, functor object, function pointer
+* @param lists Lists of valid arguments (types must be in same order as in parameters of the callable)
+* @return true if all the cases succeed
+* @return false if any one of the cases fails
+*/
+
+template <typename Callable, typename... ARGS>
+bool matrix(Callable&& callable, initializer_list<ARGS>&&... lists)
+{
+    return property(callable).matrix(util::forward<decltype(lists)>(lists)...);
 }
 
 #define EXPECT_FOR_ALL(CALLABLE, ...) EXPECT_TRUE(proptest::forAll(CALLABLE, __VA_ARGS__))

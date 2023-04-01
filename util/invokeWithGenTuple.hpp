@@ -10,9 +10,12 @@ namespace util {
 template <typename Function, typename GenTuple, size_t... index>
 decltype(auto) invokeWithGenHelper(Random& rand, Function&& f, GenTuple&& genTup, index_sequence<index...>)
 {
+    // invoke generator with random
     auto valueTup = util::make_tuple(get<index>(genTup)(rand)...);
+    // get value from shrinkable
     auto values = transformHeteroTuple<ShrinkableGet>(util::forward<decltype(valueTup)>(valueTup));
     try {
+        // run function f with arguments
         return invokeWithArgTuple(util::forward<Function>(f), util::forward<decltype(values)>(values));
     } catch (const AssertFailed& e) {
         throw PropertyFailed<decltype(valueTup)>(e);
