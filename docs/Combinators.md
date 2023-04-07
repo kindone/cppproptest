@@ -99,7 +99,7 @@ You can combine generators to a single generator that can generate each of them 
     auto evenGen = oneOf<int>(interval(0, 10), interval(100, 1000), interval(10000, 100000));
     ```
 
-    * `oneOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
+    * `oneOf` can receive optional probabilistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
     `weightedGen(<generator>, <weight>)` is used to annotate the desired weight.
 
     ```cpp

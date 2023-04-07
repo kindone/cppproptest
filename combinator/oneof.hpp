@@ -17,8 +17,11 @@ template <typename T>
 struct Weighted;
 }  // namespace util
 
-template <typename T, typename GEN>
-util::Weighted<T> weightedGen(GEN&& gen, double weight);
+template <typename T>
+util::Weighted<T> weightedGen(GenFunction<T> gen, double weight);
+
+template <typename GEN>
+auto weightedGen(GEN&& gen, double weight) -> util::Weighted<typename invoke_result_t<GEN, Random&>::type>;
 
 namespace util {
 
@@ -97,12 +100,19 @@ decltype(auto) oneOfHelper(const shared_ptr<vector<util::Weighted<T>>>& genVecPt
 
 }  // namespace util
 
-template <typename T, typename GEN>
-util::Weighted<T> weightedGen(GEN&& gen, double weight)
+
+template <typename T>
+util::Weighted<T> weightedGen(GenFunction<T> gen, double weight)
 {
-    using FuncType = GenFunction<T>;
-    shared_ptr<FuncType> funcPtr = util::make_shared<FuncType>(util::forward<GEN>(gen));
+    auto funcPtr = util::make_shared<GenFunction<T>>(gen);
     return util::Weighted<T>(funcPtr, weight);
+}
+
+template <typename GEN>
+auto weightedGen(GEN&& gen, double weight) -> util::Weighted<typename invoke_result_t<GEN, Random&>::type>
+{
+    using T = typename invoke_result_t<GEN, Random&>::type;
+    return weightedGen<T>(util::forward<GEN>(gen), weight);
 }
 
 /**

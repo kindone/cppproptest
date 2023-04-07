@@ -50,7 +50,7 @@ TEST(StateTest, StateFunction)
     }));
 
     auto actionGen =
-        oneOf<SimpleAction<T>>(pushBackGen, popBackGen, popBackGen2, weightedGen<SimpleAction<T>>(clearGen, 0.1));
+        oneOf<SimpleAction<T>>(pushBackGen, popBackGen, popBackGen2, weightedGen(clearGen, 0.1));
     auto prop = statefulProperty<T>(Arbi<T>(), actionGen);
     prop.setOnStartup([]() { cout << "startup" << endl; });
     prop.setOnCleanup([]() { cout << "cleanup" << endl; });

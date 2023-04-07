@@ -133,7 +133,7 @@ Once a property has been defined, you can run a simple randomized test based on 
 auto prop = property([](int a, int b) -> bool {
     return true;
 }, myIntGenerator);
-
+.oreDhttps://help.sap.com/docs/SAP_NETWEAVER_750/f2e545608079437ab165c105649b89db/70730c006bf41014b5040bee4e204223.html
 prop.forAll();
 ```
 
@@ -242,7 +242,7 @@ prop.setSeed(savedSeed).setNumRuns(1000000).setMaxDurationMs(60000).forAll();
 
 ## Using Assertions
 
-`cppproptest` provides assertion(fatal)/expection(non-fatal) macros based on the popular [Google Test](https://github.com/google/googletest) library.
+`cppproptest` provides assertion(fatal)/expectation(non-fatal) macros based on the popular [Google Test](https://github.com/google/googletest) library.
 
 ```cpp
 // PROP_EXPECT*: non-fatal, continues upon failure

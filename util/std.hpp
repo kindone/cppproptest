@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <random>
 #include <limits>
+#include <variant>
 
 #include <chrono>
 
@@ -53,6 +54,8 @@ using std::make_tuple;
 using std::make_unique;
 using std::move;
 using std::transform;
+using std::variant;
+using std::holds_alternative;
 }  // namespace util
 
 using std::conditional_t;

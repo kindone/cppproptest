@@ -198,7 +198,7 @@ TEST(PropTest, TestOneOfWeighted)
     auto intGen = Arbi<int>();
     auto smallIntGen = GenSmallInt();
 
-    auto gen = oneOf<int>(just(0), weightedGen<int>(just(1), 0.2));
+    auto gen = oneOf<int>(just(0), weightedGen(just(1), 0.2));
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)
@@ -216,7 +216,7 @@ TEST(PropTest, TestElementOf)
 
 TEST(PropTest, TestElementOfWeighted)
 {
-    auto gen = elementOf<int>(0, weightedVal<int>(1, 0.1), weightedVal(2, 0.1));
+    auto gen = elementOf<int>(0, weightedVal(1, 0.1), weightedVal(2, 0.1));
     int64_t seed = getCurrentTime();
     Random rand(seed);
     for (int i = 0; i < 10; i++)

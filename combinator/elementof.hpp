@@ -81,7 +81,7 @@ decltype(auto) elementOf(Impl&&... values)
 
     transform(
         wvaluevec.begin(), wvaluevec.end(), util::back_inserter(*genVecPtr),
-        +[](const util::WeightedValue<T>& wvalue) { return weightedGen<T>(just(wvalue.valuePtr), wvalue.weight); });
+        +[](const util::WeightedValue<T>& wvalue) { return weightedGen(just(wvalue.valuePtr), wvalue.weight); });
 
     return util::oneOfHelper<T>(genVecPtr);
 }
