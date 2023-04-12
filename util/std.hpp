@@ -46,6 +46,7 @@ using std::remove_reference_t;
 
 namespace util {
 using std::any;
+using std::make_any;
 using std::back_inserter;
 using std::forward;
 using std::make_pair;
@@ -72,6 +73,7 @@ using std::enable_if_t;
 using std::invoke_result;
 using std::invoke_result_t;
 
+using std::reinterpret_pointer_cast;
 using std::shared_ptr;
 using std::static_pointer_cast;
 using std::any_cast;

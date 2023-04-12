@@ -46,10 +46,10 @@ public:
     Shrinkable<vector<T>> operator()(Random& rand) override
     {
         size_t size = rand.getRandomSize(minSize, maxSize + 1);
-        auto shrinkVec = util::make_shared<vector<Shrinkable<util::any>>>();
+        auto shrinkVec = util::make_shared<vector<ShrinkableAny>>();
         shrinkVec->reserve(size);
         for (size_t i = 0; i < size; i++)
-            shrinkVec->push_back(elemGen(rand).template map<util::any>(+[](const T& t) { return util::any{t}; }));
+            shrinkVec->push_back(elemGen(rand));
 
         auto result = shrinkListLike<vector, T>(shrinkVec, minSize);
         return result;

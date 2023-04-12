@@ -11,15 +11,13 @@ TEST(PropTest, FilterWithTolerance)
 
     for (int i = 0; i < 4; i++) {
         auto shr = smallIntGen(rand);
-        auto criteria = [](int& v) { return v % 4 == 1; };
-        auto criteriaPtr = util::make_shared<function<bool(const int&)>>(
-            [criteria](const int& t) { return criteria(const_cast<int&>(t)); });
+        auto criteria = [](const int& v) { return v % 4 == 1; };
         if (!criteria(shr.getRef()))
             continue;
         cout << "filter with tolerance:" << endl;
-        exhaustive(shr.filter(criteriaPtr, 1), 0);
+        exhaustive(shr.filter(criteria, 1), 0);
         cout << "filter without tolerance:" << endl;
-        exhaustive(shr.filter(criteriaPtr), 0);
+        exhaustive(shr.filter(criteria), 0);
         cout << "full" << endl;
         exhaustive(shr, 0);
     }
@@ -72,7 +70,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto andThen = evenShrinkable.andThenStatic(
-        [evenShrinkable]() { return Stream::one(make_shrinkable<int>(1000)); });
+        [evenShrinkable]() { return Stream::one(make_shrinkable_any<int>(1000)); });
 
     cout << "even.andThenStatic([1000]): " << andThen.get() << endl;
     {
@@ -80,7 +78,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto andThen2 = evenShrinkable.andThen([evenShrinkable](const Shrinkable<int>& parent) {
-        return Stream::one(make_shrinkable<int>(parent.get() / 2));
+        return Stream::one(make_shrinkable_any<int>(parent.get() / 2));
     });
 
     cout << "even.andThen([n/2]): " << andThen2.get() << endl;
@@ -89,7 +87,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto concat = evenShrinkable.concatStatic(
-        [evenShrinkable]() { return Stream::one(make_shrinkable<int>(1000)); });
+        [evenShrinkable]() { return Stream::one(make_shrinkable_any<int>(1000)); });
 
     cout << "even.concatStatic(1000): " << concat.get() << endl;
     {
@@ -97,7 +95,7 @@ TEST(PropTest, ShrinkableAndThen)
     }
 
     auto concat2 = evenShrinkable.concat([evenShrinkable](const Shrinkable<int>& parent) {
-        return Stream::one(make_shrinkable<int>(parent.get() / 2));
+        return Stream::one(make_shrinkable_any<int>(parent.get() / 2));
     });
 
     cout << "even.concat(n/2): " << concat2.get() << endl;
@@ -211,7 +209,7 @@ TEST(PropTest, ShrinkVector)
         vector<T> copy = shr.get();
         if (!copy.empty())
             copy[0] /= 2;
-        return Stream(make_shrinkable<vector<T>>(copy));
+        return Stream(make_shrinkable_any<vector<T>>(copy));
     });
 
     exhaustive(shrinkableVector, 0);
@@ -487,6 +485,13 @@ TEST(PropTest, Polymorphic)
         auto carShrinkable = carGen(rand);
         // polymorphism doesn't work!
         cout << "car.get(): " << carShrinkable.getRef().get() << endl;
+    }
+
+    {
+        auto carGen = lazy<shared_ptr<Vehicle>>([]() { return util::make_shared<Car>(); });
+        auto carShrinkable = carGen(rand);
+        // polymorphism works
+        cout << "car.get(): " << carShrinkable.getRef()->get() << endl;
     }
 
     {

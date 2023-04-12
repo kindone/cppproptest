@@ -45,7 +45,7 @@ Stream shrinkFloat(FLOATTYPE value)
     if (value == 0.0f) {
         return Stream::empty();
     } else if (isnan(value)) {
-        return Stream::one(make_shrinkable<FLOATTYPE>(0.0f));
+        return Stream::one(make_shrinkable_any<FLOATTYPE>(0.0f));
     } else {
         FLOATTYPE fraction = 0.0f;
         if (isinf(value)) {
@@ -67,7 +67,7 @@ Stream shrinkFloat(FLOATTYPE value)
 
         // prepend 0.0
         floatShrinkable = floatShrinkable.with([shrinksPtr = floatShrinkable.shrinksPtr]() {
-            auto zero = Stream::one(make_shrinkable<FLOATTYPE>(0.0f));
+            auto zero = Stream::one(make_shrinkable_any<FLOATTYPE>(0.0f));
             return zero.concat((*shrinksPtr)());
         });
 
@@ -79,9 +79,9 @@ Stream shrinkFloat(FLOATTYPE value)
             if (value == 0.0f)
                 return Stream::empty();
             else if (value > 0) {
-                return Stream::one(make_shrinkable<FLOATTYPE>(util::composeFloat(0.5f, exp)));
+                return Stream::one(make_shrinkable_any<FLOATTYPE>(util::composeFloat(0.5f, exp)));
             } else {
-                return Stream::one(make_shrinkable<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
+                return Stream::one(make_shrinkable_any<FLOATTYPE>(util::composeFloat(-0.5f, exp)));
             }
         });
 
@@ -90,7 +90,7 @@ Stream shrinkFloat(FLOATTYPE value)
             auto value = shr.get();
             auto intValue = static_cast<int>(value);
             if (intValue != 0 && abs(intValue) < abs(value)) {
-                return Stream::one(make_shrinkable<FLOATTYPE>(intValue));
+                return Stream::one(make_shrinkable_any<FLOATTYPE>(intValue));
             } else
                 return Stream::empty();
         });

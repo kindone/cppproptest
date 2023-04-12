@@ -140,7 +140,7 @@ TEST(UtilTestCase, StreamShrink)
         if (val <= 0 || (val - min) <= 1 || mid == val || mid == min)
             return stream_t::empty();
         else
-            return stream_t(make_shrinkable<int>(mid).with([=]() { return genpos(0, mid); }),
+            return stream_t(make_shrinkable_any<int>(mid).with([=]() { return genpos(0, mid); }),
                             [=]() { return genpos(mid, val); });
     };
 
@@ -150,14 +150,14 @@ TEST(UtilTestCase, StreamShrink)
         if (val >= 0 || (max - val) <= 1 || mid == val || mid == max)
             return stream_t::empty();
         else
-            return stream_t(make_shrinkable<int>(mid).with([=]() { return genneg(0, mid); }),
+            return stream_t(make_shrinkable_any<int>(mid).with([=]() { return genneg(0, mid); }),
                             [=]() { return genneg(mid, val); });
     };
 
     // cout << "      val0: " << value << endl;
     auto shr = make_shrinkable<int>(value).with([value]() {
         // cout << "      val1: " << value << endl;
-        return stream_t(make_shrinkable<int>(0), [value]() {
+        return stream_t(make_shrinkable_any<int>(0), [value]() {
             // cout << "      val2: " << value << endl;
             if (value >= 0)
                 return genpos(0, value);
@@ -166,28 +166,28 @@ TEST(UtilTestCase, StreamShrink)
         });
     });
 
-    for (auto itr = shr.shrinks().iterator<Shrinkable<int>>(); itr.hasNext();) {
+    for (auto itr = shr.shrinks().iterator<ShrinkableAny>(); itr.hasNext();) {
         auto shrinkable = itr.next();
-        cout << "streamshrink:" << shrinkable.get() << endl;
-        for (auto itr2 = shrinkable.shrinks().iterator<Shrinkable<int>>(); itr2.hasNext();) {
-            cout << "  shrink: " << itr2.next().get() << endl;
+        cout << "streamshrink:" << shrinkable.as<int>().get() << endl;
+        for (auto itr2 = shrinkable.shrinks().iterator<ShrinkableAny>(); itr2.hasNext();) {
+            cout << "  shrink: " << itr2.next().as<int>().get() << endl;
         }
     }
 
     Stream strstream =
-        shr.shrinks().transform<Shrinkable<int>, Shrinkable<string>>([](const Shrinkable<int>& value) {
+        shr.shrinks().transform<ShrinkableAny, ShrinkableAny>([](const ShrinkableAny& value) {
             auto shrinksPtr = value.shrinksPtr;
-            return make_shrinkable<string>(to_string(value.get())).with([shrinksPtr]() {
-                return (*shrinksPtr)().transform<Shrinkable<int>, Shrinkable<string>>(
-                    [](const Shrinkable<int>& v) { return make_shrinkable<string>(to_string(v.get())); });
+            return make_shrinkable_any<string>(to_string(Shrinkable<int>(value).get())).with([shrinksPtr]() {
+                return (*shrinksPtr)().transform<ShrinkableAny, ShrinkableAny>(
+                    [](const ShrinkableAny& v) { return make_shrinkable_any<string>(to_string(v.as<int>().get())); });
             });
         });
 
-    for (auto itr = strstream.iterator<Shrinkable<string>>(); itr.hasNext();) {
+    for (auto itr = strstream.iterator<ShrinkableAny>(); itr.hasNext();) {
         auto shrinkable = itr.next();
-        cout << "strstreamshrink:" << shrinkable.get() << endl;
-        for (auto itr2 = shrinkable.shrinks().iterator<Shrinkable<string>>(); itr2.hasNext();) {
-            cout << "  shrink: " << itr2.next().get() << endl;
+        cout << "strstreamshrink:" << shrinkable.as<int>().get() << endl;
+        for (auto itr2 = shrinkable.shrinks().iterator<ShrinkableAny>(); itr2.hasNext();) {
+            cout << "  shrink: " << itr2.next().as<int>().get() << endl;
         }
     }
 }
@@ -197,25 +197,25 @@ TEST(UtilTestCase, Shrinkable)
     // generates 50,49,...,0
     int val = 50;
     // recursive
-    auto stream = Stream(make_shrinkable<int>(val), [val]() {
+    auto stream = Stream(make_shrinkable_any<int>(val), [val]() {
         static function<Stream(int)> gen = [](int val) {
             if (val <= 0)
                 return Stream::empty();
             else
-                return Stream(make_shrinkable<int>(val - 1), [val]() { return gen(val - 1); });
+                return Stream(make_shrinkable_any<int>(val - 1), [val]() { return gen(val - 1); });
         };
         return gen(val);
     });
 
-    for (auto itr = stream.iterator<Shrinkable<int>>(); itr.hasNext();) {
-        cout << "stream:" << itr.next().get() << endl;
+    for (auto itr = stream.iterator<ShrinkableAny>(); itr.hasNext();) {
+        cout << "stream:" << itr.next().as<int>().get() << endl;
     }
 
     auto shrinkable = make_shrinkable<int>(5).with([=]() { return stream; });
 
     auto stream2 = shrinkable.shrinks();
-    for (auto itr = stream.iterator<Shrinkable<int>>(); itr.hasNext();) {
-        cout << "stream2:" << itr.next().get() << endl;
+    for (auto itr = stream.iterator<ShrinkableAny>(); itr.hasNext();) {
+        cout << "stream2:" << itr.next().as<int>().get() << endl;
     }
 }
 
@@ -227,18 +227,18 @@ TEST(UtilTestCase, ShrinkableNumeric)
         int value = values[i];
         auto shrinkable = util::binarySearchShrinkable(value);
 
-        for (auto itr = shrinkable.shrinks().iterator<Shrinkable<int64_t>>(); itr.hasNext();) {
+        for (auto itr = shrinkable.shrinks().iterator<ShrinkableAny>(); itr.hasNext();) {
             auto shrinkable1 = itr.next();
-            cout << "strstreamshrink:" << shrinkable1.get() << endl;
-            for (auto itr2 = shrinkable1.shrinks().iterator<Shrinkable<int64_t>>(); itr2.hasNext();) {
+            cout << "strstreamshrink:" << shrinkable1.as<int64_t>().get() << endl;
+            for (auto itr2 = shrinkable1.shrinks().iterator<ShrinkableAny>(); itr2.hasNext();) {
                 auto shrinkable2 = itr2.next();
-                cout << "  shrink: " << shrinkable2.get() << endl;
-                for (auto itr3 = shrinkable2.shrinks().iterator<Shrinkable<int64_t>>(); itr3.hasNext();) {
+                cout << "  shrink: " << shrinkable2.as<int64_t>().get() << endl;
+                for (auto itr3 = shrinkable2.shrinks().iterator<ShrinkableAny>(); itr3.hasNext();) {
                     auto shrinkable3 = itr3.next();
-                    cout << "    shrink: " << shrinkable3.get() << endl;
-                    for (auto itr4 = shrinkable3.shrinks().iterator<Shrinkable<int64_t>>(); itr4.hasNext();) {
+                    cout << "    shrink: " << shrinkable3.as<int64_t>().get() << endl;
+                    for (auto itr4 = shrinkable3.shrinks().iterator<ShrinkableAny>(); itr4.hasNext();) {
                         auto shrinkable4 = itr4.next();
-                        cout << "      shrink: " << shrinkable4.get() << endl;
+                        cout << "      shrink: " << shrinkable4.as<int64_t>().get() << endl;
                     }
                 }
             }
@@ -253,11 +253,11 @@ TEST(UtilTestCase, ShrinkableString)
     auto shrinkable = util::binarySearchShrinkable(len).template map<string>(
         [str](const int64_t& len) { return str.substr(0, len); });
 
-    for (auto itr = shrinkable.shrinks().iterator<Shrinkable<string>>(); itr.hasNext();) {
+    for (auto itr = shrinkable.shrinks().iterator<ShrinkableAny>(); itr.hasNext();) {
         auto shrinkable1 = itr.next();
-        cout << "strstreamshrink:" << shrinkable1.get() << endl;
-        for (auto itr2 = shrinkable1.shrinks().iterator<Shrinkable<string>>(); itr2.hasNext();) {
-            cout << "  shrink: " << itr2.next().get() << endl;
+        cout << "strstreamshrink:" << shrinkable1.as<int64_t>().get() << endl;
+        for (auto itr2 = shrinkable1.shrinks().iterator<ShrinkableAny>(); itr2.hasNext();) {
+            cout << "  shrink: " << itr2.next().as<int64_t>().get() << endl;
         }
     }
 }

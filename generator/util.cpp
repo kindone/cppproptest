@@ -17,9 +17,9 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
         if (min + 1 >= max) {
             return stream_t::empty();
         } else if (min + 2 >= max) {
-            return stream_t(make_shrinkable<int64_t>(mid));
+            return stream_t(make_shrinkable_any<int64_t>(mid));
         } else
-            return stream_t(make_shrinkable<int64_t>(mid).with([=]() { return genpos(min, mid); }),
+            return stream_t(make_shrinkable_any<int64_t>(mid).with([=]() { return genpos(min, mid); }),
                             [=]() { return genpos(mid, max); });
     };
 
@@ -29,9 +29,9 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
         if (min + 1 >= max) {
             return stream_t::empty();
         } else if (min + 2 >= max) {
-            return stream_t(make_shrinkable<int64_t>(mid));
+            return stream_t(make_shrinkable_any<int64_t>(mid));
         } else
-            return stream_t(make_shrinkable<int64_t>(mid).with([=]() { return genneg(mid, max); }),
+            return stream_t(make_shrinkable_any<int64_t>(mid).with([=]() { return genneg(mid, max); }),
                             [=]() { return genneg(min, mid); });
     };
 
@@ -39,9 +39,9 @@ Shrinkable<int64_t> binarySearchShrinkable(int64_t value)
         if (value == 0)
             return stream_t::empty();
         else if (value > 0)
-            return stream_t(make_shrinkable<int64_t>(0)).concat(genpos(0, value));
+            return stream_t(make_shrinkable_any<int64_t>(0)).concat(genpos(0, value));
         else
-            return stream_t(make_shrinkable<int64_t>(0)).concat(genneg(value, 0));
+            return stream_t(make_shrinkable_any<int64_t>(0)).concat(genneg(value, 0));
     });
 }
 
@@ -57,9 +57,9 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
         if (min + 1 >= max) {
             return stream_t::empty();
         } else if (min + 2 >= max) {
-            return stream_t(make_shrinkable<uint64_t>(mid));
+            return stream_t(make_shrinkable_any<uint64_t>(mid));
         } else
-            return stream_t(make_shrinkable<uint64_t>(mid).with([=]() { return genpos(min, mid); }),
+            return stream_t(make_shrinkable_any<uint64_t>(mid).with([=]() { return genpos(min, mid); }),
                             [=]() { return genpos(mid, max); });
     };
 
@@ -69,9 +69,9 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
         if (min + 1 >= max) {
             return stream_t::empty();
         } else if (min + 2 >= max) {
-            return stream_t(make_shrinkable<uint64_t>(mid));
+            return stream_t(make_shrinkable_any<uint64_t>(mid));
         } else
-            return stream_t(make_shrinkable<uint64_t>(mid).with([=]() { return genneg(mid, max); }),
+            return stream_t(make_shrinkable_any<uint64_t>(mid).with([=]() { return genneg(mid, max); }),
                             [=]() { return genneg(min, mid); });
     };
 
@@ -79,9 +79,9 @@ Shrinkable<uint64_t> binarySearchShrinkableU(uint64_t value)
         if (value == 0)
             return stream_t::empty();
         else if (value > 0)
-            return stream_t(make_shrinkable<uint64_t>(0)).concat(genpos(0, value));
+            return stream_t(make_shrinkable_any<uint64_t>(0)).concat(genpos(0, value));
         else
-            return stream_t(make_shrinkable<uint64_t>(0)).concat(genneg(value, 0));
+            return stream_t(make_shrinkable_any<uint64_t>(0)).concat(genneg(value, 0));
     });
 }
 

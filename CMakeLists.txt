@@ -44,6 +44,7 @@ SET(proptest_sources
     util/printing.cpp
     util/bitmap.cpp
     Stream.cpp
+    Shrinkable.cpp
     Property.cpp
     PropertyContext.cpp
     Random.cpp

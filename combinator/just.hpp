@@ -30,20 +30,8 @@ enable_if_t<is_trivial<T>::value, Generator<T>> just(T&& value)
 template <typename T>
 enable_if_t<!is_trivial<T>::value, Generator<T>> just(const T& value)
 {
-    auto ptr = util::make_shared<T>(value);  // requires copy constructor
+    auto ptr = util::make_shared<Any>(make_anything<T>(value));  // requires copy constructor
     return generator([ptr](Random&) { return Shrinkable<T>(ptr); });
-}
-
-/**
- * @ingroup Combinators
- * @brief Generator combinator for generating just a specific value, given as raw pointer of type T
- * @details Will always generate a specific value of type T
- */
-template <typename T, typename U>
-enable_if_t<is_same<decay_t<T>, decay_t<U>>::value, Generator<T>> just(U* valuePtr)
-{
-    shared_ptr<T> sharedPtr(valuePtr);
-    return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });
 }
 
 /**
@@ -53,7 +41,7 @@ enable_if_t<is_same<decay_t<T>, decay_t<U>>::value, Generator<T>> just(U* valueP
  * non-copyable.
  */
 template <typename T>
-Generator<T> just(shared_ptr<T> sharedPtr)
+enable_if_t<!is_same_v<decay_t<T>, Any>, Generator<T>> just(shared_ptr<Any> sharedPtr)
 {
     return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });
 }

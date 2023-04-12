@@ -108,6 +108,11 @@ util::Weighted<T> weightedGen(GenFunction<T> gen, double weight)
     return util::Weighted<T>(funcPtr, weight);
 }
 
+/**
+ * @ingroup Combinators
+ * @brief Decorator function to pair a generator GEN with desired probability for use in `oneOf` combinator
+ * @tparam GEN (optional) generator (function of Random& -> Shrinkable<T>)
+ */
 template <typename GEN>
 auto weightedGen(GEN&& gen, double weight) -> util::Weighted<typename invoke_result_t<GEN, Random&>::type>
 {
@@ -121,7 +126,7 @@ auto weightedGen(GEN&& gen, double weight) -> util::Weighted<typename invoke_res
  * @details You can combine generators into a single generator that can generate one of them with some probability. This
  * can be considered as taking a union of generators. It can generate a type T from multiple generators for type T, by
  * choosing one of the generators randomly, with even probability, or weighted probability. a GEN can be a generator or
- * a weightedGen(generator, weight) with the weight between 0 and 1 (exclusive). Unweighted generators take rest of
+ * a weightedGen(generator, weight) decorator with the weight between 0 and 1 (exclusive). Unweighted generators take rest of
  * unweighted probability evenly.
  */
 template <typename T, typename... GENS>

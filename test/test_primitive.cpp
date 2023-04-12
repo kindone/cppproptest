@@ -432,9 +432,12 @@ TEST(PropTest, GenSharedPtr)
 {
     int64_t seed = getCurrentTime();
     Random rand(seed);
-    Arbi<shared_ptr<int>> gen;
+    Arbi<shared_ptr<bool>> gen;
     for (int i = 0; i < 20; i++) {
-        cout << "int: " << *gen(rand).getRef() << endl;
+        auto shr = gen(rand);
+        auto ptr = shr.getRef();
+        auto value = *ptr;
+        cout << "int: " << value << endl;
     }
 }
 

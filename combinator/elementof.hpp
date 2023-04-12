@@ -27,9 +27,9 @@ namespace util {
 template <typename T>
 struct WeightedValue
 {
-    WeightedValue(shared_ptr<T> _valuePtr, double _weight) : valuePtr(_valuePtr), weight(_weight) {}
+    WeightedValue(shared_ptr<Any> _valuePtr, double _weight) : valuePtr(_valuePtr), weight(_weight) {}
 
-    shared_ptr<T> valuePtr;
+    shared_ptr<Any> valuePtr;
     double weight;
 };
 
@@ -56,7 +56,7 @@ WeightedValue<T>& ValueToWeighted(WeightedValue<T>& weighted)
 template <typename Impl, typename T>
 util::WeightedValue<T> weightedVal(Impl&& value, double weight)
 {
-    shared_ptr<T> valuePtr = util::make_shared<T>(util::forward<Impl>(value));
+    shared_ptr<Any> valuePtr = util::make_shared<Any>(make_anything<T>(util::forward<Impl>(value)));
     return util::WeightedValue<T>(valuePtr, weight);
 }
 
@@ -81,7 +81,7 @@ decltype(auto) elementOf(Impl&&... values)
 
     transform(
         wvaluevec.begin(), wvaluevec.end(), util::back_inserter(*genVecPtr),
-        +[](const util::WeightedValue<T>& wvalue) { return weightedGen(just(wvalue.valuePtr), wvalue.weight); });
+        +[](const util::WeightedValue<T>& wvalue) { return weightedGen<T>(just<T>(wvalue.valuePtr), wvalue.weight); });
 
     return util::oneOfHelper<T>(genVecPtr);
 }

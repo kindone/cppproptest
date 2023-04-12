@@ -35,7 +35,9 @@ Generator<T> filter(GEN&& gen, Criteria&& criteria)
                   "Gen must be a GenFunction<T> or a callable of Random& -> Shrinkable<T>");
     auto genPtr = util::make_shared<GenFunction<T>>(util::forward<GEN>(gen));
     auto criteriaPtr =
-        util::make_shared<function<bool(const T&)>>([criteria](const T& t) { return criteria(const_cast<T&>(t)); });
+        util::make_shared<function<bool(const Any&)>>([criteria](const Any& a) {
+            return criteria(a.cast<T>());
+        });
     return Generator<T>([criteriaPtr, genPtr](Random& rand) {
         // TODO: add some configurable termination criteria (e.g. maximum no. of attempts)
         while (true) {

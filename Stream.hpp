@@ -16,19 +16,19 @@ struct PROPTEST_API Stream
 
     template <typename T>
     Stream(const shared_ptr<T>& h, function<Stream()> gen)
-        : headPtr(static_pointer_cast<util::any>(h)), tailGen(util::make_shared<function<Stream()>>(gen))
+        : headPtr(static_pointer_cast<void>(h)), tailGen(util::make_shared<function<Stream()>>(gen))
     {
     }
 
     template <typename T>
     Stream(const T& h, function<Stream()> gen)
-        : headPtr(util::make_shared<util::any>(h)), tailGen(util::make_shared<function<Stream()>>(gen))
+        : headPtr(static_pointer_cast<void>(util::make_shared<T>(h))), tailGen(util::make_shared<function<Stream()>>(gen))
     {
     }
 
 
     template <typename T>
-    Stream(const T& h) : headPtr(util::make_shared<util::any>(h)), tailGen(util::make_shared<function<Stream()>>(done()))
+    Stream(const T& h) : headPtr(static_pointer_cast<void>(util::make_shared<T>(h))), tailGen(util::make_shared<function<Stream()>>(done()))
     {
     }
 
@@ -37,7 +37,7 @@ struct PROPTEST_API Stream
     bool isEmpty() const;
 
     template <typename T>
-    T head() const { return any_cast<T>(*headPtr); }
+    T head() const { return *static_pointer_cast<T>(headPtr); }
 
     Stream tail() const;
 
@@ -92,7 +92,7 @@ struct PROPTEST_API Stream
 
     Stream take(int n) const;
 
-    shared_ptr<util::any> headPtr;
+    shared_ptr<void> headPtr;
     shared_ptr<function<Stream()>> tailGen;
 
     static Stream empty();
