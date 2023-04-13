@@ -56,7 +56,7 @@ WeightedValue<T>& ValueToWeighted(WeightedValue<T>& weighted)
 template <typename Impl, typename T>
 util::WeightedValue<T> weightedVal(Impl&& value, double weight)
 {
-    shared_ptr<Any> valuePtr = util::make_shared<Any>(make_anything<T>(util::forward<Impl>(value)));
+    shared_ptr<Any> valuePtr = util::make_shared<Any>(util::make_any<T>(util::forward<Impl>(value)));
     return util::WeightedValue<T>(valuePtr, weight);
 }
 

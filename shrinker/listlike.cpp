@@ -116,7 +116,7 @@ VectorShrinker::shrinkable_t VectorShrinker::shrinkMid(shared_ptr<vector<Shrinka
     auto rangeShrinkable = util::binarySearchShrinkable(maxRearSize - minRearSize).template map<size_t>([minRearSize](const size_t& s) { return s + minRearSize; });
     return rangeShrinkable.template flatMap<vector<ShrinkableAny>>([shrinkableCont, frontSize](const size_t& rearSize) {
         // concat front and rear
-        auto cont = util::make_shared<Any>(make_anything<vector<ShrinkableAny>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize));
+        auto cont = util::make_shared<Any>(util::make_any<vector<ShrinkableAny>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize));
         auto& contRef = cont->cast<vector<ShrinkableAny>>();
         contRef.insert(contRef.end(), shrinkableCont->begin() + (contRef.size()-rearSize), shrinkableCont->end());
         return Shrinkable<vector<ShrinkableAny>>(cont);
@@ -137,7 +137,7 @@ VectorShrinker::shrinkable_t VectorShrinker::shrinkFrontAndThenMid(shared_ptr<ve
     auto rangeShrinkable = util::binarySearchShrinkable(maxFrontSize - minFrontSize).template map<size_t>([minFrontSize](const size_t& s) { return s + minFrontSize; });
     return rangeShrinkable.template flatMap<vector<ShrinkableAny>>([shrinkableCont, maxFrontSize](const size_t& frontSize) {
         // concat front and rear
-        auto cont = util::make_shared<Any>(make_anything<vector<ShrinkableAny>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize));
+        auto cont = util::make_shared<Any>(util::make_any<vector<ShrinkableAny>>(shrinkableCont->begin(), shrinkableCont->begin() + frontSize));
         auto& contRef = cont->cast<vector<ShrinkableAny>>();
         contRef.insert(contRef.end(), shrinkableCont->begin() + maxFrontSize, shrinkableCont->end());
         return Shrinkable<vector<ShrinkableAny>>(cont);

@@ -34,7 +34,7 @@ Generator<U> transform(GenFunction<T> gen, function<U(T&)> transformer)
         });
     return generator([genPtr, transformerPtr](Random& rand) -> Shrinkable<U> {
         Shrinkable<T> shrinkable = (*genPtr)(rand);
-        return shrinkable.map<U>(transformerPtr);
+        return shrinkable.template map<U>(transformerPtr);
     });
 }
 

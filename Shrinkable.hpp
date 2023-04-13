@@ -18,14 +18,6 @@ Shrinkable<T> make_shrinkable(Args&&... args);
 template <typename T, typename... Args>
 ShrinkableAny make_shrinkable_any(Args&&... args);
 
-template <typename T, typename... Args>
-Any make_anything(Args&&... args)
-{
-    Any any;
-    any.ptr = static_pointer_cast<void>(util::make_shared<T>(args...));
-    return any;
-}
-
 namespace util {
 
 struct AnyFunction
@@ -278,9 +270,9 @@ namespace util {
 template <typename T, typename U>
 AnyFunction::AnyFunction(function<U(const T&)> inFunc)
 {
-    auto inFuncPtr = make_shared<decltype(inFunc)>(inFunc);
+    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
 
-    funcPtr = make_shared<F>([inFuncPtr](const Any& a) -> Any {
+    funcPtr = util::make_shared<F>([inFuncPtr](const Any& a) -> Any {
         return (*inFuncPtr)(a.cast<T>());
     });
 }
@@ -288,9 +280,9 @@ AnyFunction::AnyFunction(function<U(const T&)> inFunc)
 
 template <typename T, typename U>
 ShrinkableAnyFunction::ShrinkableAnyFunction(function<Shrinkable<U>(const T&)> inFunc) {
-    auto inFuncPtr = make_shared<decltype(inFunc)>(inFunc);
+    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
 
-    funcPtr = make_shared<F>([inFuncPtr](const Any& a) -> ShrinkableAny {
+    funcPtr = util::make_shared<F>([inFuncPtr](const Any& a) -> ShrinkableAny {
         return (*inFuncPtr)(a.cast<T>());
     });
 }
@@ -298,9 +290,9 @@ ShrinkableAnyFunction::ShrinkableAnyFunction(function<Shrinkable<U>(const T&)> i
 
 template <typename T, typename U>
 ShrinkableAnyFunction1::ShrinkableAnyFunction1(function<Shrinkable<U>(const Shrinkable<T>&)> inFunc) {
-    auto inFuncPtr = make_shared<decltype(inFunc)>(inFunc);
+    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
 
-    funcPtr = make_shared<F>([inFuncPtr](const ShrinkableAny& shr) -> ShrinkableAny {
+    funcPtr = util::make_shared<F>([inFuncPtr](const ShrinkableAny& shr) -> ShrinkableAny {
         return (*inFuncPtr)(shr.as<T>());
     });
 }
@@ -316,9 +308,9 @@ BoolFunction::BoolFunction(function<bool(const T&)> inFunc) {
 
 template <typename T>
 StreamFunction::StreamFunction(function<Stream(const Shrinkable<T>&)> inFunc) {
-    auto inFuncPtr = make_shared<decltype(inFunc)>(inFunc);
+    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
 
-    funcPtr = make_shared<F>([inFuncPtr](const ShrinkableAny& shr) -> Stream {
+    funcPtr = util::make_shared<F>([inFuncPtr](const ShrinkableAny& shr) -> Stream {
         return (*inFuncPtr)(shr.as<T>());
     });
 }
@@ -333,14 +325,14 @@ Shrinkable<T> ShrinkableAny::as() const {
 template <typename T, typename... Args>
 Shrinkable<T> make_shrinkable(Args&&... args)
 {
-    Shrinkable<T> shrinkable(util::make_shared<Any>(make_anything<T>(args...)));
+    Shrinkable<T> shrinkable(util::make_shared<Any>(util::make_any<T>(args...)));
     return shrinkable;
 }
 
 template <typename T, typename... Args>
 ShrinkableAny make_shrinkable_any(Args&&... args)
 {
-    ShrinkableAny shrinkable(util::make_shared<Any>(make_anything<T>(args...)));
+    ShrinkableAny shrinkable(util::make_shared<Any>(util::make_any<T>(args...)));
     return shrinkable;
 }
 
