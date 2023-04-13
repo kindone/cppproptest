@@ -84,16 +84,6 @@ Shrinkable<uint64_t> Arbi<uint64_t>::operator()(Random& rand)
     return generateInteger<uint64_t>(rand);
 }
 
-constexpr char Arbi<char>::boundaryValues[];
-constexpr int8_t Arbi<int8_t>::boundaryValues[];
-constexpr int16_t Arbi<int16_t>::boundaryValues[];
-constexpr int32_t Arbi<int32_t>::boundaryValues[];
-constexpr int64_t Arbi<int64_t>::boundaryValues[];
-constexpr uint8_t Arbi<uint8_t>::boundaryValues[];
-constexpr uint16_t Arbi<uint16_t>::boundaryValues[];
-constexpr uint32_t Arbi<uint32_t>::boundaryValues[];
-constexpr uint64_t Arbi<uint64_t>::boundaryValues[];
-
 // template instantiation
 DEFINE_FOR_ALL_INTTYPES(DEFINE_GENERATEINTEGER);
 DEFINE_FOR_ALL_INTTYPES(DEFINE_NATURAL);

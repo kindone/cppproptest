@@ -24,7 +24,4 @@ Shrinkable<double> Arbi<double>::operator()(Random& rand)
     return make_shrinkable<double>(value).with([value]() { return shrinkFloat(value); });
 }
 
-constexpr float Arbi<float>::boundaryValues[];
-constexpr double Arbi<double>::boundaryValues[];
-
 }  // namespace proptest

@@ -4,8 +4,6 @@
 #include "util/cesu8string.hpp"
 #include "util/unicode.hpp"
 
-constexpr int32_t GenSmallInt::boundaryValues[13];
-
 double getTime()
 {
     struct timeval time;
