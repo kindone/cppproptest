@@ -278,8 +278,10 @@ Falsifiable, after 1 tests: vec.size() < 5 (test/test_state_func.cpp:111)
 ### Configuring stateful test runs
 
 You can alter some of test characteristics of stateful test runs.
+
 * Random seed
 * Number of runs
+* Maximum time duration of test runs
 
 ```cpp
 auto prop = statefulProperty(...);
@@ -287,9 +289,11 @@ auto prop = statefulProperty(...);
 prop.setSeed(5464561L);
 // number of sequences to be tested
 prop.setNumRuns(10000);
+// maximum time duration for go() is 60 seconds
+prop.setMaxDurationMs(60*1000);
 prop.go();
 // or you can simply chain the property:
-prop.setSeed(0).setNumRuns(1000).go();
+prop.setSeed(0).setNumRuns(1000).setMaxDurationMs(10000).go();
 ```
 
 ## Alternative Style: Using Action Classes

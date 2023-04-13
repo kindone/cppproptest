@@ -55,7 +55,7 @@ Here's the list of property-based test functions (with namespace `proptest`) you
 
 | Name                                    | Description                                       | Remark                                      |
 | :-------------------------------------- | :------------------------------------------------ | :------------------------------------------ |
-| `property()`                            | Define a property                                 | Returns a `proptest::Property` Object       |
+| `property()`                            | Define a property                                 | Returns a `proptest::Property` Any          |
 | `forAll()`                              | Define and run a property                         | Shorthand for `property(callable).forAll()` |
 | `matrix()`                              | Define and run a matrix test                      | Shorthand for `property(callable).matrix()` |
 | `Property::forAll()`                    | Run the property with random inputs               | Requires generators (defined or supplied)   |
@@ -65,7 +65,7 @@ Here's the list of property-based test functions (with namespace `proptest`) you
 | `ASSERT_FOR_ALL()`                      | Run `forAll` with `ASSERT_TRUE` Google Test macro | Shorthand for `ASSERT_TRUE(forAll(...))`    |
 
 You can define a property with a criteria function and certain input domain. You can choose to verify the criteria function with randomly generated inputs (`forAll()`) or with manually specified ones (`example()`). You can also exhaustively test all combinations of inputs based on the values you provided (`matrix`).
-You can wrap arround a property test with Google Tests' macro so that you make Google Test consider the property test failure as a test failure (otherwise, the property test will only print the failure information to standard output and return false.).
+You can wrap around a property test with Google Tests' macro so that you make Google Test consider the property test failure as a test failure (otherwise, the property test will only print the failure information to standard output and return false.).
 
 ## Defining and running a `property` test
 
@@ -141,7 +141,7 @@ It will repeatedly call the lambda with different input combinations of `a` and 
 
 #### Specifying generators with `Property::forAll()`
 
-While you can define a property with or without speciying generators, you can additionally specify or override some of the generators when calling `.forAll()`, by passing the generators as arguments.
+While you can define a property with or without specifying generators, you can additionally specify or override some of the generators when calling `.forAll()`, by passing the generators as arguments.
 
 ```cpp
 // a is fixed to INT_MAX, while b is randomly generated
