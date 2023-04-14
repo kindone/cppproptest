@@ -41,7 +41,7 @@ public:
     Concurrency(shared_ptr<ObjectTypeGen> _initialGenPtr, shared_ptr<ActionGen> _actionGenPtr)
         : initialGenPtr(_initialGenPtr),
           actionGenPtr(_actionGenPtr),
-          seed(getCurrentTime()),
+          seed(util::getGlobalSeed()),
           numRuns(defaultNumRuns),
           numThreads(defaultNumThreads),
           maxDurationMs(0)
@@ -53,7 +53,7 @@ public:
         : initialGenPtr(_initialGenPtr),
           modelFactoryPtr(_modelFactoryPtr),
           actionGenPtr(_actionGenPtr),
-          seed(getCurrentTime()),
+          seed(util::getGlobalSeed()),
           numRuns(defaultNumRuns),
           numThreads(defaultNumThreads),
           maxDurationMs(0)
