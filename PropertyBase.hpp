@@ -68,9 +68,6 @@
 namespace proptest {
 
 class Random;
-namespace util {
-uint64_t getGlobalSeed();
-}
 
 class PROPTEST_API PropertyBase {
 public:

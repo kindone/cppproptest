@@ -26,6 +26,10 @@ struct Failure
     stringstream str;
 };
 
+namespace util {
+uint64_t getGlobalSeed();
+}
+
 ostream& operator<<(ostream&, const Failure&);
 
 struct PROPTEST_API PropertyContext
