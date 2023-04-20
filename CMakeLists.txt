@@ -33,6 +33,7 @@ SET(proptest_sources
     generator/util.cpp
     generator/unicode.cpp
     shrinker/bool.cpp
+    shrinker/floating.cpp
     shrinker/string.cpp
     shrinker/listlike.cpp
     combinator/intervals.cpp

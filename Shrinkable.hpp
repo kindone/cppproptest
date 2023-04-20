@@ -39,6 +39,8 @@ struct ShrinkableAnyFunction
     template <typename T, typename U>
     ShrinkableAnyFunction(function<Shrinkable<U>(const T&)> inFunc);
 
+    ShrinkableAnyFunction(function<ShrinkableAny(const Any&)> inFunc);
+
     ShrinkableAny operator()(const Any& in);
 
     shared_ptr<F> funcPtr;
@@ -286,7 +288,6 @@ ShrinkableAnyFunction::ShrinkableAnyFunction(function<Shrinkable<U>(const T&)> i
         return (*inFuncPtr)(a.cast<T>());
     });
 }
-
 
 template <typename T, typename U>
 ShrinkableAnyFunction1::ShrinkableAnyFunction1(function<Shrinkable<U>(const Shrinkable<T>&)> inFunc) {

@@ -26,6 +26,7 @@ using std::thread;
 using proptest::stateful::alt::Action;
 using proptest::stateful::alt::actionListGenOf;
 using proptest::stateful::alt::SimpleAction;
+using proptest::stateful::alt::EmptyModel;
 
 template <typename ActionType>
 class PROPTEST_API Concurrency {
@@ -60,9 +61,7 @@ public:
     }
 
     bool go();
-    bool go(function<void(ObjectType&, ModelType&)> postCheck);
-    bool go(function<void(ObjectType&)> postCheck);
-    bool invoke(Random& rand, function<void(ObjectType&, ModelType&)> postCheck);
+    bool invoke(Random& rand);
     void handleShrink(Random& savedRand);
 
     Concurrency& setSeed(uint64_t s)
@@ -83,10 +82,36 @@ public:
         return *this;
     }
 
+    Concurrency& setOnStartup(function<void()> onStartup) {
+        onStartupPtr = util::make_shared<function<void()>>(onStartup);
+        return *this;
+    }
+
+    Concurrency& setOnCleanup(function<void()> onCleanup) {
+        onCleanupPtr = util::make_shared<function<void()>>(onCleanup);
+        return *this;
+    }
+
+    template <typename M = ModelType>
+    enable_if_t<!is_same_v<M, EmptyModel>, Concurrency>& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)  {
+        postCheckPtr = util::make_shared<function<void(ObjectType&, ModelType&)>>(postCheck);
+        return *this;
+    }
+
+    template <typename M = ModelType>
+    enable_if_t<is_same_v<M, EmptyModel>, Concurrency>&  setPostCheck(function<void(ObjectType&)> postCheck)  {
+        function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
+        postCheckPtr = util::make_shared(fullPostCheck);
+        return *this;
+    }
+
 private:
     shared_ptr<ObjectTypeGen> initialGenPtr;
     shared_ptr<ModelTypeGen> modelFactoryPtr;
     shared_ptr<ActionListGen> actionListGenPtr;
+    shared_ptr<function<void()>> onStartupPtr;
+    shared_ptr<function<void()>> onCleanupPtr;
+    shared_ptr<function<void(ObjectType&, ModelType&)>> postCheckPtr;
     uint64_t seed;
     uint32_t numRuns;
     uint32_t maxDurationMs;
@@ -94,20 +119,6 @@ private:
 
 template <typename ActionType>
 bool Concurrency<ActionType>::go()
-{
-    static auto emptyPostCheck = +[](ObjectType&, ModelType&) {};
-    return go(emptyPostCheck);
-}
-
-template <typename ActionType>
-bool Concurrency<ActionType>::go(function<void(ObjectType&)> postCheck)
-{
-    auto fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
-    return go(fullPostCheck);
-}
-
-template <typename ActionType>
-bool Concurrency<ActionType>::go(function<void(ObjectType&, ModelType&)> postCheck)
 {
     Random rand(seed);
     Random savedRand(seed);
@@ -130,7 +141,10 @@ bool Concurrency<ActionType>::go(function<void(ObjectType&, ModelType&)> postChe
                 pass = true;
                 try {
                     savedRand = rand;
-                    invoke(rand, postCheck);
+                    if(onStartupPtr)
+                        (*onStartupPtr)();
+                    if(invoke(rand) && onCleanupPtr)
+                        (*onCleanupPtr)();
                     pass = true;
                 } catch (const Success&) {
                     pass = true;
@@ -205,7 +219,7 @@ struct RearRunner
 };
 
 template <typename ActionType>
-bool Concurrency<ActionType>::invoke(Random& rand, function<void(ObjectType&, ModelType&)> postCheck)
+bool Concurrency<ActionType>::invoke(Random& rand)
 {
     Shrinkable<ObjectType> initialShr = (*initialGenPtr)(rand);
     ObjectType& obj = initialShr.getRef();
@@ -250,7 +264,9 @@ bool Concurrency<ActionType>::invoke(Random& rand, function<void(ObjectType&, Mo
     });
 
     spawner.join();
-    postCheck(obj, model);
+
+    if(postCheckPtr)
+            (*postCheckPtr)(obj, model);
 
     return true;
 }

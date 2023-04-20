@@ -298,7 +298,7 @@ prop.setSeed(0).setNumRuns(1000).setMaxDurationMs(10000).go();
 
 ## Alternative Style: Using Action Classes
 
-There are actually two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*. While the first style using functions are easier to use and understand, the second style is more formal and traditional way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests. See [the separate page](./StatefulTestingStyle2.md) for detail. This style is more traditional way of defining actions. Both styles are similar in terms of expressive power.
+There are actually two styles of stateful testing - one with *action functions(lambda)* and one with *action classes*. While the first style using functions are easier to use and understand, the second style is more formal way of doing stateful testing. You may choose to use either style. Both have similar process of defining and running stateful tests. See [the separate page](./StatefulTestingStyle2.md) for detail. Both styles are similar in terms of expressive power.
 
 
 # Further topics

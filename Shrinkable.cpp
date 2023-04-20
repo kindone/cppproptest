@@ -11,6 +11,10 @@ Any AnyFunction::operator()(const Any& in) {
     return (*funcPtr)(in);
 }
 
+ShrinkableAnyFunction::ShrinkableAnyFunction(function<ShrinkableAny(const Any&)> inFunc) {
+    funcPtr = util::make_shared<decltype(inFunc)>(inFunc);
+}
+
 ShrinkableAny ShrinkableAnyFunction::operator()(const Any& in) {
     return (*funcPtr)(in);
 }

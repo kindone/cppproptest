@@ -9,32 +9,20 @@ namespace util {
 template <typename FLOATTYPE>
 FLOATTYPE decomposeFloat(FLOATTYPE value, int* exp);
 
-template <>
-float decomposeFloat<float>(float value, int* exp)
-{
-    return frexpf(value, exp);
-}
-
-template <>
-double decomposeFloat<double>(double value, int* exp)
-{
-    return frexp(value, exp);
-}
-
 template <typename FLOATTYPE>
 FLOATTYPE composeFloat(FLOATTYPE value, int exp);
 
 template <>
-float composeFloat<float>(float value, int exp)
-{
-    return ldexpf(value, exp);
-}
+float decomposeFloat<float>(float value, int* exp);
 
 template <>
-double composeFloat<double>(double value, int exp)
-{
-    return ldexp(value, exp);
-}
+double decomposeFloat<double>(double value, int* exp);
+
+template <>
+float composeFloat<float>(float value, int exp);
+
+template <>
+double composeFloat<double>(double value, int exp);
 
 }  // namespace util
 
@@ -98,5 +86,6 @@ Stream shrinkFloat(FLOATTYPE value)
         return floatShrinkable.shrinks();
     }
 }
+
 
 } // namespace proptest
