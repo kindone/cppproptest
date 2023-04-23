@@ -5,18 +5,18 @@ Generator combinators are provided for building a new generator based on existin
 
 While you can go through this document from top to the bottom, you might be want to find a suitable combinator for your use case using this table:
 
-| Purpose                                            | Examples                                   | Related Generator/Combinator                                                                                           |
-| -------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Generate just a constant                           | `0` or `"1337"`                            | [`just<T>`](#constants)                                                                                                |
-| Generate a list of unique values                   | `{3,5,1}` but not `{3,5,5}`                | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)                                                                   |
-| Generate a value within numeric range of values    | a number within `1`~`9999`                 | [`interval<T>`, `integers<T>`](#integers-and-intervals)                                                                |
-| Generate a value within a set of values            | a prime number under 100                   | [`elementOf<T>`](#selecting-from-values)                                                                               |
-| Generate a pair or a tuple of different types      | a `pair<int, string>`                      | [`pairOf<T1,T2>`, `tupleOf<Ts...>`](#pair-and-tuples)                                                                  |
-| Union multiple generators                          | `20~39` or `60~79` combined                | [`unionOf<T>` (`oneOf<T>`)](#selecting-from-generators)                                                                |
-| Transform into another type or a value             | `"0"` or `"1.4"` (a number as string).     | [`transform<T,U>`](#transforming-or-mapping)                                                                           |
-| Generate a struct or a class object                | a `Rectangle` object with width and height | [`construct<T,ARGS...>`](#constructing-an-object)                                                                      |
-| Apply constraints in generated values              | an even natural number (`n % 2 == 0`)      | [`filter` (`suchThat`)](#applying-constraints)                                                                         |
-| Generate values with dependencies or relationships | a rectangle where `width == height * 2`    | [`dependency`, `chain`](#values-with-dependencies), [`pairWith`, `tupleWith`](#utility-methods-in-standard-generators) |
+| Purpose                                            | Related Generator/Combinator                                                                                           | Examples                                   |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Generate just a constant                           | [`just<T>`](#constants)                                                                                                | `0` or `"1337"`                            |
+| Generate a value within constants                  | [`elementOf<T>`](#selecting-from-values)                                                                               | a prime number under 100                   |
+| Generate a list of unique values                   | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)                                                                   | `{3,5,1}` but not `{3,5,5}`                |
+| Generate a value within numeric range of values    | [`interval<T>`, `integers<T>`](#integers-and-intervals)                                                                | a number within `1`~`9999`                 |
+| Generate a pair or a tuple of different types      | [`pairOf<T1,T2>`, `tupleOf<Ts...>`](#pair-and-tuples)                                                                  | a `pair<int, string>`                      |
+| Union multiple generators                          | [`unionOf<T>` (`oneOf<T>`)](#selecting-from-generators)                                                                | `20~39` or `60~79` combined                |
+| Transform into another type or a value             | [`transform<T,U>`](#transforming-or-mapping)                                                                           | `"0"` or `"1.4"` (a number as string).     |
+| Generate a struct or a class object                | [`construct<T,ARGS...>`](#constructing-an-object)                                                                      | a `Rectangle` object with width and height |
+| Apply constraints in generated values              | [`filter` (`suchThat`)](#applying-constraints)                                                                         | an even natural number (`n % 2 == 0`)      |
+| Generate values with dependencies or relationships | [`dependency`, `chain`](#values-with-dependencies), [`pairWith`, `tupleWith`](#utility-methods-in-standard-generators) | a rectangle where `width == height * 2`    |
 
 &nbsp;
 
@@ -24,11 +24,30 @@ While you can go through this document from top to the bottom, you might be want
 
 ### Constants
 
-* `just<T>(T*)` or `just<T>(T)`: always generates specific value
+* `just<T>(T*)`, `just<T>(T)`, `just<T>(shared_ptr<T>)`: always generates a specific value. A shared pointer can be used for non-copyable types.
 * `lazy<T>(std::function<T()>)`: generates a value by calling a function
     ```cpp
     auto zeroGen = just(0); // template argument is optional if type is deducible
     auto oneGen = lazy<int>([]() { return 1; });
+    ```
+
+### Selecting from constants
+
+You may want to random choose from specific list of values.
+
+* `elementOf<T>(val1, ..., valN)`: generates a type `T` from multiple values for type `T`, by choosing one of the values randomly
+    ```cpp
+    // generates a prime number under 50
+    auto primeGen = elementOf<int>(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47);
+    ```
+
+    * `elementOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
+    `weightedVal(<value>, <weight>)` is used to annotate the desired weight.
+
+    ```cpp
+    // generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
+    //   weight for 10 automatically becomes 1.0 - 0.8 - 0.15 == 0.05
+    elementOf<int>(weightedVal(2, 0.8), weightedVal(5, 0.15), 10);
     ```
 
 ### Integers and intervals
@@ -48,25 +67,6 @@ Some utility generators for integers are provided
     ```
 * `natural<INT_TYPE>(max)`: generates a positive integer up to `max`(inclusive)
 * `nonNegative<INT_TYPE>(max)`: : generates zero or a positive integer up to `max`(inclusive)
-
-### Selecting from values
-
-You may want to random choose from specific list of values.
-
-* `elementOf<T>(val1, ..., valN)`: generates a type `T` from multiple values for type `T`, by choosing one of the values randomly
-    ```cpp
-    // generates a prime number under 50
-    auto primeGen = elementOf<int>(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47);
-    ```
-
-    * `elementOf` can receive optional probabilitistic weights (`0 < weight < 1`, sum of weights must not exceed 1.0) for generators. If weight is unspecified for a generator, it is calculated automatically so that remaining probability among unspecified generators is evenly distributed.
-    `weightedVal(<value>, <weight>)` is used to annotate the desired weight.
-
-    ```cpp
-    // generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
-    //   weight for 10 automatically becomes 1.0 - 0.8 - 0.15 == 0.05
-    elementOf<int>(weightedVal(2, 0.8), weightedVal(5, 0.15), 10);
-    ```
 
 ### Pair and Tuples
 

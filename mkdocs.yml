@@ -25,6 +25,7 @@ theme:
     - navigation.top
     - search.highlight
     - search.suggest
+    - navigation.expand
 
 markdown_extensions:
   - admonition
@@ -54,7 +55,8 @@ plugins:
 nav:
   - 'cppproptest':
     - README.md
-    - 'Getting Started': GettingStarted.md
+    - 'Getting Started' : GettingStarted.md
+    - Property.md
     - Generators.md
     - Combinators.md
     - Shrinking.md

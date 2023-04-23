@@ -62,19 +62,19 @@ forAll([](SomeNewType x, SomeOtherType y) {
 
 Here's quick reference for built-in arbitraries:
 
- | Purpose                          | Examples                            | Generator                                   |
- | -------------------------------- | ----------------------------------- | ------------------------------------------- |
- | Generate a boolean               | `true` or `false`                   | `Arbi<bool>()`                              |
- | Generate a character             | `'c'` or `'%'`                      | `Arbi<char>()`                              |
- | Generate an integer              | `12` or `-1133`                     | `Arbi<int>()`, `Arbi<uint64_t>()`, ...      |
- | Generate a floating point number | `3.4` or `-1.4e3`                   | `Arbi<float>()`, `Arbi<double>()`           |
- | Generate a string                | `"world"` or `"あ叶葉말"`           | `Arbi<std::string>()`, `Arbi<UTF8String>()` |
- | Generate a pair                  | `{1, "xv"}` or `{true, 3.4}`        | `Arbi<std::pair<T1,T2>>()`                  |
- | Generate a tuple                 | `{1, "xv", true}` or `{true, 3.4}`  | `Arbi<std::tuple<Ts...>>()`                 |
- | Generate a list                  | `{10, -4, 0}` or `{"k", "&"}`       | `Arbi<std::list<T>>()`                      |
- | Generate a vector                | `{10, -4, 0}` or `{"k", "&"}`       | `Arbi<std::vector<T>>()`                    |
- | Generate a set                   | set `{1, 3, 4}` but not `{1, 1, 3}` | `Arbi<std::set<T>>()`                       |
- | Generate a map                   | map of `"Bob" -> 25, "Alice" -> 30` | `Arbi<std::map<K,V>>()`                     |
+| Purpose                          | Generator                                   | Examples                            |
+| -------------------------------- | ------------------------------------------- | ----------------------------------- |
+| Generate a boolean               | `Arbi<bool>()`                              | `true` or `false`                   |
+| Generate a character             | `Arbi<char>()`                              | `'c'` or `'%'`                      |
+| Generate an integer              | `Arbi<int>()`, `Arbi<uint64_t>()`, ...      | `12` or `-1133`                     |
+| Generate a floating point number | `Arbi<float>()`, `Arbi<double>()`           | `3.4` or `-1.4e3`                   |
+| Generate a string                | `Arbi<std::string>()`, `Arbi<UTF8String>()` | `"world"` or `"あ叶葉말"`           |
+| Generate a pair                  | `Arbi<std::pair<T1,T2>>()`                  | `{1, "xv"}` or `{true, 3.4}`        |
+| Generate a tuple                 | `Arbi<std::tuple<Ts...>>()`                 | `{1, "xv", true}` or `{true, 3.4}`  |
+| Generate a list                  | `Arbi<std::list<T>>()`                      | `{10, -4, 0}` or `{"k", "&"}`       |
+| Generate a vector                | `Arbi<std::vector<T>>()`                    | `{10, -4, 0}` or `{"k", "&"}`       |
+| Generate a set                   | `Arbi<std::set<T>>()`                       | set `{1, 3, 4}` but not `{1, 1, 3}` |
+| Generate a map                   | `Arbi<std::map<K,V>>()`                     | map of `"Bob" -> 25, "Alice" -> 30` |
 
 * Boolean type:`bool`
 * Character type: `char`

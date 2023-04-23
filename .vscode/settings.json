@@ -100,5 +100,7 @@
     "doc/**": true,
     "doxygen.cfg": true,
     "googletest": true
-  }
+  },
+  "markdown-kroki.url": "https://kroki.io",
+  "markdown-kroki.prefix": "kroki-"
 }
