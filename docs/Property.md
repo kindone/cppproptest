@@ -2,6 +2,8 @@
 
 ## What you can do with `cppproptest`
 
+![Property functions and shorthands](images/property.svg)
+<!--
 ```kroki-d2
 
 callable : Callable {
@@ -60,7 +62,7 @@ cont2 : Shorthands {
 }
 
 cont.property -> cont.propertyForAll : random inputs
-cont.property -> cont.propertyMatrix : cartesian products
+cont.property -> cont.propertyMatrix : Cartesian products
 cont.property -> cont.example : specific inputs
 
 cont.propertyForAll -- cont2.forAll : shorthand {
@@ -84,21 +86,40 @@ cont2.forAll -- cont2.assertForAll : Google Test ASSERT_TRUE {
 }
 ```
 
-Here's the list of property-based test functions (with namespace `proptest`) you can use in `cppproptest`:
+-->
 
-| Name                                     | Description                                                 | Remark                                                |
-| :--------------------------------------- | :---------------------------------------------------------- | :---------------------------------------------------- |
-| `proptest::property()`&nbsp;&nbsp;&nbsp; | Define a property based on a callable                       |                                                       |
-| `  .forAll()`                            | Run the property with random inputs                         | Requires generators (defined or supplied)             |
-| `  .matrix()`                            | Run the property with cartesian product of inputs           | Input list as `initializer_list`                      |
-| `  .example()`                           | Run the property with specific inputs                       |                                                       |
-| `proptest::forAll()`                     | Define and run a property immediately                       | Shorthand for `proptest::property(callable).forAll()` |
-| `proptest::matrix()`                     | Define and run a matrix test immediately                    | Shorthand for `proptest::property(callable).matrix()` |
-| `EXPECT_FOR_ALL()`                       | Run `proptest::forAll` with `EXPECT_TRUE` Google Test macro | Shorthand for `EXPECT_TRUE(forAll(...))`              |
-| `ASSERT_FOR_ALL()`                       | Run `proptest::forAll` with `ASSERT_TRUE` Google Test macro | Shorthand for `ASSERT_TRUE(forAll(...))`              |
+Here's the list of property-based test functions and macros you can use in `cppproptest`:
 
-You can define a property with a criteria function and certain input domain. You can choose to verify the criteria function with randomly generated inputs (`forAll()`) or with manually specified ones (`example()`). You can also exhaustively test all combinations of inputs based on the values you provided (`matrix`).
-You can wrap around a property test with Google Tests' macro so that you make Google Test consider the property test failure as a test failure (otherwise, the property test will only print the failure information to standard output and return false.).
+#### Property Function and Its Test Methods
+
+You can define a property with a criteria function and certain input domain. You can choose to verify the criteria function with randomly generated inputs (`forAll()`) or with manually specified ones (`example()`). You can also exhaustively test all combinations of inputs based on the values you provided (`matrix()`).
+
+| Name                                                        | Description                                       | Remark                           |
+| :---------------------------------------------------------- | :------------------------------------------------ | :------------------------------- |
+| `proptest::property()` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Define a property based on a callable             |                                  |
+| &nbsp;&nbsp;&nbsp;&nbsp;`.forAll()`                         | Run the property with random inputs               |                                  |
+| &nbsp;&nbsp;&nbsp;&nbsp;`.matrix()`                         | Run the property with Cartesian product of inputs | Input list as `initializer_list` |
+| &nbsp;&nbsp;&nbsp;&nbsp;`.example()`                        | Run the property with specific inputs             |                                  |
+
+
+#### Shorthands for Property Test Methods
+
+You can use convenient shorthands for above methods.
+
+| Name                             | Description                              | Remark                                                |
+| :------------------------------- | :--------------------------------------- | :---------------------------------------------------- |
+| `proptest::forAll()`&nbsp;&nbsp; | Define and run a property immediately    | Shorthand for `proptest::property(callable).forAll()` |
+| `proptest::matrix()`             | Define and run a matrix test immediately | Shorthand for `proptest::property(callable).matrix()` |
+
+#### Google Test Assertion Macros
+
+You can wrap around a property test with Google Tests' macro so that you make Google Test consider the property test failure as a test failure (otherwise, the property test will only print the failure information to standard output and return `false`.).
+
+| Name                                       | Description                                                 | Remark                                             |
+| :----------------------------------------- | :---------------------------------------------------------- | :------------------------------------------------- |
+| `EXPECT_FOR_ALL()`&nbsp;&nbsp;&nbsp;&nbsp; | Run `proptest::forAll` with `EXPECT_TRUE` Google Test macro | Shorthand for `EXPECT_TRUE(proptest::forAll(...))` |
+| `ASSERT_FOR_ALL()`                         | Run `proptest::forAll` with `ASSERT_TRUE` Google Test macro | Shorthand for `ASSERT_TRUE(proptest::forAll(...))` |
+
 
 ## Defining and running a `property` test
 
@@ -205,7 +226,7 @@ prop.example(INT_MAX, INT_MAX);
 
 #### Specifying full matrix of inputs with `Property::matrix()`
 
-While `.example()` provides a way to test certain examples by specifying each one of them, you might want to go even further to test all combinations of concerned inputs (e.g. all defined enum values) by taking a cartesian product of the input parameters. In above example,taking `{INT_MIN, INT_MAX}` for `a` and another `{INT_MIN, INT_MAX}` for `b` and multiply them as if it was a matrix multiplication. This will result in four combinations `{(INT_MIN, INT_MIN), (INT_MIN, INT_MAX), (INT_MAX, INT_MIN), (INT_MAX, INT_MAX)}`. `.matrix()` lets you do exactly this kind of combination test:
+While `.example()` provides a way to test certain examples by specifying each one of them, you might want to go even further to test all combinations of concerned inputs (e.g. all defined enum values) by taking a Cartesian product of the input parameters. In above example,taking `{INT_MIN, INT_MAX}` for `a` and another `{INT_MIN, INT_MAX}` for `b` and multiply them as if it was a matrix multiplication. This will result in four combinations `{(INT_MIN, INT_MIN), (INT_MIN, INT_MAX), (INT_MAX, INT_MIN), (INT_MAX, INT_MAX)}`. `.matrix()` lets you do exactly this kind of combination test:
 
 ```cpp
 // equivalent to above using four `prop.example()`

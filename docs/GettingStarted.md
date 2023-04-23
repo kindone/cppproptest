@@ -1,8 +1,6 @@
 # Getting Started with `cppproptest`
 
-## Running your first property-based test
-
-`cppproptest` requires [CMake](https://cmake.org) for build tool.
+`cppproptest` can be built and used with [CMake](https://cmake.org).
 You can examine the requirements with:
 
 ```Shell
@@ -18,7 +16,7 @@ ADD_SUBDIRECTORY(<path_to_cppproptest_root>)
 
 ```
 
-And then add this library to `TARGET_LINK_LIBRARIES` section.
+And then add the shared library `proptest` to `TARGET_LINK_LIBRARIES` section.
 
 ```
 TARGET_LINK_LIBRARIES( ...
@@ -49,4 +47,4 @@ TEST(AudioCodec, EncoderDecoder)
 
 Note that `ASSERT_FOR_ALL` is a simple macro wrapping an `ASSERT_TRUE` google test macro around the `proptest::forAll` function. You can find more information in [Using Assertion](#using-assertions) section.
 
-You can continue to [What You Can Do with `cppproptest`](Property.md)
+You can continue to [Writing Property-based Tests](Property.md)
