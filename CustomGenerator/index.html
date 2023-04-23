@@ -12,7 +12,7 @@
         <meta name="author" content="kindone">
       
       
-        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/Mocking/">
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/CustomGenerator/">
       
       
       
@@ -21,7 +21,7 @@
     
     
       
-        <title>Mocking - cppproptest</title>
+        <title>Building Custom Generator from Scratch - cppproptest</title>
       
     
     
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#generating-mocks" class="md-skip">
+        <a href="#building-custom-generator-from-scratch" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Mocking
+              Building Custom Generator from Scratch
             
           </span>
         </div>
@@ -404,6 +404,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -412,22 +414,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#generating-mocks" class="md-nav__link">
-    Generating Mocks
-  </a>
-  
-    <nav class="md-nav" aria-label="Generating Mocks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#todo" class="md-nav__link">
-    TODO
+  <a href="#genfunctiont-common-representation-for-all-generators-for-type-t" class="md-nav__link">
+    GenFunction&lt;T&gt; - Common representation for all generators for type T
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#generatort-decorator-class-for-supercharging-a-generator" class="md-nav__link">
+    Generator&lt;T&gt; - Decorator class for supercharging a generator
+  </a>
   
 </li>
       
@@ -449,17 +445,56 @@
   
 
 
-  <h1>Mocking</h1>
+<h1 id="building-custom-generator-from-scratch">Building Custom Generator from Scratch<a class="headerlink" href="#building-custom-generator-from-scratch" title="Permanent link">&para;</a></h1>
+<h2 id="genfunctiont-common-representation-for-all-generators-for-type-t"><code>GenFunction&lt;T&gt;</code> - Common representation for all generators for type <code>T</code><a class="headerlink" href="#genfunctiont-common-representation-for-all-generators-for-type-t" title="Permanent link">&para;</a></h2>
+<p>All generators, including the default ones, share the same base <em>function</em> type. A generator can be a callable (function, functor, or lambda) with following common signature:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// (Random&amp;) -&gt; Shrinkable&lt;T&gt;</span>
+</code></pre></div>
+<p>This can be represented as (or coerced to) a standard function type, <code>std::function&lt;Shrinkable&lt;T&gt;(Random&amp;)&gt;</code>. In <code>cppproptest</code>, this function type is aliased as <code>GenFunction&lt;T&gt;</code>. We will use this term <em>GenFunction</em> throughout this page to refer the generator function type.</p>
+<div class="highlight"><pre><span></span><code><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">using</span><span class="w"> </span><span class="n">GenFunction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Random</span><span class="o">&amp;</span><span class="p">);</span>
+</code></pre></div>
+<p>By the way, you may have noticed a strange template type <code>Shrinkable</code> in this signature. You can refer to <a href="../Shrinking/"><code>Shrinkable</code></a> for its further detail, but it can be treated as a wrapper for type <code>T</code> for now. So a generator (<code>Generator&lt;T&gt;</code>) basically generates a value of type <code>T</code> from a random number generator of <code>Random</code> type. A generator can be defined as function, functor, or lambda, as following:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// lambda style</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">myIntGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[](</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="p">};</span>
 
-<h2 id="generating-mocks">Generating Mocks<a class="headerlink" href="#generating-mocks" title="Permanent link">&para;</a></h2>
-<h3 id="todo">TODO<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h3>
+<span class="c1">// function style</span>
+<span class="n">Shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">myIntGen</span><span class="p">(</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// functor style</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">MyIntGen</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="k">operator</span><span class="p">()(</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h2 id="generatort-decorator-class-for-supercharging-a-generator"><code>Generator&lt;T&gt;</code> - Decorator class for supercharging a generator<a class="headerlink" href="#generatort-decorator-class-for-supercharging-a-generator" title="Permanent link">&para;</a></h2>
+<p>The template class <code>Generator&lt;T&gt;</code> is an abstract functor class that also coerces to <code>GenFunction&lt;T&gt;</code>. A <code>Generator&lt;T&gt;</code> gives access to some useful methods so that you can wrap your callable with this to decorate with those methods. As all accompanied generators and combinators of <code>cppproptest</code> produce decorated <code>Generator&lt;T&gt;</code>s, you can use the utility methods out-of-box.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// decorate a GenFunction with Generator&lt;T&gt;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">myIntGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Generator</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">Random</span><span class="o">&amp;</span><span class="w"> </span><span class="n">rand</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">smallInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="n">getRandomInt8</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">make_shrinkable</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">smallInt</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// .filter and other utility methods can be used once the generator is decorated with Generator&lt;T&gt;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">evenGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myIntGen</span><span class="p">.</span><span class="n">filter</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">});</span><span class="w"> </span><span class="c1">// generates even numbers only</span>
+</code></pre></div>
 
   <hr>
 <div class="md-source-file">
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">March 26, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 1, 2023</span>
       
     
   </small>

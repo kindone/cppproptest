@@ -1,0 +1,125 @@
+<svg version="1.1" baseProfile="full" width="1029.6" height="281.0" viewbox="0 0 1029.6344086021504 281" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+	<desc >#.many: visual=note
+	#stroke: #1831ab
+	#fill: #f3f4f7;#f8f7f3
+	#lineWidth:2
+	#bendSize: 0.6
+	#arrowSize: 0.7
+	#fontSize: 10
+	#edgeMargin:3
+	#spacing:60
+	#direction: right
+	#gravity:2
+	
+	[Namespace
+	  [&lt;many&gt;Arbitraries]
+	  [&lt;many&gt;Built-in ;Generators]
+	]
+	
+	[Custom Generator 1]
+	
+	[Custom Generator 2]
+	
+	[New Arbitrary&lt;T&gt;]
+	
+	[Namespace] -&gt; apply combinator [Custom Generator 1]
+	[Custom Generator 1] -&gt; apply combinator [Custom Generator 2]
+	[Custom Generator 2] define arbitrary for T -&gt; [New Arbitrary&lt;T&gt;]
+	
+	[New Arbitrary&lt;T&gt;] globally available --\&gt; [Namespace]</desc>
+	<g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="10pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+		<g font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round" stroke="#1831ab">
+			<g stroke="transparent" fill="transparent">
+				<rect x="0.0" y="0.0" height="281.0" width="1029.6" stroke="none"></rect>
+			</g>
+			<g transform="translate(8, 8)" fill="#1831ab">
+				<g transform="translate(20, 20)" fill="#1831ab" font-family="Helvetica" font-size="10pt" font-weight="normal" font-style="normal">
+					<text x="156.7" y="65.8" stroke="none">apply combinator</text>
+					<path d="M158.0 84.4 L188 73.75 L218 73.75 L218 73.75 L248 73.75 L248 73.75 L271 73.75 L271.0 73.8 " fill="none"></path>
+					<path d="M264.0 79.3 L271.0 73.8 L264.0 68.2 L278.0 73.8 Z"></path>
+					<text x="431.7" y="65.8" stroke="none">apply combinator</text>
+					<path d="M433.0 73.8 L463 73.75 L493 73.75 L493 73.75 L523 73.75 L523 73.75 L546 73.75 L546.0 73.8 " fill="none"></path>
+					<path d="M539.0 79.3 L546.0 73.8 L539.0 68.2 L553.0 73.8 Z"></path>
+					<text x="716.0" y="65.8" stroke="none">define arbitrary for T</text>
+					<path d="M708.0 73.8 L738 73.75 L768 73.75 L768 73.75 L798 73.75 L798 73.75 L844.9626693938301 92.41465065652218 L845.0 92.4 " fill="none"></path>
+					<path d="M836.4 95.0 L845.0 92.4 L840.5 84.6 L851.5 95.0 Z"></path>
+					<text x="859.5" y="148.0" stroke="none">globally available</text>
+					<text x="137.5" y="158.6" stroke="none">\&gt;</text>
+					<g stroke-dasharray="4 4">
+						<path d="M851.5 130.0 L798 151.25 L768 151.25 L768 151.25 L738 151.25 L738 151.25 L630.5 151.25 L630.5 151.25 L523 151.25 L523 151.25 L493 151.25 L493 151.25 L463 151.25 L463 151.25 L355.5 151.25 L355.5 151.25 L248 151.25 L248 151.25 L218 151.25 L218 151.25 L188 151.25 L188 151.25 L158 140.58486238532112 L158.0 140.6 " fill="none"></path>
+					</g>
+					<g data-name="Namespace">
+						<g fill="#f3f4f7" stroke="#1831ab" data-name="Namespace">
+							<rect x="3.0" y="3.0" height="219.0" width="152.0" data-name="Namespace"></rect>
+						</g>
+						<g transform="translate(3, 3)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Namespace">
+							<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Namespace">
+								<text x="68.0" y="11.3" stroke="none" text-anchor="middle" data-name="Namespace">Namespace</text>
+								<g transform="translate(20, 20)" data-name="Namespace">
+									<g data-name="Arbitraries">
+										<g fill="#f8f7f3" stroke="#1831ab" data-name="Arbitraries">
+											<path d="M6.0 3.0 L82.0 3.0 L90.0 11.0 L90.0 32.0 L6.0 32.0 L6.0 3.0 Z" data-name="Arbitraries"></path>
+											<path d="M82.0 3.0 L82.0 11.0 L90.0 11.0" fill="none" data-name="Arbitraries"></path>
+										</g>
+										<g transform="translate(6, 3)" font-family="Helvetica" font-size="10pt" font-weight="normal" font-style="normal" data-name="Arbitraries">
+											<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Arbitraries">
+												<text x="34.0" y="11.3" stroke="none" text-anchor="middle" data-name="Arbitraries">Arbitraries</text>
+												
+											</g>
+										</g>
+									</g>
+									<g data-name="Built-in">
+										<g fill="#f8f7f3" stroke="#1831ab" data-name="Built-in">
+											<path d="M3.0 98.0 L85.0 98.0 L93.0 106.0 L93.0 139.0 L3.0 139.0 L3.0 98.0 Z" data-name="Built-in"></path>
+											<path d="M85.0 98.0 L85.0 106.0 L93.0 106.0" fill="none" data-name="Built-in"></path>
+										</g>
+										<g transform="translate(3, 98)" font-family="Helvetica" font-size="10pt" font-weight="normal" font-style="normal" data-name="Built-in">
+											<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Built-in">
+												<text x="37.0" y="11.3" stroke="none" text-anchor="middle" data-name="Built-in">Built-in</text>
+												<text x="37.0" y="23.8" stroke="none" text-anchor="middle" data-name="Built-in">Generators</text>
+												
+											</g>
+										</g>
+									</g>
+								</g>
+							</g>
+						</g>
+					</g>
+					<g data-name="Custom Generator 1">
+						<g fill="#f3f4f7" stroke="#1831ab" data-name="Custom Generator 1">
+							<rect x="281.0" y="59.0" height="29.0" width="149.0" data-name="Custom Generator 1"></rect>
+						</g>
+						<g transform="translate(281, 59)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Custom Generator 1">
+							<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Custom Generator 1">
+								<text x="66.5" y="11.3" stroke="none" text-anchor="middle" data-name="Custom Generator 1">Custom Generator 1</text>
+								
+							</g>
+						</g>
+					</g>
+					<g data-name="Custom Generator 2">
+						<g fill="#f3f4f7" stroke="#1831ab" data-name="Custom Generator 2">
+							<rect x="556.0" y="59.0" height="29.0" width="149.0" data-name="Custom Generator 2"></rect>
+						</g>
+						<g transform="translate(556, 59)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Custom Generator 2">
+							<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Custom Generator 2">
+								<text x="66.5" y="11.3" stroke="none" text-anchor="middle" data-name="Custom Generator 2">Custom Generator 2</text>
+								
+							</g>
+						</g>
+					</g>
+					<g data-name="New Arbitrary&lt;T&gt;">
+						<g fill="#f3f4f7" stroke="#1831ab" data-name="New Arbitrary&lt;T&gt;">
+							<rect x="831.0" y="98.0" height="29.0" width="129.0" data-name="New Arbitrary&lt;T&gt;"></rect>
+						</g>
+						<g transform="translate(831, 98)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="New Arbitrary&lt;T&gt;">
+							<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="New Arbitrary&lt;T&gt;">
+								<text x="56.5" y="11.3" stroke="none" text-anchor="middle" data-name="New Arbitrary&lt;T&gt;">New Arbitrary&lt;T&gt;</text>
+								
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>

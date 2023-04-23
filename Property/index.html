@@ -1,0 +1,1041 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="C++ Property Testing">
+      
+      
+        <meta name="author" content="kindone">
+      
+      
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/Property/">
+      
+      
+        <link rel="prev" href="../GettingStarted/">
+      
+      
+        <link rel="next" href="../Generators/">
+      
+      <link rel="icon" href="../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
+    
+    
+      
+        <title>Writing Property-based Tests - cppproptest</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ded33207.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CInconsolata:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"Inconsolata"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="light-green">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#writing-property-based-tests" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="cppproptest" class="md-header__button md-logo" aria-label="cppproptest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            cppproptest
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Writing Property-based Tests
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kindone/cppproptest
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="cppproptest" class="md-nav__button md-logo" aria-label="cppproptest" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    cppproptest
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kindone/cppproptest
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="..">cppproptest</a>
+          
+            <label for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          cppproptest
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GettingStarted/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Writing Property-based Tests
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Writing Property-based Tests
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-can-do-with-cppproptest" class="md-nav__link">
+    What you can do with cppproptest
+  </a>
+  
+    <nav class="md-nav" aria-label="What you can do with cppproptest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#property-function-and-its-test-methods" class="md-nav__link">
+    Property Function and Its Test Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shorthands-for-property-test-methods" class="md-nav__link">
+    Shorthands for Property Test Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-test-assertion-macros" class="md-nav__link">
+    Google Test Assertion Macros
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-and-running-a-property-test" class="md-nav__link">
+    Defining and running a property test
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining and running a property test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-a-property" class="md-nav__link">
+    Defining a Property
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generators-and-arbitraries-under-the-hood" class="md-nav__link">
+    Generators and Arbitraries under the hood
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-a-property" class="md-nav__link">
+    Testing a Property
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing a Property">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specifying-generators-with-propertyforall" class="md-nav__link">
+    Specifying generators with Property::forAll()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-example-inputs-with-propertyexample" class="md-nav__link">
+    Specifying example inputs with Property::example()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-full-matrix-of-inputs-with-propertymatrix" class="md-nav__link">
+    Specifying full matrix of inputs with Property::matrix()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-test-runs" class="md-nav__link">
+    Configuring test runs
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuring test runs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-number-of-runs" class="md-nav__link">
+    Setting number of runs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-the-random-seed" class="md-nav__link">
+    Setting the random seed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-maximum-test-duration" class="md-nav__link">
+    Setting maximum test duration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chaining-configurations" class="md-nav__link">
+    Chaining configurations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-assertions" class="md-nav__link">
+    Using Assertions
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Generators/" class="md-nav__link">
+        Generating Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Combinators/" class="md-nav__link">
+        Generator Combinators
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Shrinking/" class="md-nav__link">
+        Simplifying Failed Inputs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Printing/" class="md-nav__link">
+        Printing Facilities
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../StatefulTesting/" class="md-nav__link">
+        Stateful Testing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ConcurrencyTesting/" class="md-nav__link">
+        Concurrency Testing
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-can-do-with-cppproptest" class="md-nav__link">
+    What you can do with cppproptest
+  </a>
+  
+    <nav class="md-nav" aria-label="What you can do with cppproptest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#property-function-and-its-test-methods" class="md-nav__link">
+    Property Function and Its Test Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shorthands-for-property-test-methods" class="md-nav__link">
+    Shorthands for Property Test Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-test-assertion-macros" class="md-nav__link">
+    Google Test Assertion Macros
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-and-running-a-property-test" class="md-nav__link">
+    Defining and running a property test
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining and running a property test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-a-property" class="md-nav__link">
+    Defining a Property
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generators-and-arbitraries-under-the-hood" class="md-nav__link">
+    Generators and Arbitraries under the hood
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-a-property" class="md-nav__link">
+    Testing a Property
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing a Property">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specifying-generators-with-propertyforall" class="md-nav__link">
+    Specifying generators with Property::forAll()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-example-inputs-with-propertyexample" class="md-nav__link">
+    Specifying example inputs with Property::example()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-full-matrix-of-inputs-with-propertymatrix" class="md-nav__link">
+    Specifying full matrix of inputs with Property::matrix()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-test-runs" class="md-nav__link">
+    Configuring test runs
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuring test runs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-number-of-runs" class="md-nav__link">
+    Setting number of runs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-the-random-seed" class="md-nav__link">
+    Setting the random seed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-maximum-test-duration" class="md-nav__link">
+    Setting maximum test duration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chaining-configurations" class="md-nav__link">
+    Chaining configurations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-assertions" class="md-nav__link">
+    Using Assertions
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="writing-property-based-tests">Writing Property-based Tests<a class="headerlink" href="#writing-property-based-tests" title="Permanent link">&para;</a></h1>
+<h2 id="what-you-can-do-with-cppproptest">What you can do with <code>cppproptest</code><a class="headerlink" href="#what-you-can-do-with-cppproptest" title="Permanent link">&para;</a></h2>
+<p><img alt="Property functions and shorthands" src="../images/property.svg" /></p>
+<!--
+![Kroki](https://github.com/pages/kindone/cppproptest/images/kroki_generated/Property-1c6c939a6b931e34f47a3d1d1942c31f.svg)
+
+-->
+
+<p>Here's the list of property-based test functions and macros you can use in <code>cppproptest</code>:</p>
+<h4 id="property-function-and-its-test-methods">Property Function and Its Test Methods<a class="headerlink" href="#property-function-and-its-test-methods" title="Permanent link">&para;</a></h4>
+<p>You can define a property with a criteria function and certain input domain. You can choose to verify the criteria function with randomly generated inputs (<code>forAll()</code>) or with manually specified ones (<code>example()</code>). You can also exhaustively test all combinations of inputs based on the values you provided (<code>matrix()</code>).</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Description</th>
+<th align="left">Remark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>proptest::property()</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="left">Define a property based on a callable</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;<code>.forAll()</code></td>
+<td align="left">Run the property with random inputs</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;<code>.matrix()</code></td>
+<td align="left">Run the property with Cartesian product of inputs</td>
+<td align="left">Input list as <code>initializer_list</code></td>
+</tr>
+<tr>
+<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;<code>.example()</code></td>
+<td align="left">Run the property with specific inputs</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<h4 id="shorthands-for-property-test-methods">Shorthands for Property Test Methods<a class="headerlink" href="#shorthands-for-property-test-methods" title="Permanent link">&para;</a></h4>
+<p>You can use convenient shorthands for above methods.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Description</th>
+<th align="left">Remark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>proptest::forAll()</code>&nbsp;&nbsp;</td>
+<td align="left">Define and run a property immediately</td>
+<td align="left">Shorthand for <code>proptest::property(callable).forAll()</code></td>
+</tr>
+<tr>
+<td align="left"><code>proptest::matrix()</code></td>
+<td align="left">Define and run a matrix test immediately</td>
+<td align="left">Shorthand for <code>proptest::property(callable).matrix()</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="google-test-assertion-macros">Google Test Assertion Macros<a class="headerlink" href="#google-test-assertion-macros" title="Permanent link">&para;</a></h4>
+<p>You can wrap around a property test with Google Tests' macro so that you make Google Test consider the property test failure as a test failure (otherwise, the property test will only print the failure information to standard output and return <code>false</code>.).</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Description</th>
+<th align="left">Remark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>EXPECT_FOR_ALL()</code>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="left">Run <code>proptest::forAll</code> with <code>EXPECT_TRUE</code> Google Test macro</td>
+<td align="left">Shorthand for <code>EXPECT_TRUE(proptest::forAll(...))</code></td>
+</tr>
+<tr>
+<td align="left"><code>ASSERT_FOR_ALL()</code></td>
+<td align="left">Run <code>proptest::forAll</code> with <code>ASSERT_TRUE</code> Google Test macro</td>
+<td align="left">Shorthand for <code>ASSERT_TRUE(proptest::forAll(...))</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="defining-and-running-a-property-test">Defining and running a <code>property</code> test<a class="headerlink" href="#defining-and-running-a-property-test" title="Permanent link">&para;</a></h2>
+<p><code>property()</code> defines a property with optional configurations. By calling <code>property()</code>, you are creating a <code>Property</code> object. <code>forAll()</code> is the shorthand for calling <code>Property</code>'s method <code>forAll()</code>. <code>Property::forAll()</code> performs property-based test using supplied callable (function, functor, or lambda). While <code>forAll()</code> would work most of the time, <code>property()</code> in combination with its methods <code>.forAll()</code>, <code>.example()</code>, <code>.matrix()</code> can be more versatile and configurable at times.</p>
+<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>is equivalent to:</p>
+<div class="highlight"><pre><span></span><code><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="p">}).</span><span class="n">forAll</span><span class="p">();</span>
+</code></pre></div>
+<h3 id="defining-a-property">Defining a Property<a class="headerlink" href="#defining-a-property" title="Permanent link">&para;</a></h3>
+<p>Defining a property requires a callable. For example, a lambda as following is such a callable with an <code>int</code> as parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Arguments are generated automatically by the library and the return value of the function will indicate success(<code>true</code>) or failure(<code>false</code>) of the property.
+Asserts can also be used to mark successes and failures. If you prefer not to use boolean return value to indicate success/fail, you can use void return type and use assertions instead:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="hll"><span class="w">    </span><span class="n">PROP_ASSERT_GE</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</span><span class="p">}</span>
+</code></pre></div>
+<h3 id="generators-and-arbitraries-under-the-hood">Generators and Arbitraries under the hood<a class="headerlink" href="#generators-and-arbitraries-under-the-hood" title="Permanent link">&para;</a></h3>
+<p>In above case, the function is called with an integer argument randomly generated by the test library. The library will repeatedly feed in some random values into the function for given number of runs.</p>
+<p>Under the hood, the library requires a generator for each of given parameter types. For each parameter, either an <code>Arbi&lt;T&gt;</code> (an arbitrary, the default generator for type <code>T</code>) should be defined ahead, or a custom generator must be provided. In above example, a predefined generator <code>Arbi&lt;int&gt;</code> is used to generate an integer argument.</p>
+<p>You can provide a custom generator as additional argument(s) to <code>property()</code> function, as following:</p>
+<div class="highlight"><pre><span></span><code><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="hll"><span class="p">},</span><span class="w"> </span><span class="n">myIntGenerator</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Any remaining parameter in the property function with no custom generator supplied will be generated using an arbitrary. In above example, <code>int a</code> is generated using <code>myIntGenerator</code> as it was supplied in the arguments, while <code>int b</code> will be generated using <code>Arbi&lt;int&gt;</code>, as no custom generator was supplied. If there is no arbitrary defined for a type and no custom generator is supplied either, a compile error will be emitted, as the library cannot test a property without a generator for the input type.</p>
+<p>Many primitive types and standard containers have their default generators <code>Arbi&lt;T&gt;</code> defined by the library for convenience.
+You can find more about generators and see the full list of built-in Arbitraries in <a href="../Generators/">Generators</a> page.</p>
+<h2 id="testing-a-property">Testing a Property<a class="headerlink" href="#testing-a-property" title="Permanent link">&para;</a></h2>
+<p>Once a property has been defined, you can run a simple randomized test based on the defined property with <code>Property::forAll()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">},</span><span class="w"> </span><span class="n">myIntGenerator</span><span class="p">);</span>
+
+<span class="hll"><span class="n">prop</span><span class="p">.</span><span class="n">forAll</span><span class="p">();</span>
+</span></code></pre></div>
+<p>It will repeatedly call the lambda with different input combinations of <code>a</code> and <code>b</code> then stops after some designated number of runs or a time duration. If a property fails with an input combination by the lambda returning <code>false</code> or encountering an assertion failure, the test stops there and the library will provide some information on the failed case. If possible the library will simplify the failed case with a process called <strong>shrinking</strong>. See <a href="../Shrinking/">Shrinking</a> page for more information on this process.</p>
+<h4 id="specifying-generators-with-propertyforall">Specifying generators with <code>Property::forAll()</code><a class="headerlink" href="#specifying-generators-with-propertyforall" title="Permanent link">&para;</a></h4>
+<p>While you can define a property with or without specifying generators, you can additionally specify or override some of the generators when calling <code>.forAll()</code>, by passing the generators as arguments.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// a is fixed to INT_MAX, while b is randomly generated</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">forAll</span><span class="p">(</span><span class="n">just</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">INT_MIN</span><span class="p">));</span>
+
+<span class="c1">// specifying generator for both a and b</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">forAll</span><span class="p">(</span><span class="n">just</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">INT_MIN</span><span class="p">),</span><span class="w"> </span><span class="n">inRange</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">-100</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">));</span>
+</code></pre></div>
+<p>In above example, <code>proptest::just()</code> is a <a href="../Combinators/">generator combinator</a> that simply keeps generating a single value. <code>proptest::inRange</code> is another example of generator combinator. It generates a numeric value within a given range.</p>
+<h4 id="specifying-example-inputs-with-propertyexample">Specifying example inputs with <code>Property::example()</code><a class="headerlink" href="#specifying-example-inputs-with-propertyexample" title="Permanent link">&para;</a></h4>
+<p>While having a randomized set of inputs is powerful, you might want to test the property with specific combination of inputs to ensure those combinations are always tested. This can be accomplished using <code>.example(...)</code>. You need to specify all the parameters needed to call the callable:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// define a property</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="c1">// check specific examples</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">example</span><span class="p">(</span><span class="n">INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MIN</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">example</span><span class="p">(</span><span class="n">INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MAX</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">example</span><span class="p">(</span><span class="n">INT_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MIN</span><span class="p">);</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">example</span><span class="p">(</span><span class="n">INT_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MAX</span><span class="p">);</span>
+</code></pre></div>
+<h4 id="specifying-full-matrix-of-inputs-with-propertymatrix">Specifying full matrix of inputs with <code>Property::matrix()</code><a class="headerlink" href="#specifying-full-matrix-of-inputs-with-propertymatrix" title="Permanent link">&para;</a></h4>
+<p>While <code>.example()</code> provides a way to test certain examples by specifying each one of them, you might want to go even further to test all combinations of concerned inputs (e.g. all defined enum values) by taking a Cartesian product of the input parameters. In above example,taking <code>{INT_MIN, INT_MAX}</code> for <code>a</code> and another <code>{INT_MIN, INT_MAX}</code> for <code>b</code> and multiply them as if it was a matrix multiplication. This will result in four combinations <code>{(INT_MIN, INT_MIN), (INT_MIN, INT_MAX), (INT_MAX, INT_MIN), (INT_MAX, INT_MAX)}</code>. <code>.matrix()</code> lets you do exactly this kind of combination test:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// equivalent to above using four `prop.example()`</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">matrix</span><span class="p">({</span><span class="n">INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MAX</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="n">INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MAX</span><span class="p">});</span>
+<span class="c1">// arbitrary size of the list can be used</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">matrix</span><span class="p">({</span><span class="n">INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MAX</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="n">INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">INT_MAX</span><span class="p">});</span>
+</code></pre></div>
+<h2 id="configuring-test-runs">Configuring test runs<a class="headerlink" href="#configuring-test-runs" title="Permanent link">&para;</a></h2>
+<h4 id="setting-number-of-runs">Setting number of runs<a class="headerlink" href="#setting-number-of-runs" title="Permanent link">&para;</a></h4>
+<p>You can set the number of runs with <code>Property::setNumRuns(int num)</code>. The default number of runs is <code>1000</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">});</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">setNumRuns</span><span class="p">(</span><span class="mi">100</span><span class="p">).</span><span class="n">forAll</span><span class="p">();</span>
+</code></pre></div>
+<p>You can set default number of runs affected globally by calling the static method <code>PropertyBase::setDefaultNumRuns(int num)</code>. Subsequent properties will follow this number of runs unless specified with <code>setNumRuns()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">PropertyBase</span><span class="o">::</span><span class="n">setDefaultNumRuns</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+</code></pre></div>
+<h4 id="setting-the-random-seed">Setting the random seed<a class="headerlink" href="#setting-the-random-seed" title="Permanent link">&para;</a></h4>
+<p>A property can be configured a specific random seed. This can be done by calling <code>Property::setSeed(unsigned long seed)</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">});</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">setSeed</span><span class="p">(</span><span class="n">savedSeed</span><span class="p">).</span><span class="n">forAll</span><span class="p">();</span>
+</code></pre></div>
+<p>If no random seed is specified, current timestamp in milliseconds is used. You can override these unspecified random seeds globally with an environment variable <code>PROPTEST_SEED</code>. This comes in handy when you have encountered a failure and its random seed value is available for reproduction:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ... failed test with random seed 15665312</span>
+$<span class="w"> </span><span class="nv">PROPTEST_SEED</span><span class="o">=</span><span class="m">15665312</span><span class="w"> </span>./my_proptest
+</code></pre></div>
+<h4 id="setting-maximum-test-duration">Setting maximum test duration<a class="headerlink" href="#setting-maximum-test-duration" title="Permanent link">&para;</a></h4>
+<p>You can set maximum duration for a property test run by calling <code>Property::setMaxDurationMs()</code>. This will limit the time regardless of number of runs. It can be useful if your time resource is limited or if you have some external timeout duration configured.</p>
+<div class="highlight"><pre><span></span><code><span class="n">prop</span><span class="p">.</span><span class="n">setMaxDurationMs</span><span class="p">(</span><span class="mi">60000</span><span class="p">);</span><span class="w"> </span><span class="c1">// will run the test for maximum of 60 seconds, if number of runs does not run out first.</span>
+</code></pre></div>
+<h4 id="chaining-configurations">Chaining configurations<a class="headerlink" href="#chaining-configurations" title="Permanent link">&para;</a></h4>
+<p>You can chain the configurations for a property as following, for ease of use:</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">prop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">property</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">});</span>
+<span class="n">prop</span><span class="p">.</span><span class="n">setSeed</span><span class="p">(</span><span class="n">savedSeed</span><span class="p">).</span><span class="n">setNumRuns</span><span class="p">(</span><span class="mi">1000000</span><span class="p">).</span><span class="n">setMaxDurationMs</span><span class="p">(</span><span class="mi">60000</span><span class="p">).</span><span class="n">forAll</span><span class="p">();</span>
+</code></pre></div>
+<h2 id="using-assertions">Using Assertions<a class="headerlink" href="#using-assertions" title="Permanent link">&para;</a></h2>
+<p><code>cppproptest</code> provides assertion(fatal)/expectation(non-fatal) macros based on the popular <a href="https://github.com/google/googletest">Google Test</a> library.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// PROP_EXPECT*: non-fatal, continues upon failure</span>
+<span class="n">PROP_EXPECT</span><span class="p">(</span><span class="n">condition</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_TRUE</span><span class="p">(</span><span class="n">condition</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_FALSE</span><span class="p">(</span><span class="n">condition</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_EQ</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_NE</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_LT</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_GT</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_LE</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_GE</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_EXPECT_STREQ</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">);</span>
+
+<span class="c1">// PROP_ASSERT*: fatal, breaks test upon failure</span>
+<span class="n">PROP_ASSERT</span><span class="p">(</span><span class="n">condition</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_TRUE</span><span class="p">(</span><span class="n">condition</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_FALSE</span><span class="p">(</span><span class="n">condition</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_EQ</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_NE</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_LT</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_GT</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_LE</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_GE</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">);</span>
+<span class="n">PROP_ASSERT_STREQ</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">);</span>
+</code></pre></div>
+<p>Also, there are <a href="https://github.com/google/googletest">Google Test</a> compatible macros for <code>forAll</code> that fails the gtest test case or suite upon a property test failure (since with a bare <code>forAll</code>, the failures won't behave as gtest failure):</p>
+<div class="highlight"><pre><span></span><code><span class="n">EXPECT_FOR_ALL</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// non-fatal, shorthand for EXPECT_TRUE(proptest::forAll(...));</span>
+<span class="n">ASSERT_FOR_ALL</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// fatal, shorthand for ASSERT_TRUE(proptest::forAll(...));</span>
+</code></pre></div>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 23, 2023</span>
+      
+    
+  </small>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking", "navigation.tabs.sticky", "navigation.indexes", "navigation.path", "toc.follow", "navigation.top", "search.highlight", "search.suggest", "navigation.expand"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.51198bba.min.js"></script>
+      
+    
+  </body>
+</html>

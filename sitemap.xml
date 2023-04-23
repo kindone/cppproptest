@@ -2,62 +2,72 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/Combinators/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/ConcurrencyTesting/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/pages/kindone/cppproptest/CustomGenerator/</loc>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/Generators/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/GettingStarted/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/Mocking/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/Printing/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/pages/kindone/cppproptest/Property/</loc>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/Shrinking/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/StatefulTesting/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/StatefulTestingStyle2/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/WhyPropertyBasedTesting/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://github.com/pages/kindone/cppproptest/WhyPropertyBasedTesting2/</loc>
-         <lastmod>2023-03-30</lastmod>
+         <lastmod>2023-04-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
