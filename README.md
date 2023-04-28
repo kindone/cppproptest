@@ -11,4 +11,4 @@
 * Concurrency testing support for testing concurrent state changes
 
 
-You can get started with `cppproptest` on the [Documentation Page](https://github.wdf.sap.corp/pages/i073940/cppproptest).
+You can get started with `cppproptest` on the [Documentation Page](https://kindone.github.io/cppproptest).
