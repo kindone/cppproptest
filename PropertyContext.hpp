@@ -27,7 +27,7 @@ struct Failure
 };
 
 namespace util {
-uint64_t getGlobalSeed();
+PROPTEST_API uint64_t getGlobalSeed();
 }
 
 ostream& operator<<(ostream&, const Failure&);
