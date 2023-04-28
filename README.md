@@ -12,3 +12,7 @@
 
 
 You can get started with `cppproptest` on the [Documentation Page](https://kindone.github.io/cppproptest).
+
+## License
+
+This project is licensed under the terms of the MIT license. See the [LICENSE.txt](LICENSE.txt) file for details.
