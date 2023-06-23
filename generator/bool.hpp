@@ -21,7 +21,7 @@ public:
 
     Shrinkable<bool> operator()(Random& rand) override;
 
-    Arbi<bool>(const Arbi<bool>&) = default;
+    Arbi(const Arbi<bool>&) = default;
 
     virtual ~Arbi();
 
