@@ -37,6 +37,7 @@ Stream StreamFunction::operator()(const ShrinkableAny& in) {
 
 ShrinkableAny::ShrinkableAny(shared_ptr<Any> p) : ptr(p), shrinksPtr(emptyPtr()) {}
 ShrinkableAny::ShrinkableAny(const ShrinkableAny& other) : ptr(other.ptr), shrinksPtr(other.shrinksPtr) {}
+ShrinkableAny::~ShrinkableAny() {}
 
 ShrinkableAny& ShrinkableAny::operator=(const ShrinkableAny& other)
 {

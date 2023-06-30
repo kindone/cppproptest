@@ -88,7 +88,7 @@ struct PROPTEST_API ShrinkableAny
 {
     ShrinkableAny(shared_ptr<Any> p);
     ShrinkableAny(const ShrinkableAny& other);
-    virtual ~ShrinkableAny() = default;
+    virtual ~ShrinkableAny();
 
     ShrinkableAny& operator=(const ShrinkableAny& other);
 
