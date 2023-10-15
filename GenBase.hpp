@@ -33,6 +33,18 @@ class Random;
 template <typename T>
 using GenFunction = function<Shrinkable<T>(Random&)>;
 
+template <typename F, typename T, typename S = T>
+concept GenFunctionLike = requires(F f, Random& rand) {
+    { f(rand) }
+    -> same_as<Shrinkable<S>>;
+};
+
+template <typename F, typename T>
+concept GenFunctionLikeGen = requires(F f, T& t) {
+    { f(t) }
+    -> GenFunctionLike<T, typename invoke_result_t<invoke_result_t<F, T&>, Random&>::type>;
+};
+
 template <typename T>
 struct GenBase
 {

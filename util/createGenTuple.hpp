@@ -38,8 +38,8 @@ tuple<GenFunction<decay_t<ARGS>>...> createGenTuple(TypeList<ARGS...> /*argument
 }
 
 template <typename... ARGS, typename... EXPGENS>
-enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGS)),
-                 tuple<decay_t<EXPGENS>...>>
+    requires (sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) == sizeof...(ARGS))
+tuple<decay_t<EXPGENS>...>
 createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     // constexpr auto ExplicitSize = sizeof...(EXPGENS);
@@ -48,8 +48,8 @@ createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 }
 
 template <typename... ARGS, typename... EXPGENS>
-enable_if_t<(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGS)),
-                 tuple<GenFunction<decay_t<ARGS>>...>>
+    requires(sizeof...(EXPGENS) > 0 && sizeof...(EXPGENS) < sizeof...(ARGS))
+tuple<GenFunction<decay_t<ARGS>>...>
 createGenTuple(TypeList<ARGS...>, EXPGENS&&... gens)
 {
     constexpr auto ExplicitSize = sizeof...(EXPGENS);

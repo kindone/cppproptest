@@ -19,13 +19,15 @@ class TupleShrinker {
 
 private:
     template <size_t N>
-        static enable_if_t < N<sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
+        requires (N < sizeof...(ARGS))
+    static shrinkable_t ConcatHelper(const shrinkable_t& aggr)
     {
         return ConcatHelper<N + 1>(aggr.concat(genStream<N>()));
     }
 
     template <size_t N>
-    static enable_if_t<N >= sizeof...(ARGS), shrinkable_t> ConcatHelper(const shrinkable_t& aggr)
+        requires (N >= sizeof...(ARGS))
+    static shrinkable_t ConcatHelper(const shrinkable_t& aggr)
     {
         return aggr;
     }

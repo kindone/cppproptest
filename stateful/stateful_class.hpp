@@ -17,9 +17,8 @@ class Property;
 namespace util {
 
 template <typename ActionType, typename GEN>
-enable_if_t<is_pointer<typename function_traits<GEN>::return_type::type>::value,
-                 GenFunction<shared_ptr<ActionType>>>
-toSharedPtrGen(GEN&& gen)
+    requires(is_pointer<typename function_traits<GEN>::return_type::type>::value)
+GenFunction<shared_ptr<ActionType>> toSharedPtrGen(GEN&& gen)
 {
     return transform<ActionType*, shared_ptr<ActionType>>(
         gen, +[](const ActionType* actionType) {
@@ -29,7 +28,8 @@ toSharedPtrGen(GEN&& gen)
 }
 
 template <typename ActionType, typename GEN>
-enable_if_t<!is_pointer<typename function_traits<GEN>::return_type::type>::value, GEN&&> toSharedPtrGen(
+    requires(!is_pointer<typename function_traits<GEN>::return_type::type>::value)
+GEN&& toSharedPtrGen(
     GEN&& gen)
 {
     return util::forward<GEN>(gen);

@@ -76,4 +76,11 @@ struct function_traits<F&&> : public function_traits<F>
 {
 };
 
+template <class F, class R, class... Args>
+concept Callable = requires(F f, Args... args)
+{
+    { f(args...) }
+    ->std::same_as<R>;
+};
+
 }  // namespace proptest

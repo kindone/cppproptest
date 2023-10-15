@@ -19,13 +19,15 @@ decltype(auto) invokeWithArgTuple(Function&& f, ArgTuple&& argTup)
 }
 
 template <size_t N, size_t M, typename Tuple, typename Replace>
-enable_if_t<N == M, Replace&&> ReplaceHelper(Tuple&&, Replace&& replace)
+    requires (N == M)
+Replace&& ReplaceHelper(Tuple&&, Replace&& replace)
 {
     return util::forward<Replace>(replace);
 }
 
 template <size_t N, size_t M, typename Tuple, typename Replace>
-enable_if_t<N != M, tuple_element_t<M, Tuple>> ReplaceHelper(Tuple&& valueTup, Replace&&)
+    requires (N != M)
+tuple_element_t<M, Tuple> ReplaceHelper(Tuple&& valueTup, Replace&&)
 {
     return get<M>(util::forward<Tuple>(valueTup));
 }
