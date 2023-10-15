@@ -87,9 +87,9 @@
 					</g>
 					<g data-name="Custom Generator 1">
 						<g fill="#f3f4f7" stroke="#1831ab" data-name="Custom Generator 1">
-							<rect x="281.0" y="59.0" height="29.0" width="149.0" data-name="Custom Generator 1"></rect>
+							<rect x="281.0" y="59.3" height="29.0" width="149.0" data-name="Custom Generator 1"></rect>
 						</g>
-						<g transform="translate(281, 59)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Custom Generator 1">
+						<g transform="translate(281, 59.25)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Custom Generator 1">
 							<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Custom Generator 1">
 								<text x="66.5" y="11.3" stroke="none" text-anchor="middle" data-name="Custom Generator 1">Custom Generator 1</text>
 								
@@ -98,9 +98,9 @@
 					</g>
 					<g data-name="Custom Generator 2">
 						<g fill="#f3f4f7" stroke="#1831ab" data-name="Custom Generator 2">
-							<rect x="556.0" y="59.0" height="29.0" width="149.0" data-name="Custom Generator 2"></rect>
+							<rect x="556.0" y="59.3" height="29.0" width="149.0" data-name="Custom Generator 2"></rect>
 						</g>
-						<g transform="translate(556, 59)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Custom Generator 2">
+						<g transform="translate(556, 59.25)" font-family="Helvetica" font-size="10pt" font-weight="bold" font-style="normal" data-name="Custom Generator 2">
 							<g transform="translate(8, 8)" fill="#1831ab" text-align="center" data-name="Custom Generator 2">
 								<text x="66.5" y="11.3" stroke="none" text-anchor="middle" data-name="Custom Generator 2">Custom Generator 2</text>
 								
