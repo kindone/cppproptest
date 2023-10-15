@@ -5,18 +5,19 @@ Generator combinators are provided for building a new generator based on existin
 
 While you can go through this document from top to the bottom, you might be want to find a suitable combinator for your use case using this table:
 
-| Purpose                                            | Related Generator/Combinator                                                                                           | Examples                                   |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Generate just a constant                           | [`just<T>`](#constants)                                                                                                | `0` or `"1337"`                            |
-| Generate a value within constants                  | [`elementOf<T>`](#selecting-from-values)                                                                               | a prime number under 100                   |
-| Generate a list of unique values                   | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)                                                                   | `{3,5,1}` but not `{3,5,5}`                |
-| Generate a value within numeric range of values    | [`interval<T>`, `integers<T>`](#integers-and-intervals)                                                                | a number within `1`~`9999`                 |
-| Generate a pair or a tuple of different types      | [`pairOf<T1,T2>`, `tupleOf<Ts...>`](#pair-and-tuples)                                                                  | a `pair<int, string>`                      |
-| Union multiple generators                          | [`unionOf<T>` (`oneOf<T>`)](#selecting-from-generators)                                                                | `20~39` or `60~79` combined                |
-| Transform into another type or a value             | [`transform<T,U>`](#transforming-or-mapping)                                                                           | `"0"` or `"1.4"` (a number as string).     |
-| Generate a struct or a class object                | [`construct<T,ARGS...>`](#constructing-an-object)                                                                      | a `Rectangle` object with width and height |
-| Apply constraints in generated values              | [`filter` (`suchThat`)](#applying-constraints)                                                                         | an even natural number (`n % 2 == 0`)      |
-| Generate values with dependencies or relationships | [`dependency`, `chain`](#values-with-dependencies), [`pairWith`, `tupleWith`](#utility-methods-in-standard-generators) | a rectangle where `width == height * 2`    |
+| Purpose                                              | Related Generator/Combinator                                                                                           | Examples                                                                      |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Generate just a constant                             | [`just<T>`](#constants)                                                                                                | `0` or `"1337"`                                                               |
+| Generate a value within constants                    | [`elementOf<T>`](#selecting-from-values)                                                                               | a prime number under 100                                                      |
+| Generate a list of unique values                     | [`Arbi<set<T>>`](Generators.md#built-in-arbitraries)                                                                   | `{3,5,1}` but not `{3,5,5}`                                                   |
+| Generate a value within numeric range of values      | [`interval<T>`, `integers<T>`](#integers-and-intervals)                                                                | a number within `1`~`9999`                                                    |
+| Generate a pair or a tuple of different types        | [`pairOf<T1,T2>`, `tupleOf<Ts...>`](#pair-and-tuples)                                                                  | a `pair<int, string>`                                                         |
+| Union multiple generators                            | [`unionOf<T>` (`oneOf<T>`)](#selecting-from-generators)                                                                | `20~39` or `60~79` combined                                                   |
+| Transform into another type or a value               | [`transform<T,U>`](#transforming-or-mapping)                                                                           | `"0"` or `"1.4"` (a number as string).                                        |
+| Generate a struct or a class object                  | [`construct<T,ARGS...>`](#constructing-an-object)                                                                      | a `Rectangle` object with width and height                                    |
+| Apply constraints in generated values                | [`filter` (`suchThat`)](#applying-constraints)                                                                         | an even natural number (`n % 2 == 0`)                                         |
+| Generate values with dependencies or relationships   | [`dependency`, `chain`](#values-with-dependencies), [`pairWith`, `tupleWith`](#utility-methods-in-standard-generators) | a rectangle where `width == height * 2`                                       |
+| Generate a value based on previously generated value | [`aggregate`, `accumulate`](#aggregation-or-accumulation-of-values)                                                    | a sequence of numbers where each one is between 0.5x and 1.5x of its previous |
 
 &nbsp;
 
@@ -106,6 +107,7 @@ You can combine generators to a single generator that can generate each of them 
     // generates a numeric within ranges [0,10], [100, 1000], [10000, 100000]
     auto evenGen = oneOf<int>(weightedGen(interval(0, 10), 0.8), weightedGen(interval(100, 1000), 0.15), interval(10000, 100000)/* weight automatically becomes 1.0 - (0.8 + 0.15) == 0.05 */);
     ```
+
 * `unionOf<T>` is an alias of `oneOf<T>`
 
 ### Constructing an object
@@ -137,6 +139,7 @@ You can add a filtering condition to a generator to restrict the generated value
         return num % 2 == 0;
     });
     ```
+
 * `suchThat<T>`: an alias of `filter`
 
 ### Transforming or mapping
@@ -249,6 +252,42 @@ Actually you can achieve the similar goal using `filter` combinator:
 
 However, using `filter` for generating values with complex dependency may result in many generated values that do not meet the constraint to be discarded and retried. Therefore it's usually not recommended for that purpose if the ratio of discarded values is high.
 
+
+### Aggregation or Accumulation of Values
+
+You may want to generate values that are related to previously generated values. This can be achieved with `aggregate` or `accumulate`.
+Both of the combinators take base generator in the form of `Generator<T>` as the first argument and a factory that takes a value of type `T` and returns `Generator<T>`, as the second argument.
+
+While `aggregate` generates a single value, accumulate generates a list of values at each generation.
+
+| Combinator                                                      | Result type          | Remark |
+| --------------------------------------------------------------- | -------------------- | ------ |
+| `aggregate<GenT, GenT2GenT>(genT, gen2GenT, minSize, maxSize)`  | `Generator<T>`       |        |
+| `accumulate<GenT, GenT2GenT>(genT, gen2GenT, minSize, maxSize)` | `Generator<list<T>>` |        |
+
+```cpp
+    // generate initial value
+    auto baseGen = interval(0, 1000);
+    // generate a value based on previous value
+    auto gen = aggregate(
+        gen1,
+        [](int& num) {
+            return interval(num/2, num*2);
+        },
+        2 /* min size */, 10 /* max size */);
+```
+
+```cpp
+    // generate initial value
+    auto baseGen = interval(0, 1000);
+    // generate list of values
+    auto gen = accumulate(
+        gen1,
+        [](int& num) {
+            return interval(num/2, num*2);
+        },
+        2 /* min size */, 10 /* max size */);
+```
 
 ## Utility Methods in Standard Generators
 

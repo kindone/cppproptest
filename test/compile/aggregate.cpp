@@ -5,7 +5,19 @@
 
 using namespace proptest;
 
-TEST(Compile, aggregate)
+TEST(Compile, aggregate1)
+{
+    auto gen1 = interval<int>(0, 1000);
+
+    [[maybe_unused]] auto gen = aggregate(
+        gen1,
+        [](int& num) {
+            return interval(num/2, num*2);
+        },
+        2, 10);
+}
+
+TEST(Compile, aggregate2)
 {
     auto gen1 = interval<int>(0, 1).map([](int& num) {
         list<int> l{num};
