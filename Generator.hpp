@@ -62,7 +62,7 @@ struct Generator : public GenBase<T>
      * @param mapper Function that takes a value of type `T` and returns a value of type `U`
      * @return Generator<U> Generator for type `U`
      */
-    template <typename F>
+    template <invocable<T&> F>
     auto map(F&& mapper) -> Generator<invoke_result_t<F, T&>>
     {
         return map<invoke_result_t<F, T&>>(util::forward<F>(mapper));
@@ -99,7 +99,7 @@ struct Generator : public GenBase<T>
         return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
-    template <typename FACTORY>
+    template <invocable<T&> FACTORY>
     decltype(auto) pairWith(FACTORY&& genFactory)
     {
         using GEN = invoke_result_t<FACTORY, T&>;
@@ -151,7 +151,7 @@ struct Generator : public GenBase<T>
         return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
     }
 
-    template <typename FACTORY>
+    template <invocable<T&> FACTORY>
     decltype(auto) flatMap(FACTORY&& genFactory)
     {
         using U = typename invoke_result_t<invoke_result_t<FACTORY, T&>, Random&>::type;

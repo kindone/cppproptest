@@ -39,13 +39,13 @@ You can get started with `cppproptest` on this [page](GettingStarted.md).
 
 &nbsp;
 
-# Why Property-based Testing?
+## Why Property-based Testing?
 
-## Generalization and Abstraction
+### Generalization and Abstraction
 
 Property-based testing lets you write tests using abstract ideas, instead of introducing some dummy examples or overly contrived scenarios. You can write tests focusing on specification or requirements of the tested components.
 
-### Clear Separation of Variants and Invariants
+#### Clear Separation of Variants and Invariants
 
 In reality, we often mix variants and invariants in our tests under typical *example-based tests*. This is one of the reasons why those tests become hard to maintain and difficult to read over time. Let's see following example-based test for an encoder and a decoder:
 
@@ -90,7 +90,7 @@ As a result, `forAll()` will test the encoder and decoder against arbitrary inpu
 
 With this approach, our test becomes more readable, gets easier to maintain, and carries test writer's intention better.
 
-## Convenience and Versatility
+### Convenience and Versatility
 
 Property-based testing often provides with the convenient out-of-box **generators** and **generator combinators** (that can make new generators out of existing ones), and lets you to effortlessly define an input domain tailored for your test. You can specify your input domain using various notions - range, constraint, union, transformation, composition, and dependency, just to name a few.
 
@@ -257,7 +257,7 @@ You don't need to care too much about *how* to test your requirements. Most of i
 &nbsp;
 
 
-# Further Topics and Details:
+## Further Topics and Details:
 
 * [Getting Started with cppproptest](GettingStarted.md)
 * [Introduction to generators](Generators.md)
@@ -269,3 +269,6 @@ You don't need to care too much about *how* to test your requirements. Most of i
 * [Stateful testing with `cppproptest`](StatefulTesting.md)
 * [Concurrency testing with `cppproptest`](ConcurrencyTesting.md)
 * [Advanced mocking with `cppproptest` (work in progress)](Mocking.md)
+
+## License
+This project is licensed under the terms of the MIT license.

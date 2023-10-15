@@ -14,19 +14,22 @@ class Random;
 namespace util {
 
 template <typename TO, typename SHRINKABLE>
-enable_if_t<!is_lvalue_reference<TO>::value, TO> autoCast(SHRINKABLE&& shr)
+    requires (!is_lvalue_reference<TO>::value)
+TO autoCast(SHRINKABLE&& shr)
 {
     return shr.get();
 }
 
 template <typename TO, typename SHRINKABLE>
-enable_if_t<is_pointer<TO>::value, TO> autoCast(SHRINKABLE&& shr)
+    requires(is_pointer<TO>::value)
+TO autoCast(SHRINKABLE&& shr)
 {
     return shr.getPtr();
 }
 
 template <typename TO, typename SHRINKABLE>
-enable_if_t<is_lvalue_reference<TO>::value, TO> autoCast(SHRINKABLE&& shr)
+    requires(is_lvalue_reference<TO>::value)
+TO autoCast(SHRINKABLE&& shr)
 {
     return shr.getRef();
 }

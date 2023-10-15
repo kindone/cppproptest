@@ -46,6 +46,7 @@ Generator<T> aggregateImpl(GenFunction<T> gen1, function<GenFunction<T>(T&)> gen
  * @return last generated value of T throughout the aggregation
  */
 template <typename GEN1, typename GEN2GEN>
+    requires GenFunctionLike<GEN1, typename invoke_result_t<GEN1, Random&>::type> && GenFunctionLikeGen<GEN2GEN, typename invoke_result_t<GEN1, Random&>::type>
 decltype(auto) aggregate(GEN1&& gen1, GEN2GEN&& gen2gen, size_t minSize, size_t maxSize)
 {
     using T = typename invoke_result_t<GEN1, Random&>::type;  // get the T from shrinkable<T>(Random&)

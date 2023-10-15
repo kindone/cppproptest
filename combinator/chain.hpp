@@ -138,6 +138,7 @@ Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> g
  * @endcode
  */
 template <typename GEN1, typename GEN2GEN>
+    requires GenFunctionLike<GEN1, typename invoke_result_t<GEN1, Random&>::type> && GenFunctionLikeGen<GEN2GEN, typename invoke_result_t<GEN1, Random&>::type>
 decltype(auto) chain(GEN1&& gen1, GEN2GEN&& gen2gen)
 {
     using CHAIN = typename function_traits<GEN1>::return_type::type;  // get the T from shrinkable<T>(Random&)

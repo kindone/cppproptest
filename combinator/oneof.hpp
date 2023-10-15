@@ -38,7 +38,8 @@ struct Weighted
 };
 
 template <typename T, typename GEN>
-enable_if_t<!is_same<decay_t<GEN>, Weighted<T>>::value, Weighted<T>> GenToWeighted(GEN&& gen)
+    requires (!is_same_v<decay_t<GEN>, Weighted<T>>)
+Weighted<T> GenToWeighted(GEN&& gen)
 {
     return weightedGen<T>(util::forward<GEN>(gen), 0.0);
 }
@@ -114,6 +115,7 @@ util::Weighted<T> weightedGen(GenFunction<T> gen, double weight)
  * @tparam GEN (optional) generator (function of Random& -> Shrinkable<T>)
  */
 template <typename GEN>
+    requires GenFunctionLike<GEN, typename invoke_result_t<GEN, Random&>::type>
 auto weightedGen(GEN&& gen, double weight) -> util::Weighted<typename invoke_result_t<GEN, Random&>::type>
 {
     using T = typename invoke_result_t<GEN, Random&>::type;
@@ -130,10 +132,11 @@ auto weightedGen(GEN&& gen, double weight) -> util::Weighted<typename invoke_res
  * unweighted probability evenly.
  */
 template <typename T, typename... GENS>
+    requires ((GenFunctionLike<GENS, T> || is_same_v<decay_t<GENS>, util::Weighted<T>>) && ...)
 decltype(auto) oneOf(GENS&&... gens)
 {
     static_assert(
-        conjunction_v<std::bool_constant<(is_convertible_v<GENS, function<Shrinkable<T>(Random&)>> ||
+        conjunction_v<bool_constant<(is_convertible_v<GENS, function<Shrinkable<T>(Random&)>> ||
                                           is_convertible_v<GENS, util::Weighted<T>>)>...>,
         "A GENS must be a generator callable for T (GenFunction<T> or Random& -> Shrinkable<T>) or a WeightGen<T>");
     using WeightedVec = vector<util::Weighted<T>>;
@@ -147,6 +150,7 @@ decltype(auto) oneOf(GENS&&... gens)
  * @brief Alias for \ref oneOf combinator
  */
 template <typename T, typename... GENS>
+    requires ((GenFunctionLike<GENS, T> || convertible_to<GENS, util::Weighted<T>>) && ...)
 decltype(auto) unionOf(GENS&&... gens)
 {
     static_assert(
