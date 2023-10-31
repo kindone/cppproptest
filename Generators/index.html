@@ -9,10 +9,10 @@
         <meta name="description" content="C++ Property Testing">
       
       
-        <meta name="author" content="Won-Wook Hong">
+        <meta name="author" content="kindone">
       
       
-        <link rel="canonical" href="https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/Generators/">
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/Generators/">
       
       <link rel="icon" href="../assets/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.2.7">
@@ -150,13 +150,13 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
       </div>
@@ -195,13 +195,13 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
     </div>
@@ -568,7 +568,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest/edit/master/docs/Generators.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/kindone/cppproptest/edit/master/docs/Generators.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -577,14 +577,14 @@
 <h1 id="generating-inputs">Generating Inputs<a class="headerlink" href="#generating-inputs" title="Permanent link">&para;</a></h1>
 <h2 id="generators-in-property-based-testing">Generators in Property-Based Testing<a class="headerlink" href="#generators-in-property-based-testing" title="Permanent link">&para;</a></h2>
 <p>Property-based testing promotes the concept of <strong>input domain</strong> of a property. In property-based testing, <strong>generators</strong> are the means for representing input domains. A <em>generator</em> is basically a function that generates random values. It defines the constraints of the generated random values in its body. Even a simple <code>forAll()</code> call depends on generators under the hood. Let's see following example:</p>
-<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="p">});</span>
 </code></pre></div>
-<p>This <code>forAll()</code> call takes a function with parameters of types <code>int</code> and <code>ltt::string</code>. This function is the <em>property function</em>. If no additional specification is given on how to generate the values for <code>age</code> and <code>name</code> as in this example, the parameter types are identified to invoke the default generators for those types. In this case, it calls the default generators for <code>int</code> and <code>ltt::string</code> types. Those default generators are called the <em>arbitraries</em>. You can access the arbitraries of a type <code>T</code> with <code>Arbitrary&lt;T&gt;</code> or <code>Arbi&lt;T&gt;</code>. This code is actually equivalent to:</p>
-<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="p">},</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">());</span>
+<p>This <code>forAll()</code> call takes a function with parameters of types <code>int</code> and <code>std::string</code>. This function is the <em>property function</em>. If no additional specification is given on how to generate the values for <code>age</code> and <code>name</code> as in this example, the parameter types are identified to invoke the default generators for those types. In this case, it calls the default generators for <code>int</code> and <code>std::string</code> types. Those default generators are called the <em>arbitraries</em>. You can access the arbitraries of a type <code>T</code> with <code>Arbitrary&lt;T&gt;</code> or <code>Arbi&lt;T&gt;</code>. This code is actually equivalent to:</p>
+<div class="highlight"><pre><span></span><code><span class="n">forAll</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">},</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">());</span>
 </code></pre></div>
-<p>Notice the extra arguments <code>Arbitrary&lt;int&gt;()</code> and <code>Arbitrary&lt;ltt::string&gt;()</code> in the <code>forAll()</code> call. As you can see, <code>forAll()</code> actually requires some information on how to generate the values for the parameter types. Some of the often used types have default generators defined in <code>cppproptest</code>.</p>
+<p>Notice the extra arguments <code>Arbitrary&lt;int&gt;()</code> and <code>Arbitrary&lt;std::string&gt;()</code> in the <code>forAll()</code> call. As you can see, <code>forAll()</code> actually requires some information on how to generate the values for the parameter types. Some of the often used types have default generators defined in <code>cppproptest</code>.</p>
 <p>&nbsp;</p>
 <h2 id="arbitraries-the-default-generators">Arbitraries - The Default Generators<a class="headerlink" href="#arbitraries-the-default-generators" title="Permanent link">&para;</a></h2>
 <h3 id="what-makes-defaults-so-special">What makes defaults so special<a class="headerlink" href="#what-makes-defaults-so-special" title="Permanent link">&para;</a></h3>
@@ -647,37 +647,37 @@ Arbitraries are specially treated in <code>cppproptest</code>. An arbitrary serv
 </tr>
 <tr>
 <td>Generate a string</td>
-<td><code>Arbi&lt;ltt::string&gt;()</code>, <code>Arbi&lt;UTF8String&gt;()</code></td>
+<td><code>Arbi&lt;std::string&gt;()</code>, <code>Arbi&lt;UTF8String&gt;()</code></td>
 <td><code>"world"</code> or <code>"あ叶葉말"</code></td>
 </tr>
 <tr>
 <td>Generate a pair</td>
-<td><code>Arbi&lt;ltt::pair&lt;T1,T2&gt;&gt;()</code></td>
+<td><code>Arbi&lt;std::pair&lt;T1,T2&gt;&gt;()</code></td>
 <td><code>{1, "xv"}</code> or <code>{true, 3.4}</code></td>
 </tr>
 <tr>
 <td>Generate a tuple</td>
-<td><code>Arbi&lt;ltt::tuple&lt;Ts...&gt;&gt;()</code></td>
+<td><code>Arbi&lt;std::tuple&lt;Ts...&gt;&gt;()</code></td>
 <td><code>{1, "xv", true}</code> or <code>{true, 3.4}</code></td>
 </tr>
 <tr>
 <td>Generate a list</td>
-<td><code>Arbi&lt;ltt::list&lt;T&gt;&gt;()</code></td>
+<td><code>Arbi&lt;std::list&lt;T&gt;&gt;()</code></td>
 <td><code>{10, -4, 0}</code> or <code>{"k", "&amp;"}</code></td>
 </tr>
 <tr>
 <td>Generate a vector</td>
-<td><code>Arbi&lt;ltt::vector&lt;T&gt;&gt;()</code></td>
+<td><code>Arbi&lt;std::vector&lt;T&gt;&gt;()</code></td>
 <td><code>{10, -4, 0}</code> or <code>{"k", "&amp;"}</code></td>
 </tr>
 <tr>
 <td>Generate a set</td>
-<td><code>Arbi&lt;ltt::set&lt;T&gt;&gt;()</code></td>
+<td><code>Arbi&lt;std::set&lt;T&gt;&gt;()</code></td>
 <td>set <code>{1, 3, 4}</code> but not <code>{1, 1, 3}</code></td>
 </tr>
 <tr>
 <td>Generate a map</td>
-<td><code>Arbi&lt;ltt::map&lt;K,V&gt;&gt;()</code></td>
+<td><code>Arbi&lt;std::map&lt;K,V&gt;&gt;()</code></td>
 <td>map of <code>"Bob" -&gt; 25, "Alice" -&gt; 30</code></td>
 </tr>
 </tbody>
@@ -688,13 +688,13 @@ Arbitraries are specially treated in <code>cppproptest</code>. An arbitrary serv
 <li>Integral types: <code>int8_t</code>, <code>uint8_t</code>, <code>int16_t</code>, <code>uint16_t</code>, <code>int32_t</code>, <code>uint32_t</code>, <code>int64_t</code>, <code>uint64_t</code></li>
 <li>Floating point types: <code>float</code>, <code>double</code></li>
 <li>String types:<ul>
-<li><code>ltt::string</code> (defaults to generate ASCII character strings in [0x01, 0x7F] range)</li>
-<li><code>UTF8String</code> (a class which extends <code>ltt::string</code> and can be used to generate valid <a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</a> strings by using <code>Arbi&lt;UTF8String&gt;</code>)</li>
+<li><code>std::string</code> (defaults to generate ASCII character strings in [0x01, 0x7F] range)</li>
+<li><code>UTF8String</code> (a class which extends <code>std::string</code> and can be used to generate valid <a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</a> strings by using <code>Arbi&lt;UTF8String&gt;</code>)</li>
 <li><code>CESU8String</code> (similar to UTF-8, but can be used to generate valid <a href="https://en.wikipedia.org/wiki/CESU-8">CESU-8</a> strings)</li>
 <li><code>UTF16BEString</code> and <code>UTF16LEString</code> for <a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a> big and little endian strings. CESU-8 and Unicode types produce full unicode code point range of [0x1, 0x10FFFF], excluding forbidden surrogate code points ([0xD800, 0xDFFF])</li>
 </ul>
 </li>
-<li>Shared pointers: <code>ltt::shared_ptr&lt;T&gt;</code> where an <code>Arbi&lt;T&gt;</code> or a custom generator for <code>T</code> is available. It's also useful for generating polymorphic types.
+<li>Shared pointers: <code>std::shared_ptr&lt;T&gt;</code> where an <code>Arbi&lt;T&gt;</code> or a custom generator for <code>T</code> is available. It's also useful for generating polymorphic types.
     <div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">Action</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
@@ -704,26 +704,26 @@ Arbitraries are specially treated in <code>cppproptest</code>. An arbitrary serv
 <span class="k">struct</span><span class="w"> </span><span class="nc">Delete</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Action</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 <span class="p">};</span>
-<span class="n">Generator</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;&gt;</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// can hold both Insert and Delete</span>
+<span class="n">Generator</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;&gt;</span><span class="p">(...);</span><span class="w"> </span><span class="c1">// can hold both Insert and Delete</span>
 </code></pre></div></li>
 <li>
-<p>Standard containers: <code>ltt::string</code>, <code>ltt::vector</code>, <code>ltt::list</code>, <code>ltt::set</code>, <code>ltt::pair</code>, <code>ltt::tuple</code>, <code>ltt::map</code></p>
+<p>Standard containers: <code>std::string</code>, <code>std::vector</code>, <code>std::list</code>, <code>std::set</code>, <code>std::pair</code>, <code>std::tuple</code>, <code>std::map</code></p>
 <ul>
 <li>
 <p>Arbitraries for containers can optionally take a custom generator for their elemental types. If no custom generator for elemental type <code>T</code> is provided, <code>Arbitrary&lt;T&gt;</code> will be used instead.
     <div class="highlight"><pre><span></span><code><span class="c1">// You can supply a specific generator for integers</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">vecInt0to100</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">vecInt0to100</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">));</span>
 <span class="c1">// otherwise, Arbi&lt;int&gt; is used</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">vecInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">vecInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
 
 <span class="c1">// string aarbitraries also take optional element generator</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">uppercaseGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">));</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">alphabetGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">unionOf</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">),</span><span class="w"> </span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;z&#39;</span><span class="p">)));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">uppercaseGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">));</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">alphabetGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">unionOf</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">),</span><span class="w"> </span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="sc">&#39;z&#39;</span><span class="p">)));</span>
 </code></pre></div></p>
 </li>
 <li>
-<p><code>Arbi&lt;ltt::Map&gt;</code> provides setter methods for assigning a key generator and a value generator.</p>
-<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">mapGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+<p><code>Arbi&lt;std::Map&gt;</code> provides setter methods for assigning a key generator and a value generator.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">mapGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
 <span class="n">mapGen</span><span class="p">.</span><span class="n">setKeyGen</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">));</span><span class="w"> </span><span class="c1">// interval: key ranges from 0 to 100</span>
 <span class="n">mapGen</span><span class="p">.</span><span class="n">setElemGen</span><span class="p">(</span><span class="n">interval</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">-100</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">));</span><span class="w"> </span><span class="c1">// interval: value ranges from -100 to 100</span>
 </code></pre></div>
@@ -734,7 +734,7 @@ Arbitraries are specially treated in <code>cppproptest</code>. An arbitrary serv
 <li><code>setMinSize(size)</code>, <code>setMaxSize(size)</code> for restricting the container to specific range of sizes</li>
 <li><code>setSize(size)</code> for restricting the container to a specific size</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">vecInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">vecInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
 <span class="n">vecInt</span><span class="p">.</span><span class="n">setSize</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">    </span><span class="c1">// 1) generated vector will always have size 10</span>
 <span class="n">vecInt</span><span class="p">.</span><span class="n">setMinSize</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">  </span><span class="c1">// 2) generated vector will have size &gt;= 1</span>
 <span class="n">vecInt</span><span class="p">.</span><span class="n">setMaxSize</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"> </span><span class="c1">//    generated vector will have size &lt;= 10</span>
@@ -745,8 +745,8 @@ Arbitraries are specially treated in <code>cppproptest</code>. An arbitrary serv
 </li>
 </ul>
 <p>As long as a generator for type <code>T</code> is available (either by <code>Arbitary&lt;T&gt;</code> defined or a custom generator provided), you can generate a container of that type, however complex the type <code>T</code> is, even including a container type. This means you can readily generate a random <code>vector&lt;vector&lt;int&gt;&gt;</code>, as <code>Arbitrary&lt;vector&lt;T&gt;&gt;</code> and <code>Arbitrary&lt;int&gt;</code> is readily available.</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">();</span><span class="w"> </span><span class="c1">// generates a vector of vector of ints.</span>
-<span class="w">    </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;&gt;</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">();</span><span class="w"> </span><span class="c1">// generates a vector of vector of ints.</span>
+<span class="w">    </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;&gt;</span><span class="p">();</span>
 </code></pre></div>
 <p>This design makes arbitraries of <code>cppproptest</code> composable, meaning that they can be easily reusable as building blocks for a new generator.</p>
 <h3 id="defining-an-arbitrary">Defining an Arbitrary<a class="headerlink" href="#defining-an-arbitrary" title="Permanent link">&para;</a></h3>
@@ -797,7 +797,7 @@ They can also be chained to create another generator out of themselves. See <a h
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 31, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 23, 2023</span>
       
     
   </small>
