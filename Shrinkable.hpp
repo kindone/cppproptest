@@ -29,7 +29,7 @@ struct AnyFunction
 
     Any operator()(const Any& in);
 
-    shared_ptr<F> funcPtr;
+    F func;
 };
 
 struct ShrinkableAnyFunction
@@ -43,7 +43,7 @@ struct ShrinkableAnyFunction
 
     ShrinkableAny operator()(const Any& in);
 
-    shared_ptr<F> funcPtr;
+    F func;
 };
 
 struct ShrinkableAnyFunction1
@@ -55,7 +55,7 @@ struct ShrinkableAnyFunction1
 
     ShrinkableAny operator()(const ShrinkableAny& in);
 
-    shared_ptr<F> funcPtr;
+    F func;
 };
 
 struct BoolFunction
@@ -67,7 +67,7 @@ struct BoolFunction
 
     bool operator()(const Any& in);
 
-    shared_ptr<F> funcPtr;
+    F func;
 };
 
 struct StreamFunction
@@ -79,7 +79,7 @@ struct StreamFunction
 
     Stream operator()(const ShrinkableAny& in);
 
-    shared_ptr<F> funcPtr;
+    F func;
 };
 
 }
@@ -270,50 +270,79 @@ public:
 namespace util {
 
 template <typename T, typename U>
+struct AnyFunctionFunc {
+    AnyFunctionFunc(function<U(const T&)> inFunc) : inFunc(inFunc) { }
+    Any operator()(const Any& a) {
+        return inFunc(a.cast<T>());
+    }
+
+    function<U(const T&)> inFunc;
+};
+
+template <typename T, typename U>
+struct ShrinkableAnyFunctionFunc {
+    ShrinkableAnyFunctionFunc(function<Shrinkable<U>(const T&)> inFunc) : inFunc(inFunc) { }
+    ShrinkableAny operator()(const Any& a) {
+        return inFunc(a.cast<T>());
+    }
+
+    function<Shrinkable<U>(const T&)> inFunc;
+};
+
+template <typename T, typename U>
+struct ShrinkableAnyFunction1Func {
+    ShrinkableAnyFunction1Func(function<Shrinkable<U>(const Shrinkable<T>&)> inFunc) : inFunc(inFunc) { }
+    ShrinkableAny operator()(const ShrinkableAny& shr) {
+        return inFunc(shr.as<T>());
+    }
+
+    function<Shrinkable<U>(const Shrinkable<T>&)> inFunc;
+};
+
+template <typename T>
+struct BoolFunctionFunc {
+    BoolFunctionFunc(function<bool(const T&)> inFunc) : inFunc(inFunc) { }
+    bool operator()(const Any& a) {
+        return inFunc(a.cast<T>());
+    }
+
+    function<bool(const T&)> inFunc;
+};
+
+template <typename T>
+struct StreamFunctionFunc {
+    StreamFunctionFunc(function<Stream(const Shrinkable<T>&)> inFunc) : inFunc(inFunc) { }
+    Stream operator()(const ShrinkableAny& shr) {
+        return inFunc(shr.as<T>());
+    }
+
+    function<Stream(const Shrinkable<T>&)> inFunc;
+};
+
+template <typename T, typename U>
 AnyFunction::AnyFunction(function<U(const T&)> inFunc)
 {
-    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
-
-    funcPtr = util::make_shared<F>([inFuncPtr](const Any& a) -> Any {
-        return (*inFuncPtr)(a.cast<T>());
-    });
+    func = AnyFunctionFunc<T,U>(inFunc);
 }
-
 
 template <typename T, typename U>
 ShrinkableAnyFunction::ShrinkableAnyFunction(function<Shrinkable<U>(const T&)> inFunc) {
-    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
-
-    funcPtr = util::make_shared<F>([inFuncPtr](const Any& a) -> ShrinkableAny {
-        return (*inFuncPtr)(a.cast<T>());
-    });
+    func = ShrinkableAnyFunctionFunc<T,U>(inFunc);
 }
 
 template <typename T, typename U>
 ShrinkableAnyFunction1::ShrinkableAnyFunction1(function<Shrinkable<U>(const Shrinkable<T>&)> inFunc) {
-    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
-
-    funcPtr = util::make_shared<F>([inFuncPtr](const ShrinkableAny& shr) -> ShrinkableAny {
-        return (*inFuncPtr)(shr.as<T>());
-    });
+    func = ShrinkableAnyFunction1Func<T,U>(inFunc);
 }
 
 template <typename T>
 BoolFunction::BoolFunction(function<bool(const T&)> inFunc) {
-    auto inFuncPtr = make_shared<decltype(inFunc)>(inFunc);
-
-    funcPtr = make_shared<F>([inFuncPtr](const Any& a) -> bool {
-        return (*inFuncPtr)(a.cast<T>());
-    });
+    func = BoolFunctionFunc<T>(inFunc);
 }
 
 template <typename T>
 StreamFunction::StreamFunction(function<Stream(const Shrinkable<T>&)> inFunc) {
-    auto inFuncPtr = util::make_shared<decltype(inFunc)>(inFunc);
-
-    funcPtr = util::make_shared<F>([inFuncPtr](const ShrinkableAny& shr) -> Stream {
-        return (*inFuncPtr)(shr.as<T>());
-    });
+    func = StreamFunctionFunc<T>(inFunc);
 }
 
 } // namespace util

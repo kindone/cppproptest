@@ -8,27 +8,27 @@ namespace proptest {
 namespace util {
 
 Any AnyFunction::operator()(const Any& in) {
-    return (*funcPtr)(in);
+    return func(in);
 }
 
 ShrinkableAnyFunction::ShrinkableAnyFunction(function<ShrinkableAny(const Any&)> inFunc) {
-    funcPtr = util::make_shared<decltype(inFunc)>(inFunc);
+    func = inFunc;
 }
 
 ShrinkableAny ShrinkableAnyFunction::operator()(const Any& in) {
-    return (*funcPtr)(in);
+    return func(in);
 }
 
 ShrinkableAny ShrinkableAnyFunction1::operator()(const ShrinkableAny& in) {
-    return (*funcPtr)(in);
+    return func(in);
 }
 
 bool BoolFunction::operator()(const Any& in) {
-    return (*funcPtr)(in);
+    return func(in);
 }
 
 Stream StreamFunction::operator()(const ShrinkableAny& in) {
-    return (*funcPtr)(in);
+    return func(in);
 }
 
 } // namespace util
