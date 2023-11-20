@@ -98,9 +98,9 @@
   },
   "editor.formatOnSave": true,
   "files.exclude": {
+    "**/googletest": true,
     "doc/**": true,
-    "doxygen.cfg": true,
-    "googletest": true
+    "doxygen.cfg": true
   },
   "markdown-kroki.url": "https://kroki.io",
   "markdown-kroki.prefix": "kroki-"
