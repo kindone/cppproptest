@@ -1,11 +1,4 @@
 #pragma once
-#include "proptest/util/std.hpp"
-#include "proptest/Shrinkable.hpp"
-#include "proptest/util/utf8string.hpp"
-#include "proptest/util/utf16string.hpp"
-#include "proptest/util/cesu8string.hpp"
-#include "proptest/util/nullable.hpp"
-#include "proptest/util/action.hpp"
 
 namespace proptest {
 

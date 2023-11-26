@@ -1,10 +1,5 @@
 #pragma once
 
-#include "proptest/api.hpp"
-#include "proptest/Stream.hpp"
-#include "proptest/util/any.hpp"
-#include "proptest/util/std.hpp"
-
 namespace proptest {
 
 struct ShrinkableAny;

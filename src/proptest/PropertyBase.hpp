@@ -1,10 +1,5 @@
 #pragma once
 
-#include "proptest/api.hpp"
-#include "proptest/gen.hpp"
-#include "proptest/PropertyContext.hpp"
-#include "proptest/util/std.hpp"
-
 #define PROP_EXPECT_STREAM(condition, a, sign, b)                                            \
     ([&]() -> stringstream& {                                                           \
         if (!(condition)) {                                                                  \

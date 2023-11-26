@@ -1,9 +1,5 @@
 #pragma once
 
-#include "proptest/util/std.hpp"
-#include "proptest/Random.hpp"
-#include "proptest/Shrinkable.hpp"
-
 /** @file GenBase.hpp
  *  @brief Defines fundamental generator types
  */
@@ -11,6 +7,7 @@
 namespace proptest {
 
 class Random;
+template <typename T> class Shrinkable;
 /**
  * @brief Standard function type for generators
  *

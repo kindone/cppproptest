@@ -1,19 +1,5 @@
 #pragma once
 
-#include "proptest/api.hpp"
-#include "proptest/gen.hpp"
-#include "proptest/util/function_traits.hpp"
-#include "proptest/util/tuple.hpp"
-#include "proptest/util/printing.hpp"
-#include "proptest/util/invokeWithGenTuple.hpp"
-#include "proptest/util/invokeWithArgs.hpp"
-#include "proptest/util/createGenTuple.hpp"
-#include "proptest/generator/util.hpp"
-#include "proptest/PropertyContext.hpp"
-#include "proptest/PropertyBase.hpp"
-#include "proptest/Stream.hpp"
-#include "proptest/util/std.hpp"
-
 /**
  * @file Property.hpp
  * @brief Core API for `cppproptest` Property-based testing library

@@ -14,6 +14,32 @@ namespace proptest {
 template <typename GEN>
 decltype(auto) generator(GEN&& gen);
 
+namespace util {
+
+// would've been simpler with lambdas, but optimzing for compilation performance
+
+template <typename T>
+struct UnsignedFunctor {
+    UnsignedFunctor(T _min) : min(_min) {}
+    T operator()(const uint64_t& _value) { return static_cast<T>(_value + min); }
+    T min;
+};
+
+template <typename T>
+struct SignedFunctor {
+    SignedFunctor(T _min) : min(_min) {}
+    T operator()(const uint64_t& _value) { return static_cast<T>(_value + min); }
+    T min;
+};
+
+template <typename T>
+struct CastFunctor {
+    T operator()(const int64_t& _value) { return static_cast<T>(_value); }
+};
+
+}
+
+
 template <typename T>
 Shrinkable<T> generateInteger(Random& rand, T min = numeric_limits<T>::min(), T max = numeric_limits<T>::max())
 {
@@ -32,16 +58,13 @@ Shrinkable<T> generateInteger(Random& rand, T min = numeric_limits<T>::min(), T 
     if (min >= 0)  // [3,5] -> [0,2] -> [3,5]
     {
         return util::binarySearchShrinkableU(static_cast<T>(value - min))
-            .template map<T>([min](const uint64_t& _value) { return static_cast<T>(_value + min); });
+            .template map<T>(util::UnsignedFunctor<T>(min));
     } else if (max <= 0)  // [-5,-3] -> [-2,0] -> [-5,-3]
     {
-        return util::binarySearchShrinkable(static_cast<T>(value - max)).template map<T>([max](const int64_t& _value) {
-            return static_cast<T>(_value + max);
-        });
+        return util::binarySearchShrinkable(static_cast<T>(value - max)).template map<T>(util::SignedFunctor<T>(max));
     } else  // [-2, 2]
     {
-        auto transformer = +[](const int64_t& _value) { return static_cast<T>(_value); };
-        return util::binarySearchShrinkable(value).template map<T>(transformer);
+        return util::binarySearchShrinkable(value).template map<T>(util::CastFunctor<T>());
     }
 }
 
@@ -282,6 +305,50 @@ public:
                                                   UINT8_MAX + 1};
 };
 
+namespace util {
+
+// would've been simpler with lambdas, but optimzing for compilation performance
+
+template <typename T>
+struct NaturalFunctor {
+    NaturalFunctor(T _max) : max(_max) {}
+    Shrinkable<T> operator()(Random& rand) { return generateInteger<T>(rand, 1, max); }
+    T max;
+};
+
+template <typename T>
+struct NonNegativeFunctor {
+    NonNegativeFunctor(T _max) : max(_max) {}
+    Shrinkable<T> operator()(Random& rand) { return generateInteger<T>(rand, 0, max); }
+    T max;
+};
+
+template <typename T>
+struct IntervalFunctor {
+    IntervalFunctor(T _min, T _max) : min(_min), max(_max) {}
+    Shrinkable<T> operator()(Random& rand) { return generateInteger<T>(rand, min, max); }
+    T min;
+    T max;
+};
+
+template <typename T>
+struct InRangeFunctor {
+    InRangeFunctor(T _from, T _to) : from(_from), to(_to) {}
+    Shrinkable<T> operator()(Random& rand) { return generateInteger<T>(rand, from, to - 1); }
+    T from;
+    T to;
+};
+
+template <typename T>
+struct IntegersFunctor {
+    IntegersFunctor(T _start, T _count) : start(_start), count(_count) {}
+    Shrinkable<T> operator()(Random& rand) { return generateInteger<T>(rand, start, static_cast<T>(start + count - 1)); }
+    T start;
+    T count;
+};
+
+} // namespace util
+
 /**
  * @ingroup Generators
  * @brief Generates a positive integer, excluding 0
@@ -289,8 +356,9 @@ public:
 template <typename T>
 Generator<T> natural(T max = numeric_limits<T>::max())
 {
-    return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 1, max); });
+    return Generator<T>(util::NaturalFunctor<T>(max));
 }
+
 
 /**
  * @ingroup Generators
@@ -299,7 +367,7 @@ Generator<T> natural(T max = numeric_limits<T>::max())
 template <typename T>
 Generator<T> nonNegative(T max = numeric_limits<T>::max())
 {
-    return Generator<T>([max](Random& rand) { return generateInteger<T>(rand, 0, max); });
+    return Generator<T>(util::NonNegativeFunctor<T>(max));
 }
 
 /**
@@ -309,7 +377,7 @@ Generator<T> nonNegative(T max = numeric_limits<T>::max())
 template <typename T>
 Generator<T> interval(T min, T max)
 {
-    return Generator<T>([min, max](Random& rand) { return generateInteger<T>(rand, min, max); });
+    return Generator<T>(util::IntervalFunctor<T>(min, max));
 }
 
 /**
@@ -319,7 +387,7 @@ Generator<T> interval(T min, T max)
 template <typename T>
 Generator<T> inRange(T from, T to)
 {
-    return Generator<T>([from, to](Random& rand) { return generateInteger<T>(rand, from, to - 1); });
+    return Generator<T>(util::InRangeFunctor(from, to));
 }
 
 /**
@@ -329,8 +397,7 @@ Generator<T> inRange(T from, T to)
 template <typename T>
 Generator<T> integers(T start, T count)
 {
-    return Generator<T>(
-        [start, count](Random& rand) { return generateInteger<T>(rand, start, static_cast<T>(start + count - 1)); });
+    return Generator<T>(util::IntegersFunctor<T>(start, count));
 }
 
 }  // namespace proptest

@@ -1,5 +1,6 @@
-#include "proptest/assert.hpp"
+#include "proptest/api.hpp"
 #include "proptest/util/std.hpp"
+#include "proptest/assert.hpp"
 
 namespace proptest {
 namespace util {

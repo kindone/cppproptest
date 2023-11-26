@@ -1,5 +1,6 @@
-#include "proptest/Random.hpp"
+#include "proptest/api.hpp"
 #include "proptest/util/std.hpp"
+#include "proptest/Random.hpp"
 
 namespace proptest {
 

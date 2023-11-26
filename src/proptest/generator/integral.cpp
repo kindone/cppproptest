@@ -1,8 +1,9 @@
-#include "proptest/gen.hpp"
-#include "proptest/generator/integral.hpp"
-#include "proptest/generator/bool.hpp"
-#include "proptest/generator/util.hpp"
+#include "proptest/api.hpp"
 #include "proptest/util/std.hpp"
+#include "proptest/util/any.hpp"
+#include "proptest/Stream.hpp"
+#include "proptest/Shrinkable.hpp"
+#include "proptest/generator/integral.hpp"
 
 
 // for template instantiations

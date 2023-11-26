@@ -1,3 +1,7 @@
+#include "proptest/api.hpp"
+#include "proptest/util/std.hpp"
+#include "proptest/util/any.hpp"
+#include "proptest/Stream.hpp"
 #include "proptest/Shrinkable.hpp"
 #include "proptest/combinator/oneof.hpp"
 #include "proptest/generator/integral.hpp"

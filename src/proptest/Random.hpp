@@ -1,8 +1,5 @@
 #pragma once
 
-#include "proptest/api.hpp"
-#include "proptest/util/std.hpp"
-
 namespace proptest {
 
 PROPTEST_API int64_t getCurrentTime();

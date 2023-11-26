@@ -1,7 +1,8 @@
-#include "api.hpp"
-#include "Shrinkable.hpp"
-#include "util/utf8string.hpp"
-#include "util/cesu8string.hpp"
+#include "proptest/api.hpp"
+#include "proptest/util/std.hpp"
+#include "proptest/Stream.hpp"
+#include "proptest/util/any.hpp"
+#include "proptest/Shrinkable.hpp"
 
 namespace proptest {
 

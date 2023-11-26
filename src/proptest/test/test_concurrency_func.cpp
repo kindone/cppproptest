@@ -1,10 +1,7 @@
 #include "proptest/statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "proptest/Random.hpp"
-#include "proptest/util/bitmap.hpp"
 #include "proptest/stateful/concurrency_function.hpp"
-#include "proptest/util/std.hpp"
 #include <mutex>
 
 using namespace proptest;

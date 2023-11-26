@@ -1,3 +1,5 @@
+#include "proptest/api.hpp"
+#include "proptest/util/std.hpp"
 #include "proptest/Stream.hpp"
 
 namespace proptest {

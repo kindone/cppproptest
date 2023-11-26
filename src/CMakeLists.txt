@@ -121,3 +121,165 @@ TARGET_LINK_LIBRARIES(compile_proptest
         proptest
 	gtest_main
 )
+
+
+### compile separate
+SET(compile_misc_sources
+    proptest/test/compile/unicode.cpp
+    proptest/test/compile/container.cpp
+)
+
+ADD_EXECUTABLE(compile_misc_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_misc_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_misc_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+SET(compile_shrinkable_sources
+    proptest/test/compile/shrinkable.cpp
+    proptest/test/compile/stream.cpp
+)
+
+ADD_EXECUTABLE(compile_shrinkable_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_shrinkable_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_shrinkable_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+SET(compile_generator_sources
+    proptest/test/compile/integral.cpp
+    proptest/test/compile/floating.cpp
+    proptest/test/compile/vector.cpp
+    proptest/test/compile/string.cpp
+    proptest/test/compile/map.cpp
+)
+
+ADD_EXECUTABLE(compile_generator_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_generator_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_generator_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+SET(compile_combinator_sources
+    proptest/test/compile/just.cpp
+    proptest/test/compile/lazy.cpp
+    proptest/test/compile/filter.cpp
+    proptest/test/compile/derive.cpp
+    proptest/test/compile/aggregate.cpp
+    proptest/test/compile/accumulate.cpp
+    proptest/test/compile/oneof.cpp
+    proptest/test/compile/elementof.cpp
+)
+
+ADD_EXECUTABLE(compile_combinator_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_combinator_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_combinator_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+
+SET(compile_just_sources
+    proptest/test/compile/just.cpp
+)
+
+ADD_EXECUTABLE(compile_just_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_just_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_just_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+
+SET(compile_container_sources
+    proptest/test/compile/container.cpp
+)
+
+ADD_EXECUTABLE(compile_container_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_container_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_container_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+
+SET(compile_property_sources
+    proptest/test/compile/property.cpp
+)
+
+ADD_EXECUTABLE(compile_property_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_property_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_property_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+
+SET(compile_example_sources
+    proptest/test/compile/example.cpp
+)
+
+ADD_EXECUTABLE(compile_example_proptest
+    EXCLUDE_FROM_ALL
+    ${compile_example_sources}
+)
+
+TARGET_LINK_LIBRARIES(compile_example_proptest
+    PRIVATE
+        proptest
+	gtest_main
+)
+
+ADD_TEST(compile_misc_gtest
+    EXCLUDE_FROM_ALL
+    compile_misc_proptest)
+
+ADD_TEST(compile_shrinkable_gtest
+    EXCLUDE_FROM_ALL
+    compile_shrinkable_proptest)
+
+ADD_TEST(compile_generator_gtest
+    EXCLUDE_FROM_ALL
+    compile_generator_proptest)
+
+ADD_TEST(compile_combinator_gtest
+    EXCLUDE_FROM_ALL
+    compile_combinator_proptest)
+
+ADD_TEST(compile_just_gtest
+    EXCLUDE_FROM_ALL
+    compile_property_proptest)
+ADD_TEST(compile_property_gtest
+    EXCLUDE_FROM_ALL
+    compile_property_proptest)

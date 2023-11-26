@@ -1,9 +1,7 @@
 #include "proptest/statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "proptest/Random.hpp"
 #include "proptest/stateful/concurrency_class.hpp"
-#include "proptest/util/std.hpp"
 
 using namespace proptest;
 using namespace proptest::concurrent::alt;

@@ -1,10 +1,11 @@
+#include "proptest/api.hpp"
+#include "proptest/util/std.hpp"
+#include "proptest/util/any.hpp"
+#include "proptest/Stream.hpp"
+#include "proptest/Shrinkable.hpp"
 #include "proptest/gen.hpp"
 #include "proptest/shrinker/floating.hpp"
 #include "proptest/generator/floating.hpp"
-#include "proptest/generator/bool.hpp"
-#include "proptest/generator/util.hpp"
-#include "proptest/generator/tuple.hpp"
-#include "proptest/util/std.hpp"
 
 namespace proptest {
 
