@@ -15,6 +15,42 @@ decltype(auto) generator(GEN&& gen);
 template <typename T>
 struct Generator;
 
+namespace util {
+
+template <typename T, typename Criteria>
+struct FilterCastFunctor
+{
+    FilterCastFunctor(const Criteria& criteria) : criteria(criteria) {}
+
+    bool operator()(const Any& a) {
+        return criteria(a.cast<T>());
+    }
+
+    Criteria criteria;
+};
+
+template <typename T>
+struct FilterFunctor
+{
+    FilterFunctor(shared_ptr<GenFunction<T>> genPtr, shared_ptr<function<bool(const Any&)>> criteriaPtr)
+        : genPtr(genPtr), criteriaPtr(criteriaPtr) {}
+
+    Shrinkable<T> operator()(Random& rand) {
+        // TODO: add some configurable termination criteria (e.g. maximum no. of attempts)
+        while (true) {
+            Shrinkable<T> shrinkable = (*genPtr)(rand);
+            if ((*criteriaPtr)(shrinkable.getRef())) {
+                return shrinkable.filter(criteriaPtr, 1);  // 1: tolerance
+            }
+        }
+    }
+
+    shared_ptr<GenFunction<T>> genPtr;
+    shared_ptr<function<bool(const Any&)>> criteriaPtr;
+};
+
+}
+
 /**
  * @ingroup Combinators
  * @brief You can add a filtering condition to a generator to restrict the generated values to have certain constraint
@@ -35,18 +71,8 @@ Generator<T> filter(GEN&& gen, Criteria&& criteria)
                   "Gen must be a GenFunction<T> or a callable of Random& -> Shrinkable<T>");
     auto genPtr = util::make_shared<GenFunction<T>>(util::forward<GEN>(gen));
     auto criteriaPtr =
-        util::make_shared<function<bool(const Any&)>>([criteria](const Any& a) {
-            return criteria(a.cast<T>());
-        });
-    return Generator<T>([criteriaPtr, genPtr](Random& rand) {
-        // TODO: add some configurable termination criteria (e.g. maximum no. of attempts)
-        while (true) {
-            Shrinkable<T> shrinkable = (*genPtr)(rand);
-            if ((*criteriaPtr)(shrinkable.getRef())) {
-                return shrinkable.filter(criteriaPtr, 1);  // 1: tolerance
-            }
-        }
-    });
+        util::make_shared<function<bool(const Any&)>>(util::FilterCastFunctor<T, Criteria>(criteria));
+    return Generator<T>(util::FilterFunctor<T>(genPtr, criteriaPtr));
 }
 
 /**

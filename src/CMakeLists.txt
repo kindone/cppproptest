@@ -283,3 +283,16 @@ ADD_TEST(compile_just_gtest
 ADD_TEST(compile_property_gtest
     EXCLUDE_FROM_ALL
     compile_property_proptest)
+
+
+ADD_CUSTOM_TARGET(compile_part_proptest
+DEPENDS
+compile_property_proptest
+compile_just_proptest
+compile_generator_proptest
+compile_combinator_proptest
+compile_shrinkable_proptest
+compile_misc_proptest
+compile_example_proptest
+compile_container_proptest
+)

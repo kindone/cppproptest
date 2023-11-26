@@ -24,26 +24,45 @@ using Chain = tuple<Ts...>;
 
 namespace util {
 
-template <typename U, typename T>
-Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
+template <typename T, typename U>
+struct ChainCastFunctor
 {
-    auto gen1Ptr = util::make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = util::make_shared<function<GenFunction<U>(const T&)>>(
-        [gen2gen](const T& t) { return gen2gen(const_cast<T&>(t)); });
+    ChainCastFunctor(const function<GenFunction<U>(T&)>& gen2gen) : gen2gen(gen2gen) {}
 
-    auto genTuple = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<Chain<T, U>> {
+    GenFunction<U> operator()(const T& t) { return gen2gen(const_cast<T&>(t)); }
+
+    function<GenFunction<U>(T&)> gen2gen;
+};
+
+template <typename T, typename U>
+struct ChainInterFunctor {
+    ChainInterFunctor(Random& rand, shared_ptr<function<GenFunction<U>(const T&)>> gen2genPtr)
+        : rand(rand), gen2genPtr(gen2genPtr) {}
+
+    Shrinkable<pair<T, Shrinkable<U>>> operator()(const T& t) {
+        // generate U
+        auto gen2 = (*gen2genPtr)(t);
+        Shrinkable<U> shrinkableU = gen2(rand);
+        return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, shrinkableU));
+    }
+
+    Random &rand;
+    shared_ptr<function<GenFunction<U>(const T&)>> gen2genPtr;
+};
+
+template <typename T, typename U>
+struct ChainFunctor {
+    ChainFunctor(shared_ptr<GenFunction<T>> gen1Ptr, shared_ptr<function<GenFunction<U>(const T&)>> gen2genPtr)
+        : gen1Ptr(gen1Ptr), gen2genPtr(gen2genPtr) {}
+
+    Shrinkable<Chain<T, U>> operator()(Random& rand) {
         // generate T
         Shrinkable<T> shrinkableTs = (*gen1Ptr)(rand);
         using Intermediate = pair<T, Shrinkable<U>>;
 
         // shrink strategy 1: expand Shrinkable<T>
         Shrinkable<pair<T, Shrinkable<U>>> intermediate =
-            shrinkableTs.template flatMap<pair<T, Shrinkable<U>>>([&rand, gen2genPtr](const T& t) {
-                // generate U
-                auto gen2 = (*gen2genPtr)(t);
-                Shrinkable<U> shrinkableU = gen2(rand);
-                return make_shrinkable<pair<T, Shrinkable<U>>>(util::make_pair(t, shrinkableU));
-            });
+            shrinkableTs.template flatMap<pair<T, Shrinkable<U>>>(util::ChainInterFunctor<T, U>(rand, gen2genPtr));
 
         // shrink strategy 2: expand Shrinkable<U>
         intermediate =
@@ -66,58 +85,18 @@ Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&
                 return make_shrinkable<Chain<T, U>>(
                     tuple_cat(tuple<T>(t), util::make_tuple(interpair.second.getRef())));
             });
-    };
+    }
 
-    return generator(genTuple);
-}
+    shared_ptr<GenFunction<T>> gen1Ptr;
+    shared_ptr<function<GenFunction<U>(const T&)>> gen2genPtr;
+};
 
-template <typename U, typename T0, typename T1, typename... Ts>
-Generator<Chain<T0, T1, Ts..., U>> chainImpl(GenFunction<Chain<T0, T1, Ts...>> gen1,
-                                             function<GenFunction<U>(Chain<T0, T1, Ts...>&)> gen2gen)
+template <typename U, typename T>
+Generator<Chain<T, U>> chainImpl(GenFunction<T> gen1, function<GenFunction<U>(T&)> gen2gen)
 {
     auto gen1Ptr = util::make_shared<decltype(gen1)>(gen1);
-    auto gen2genPtr = util::make_shared<function<GenFunction<U>(const Chain<T0, T1, Ts...>&)>>(
-        [gen2gen](const Chain<T0, T1, Ts...>& ts) { return gen2gen(const_cast<Chain<T0, T1, Ts...>&>(ts)); });
-
-    auto genTuple = [gen1Ptr, gen2genPtr](Random& rand) -> Shrinkable<Chain<T0, T1, Ts..., U>> {
-        // generate T
-        Shrinkable<Chain<T0, T1, Ts...>> shrinkableTs = (*gen1Ptr)(rand);
-        using Intermediate = pair<Chain<T0, T1, Ts...>, Shrinkable<U>>;
-
-        // shrink strategy 1: expand Shrinkable<tuple<Ts...>>
-        Shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>> intermediate =
-            shrinkableTs.template flatMap<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
-                [&rand, gen2genPtr](const Chain<T0, T1, Ts...>& ts) {
-                    // generate U
-                    auto gen2 = (*gen2genPtr)(ts);
-                    Shrinkable<U> shrinkableU = gen2(rand);
-                    return make_shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(util::make_pair(ts, shrinkableU));
-                });
-
-        // shrink strategy 2: expand Shrinkable<U>
-        intermediate =
-            intermediate.andThen(+[](const Shrinkable<Intermediate>& interShr) -> Stream {
-                // assume interShr has no shrinks
-                Intermediate& interpair = interShr.getRef();
-                Chain<T0, T1, Ts...>& ts = interpair.first;
-                Shrinkable<U>& shrinkableU = interpair.second;
-                Shrinkable<Intermediate> newShrinkableU =
-                    shrinkableU.template flatMap<Intermediate>([ts](const U& u) mutable {
-                        return make_shrinkable<pair<Chain<T0, T1, Ts...>, Shrinkable<U>>>(
-                            util::make_pair(ts, make_shrinkable<U>(u)));
-                    });
-                return newShrinkableU.shrinks();
-            });
-
-        // reformat pair<Chain<T0, T1, Ts...>, Shrinkable<U>> to Chain<T0, T1, Ts..., U>
-        return intermediate.template flatMap<Chain<T0, T1, Ts..., U>>(
-            +[](const Intermediate& interpair) -> Shrinkable<tuple<T0, T1, Ts..., U>> {
-                const Chain<T0, T1, Ts...>& ts = interpair.first;
-                return make_shrinkable<Chain<T0, T1, Ts..., U>>(tuple_cat(ts, tuple<U>(interpair.second.getRef())));
-            });
-    };
-
-    return generator(genTuple);
+    auto gen2genPtr = util::make_shared<function<GenFunction<U>(const T&)>>(util::ChainCastFunctor<T, U>(gen2gen));
+    return generator(util::ChainFunctor<T, U>(gen1Ptr, gen2genPtr));
 }
 
 }  // namespace util
