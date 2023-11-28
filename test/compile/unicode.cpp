@@ -35,7 +35,7 @@ TEST(Compile, utf16be)
         uint32_t out = util::decodeUTF16BE(encoded);
         stringstream str;
         util::charAsHex(str, encoded);
-        PROP_EXPECT_EQ(unicode, out) << hex << unicode << " : " << out << "(" << str.str() << ")";
+        PROP_EXPECT_EQ(unicode, out) << util::hex << unicode << " : " << out << "(" << str.str() << ")";
     }, UnicodeGen());
 }
 
@@ -45,7 +45,7 @@ TEST(Compile, utf16le)
         vector<uint8_t> encoded;
         util::encodeUTF16LE(unicode, encoded);
         uint32_t out = util::decodeUTF16LE(encoded);
-        PROP_EXPECT_EQ(unicode, out) << hex << unicode << " : " << out;
+        PROP_EXPECT_EQ(unicode, out) << util::hex << unicode << " : " << out;
     }, UnicodeGen());
 }
 
@@ -64,9 +64,9 @@ TEST(Compile, unicode_stream)
         util::decodeUTF8(stream_utf8, utf8);
         util::decodeCESU8(stream_cesu8, cesu8);
 
-        PROP_EXPECT_EQ(stream_utf16le.str(), stream_utf16be.str()) << hex << unicode << " " << stream_utf16le.str() << " : " << stream_utf16be.str();
-        PROP_EXPECT_EQ(stream_utf16le.str(), stream_utf8.str()) << hex << unicode << " " << stream_utf16le.str() << " : " << stream_utf8.str();
-        PROP_EXPECT_EQ(stream_utf16le.str(), stream_cesu8.str()) << hex << unicode << " " << stream_utf16le.str() << " : " << stream_cesu8.str();
+        PROP_EXPECT_EQ(stream_utf16le.str(), stream_utf16be.str()) << util::hex << unicode << " " << stream_utf16le.str() << " : " << stream_utf16be.str();
+        PROP_EXPECT_EQ(stream_utf16le.str(), stream_utf8.str()) << util::hex << unicode << " " << stream_utf16le.str() << " : " << stream_utf8.str();
+        PROP_EXPECT_EQ(stream_utf16le.str(), stream_cesu8.str()) << util::hex << unicode << " " << stream_utf16le.str() << " : " << stream_cesu8.str();
     }, UnicodeGen());
 }
 
@@ -85,7 +85,7 @@ TEST(Compile, CESU8UTF16BE)
     util::encodeUTF16BE(unicode, utf16be);
     stringstream str;
     util::charAsHex(str, utf16be);
-    cout << hex << unicode << ", " << str.str() << endl;
+    cout << util::hex << unicode << ", " << str.str() << endl;
 }
 
 TEST(Compile, CESU8UTF16LE)
@@ -107,7 +107,7 @@ TEST(Compile, CESU8UTF16LE)
     stringstream str;
     util::charAsHex(str, utf16le);
 
-    cout << hex << "unicode: " <<unicode << ", utf16 le hex:" << str.str() << ", utf16 le decoded: " << endl;
+    cout << util::hex << "unicode: " <<unicode << ", utf16 le hex:" << str.str() << ", utf16 le decoded: " << endl;
 
     util::decodeUTF16LE(cout, utf16le);
     cout << endl;

@@ -67,7 +67,7 @@ Shrinkable<CESU8String> Arbi<CESU8String>::operator()(Random& rand)
         os << "not a valid cesu8 string: ";
         printf("not a valid cesu8 string: ");
         for (size_t i = 0; i < chars.size(); i++) {
-            os << setfill('0') << setw(2) << hex << static_cast<int>(chars[i]) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(chars[i]) << " ";
             printf("%x", chars[i]);
         }
         printf("\n");

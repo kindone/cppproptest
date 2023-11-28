@@ -82,7 +82,11 @@ using std::function;
 using std::cerr;
 using std::cout;
 using std::endl;
+
+namespace util {
 using std::hex;
+}
+
 using std::ios;
 using std::ostream;
 using std::setfill;

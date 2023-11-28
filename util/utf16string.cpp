@@ -12,7 +12,7 @@ size_t UTF16BEString::charsize() const
         stringstream str;
         str << "Not a valid UTF-16 BE string: ";
         for (size_t i = 0; i < this->size(); i++) {
-            str << setfill('0') << setw(2) << hex << static_cast<int>((*this)[i]) << " ";
+            str << setfill('0') << setw(2) << util::hex << static_cast<int>((*this)[i]) << " ";
         }
         throw runtime_error(str.str());
     }
@@ -27,7 +27,7 @@ size_t UTF16LEString::charsize() const
         stringstream str;
         str << "Not a valid UTF-16 LE string: ";
         for (size_t i = 0; i < this->size(); i++) {
-            str << setfill('0') << setw(2) << hex << static_cast<int>((*this)[i]) << " ";
+            str << setfill('0') << setw(2) << util::hex << static_cast<int>((*this)[i]) << " ";
         }
         throw runtime_error(str.str());
     }
@@ -170,10 +170,10 @@ void encodeUTF16BE(uint32_t code, vector<uint8_t>& chars)
         if (!(0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)) {
             stringstream os;
             os << "invalid surrogate pairs: ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c0) << " ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c1) << " ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c2) << " ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c3) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c0) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c1) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c2) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c3) << " ";
             throw runtime_error(os.str());
         }
 
@@ -264,10 +264,10 @@ void encodeUTF16LE(uint32_t code, vector<uint8_t>& chars)
         if (!(0xD8 <= c0 && c0 <= 0xDB && 0xDC <= c2 && c2 <= 0xDF)) {
             stringstream os;
             os << "invalid surrogate pairs: ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c1) << " ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c0) << " ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c3) << " ";
-            os << setfill('0') << setw(2) << hex << static_cast<int>(c2) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c1) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c0) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c3) << " ";
+            os << setfill('0') << setw(2) << util::hex << static_cast<int>(c2) << " ";
             throw runtime_error(os.str());
             // throw runtime_error("invalid surrogate pairs: ");
         }
