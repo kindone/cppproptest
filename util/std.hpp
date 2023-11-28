@@ -24,6 +24,8 @@
 
 #include <chrono>
 
+#include <concepts>
+
 namespace proptest {
 
 using std::list;
@@ -62,6 +64,7 @@ using std::is_pointer;
 using std::is_same;
 using std::is_same_v;
 using std::make_index_sequence;
+using std::same_as;
 
 using std::decay_t;
 using std::enable_if;
@@ -101,6 +104,7 @@ using std::logic_error;
 using std::runtime_error;
 
 using std::boolalpha;
+using std::bool_constant;
 using std::mt19937_64;
 using std::uniform_int_distribution;
 using std::uniform_real_distribution;
@@ -110,11 +114,14 @@ using std::true_type;
 
 using std::conjunction_v;
 using std::is_convertible_v;
+using std::convertible_to;
 
 using std::chrono::steady_clock;
 using std::chrono::duration_cast;
 namespace util {
 using std::chrono::milliseconds;
 }
+
+using std::invocable;
 
 }  // namespace proptest

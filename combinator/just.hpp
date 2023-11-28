@@ -17,7 +17,8 @@ namespace proptest {
  * @details Will always generate a specific value of type T. e.g. just(1339) will generate 1339
  */
 template <typename T>
-enable_if_t<is_trivial<T>::value, Generator<T>> just(T&& value)
+    requires(is_trivial<T>::value)
+Generator<T> just(T&& value)
 {
     return generator([value](Random&) { return make_shrinkable<T>(value); });
 }
@@ -28,7 +29,8 @@ enable_if_t<is_trivial<T>::value, Generator<T>> just(T&& value)
  * @details Will always generate a specific value of type T.
  */
 template <typename T>
-enable_if_t<!is_trivial<T>::value, Generator<T>> just(const T& value)
+    requires(!is_trivial<T>::value)
+Generator<T> just(const T& value)
 {
     auto ptr = util::make_shared<Any>(util::make_any<T>(value));  // requires copy constructor
     return generator([ptr](Random&) { return Shrinkable<T>(ptr); });
@@ -53,7 +55,8 @@ Generator<T> just(shared_ptr<T> sharedPtr)
  * non-copyable.
  */
 template <typename T>
-enable_if_t<!is_same_v<decay_t<T>, Any>, Generator<T>> just(shared_ptr<Any> sharedPtr)
+    requires(!is_same_v<decay_t<T>, Any>)
+Generator<T> just(shared_ptr<Any> sharedPtr)
 {
     return generator([sharedPtr](Random&) { return Shrinkable<T>(sharedPtr); });
 }

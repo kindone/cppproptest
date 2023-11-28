@@ -34,7 +34,8 @@ struct WeightedValue
 };
 
 template <typename T>
-enable_if_t<!is_same<decay_t<T>, WeightedValue<T>>::value, WeightedValue<T>> ValueToWeighted(T&& value)
+    requires(!is_same_v<decay_t<T>, WeightedValue<T>>)
+WeightedValue<T> ValueToWeighted(T&& value)
 {
     return weightedVal<T>(util::forward<T>(value), 0.0);
 }

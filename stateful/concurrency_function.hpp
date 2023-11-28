@@ -71,13 +71,15 @@ public:
     }
 
     template <typename M = ModelType>
-    enable_if_t<!is_same_v<M, EmptyModel>, Concurrency>& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)  {
+        requires(!is_same_v<M, EmptyModel>)
+    Concurrency& setPostCheck(function<void(ObjectType&, ModelType&)> postCheck)  {
         postCheckPtr = util::make_shared<function<void(ObjectType&, ModelType&)>>(postCheck);
         return *this;
     }
 
     template <typename M = ModelType>
-    enable_if_t<is_same_v<M, EmptyModel>, Concurrency>&  setPostCheck(function<void(ObjectType&)> postCheck)  {
+        requires(is_same_v<M, EmptyModel>)
+    Concurrency&  setPostCheck(function<void(ObjectType&)> postCheck)  {
         function<void(ObjectType&,ModelType&)>  fullPostCheck = [postCheck](ObjectType& sys, ModelType&) { postCheck(sys); };
         postCheckPtr = util::make_shared(fullPostCheck);
         return *this;

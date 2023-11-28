@@ -21,7 +21,8 @@ namespace proptest {
  * combinator, but it generates a value in lazily.
  */
 template <typename T, typename LazyEval>
-enable_if_t<is_convertible_v<LazyEval&&, function<T()>>, Generator<T>> lazy(LazyEval&& lazyEval)
+    requires(is_convertible_v<LazyEval&&, function<T()>>)
+Generator<T> lazy(LazyEval&& lazyEval)
 {
     auto lazyEvalPtr = util::make_shared<function<T()>>(util::forward<LazyEval>(lazyEval));
     return generator([lazyEvalPtr](Random&) { return make_shrinkable<T>((*lazyEvalPtr)()); });

@@ -82,7 +82,7 @@ public:
 private:
     using ArgTuple = tuple<decay_t<ARGS>...>;
     using ValueTuple = tuple<Shrinkable<decay_t<ARGS>>...>;
-    using ShrinksTuple = tuple<conditional_t<is_same_v<ARGS, bool>, Stream, Stream>...>;
+    using ShrinksTuple = tuple<conditional_t<is_same_v<ARGS, bool>, Stream, Stream>...>; // tuple<Stream, ...> (repeats by size of ARGS)
 
 public:
     Property(const Func& f, const GenTuple& g) : PropertyBase(new Func(f), new GenTuple(g)) {}
@@ -435,14 +435,16 @@ private:
 namespace util {
 
 template <typename RetType, typename Callable, typename... ARGS>
-enable_if_t<is_same<RetType, bool>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
+    requires(same_as<RetType, bool>)
+function<bool(ARGS...)> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
 {
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
 template <typename RetType, typename Callable, typename... ARGS>
-enable_if_t<is_same<RetType, void>::value, function<bool(ARGS...)>> functionWithBoolResultHelper(
+    requires(same_as<RetType, void>)
+function<bool(ARGS...)> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
 {
     return function<bool(ARGS...)>([callable](ARGS&&... args) {
