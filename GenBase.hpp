@@ -11,6 +11,7 @@
 namespace proptest {
 
 class Random;
+template <typename T> class Shrinkable;
 /**
  * @brief Standard function type for generators
  *

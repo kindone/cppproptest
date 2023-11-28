@@ -22,6 +22,17 @@ namespace proptest {
 
 class Random;
 
+namespace util {
+
+template <typename T>
+struct GeneratorFunctor {
+    GeneratorFunctor(shared_ptr<Generator<T>> ptr) : thisPtr(ptr) {}
+    Shrinkable<T> operator()(Random& rand) { return (*thisPtr->genPtr)(rand); }
+    shared_ptr<Generator<T>> thisPtr;
+};
+
+} // namespace util
+
 /**
  * @ingroup Generators
  * @brief \ref Generator<T> is a wrapper for generator functions (or GenFunction<T>) to provide utility methods.
@@ -50,7 +61,7 @@ struct Generator : public GenBase<T>
     {
         auto thisPtr = clone();
         return Generator<U>(
-            proptest::transform<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, mapper));
+            proptest::transform<T, U>(util::GeneratorFunctor<T>(thisPtr), mapper));
     }
 
     /**
@@ -79,7 +90,7 @@ struct Generator : public GenBase<T>
     Generator<T> filter(function<bool(T&)> criteria)
     {
         auto thisPtr = clone();
-        return proptest::filter<T>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, criteria);
+        return proptest::filter<T>(util::GeneratorFunctor<T>(thisPtr), criteria);
     }
 
     /**
@@ -96,7 +107,7 @@ struct Generator : public GenBase<T>
     Generator<pair<T, U>> pairWith(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::dependency<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
+        return proptest::dependency<T, U>(util::GeneratorFunctor<T>(thisPtr), genFactory);
     }
 
     template <invocable<T&> FACTORY>
@@ -124,7 +135,7 @@ struct Generator : public GenBase<T>
     decltype(auto) tupleWith(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::chain([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
+        return proptest::chain(util::GeneratorFunctor<T>(thisPtr), genFactory);
     }
 
     template <typename FACTORY>
@@ -148,7 +159,7 @@ struct Generator : public GenBase<T>
     Generator<U> flatMap(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::derive<T, U>([thisPtr](Random& rand) { return (*thisPtr->genPtr)(rand); }, genFactory);
+        return proptest::derive<T, U>(util::GeneratorFunctor<T>(thisPtr), genFactory);
     }
 
     template <invocable<T&> FACTORY>

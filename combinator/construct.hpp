@@ -11,6 +11,9 @@ namespace proptest {
 
 class Random;
 
+template <class CLASS, typename... ARGTYPES>
+class Construct;
+
 namespace util {
 
 template <typename TO, typename SHRINKABLE>
@@ -40,6 +43,13 @@ decltype(auto) autoCastTuple(FromTuple&& tuple)
     return autoCast<typename tuple_element<N, ToTuple>::type>(get<N>(tuple));
 }
 
+template <typename T, typename... ARGTYPES>
+struct ConstructFunctor {
+    ConstructFunctor(shared_ptr<Construct<T, ARGTYPES...>> ptr) : thisPtr(ptr) {}
+    Shrinkable<T> operator()(Random& rand) { return thisPtr->operator()(rand); }
+    shared_ptr<Construct<T,ARGTYPES...>> thisPtr;
+};
+
 }  // namespace util
 
 template <class CLASS, typename... ARGTYPES>
@@ -61,14 +71,14 @@ public:
     {
         auto thisPtr = clone();
         return Generator<U>(
-            proptest::transform<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, mapper));
+            proptest::transform<CLASS, U>(util::ConstructFunctor<CLASS, ARGTYPES...>(thisPtr), mapper));
     }
 
     template <typename Criteria>
     Generator<CLASS> filter(Criteria&& criteria)
     {
         auto thisPtr = clone();
-        return Generator<CLASS>(proptest::filter<CLASS>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+        return Generator<CLASS>(proptest::filter<CLASS>(util::ConstructFunctor<CLASS, ARGTYPES...>(thisPtr),
                                                         util::forward<Criteria>(criteria)));
     }
 
@@ -76,7 +86,7 @@ public:
     Generator<pair<CLASS, U>> pairWith(function<GenFunction<U>(const CLASS&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::dependency<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); },
+        return proptest::dependency<CLASS, U>(util::ConstructFunctor<CLASS, ARGTYPES...>(thisPtr),
                                               genFactory);
     }
 
@@ -84,7 +94,7 @@ public:
     decltype(auto) tupleWith(function<GenFunction<U>(CLASS&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
+        return proptest::chain(util::ConstructFunctor<CLASS, ARGTYPES...>(thisPtr), genFactory);
     }
 
     template <typename U>
@@ -92,7 +102,7 @@ public:
     {
         auto thisPtr = clone();
         return Generator<U>(
-            proptest::derive<CLASS, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory));
+            proptest::derive<CLASS, U>(util::ConstructFunctor<CLASS, ARGTYPES...>(thisPtr), genFactory));
     }
 
     shared_ptr<Construct<CLASS, ARGTYPES...>> clone()

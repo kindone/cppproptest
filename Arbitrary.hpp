@@ -22,6 +22,20 @@ namespace proptest {
 
 template <typename T>
 struct Arbi;
+template <typename T>
+struct ArbiBase;
+
+namespace util {
+
+template <typename T>
+struct ArbiFunctor {
+    ArbiFunctor(shared_ptr<ArbiBase<T>> ptr) : thisPtr(ptr) {}
+    Shrinkable<T> operator()(Random& rand) { return thisPtr->operator()(rand); }
+    shared_ptr<ArbiBase<T>> thisPtr;
+};
+
+} // namespace util
+
 
 /**
  * @ingroup Generators
@@ -45,7 +59,7 @@ struct ArbiBase : public GenBase<T>
     Generator<U> map(function<U(T&)> mapper)
     {
         auto thisPtr = clone();
-        return proptest::transform<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, mapper);
+        return proptest::transform<T, U>(util::ArbiFunctor<T>(thisPtr), mapper);
     }
 
     /**
@@ -74,7 +88,7 @@ struct ArbiBase : public GenBase<T>
     Generator<T> filter(function<bool(T&)> criteria)
     {
         auto thisPtr = clone();
-        return proptest::filter<T>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, criteria);
+        return proptest::filter<T>(util::ArbiFunctor<T>(thisPtr), criteria);
     }
 
     /**
@@ -91,7 +105,7 @@ struct ArbiBase : public GenBase<T>
     Generator<pair<T, U>> pairWith(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::dependency<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
+        return proptest::dependency<T, U>(util::ArbiFunctor<T>(thisPtr), genFactory);
     }
 
     template <invocable<T&> FACTORY>
@@ -118,7 +132,7 @@ struct ArbiBase : public GenBase<T>
     decltype(auto) tupleWith(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::chain([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
+        return proptest::chain(util::ArbiFunctor<T>(thisPtr), genFactory);
     }
 
     template <invocable<T&> FACTORY>
@@ -142,7 +156,7 @@ struct ArbiBase : public GenBase<T>
     Generator<U> flatMap(function<GenFunction<U>(T&)> genFactory)
     {
         auto thisPtr = clone();
-        return proptest::derive<T, U>([thisPtr](Random& rand) { return thisPtr->operator()(rand); }, genFactory);
+        return proptest::derive<T, U>(util::ArbiFunctor<T>(thisPtr), genFactory);
     }
 
     template <invocable<T&> FACTORY>

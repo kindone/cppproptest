@@ -40,7 +40,7 @@ struct Matrix
     }
 
     template <size_t N, typename Lists>
-    static decltype(auto) progressN(bool& incremented, Lists&& lists, vector<int>& indices)
+    static bool progressN(bool& incremented, Lists&& lists, vector<int>& indices)
     {
         auto& list = get<N>(lists);
         // already incremented
@@ -442,15 +442,23 @@ function<bool(ARGS...)> functionWithBoolResultHelper(
     return static_cast<function<RetType(ARGS...)>>(callable);
 }
 
+template <typename Callable, typename ...ARGS>
+struct BoolResultFunctor {
+    BoolResultFunctor(Callable&& callable) : callable(callable) {}
+
+    bool operator()(ARGS&&... args) {
+        callable(util::forward<ARGS>(args)...);
+        return true;
+    }
+    Callable&& callable;
+};
+
 template <typename RetType, typename Callable, typename... ARGS>
     requires(same_as<RetType, void>)
 function<bool(ARGS...)> functionWithBoolResultHelper(
     util::TypeList<ARGS...>, Callable&& callable)
 {
-    return function<bool(ARGS...)>([callable](ARGS&&... args) {
-        callable(util::forward<ARGS>(args)...);
-        return true;
-    });
+    return BoolResultFunctor<Callable, ARGS...>(util::forward<Callable>(callable));
 }
 
 template <class Callable>
