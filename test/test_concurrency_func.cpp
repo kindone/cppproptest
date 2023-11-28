@@ -3,7 +3,7 @@
 #include "googletest/googlemock/include/gmock/gmock.h"
 #include "Random.hpp"
 #include "../util/bitmap.hpp"
-#include "../combinator/concurrency_function.hpp"
+#include "../stateful/concurrency_function.hpp"
 #include "../util/std.hpp"
 #include <mutex>
 
