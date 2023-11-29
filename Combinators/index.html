@@ -9,10 +9,10 @@
         <meta name="description" content="C++ Property Testing">
       
       
-        <meta name="author" content="Won-Wook Hong">
+        <meta name="author" content="kindone">
       
       
-        <link rel="canonical" href="https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/Combinators/">
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/Combinators/">
       
       
         <link rel="prev" href="../Generators/">
@@ -165,13 +165,13 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
       </div>
@@ -211,13 +211,13 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
     </div>
@@ -839,7 +839,7 @@
 <h3 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>just&lt;T&gt;(T*)</code>, <code>just&lt;T&gt;(T)</code>, <code>just&lt;T&gt;(shared_ptr&lt;T&gt;)</code>: always generates a specific value. A shared pointer can be used for non-copyable types.</li>
-<li><code>lazy&lt;T&gt;(ltt_adp::function&lt;T()&gt;)</code>: generates a value by calling a function
+<li><code>lazy&lt;T&gt;(std::function&lt;T()&gt;)</code>: generates a value by calling a function
     <div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">zeroGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// template argument is optional if type is deducible</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">oneGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lazy</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">([]()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div></li>
@@ -882,13 +882,13 @@
 <p>Generators for different types can be bound to a pair or a tuple.</p>
 <ul>
 <li>
-<p><code>pairOf&lt;T1, T2&gt;(gen1, gen2)</code> : generates a <code>ltt_adp::pair&lt;T1,T2&gt;</code> based on result of generators <code>gen1</code> and <code>gen2</code></p>
-<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">pairGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairOf</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">());</span>
+<p><code>pairOf&lt;T1, T2&gt;(gen1, gen2)</code> : generates a <code>std::pair&lt;T1,T2&gt;</code> based on result of generators <code>gen1</code> and <code>gen2</code></p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">pairGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairOf</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">());</span>
 </code></pre></div>
 </li>
 <li>
-<p><code>tupleOf&lt;T1, ..., TN&gt;(gen1, ..., genN)</code>: generates a <code>ltt::tuple&lt;T1,...,TN&gt;</code> based on result of generators <code>gen1</code> through <code>genN</code></p>
-<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">tupleGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupleOf</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">());</span>
+<p><code>tupleOf&lt;T1, ..., TN&gt;(gen1, ..., genN)</code>: generates a <code>std::tuple&lt;T1,...,TN&gt;</code> based on result of generators <code>gen1</code> through <code>genN</code></p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">tupleGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupleOf</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">());</span>
 </code></pre></div>
 </li>
 </ul>
@@ -951,8 +951,8 @@
 <li>
 <p><code>transform&lt;T,U&gt;(gen, transformer)</code>: generates type <code>U</code> based on generator for type <code>T</code>, using <code>transformer</code> that transforms a value of type <code>T</code> to type <code>U</code></p>
 <div class="highlight"><pre><span></span><code><span class="c1">// generates string from integers (e.g. &quot;0&quot;, &quot;1&quot;, ... , &quot;-16384&quot;)</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">numStringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transform</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),[](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">numStringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transform</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),[](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
 </li>
@@ -963,13 +963,13 @@
 <li>
 <p><code>derive&lt;T, U&gt;(genT, genUGen)</code>: derives a new generator for type <code>U</code>, based on result of <code>genT</code>, which is a generator for type <code>T</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// generates a string something like &quot;KOPZZFASF&quot;, &quot;ghnpqpojv&quot;, or &quot;49681002378&quot;, ... that consists of only uppercase/lowercase alphabets/numeric characters.</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">derive</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">derive</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">num</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">));</span>
 <span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">num</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;z&#39;</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;z&#39;</span><span class="p">));</span>
 <span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="c1">// num == 2</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;0&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;9&#39;</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">interval</span><span class="p">(</span><span class="sc">&#39;0&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;9&#39;</span><span class="p">));</span>
 <span class="p">});</span>
 </code></pre></div>
 </li>
@@ -1000,9 +1000,9 @@
 <p>You may want to include dependency in the generated values. There are two variants that do this. One generates a pair and the other one generates a tuple.</p>
 <ul>
 <li>
-<p><code>dependency&lt;T,U&gt;(genT, genUgen)</code>: generates a <code>ltt_adp::pair&lt;T,U&gt;</code> with a generator <code>genT</code> for type <code>T</code> and <code>genUgen</code>. <code>genUgen</code> receives a type <code>T</code> and returns a generator for type <code>U</code>. This can effectively create a generator for a pair where second item depends on the first one.</p>
-<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">sizeAndVectorGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dependency</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">vectorGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
+<p><code>dependency&lt;T,U&gt;(genT, genUgen)</code>: generates a <code>std::pair&lt;T,U&gt;</code> with a generator <code>genT</code> for type <code>T</code> and <code>genUgen</code>. <code>genUgen</code> receives a type <code>T</code> and returns a generator for type <code>U</code>. This can effectively create a generator for a pair where second item depends on the first one.</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">sizeAndVectorGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dependency</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">vectorGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">();</span>
 <span class="w">    </span><span class="n">vectorGen</span><span class="p">.</span><span class="n">maxLen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num</span><span class="p">;</span>
 <span class="w">    </span><span class="c1">// generates a vector with maximum size of num</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">vectorGen</span><span class="p">;</span>
@@ -1017,12 +1017,12 @@
 </code></pre></div>
 </li>
 <li>
-<p><code>chain&lt;Ts..., U&gt;(genT, genUgen)</code>: similar to <code>dependency</code>, but takes a tuple generator for <code>ltt::tuple&lt;Ts...&gt;</code> and generates a <code>ltt::tuple&lt;Ts..., U&gt;</code> instead of a <code>ltt_adp::pair</code>. <code>chain</code> can be repeatedly applied to itself, and results in a tuple one element larger than the previous one. You can chain multiple dependencies with this form.</p>
+<p><code>chain&lt;Ts..., U&gt;(genT, genUgen)</code>: similar to <code>dependency</code>, but takes a tuple generator for <code>std::tuple&lt;Ts...&gt;</code> and generates a <code>std::tuple&lt;Ts..., U&gt;</code> instead of a <code>std::pair</code>. <code>chain</code> can be repeatedly applied to itself, and results in a tuple one element larger than the previous one. You can chain multiple dependencies with this form.</p>
 <div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">yearMonthGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupleOf</span><span class="p">(</span><span class="n">fromTo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">9999</span><span class="p">),</span><span class="w"> </span><span class="n">fromTo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">));</span>
 <span class="c1">// number of days of month depends on month (28~31 days) and year (whether it&#39;s a leap year)</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">yearMonthDayGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chain</span><span class="o">&lt;</span><span class="n">ltt</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">yearMonthGen</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="n">ltt</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">yearMonth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(</span><span class="n">yearMonth</span><span class="p">);</span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">yearMonth</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">yearMonthDayGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chain</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">yearMonthGen</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">yearMonth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(</span><span class="n">yearMonth</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">yearMonth</span><span class="p">);</span>
 <span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">monthHas31Days</span><span class="p">(</span><span class="n">month</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">fromTo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">31</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
@@ -1035,7 +1035,7 @@
 <span class="w">    </span><span class="k">else</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">fromTo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="p">});</span><span class="w"> </span><span class="c1">// yearMonthDayGen generates ltt::tuple&lt;int, int, int&gt; of (year, month, day)</span>
+<span class="p">});</span><span class="w"> </span><span class="c1">// yearMonthDayGen generates std::tuple&lt;int, int, int&gt; of (year, month, day)</span>
 </code></pre></div>
 </li>
 </ul>
@@ -1043,10 +1043,10 @@
 <div class="highlight"><pre><span></span><code><span class="w">    </span><span class="c1">// generate any year,month,day combination</span>
 <span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">yearMonthDayGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tupleOf</span><span class="p">(</span><span class="n">fromTo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">9999</span><span class="p">),</span><span class="w"> </span><span class="n">fromTo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span><span class="w"> </span><span class="n">fromTo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">31</span><span class="p">));</span>
 <span class="w">    </span><span class="c1">// apply filter</span>
-<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">validYearMonthDayGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yearMonthDayGen</span><span class="p">.</span><span class="n">filter</span><span class="p">([](</span><span class="n">ltt</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">ymd</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ymd</span><span class="p">);</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ymd</span><span class="p">);</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">day</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ymd</span><span class="p">);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">validYearMonthDayGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yearMonthDayGen</span><span class="p">.</span><span class="n">filter</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">ymd</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ymd</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ymd</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">day</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ymd</span><span class="p">);</span>
 <span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">monthHas31Days</span><span class="p">(</span><span class="n">month</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">day</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">31</span><span class="p">)</span>
 <span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">monthHas30Days</span><span class="p">(</span><span class="n">month</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">day</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">30</span><span class="p">)</span>
@@ -1133,18 +1133,18 @@ Both of the combinators take base generator in the form of <code>Generator&lt;T&
 </tr>
 <tr>
 <td><code>Generator&lt;T&gt;::pairWith&lt;U&gt;</code></td>
-<td><code>Generator&lt;ltt_adp::pair&lt;T,U&gt;&gt;</code></td>
+<td><code>Generator&lt;std::pair&lt;T,U&gt;&gt;</code></td>
 <td><code>dependency&lt;T,U&gt;</code></td>
 </tr>
 <tr>
 <td><code>Generator&lt;T&gt;::tupleWith&lt;U&gt;</code></td>
-<td><code>Generator&lt;ltt::tuple&lt;T,U&gt;&gt;</code></td>
+<td><code>Generator&lt;std::tuple&lt;T,U&gt;&gt;</code></td>
 <td><code>chain&lt;T,U&gt;</code></td>
 </tr>
 <tr>
-<td><code>Generator&lt;ltt::tuple&lt;Ts...&gt;&gt;::tupleWith&lt;U&gt;</code></td>
-<td><code>Generator&lt;ltt::tuple&lt;Ts...,U&gt;&gt;</code></td>
-<td><code>chain&lt;ltt::tuple&lt;Ts...&gt;,U&gt;</code></td>
+<td><code>Generator&lt;std::tuple&lt;Ts...&gt;&gt;::tupleWith&lt;U&gt;</code></td>
+<td><code>Generator&lt;std::tuple&lt;Ts...,U&gt;&gt;</code></td>
+<td><code>chain&lt;std::tuple&lt;Ts...&gt;,U&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1153,12 +1153,12 @@ Both of the combinators take base generator in the form of <code>Generator&lt;T&
 <li>
 <p><code>.map&lt;U&gt;(mapper)</code>: effectively calls <code>transform&lt;T,U&gt;(gen, transformer)</code> combinator on itself with type <code>T</code> and generator <code>gen</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// generator for strings of arbitrary number</span>
-<span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+<span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
 <span class="p">});</span>
 <span class="c1">// this is equivalent to:</span>
-<span class="n">transform</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
+<span class="n">transform</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
 </li>
@@ -1176,8 +1176,8 @@ Both of the combinators take base generator in the form of <code>Generator&lt;T&
 </li>
 <li>
 <p><code>.flatMap&lt;U&gt;(genUGen)</code>: based on generated result of the generator object itself, induces a new generator for type <code>U</code>. It's equivalent combinator is <code>derive&lt;T,U&gt;</code>. Difference to <code>.map&lt;U&gt;</code> (or <code>transform&lt;T,U&gt;</code>) is that you can have greater control on the resultant generator.</p>
-<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">flatMap</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">genString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">flatMap</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">genString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="w">    </span><span class="n">genString</span><span class="p">.</span><span class="n">setMaxSize</span><span class="p">(</span><span class="n">num</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">genString</span><span class="p">;</span>
 <span class="p">});</span>
@@ -1194,9 +1194,9 @@ Both of the combinators take base generator in the form of <code>Generator&lt;T&
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">filter</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 <span class="w">    </span><span class="p">});</span>
-<span class="p">}).</span><span class="n">tupleWith</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">ltt</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">tuple</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">tuple</span><span class="p">);</span>
-<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="p">}).</span><span class="n">tupleWith</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">tuple</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">tuple</span><span class="p">);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="w">    </span><span class="n">stringGen</span><span class="p">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">stringGen</span><span class="p">;</span>
 <span class="p">});</span>
@@ -1210,7 +1210,7 @@ Both of the combinators take base generator in the form of <code>Generator&lt;T&
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 29, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 15, 2023</span>
       
     
   </small>

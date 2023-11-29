@@ -9,10 +9,10 @@
         <meta name="description" content="C++ Property Testing">
       
       
-        <meta name="author" content="Won-Wook Hong">
+        <meta name="author" content="kindone">
       
       
-        <link rel="canonical" href="https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/ConcurrencyTesting/">
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/ConcurrencyTesting/">
       
       
         <link rel="prev" href="../StatefulTesting/">
@@ -163,13 +163,13 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
       </div>
@@ -209,13 +209,13 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
     </div>
@@ -509,43 +509,43 @@
 <p>Once you're familiar with <a href="../StatefulTesting/">stateful testing</a>, you can get acquainted with concurrent stateful testing easily.
 Concurrency testing performs interleaved state transitions using multiple threads in parallel. It allows us to see if any anomaly or breaking of requirement can be found in the tested component with concurrent accesses.</p>
 <p>Actually, a concurrency test is almost immediately achievable when you have prepared a stateful test for an object type.
-Following depicts a concurrent test for <code>ltt_adp::vector&lt;int&gt;</code> with <code>push_back(int)</code>, <code>pop_back()</code>, and <code>clear()</code> actions included.</p>
+Following depicts a concurrent test for <code>std::vector&lt;int&gt;</code> with <code>push_back(int)</code>, <code>pop_back()</code>, and <code>clear()</code> actions included.</p>
 <div class="highlight"><pre><span></span><code><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">proptest</span><span class="p">;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">proptest</span><span class="o">::</span><span class="nn">concurrent</span><span class="p">;</span>
 
 <span class="c1">// ...</span>
 
-<span class="k">auto</span><span class="w"> </span><span class="n">pushBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="p">](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">pushBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbi</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">().</span><span class="n">map</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">([](</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="p">](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">obj</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="w">    </span><span class="p">};</span>
 <span class="p">});</span>
 
-<span class="k">auto</span><span class="w"> </span><span class="n">popBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">([](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">popBackGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">obj</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="w">    </span><span class="n">obj</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="p">});</span>
 
-<span class="k">auto</span><span class="w"> </span><span class="n">clearGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">([](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">clearGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">just</span><span class="o">&lt;</span><span class="n">SimpleAction</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&gt;</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">obj</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="p">});</span>
 
-<span class="k">auto</span><span class="w"> </span><span class="n">actionListGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">actionListGenOf</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">pushBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">popBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">clearGen</span><span class="p">);</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">concurrentProp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">concurrency</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">actionListGen</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">actionListGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">actionListGenOf</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">pushBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">popBackGen</span><span class="p">,</span><span class="w"> </span><span class="n">clearGen</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">concurrentProp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">concurrency</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">Arbi</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(),</span><span class="w"> </span><span class="n">actionListGen</span><span class="p">);</span>
 <span class="n">concurrentProp</span><span class="p">.</span><span class="n">go</span><span class="p">();</span>
 </code></pre></div>
-<p>You may have noticed that, above test would lead to exceptions or crashes, as <code>ltt_adp::vector</code> is not made for concurrent writes, unless some synchronization mechanism is present.</p>
+<p>You may have noticed that, above test would lead to exceptions or crashes, as <code>std::vector</code> is not made for concurrent writes, unless some synchronization mechanism is present.</p>
 <p>You can also add a post-check to be performed after each concurrent test run, by setting a post-check function to concurrent property with <code>setPostCheck()</code> method:</p>
-<div class="highlight"><pre><span></span><code><span class="n">concurrentProp</span><span class="p">.</span><span class="n">setPostCheck</span><span class="p">([](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="n">concurrentProp</span><span class="p">.</span><span class="n">setPostCheck</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// ... post-check. perform some consistency check for obj</span>
 <span class="p">}).</span><span class="n">go</span><span class="p">();</span>
 
 <span class="c1">// variant with a model</span>
-<span class="n">concurrentProp</span><span class="p">.</span><span class="n">setPostCheck</span><span class="p">([](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">VectorModel</span><span class="o">&amp;</span><span class="w"> </span><span class="n">model</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="n">concurrentProp</span><span class="p">.</span><span class="n">setPostCheck</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">VectorModel</span><span class="o">&amp;</span><span class="w"> </span><span class="n">model</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// ... post-check. perform some consistency check for obj against model</span>
 <span class="p">}).</span><span class="n">go</span><span class="p">();</span>
 </code></pre></div>
@@ -558,7 +558,7 @@ Following depicts a concurrent test for <code>ltt_adp::vector&lt;int&gt;</code> 
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 29, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 20, 2023</span>
       
     
   </small>

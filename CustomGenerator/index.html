@@ -9,10 +9,10 @@
         <meta name="description" content="C++ Property Testing">
       
       
-        <meta name="author" content="Won-Wook Hong">
+        <meta name="author" content="kindone">
       
       
-        <link rel="canonical" href="https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/CustomGenerator/">
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/CustomGenerator/">
       
       
       
@@ -161,13 +161,13 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
       </div>
@@ -207,13 +207,13 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
     </div>
@@ -520,9 +520,9 @@
 <p>All generators, including the default ones, share the same base <em>function</em> type. A generator can be a callable (function, functor, or lambda) with following common signature:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// (Random&amp;) -&gt; Shrinkable&lt;T&gt;</span>
 </code></pre></div>
-<p>This can be represented as (or coerced to) a standard function type, <code>ltt_adp::function&lt;Shrinkable&lt;T&gt;(Random&amp;)&gt;</code>. In <code>cppproptest</code>, this function type is aliased as <code>GenFunction&lt;T&gt;</code>. We will use this term <em>GenFunction</em> throughout this page to refer the generator function type.</p>
+<p>This can be represented as (or coerced to) a standard function type, <code>std::function&lt;Shrinkable&lt;T&gt;(Random&amp;)&gt;</code>. In <code>cppproptest</code>, this function type is aliased as <code>GenFunction&lt;T&gt;</code>. We will use this term <em>GenFunction</em> throughout this page to refer the generator function type.</p>
 <div class="highlight"><pre><span></span><code><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">using</span><span class="w"> </span><span class="n">GenFunction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Random</span><span class="o">&amp;</span><span class="p">);</span>
+<span class="k">using</span><span class="w"> </span><span class="n">GenFunction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="n">Shrinkable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Random</span><span class="o">&amp;</span><span class="p">);</span>
 </code></pre></div>
 <p>By the way, you may have noticed a strange template type <code>Shrinkable</code> in this signature. You can refer to <a href="../Shrinking/"><code>Shrinkable</code></a> for its further detail, but it can be treated as a wrapper for type <code>T</code> for now. So a generator (<code>Generator&lt;T&gt;</code>) basically generates a value of type <code>T</code> from a random number generator of <code>Random</code> type. A generator can be defined as function, functor, or lambda, as following:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// lambda style</span>
@@ -564,7 +564,7 @@
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 29, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 1, 2023</span>
       
     
   </small>

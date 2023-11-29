@@ -9,10 +9,10 @@
         <meta name="description" content="C++ Property Testing">
       
       
-        <meta name="author" content="Won-Wook Hong">
+        <meta name="author" content="kindone">
       
       
-        <link rel="canonical" href="https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/">
+        <link rel="canonical" href="https://github.com/pages/kindone/cppproptest/">
       
       
       
@@ -163,13 +163,13 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
       </div>
@@ -209,13 +209,13 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.wdf.sap.corp/HANA-Kernel/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/kindone/cppproptest" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
-    HANA-Kernel/cppproptest
+    kindone/cppproptest
   </div>
 </a>
     </div>
@@ -498,7 +498,7 @@
 <h1 id="cppproptest">cppproptest<a class="headerlink" href="#cppproptest" title="Permanent link">&para;</a></h1>
 <p><img alt="cppproptest in a glance" src="images/overview.svg" /></p>
 <!--
-![Kroki](https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/images/kroki_generated/index-b92b62ec8918845d0801c080e32336c7.svg)
+![Kroki](https://github.com/pages/kindone/cppproptest/images/kroki_generated/index-af500c81426744bbc2e83406f97b72f4.svg)
 -->
 
 <p><code>cppproptest</code> is a property-based testing library for C++. It focuses on usability with features included:</p>
@@ -524,7 +524,7 @@
 <span class="n">ASSERT_EQ</span><span class="p">(</span><span class="s">&quot;Some dummy content that hopefully prove or disprove this works&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">decodedMsg</span><span class="p">);</span>
 </code></pre></div>
 <p>Even a simple test like this is confusing, as some dummy string value seems like as if it's playing a significant role in the test but in fact it isn't. Turning this dummy value to a free variable would lead to greater generalization of the test:</p>
-<div class="highlight"><pre><span></span><code><span class="hll"><span class="p">[](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">originalMsg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="hll"><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">originalMsg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">    </span><span class="c1">// a text encoded and then decoded must be identical to originalMsg</span>
 <span class="w">    </span><span class="n">MyEncoder</span><span class="w"> </span><span class="n">encoder</span><span class="p">;</span>
 <span class="w">    </span><span class="n">MyDecoder</span><span class="w"> </span><span class="n">decoder</span><span class="p">;</span>
@@ -535,7 +535,7 @@
 </span></code></pre></div>
 <p>The new free variable <code>originalMsg</code> becomes the variant part (<strong>input domain</strong>) of the test while the rest becomes the invariant part.</p>
 <p>In order to turn this into a concrete test run, we can feed in some random values for the free variable <code>originalMsg</code>. This can be achieved by enclosing this function with <code>forAll()</code> function, which calls the given test function many times with some randomly generated values for the free variable <code>originalMsg</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="hll"><span class="n">forAll</span><span class="p">([](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">originalMsg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="hll"><span class="n">forAll</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">originalMsg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span class="w">    </span><span class="c1">// a text encoded and then decoded must be identical to original</span>
 <span class="w">    </span><span class="n">MyEncoder</span><span class="w"> </span><span class="n">encoder</span><span class="p">;</span>
 <span class="w">    </span><span class="n">MyDecoder</span><span class="w"> </span><span class="n">decoder</span><span class="p">;</span>
@@ -551,25 +551,25 @@
 <p>Following example shows how certain input domain of string type can be specified using a built-in generator and generator combinators:</p>
 <p><img alt="Custom Generator" src="images/customgenerator.svg" /></p>
 <!--
-![Kroki](https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/images/kroki_generated/index-da29ebe613d938492ad55896c9267c5f.svg)
+![Kroki](https://github.com/pages/kindone/cppproptest/images/kroki_generated/index-9eb408dad9511f52242c3268b8280321.svg)
 -->
 
 <div class="highlight"><pre><span></span><code><span class="c1">// a tailored string generator</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">stringGen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arbitrary</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">()</span>
 <span class="w">    </span><span class="p">.</span><span class="n">filter</span><span class="p">([]</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// even numbers only</span>
 <span class="w">    </span><span class="p">.</span><span class="n">map</span><span class="p">([]</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">numStr</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// string like &quot;&lt;0&gt;&quot;, ..., &quot;&lt;n&gt;&quot;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">numStr</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// string like &quot;&lt;0&gt;&quot;, ..., &quot;&lt;n&gt;&quot;</span>
 <span class="w">    </span><span class="p">});</span>
 
 <span class="c1">// property</span>
-<span class="n">forAll</span><span class="p">([](</span><span class="n">ltt_adp</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">original</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="n">forAll</span><span class="p">([](</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">original</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// ... //</span>
 <span class="p">},</span><span class="w"> </span><span class="n">stringGen</span><span class="p">);</span>
 </code></pre></div>
 <p>The <code>forAll</code> function automatically identifies parameter types of the given property function. This automation allows any number of parameters of simple or complex types to be used to define a property-based test:</p>
 <p><img alt="overview" src="images/forall.svg" /></p>
 <!--
-![Kroki](https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/images/kroki_generated/index-15ec6a485588b51fc3432be3adbea1f5.svg)
+![Kroki](https://github.com/pages/kindone/cppproptest/images/kroki_generated/index-15ec6a485588b51fc3432be3adbea1f5.svg)
 -->
 
 <p>It then automatically feeds in the randomly generated values of those types to call the given function multiple times. With this powerful generation engine, we can fully parameterize and randomize our tests with high flexibility but with much less effort.</p>
@@ -577,7 +577,7 @@
 <!--
 ## Reusability and Scalability
 
-![Kroki](https://github.wdf.sap.corp/pages/HANA-Kernel/cppproptest/images/kroki_generated/index-ef41fd2e6f4a7b0fd4e0082a6d5cee8a.svg)
+![Kroki](https://github.com/pages/kindone/cppproptest/images/kroki_generated/index-ef41fd2e6f4a7b0fd4e0082a6d5cee8a.svg)
 
 -->
 
@@ -603,7 +603,7 @@
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 29, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">April 23, 2023</span>
       
     
   </small>
