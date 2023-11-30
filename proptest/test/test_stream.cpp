@@ -1,9 +1,6 @@
-
+#include "proptest/proptest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "Random.hpp"
-#include "Stream.hpp"
-#include "../util/std.hpp"
 
 class StreamTestCase : public ::testing::Test {
 };

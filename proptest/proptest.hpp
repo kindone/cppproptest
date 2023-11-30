@@ -5,6 +5,8 @@
 #include "util/invokeWithArgs.hpp"
 #include "util/invokeWithGenTuple.hpp"
 #include "util/createGenTuple.hpp"
+#include "util/unicode.hpp"
+#include "util/bitmap.hpp"
 #include "generators.hpp"
 #include "Property.hpp"
 

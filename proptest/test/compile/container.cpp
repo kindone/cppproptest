@@ -1,8 +1,6 @@
-#include "proptest.hpp"
+#include "proptest/proptest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "Random.hpp"
-
 
 template <typename T>
 class ContainerTest : public testing::Test {

@@ -1,6 +1,6 @@
-#include "proptest.hpp"
-#include "./stateful/stateful_class.hpp"
-#include "./stateful/stateful_function.hpp"
+#include "proptest/proptest.hpp"
+#include "proptest/stateful/stateful_class.hpp"
+#include "proptest/stateful/stateful_function.hpp"
 
 /**
  * @file statefultest.hpp

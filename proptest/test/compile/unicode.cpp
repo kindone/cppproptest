@@ -1,9 +1,6 @@
-#include "proptest.hpp"
+#include "proptest/proptest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "Random.hpp"
-#include "util/unicode.hpp"
-#include "generator/unicode.hpp"
 
 using namespace proptest;
 

@@ -1,8 +1,6 @@
-#include "statefultest.hpp"
+#include "proptest/statefultest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "Random.hpp"
-#include "../util/std.hpp"
 
 using namespace proptest;
 using namespace proptest::stateful;

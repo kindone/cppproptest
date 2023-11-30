@@ -1,5 +1,4 @@
 #include "testbase.hpp"
-#include "generator/unicode.hpp"
 
 using namespace proptest;
 

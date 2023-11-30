@@ -1,13 +1,8 @@
 #pragma once
-#include "proptest.hpp"
+#include "proptest/proptest.hpp"
 #include "googletest/googletest/include/gtest/gtest.h"
 #include "googletest/googlemock/include/gmock/gmock.h"
-#include "Random.hpp"
-#include "util/utf8string.hpp"
-#include "util/utf16string.hpp"
-#include "util/cesu8string.hpp"
 
-#include "../util/std.hpp"
 #include <chrono>
 
 #include <time.h>

@@ -1,8 +1,4 @@
 #include "testbase.hpp"
-#include "util/utf8string.hpp"
-#include "util/utf16string.hpp"
-#include "util/cesu8string.hpp"
-#include "util/unicode.hpp"
 
 double getTime()
 {
