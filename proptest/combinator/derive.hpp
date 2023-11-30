@@ -21,7 +21,7 @@ namespace util {
 
 template <typename T, typename U>
 struct DeriveConstCastFunctor {
-    DeriveConstCastFunctor(function<GenFunction<U>(T&)> gen2gen) : gen2gen(gen2gen) {}
+    DeriveConstCastFunctor(function<GenFunction<U>(T&)> _gen2gen) : gen2gen(_gen2gen) {}
 
     Generator<U> operator()(const T& t) { return gen2gen(const_cast<T&>(t)); }
 
@@ -30,8 +30,8 @@ struct DeriveConstCastFunctor {
 
 template <typename T, typename U>
 struct DeriveIntermediateFunctor {
-    DeriveIntermediateFunctor(Random& rand, shared_ptr<function<Generator<U>(const T&)>> gen2genPtr)
-        : rand(rand), gen2genPtr(gen2genPtr) {}
+    DeriveIntermediateFunctor(Random& _rand, shared_ptr<function<Generator<U>(const T&)>> _gen2genPtr)
+        : rand(_rand), gen2genPtr(_gen2genPtr) {}
 
     Shrinkable<U> operator()(const T& t) {
         // generate U
@@ -46,8 +46,8 @@ struct DeriveIntermediateFunctor {
 
 template <typename T, typename U>
 struct DeriveFunctor {
-    DeriveFunctor(shared_ptr<GenFunction<T>> gen1Ptr, shared_ptr<function<Generator<U>(const T&)>> gen2genPtr)
-        : gen1Ptr(gen1Ptr), gen2genPtr(gen2genPtr) {}
+    DeriveFunctor(shared_ptr<GenFunction<T>> _gen1Ptr, shared_ptr<function<Generator<U>(const T&)>> _gen2genPtr)
+        : gen1Ptr(_gen1Ptr), gen2genPtr(_gen2genPtr) {}
 
     Shrinkable<U> operator()(Random& rand) {
         // generate T

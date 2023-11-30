@@ -271,7 +271,7 @@ namespace util {
 
 template <typename T, typename U>
 struct AnyFunctionFunc {
-    AnyFunctionFunc(function<U(const T&)> inFunc) : inFunc(inFunc) { }
+    AnyFunctionFunc(function<U(const T&)> _inFunc) : inFunc(_inFunc) { }
     Any operator()(const Any& a) {
         return inFunc(a.cast<T>());
     }
@@ -281,7 +281,7 @@ struct AnyFunctionFunc {
 
 template <typename T, typename U>
 struct ShrinkableAnyFunctionFunc {
-    ShrinkableAnyFunctionFunc(function<Shrinkable<U>(const T&)> inFunc) : inFunc(inFunc) { }
+    ShrinkableAnyFunctionFunc(function<Shrinkable<U>(const T&)> _inFunc) : inFunc(_inFunc) { }
     ShrinkableAny operator()(const Any& a) {
         return inFunc(a.cast<T>());
     }
@@ -291,7 +291,7 @@ struct ShrinkableAnyFunctionFunc {
 
 template <typename T, typename U>
 struct ShrinkableAnyFunction1Func {
-    ShrinkableAnyFunction1Func(function<Shrinkable<U>(const Shrinkable<T>&)> inFunc) : inFunc(inFunc) { }
+    ShrinkableAnyFunction1Func(function<Shrinkable<U>(const Shrinkable<T>&)> _inFunc) : inFunc(_inFunc) { }
     ShrinkableAny operator()(const ShrinkableAny& shr) {
         return inFunc(shr.as<T>());
     }
@@ -301,7 +301,7 @@ struct ShrinkableAnyFunction1Func {
 
 template <typename T>
 struct BoolFunctionFunc {
-    BoolFunctionFunc(function<bool(const T&)> inFunc) : inFunc(inFunc) { }
+    BoolFunctionFunc(function<bool(const T&)> _inFunc) : inFunc(_inFunc) { }
     bool operator()(const Any& a) {
         return inFunc(a.cast<T>());
     }
@@ -311,7 +311,7 @@ struct BoolFunctionFunc {
 
 template <typename T>
 struct StreamFunctionFunc {
-    StreamFunctionFunc(function<Stream(const Shrinkable<T>&)> inFunc) : inFunc(inFunc) { }
+    StreamFunctionFunc(function<Stream(const Shrinkable<T>&)> _inFunc) : inFunc(_inFunc) { }
     Stream operator()(const ShrinkableAny& shr) {
         return inFunc(shr.as<T>());
     }

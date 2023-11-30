@@ -27,7 +27,7 @@ namespace util {
 template <typename T, typename U>
 struct ChainCastFunctor
 {
-    ChainCastFunctor(const function<GenFunction<U>(T&)>& gen2gen) : gen2gen(gen2gen) {}
+    ChainCastFunctor(const function<GenFunction<U>(T&)>& _gen2gen) : gen2gen(_gen2gen) {}
 
     GenFunction<U> operator()(const T& t) { return gen2gen(const_cast<T&>(t)); }
 
@@ -36,8 +36,8 @@ struct ChainCastFunctor
 
 template <typename T, typename U>
 struct ChainInterFunctor {
-    ChainInterFunctor(Random& rand, shared_ptr<function<GenFunction<U>(const T&)>> gen2genPtr)
-        : rand(rand), gen2genPtr(gen2genPtr) {}
+    ChainInterFunctor(Random& _rand, shared_ptr<function<GenFunction<U>(const T&)>> _gen2genPtr)
+        : rand(_rand), gen2genPtr(_gen2genPtr) {}
 
     Shrinkable<pair<T, Shrinkable<U>>> operator()(const T& t) {
         // generate U
@@ -52,8 +52,8 @@ struct ChainInterFunctor {
 
 template <typename T, typename U>
 struct ChainFunctor {
-    ChainFunctor(shared_ptr<GenFunction<T>> gen1Ptr, shared_ptr<function<GenFunction<U>(const T&)>> gen2genPtr)
-        : gen1Ptr(gen1Ptr), gen2genPtr(gen2genPtr) {}
+    ChainFunctor(shared_ptr<GenFunction<T>> _gen1Ptr, shared_ptr<function<GenFunction<U>(const T&)>> _gen2genPtr)
+        : gen1Ptr(_gen1Ptr), gen2genPtr(_gen2genPtr) {}
 
     Shrinkable<Chain<T, U>> operator()(Random& rand) {
         // generate T

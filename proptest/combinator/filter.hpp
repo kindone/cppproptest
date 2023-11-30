@@ -20,7 +20,7 @@ namespace util {
 template <typename T, typename Criteria>
 struct FilterCastFunctor
 {
-    FilterCastFunctor(const Criteria& criteria) : criteria(criteria) {}
+    FilterCastFunctor(const Criteria& _criteria) : criteria(_criteria) {}
 
     bool operator()(const Any& a) {
         return criteria(a.cast<T>());
@@ -32,8 +32,8 @@ struct FilterCastFunctor
 template <typename T>
 struct FilterFunctor
 {
-    FilterFunctor(shared_ptr<GenFunction<T>> genPtr, shared_ptr<function<bool(const Any&)>> criteriaPtr)
-        : genPtr(genPtr), criteriaPtr(criteriaPtr) {}
+    FilterFunctor(shared_ptr<GenFunction<T>> _genPtr, shared_ptr<function<bool(const Any&)>> _criteriaPtr)
+        : genPtr(_genPtr), criteriaPtr(_criteriaPtr) {}
 
     Shrinkable<T> operator()(Random& rand) {
         // TODO: add some configurable termination criteria (e.g. maximum no. of attempts)

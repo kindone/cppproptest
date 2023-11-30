@@ -21,7 +21,7 @@ namespace util {
 
 template <typename T, typename U>
 struct TransformFunctor1 {
-    TransformFunctor1(function<U(T&)> transformer) : transformer(transformer) { }
+    TransformFunctor1(function<U(T&)> _transformer) : transformer(_transformer) { }
 
     Any operator()(const Any& a) {
         return Any(transformer(a.cast<T>()));
@@ -32,8 +32,8 @@ struct TransformFunctor1 {
 
 template <typename T, typename U>
 struct TransformFunctor2 {
-    TransformFunctor2(shared_ptr<GenFunction<T>> genPtr, shared_ptr<function<Any(const Any&)>> transformerPtr)
-        : genPtr(genPtr), transformerPtr(transformerPtr) {}
+    TransformFunctor2(shared_ptr<GenFunction<T>> _genPtr, shared_ptr<function<Any(const Any&)>> _transformerPtr)
+        : genPtr(_genPtr), transformerPtr(_transformerPtr) {}
 
     Shrinkable<U> operator()(Random& rand) {
         Shrinkable<T> shrinkable = (*genPtr)(rand);
