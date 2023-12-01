@@ -154,7 +154,7 @@ template <typename T, typename... GENS>
 decltype(auto) unionOf(GENS&&... gens)
 {
     static_assert(
-        conjunction_v<std::bool_constant<(is_convertible_v<GENS, function<Shrinkable<T>(Random&)>> ||
+        conjunction_v<bool_constant<(is_convertible_v<GENS, function<Shrinkable<T>(Random&)>> ||
                                           is_convertible_v<GENS, util::Weighted<T>>)>...>,
         "A GENS must be a generator callable for T (GenFunction<T> or Random& -> Shrinkable<T>) or a WeightGen<T>");
     return oneOf(util::forward<GENS>(gens)...);
