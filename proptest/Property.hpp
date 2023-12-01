@@ -444,7 +444,7 @@ function<bool(ARGS...)> functionWithBoolResultHelper(
 
 template <typename Callable, typename ...ARGS>
 struct BoolResultFunctor {
-    BoolResultFunctor(Callable&& callable) : callable(callable) {}
+    BoolResultFunctor(Callable&& _callable) : callable(_callable) {}
 
     bool operator()(ARGS&&... args) {
         callable(util::forward<ARGS>(args)...);
