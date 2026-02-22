@@ -1,5 +1,8 @@
 # cppproptest
 
+> !!! This repository is no longer maintained.
+> See new iteration of the project in [cppproptest2](https://github.com/kindone/cppproptest2/)
+
 ![cppproptest in a glance](docs/images/overview.svg)
 
 `cppproptest` is a property-based testing library for C++. It focuses on usability with features included:
